@@ -1,0 +1,15 @@
+{
+  "name": "taqtix-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Event Growth Infrastructure — Sell Tickets. Build Audience. Grow Events.",
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "db:migrate": "pnpm --filter backend prisma migrate dev",
+    "db:studio": "pnpm --filter backend prisma studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,229 @@
+// Hal ini merupakan konfigurasi database engine menggunakan PostgreSQL
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Hal ini menghasilkan Prisma Client untuk digunakan di NestJS
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --- ENUMS ---
+
+/// Status pesanan tiket pembeli.
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+/// Status e-ticket individual.
+enum TicketStatus {
+  ISSUED
+  CHECKED_IN
+  CANCELLED
+}
+
+/// Status pembayaran transaksi.
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  EXPIRE
+  FAIL
+}
+
+/// Status kelayakan event.
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+/// Tipe mitra afiliasi distributor tiket.
+enum PartnerType {
+  AMBASSADOR
+  COMMUNITY
+  INFLUENCER
+  MEDIA
+}
+
+// --- MODELS ---
+
+/// Model User untuk otentikasi dan identifikasi role global.
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  role         String      // 'buyer' | 'organizer' | 'gate_staff' | 'partner' | 'admin'
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  organizer    Organizer?
+  checkedTickets Ticket[]   @relation("CheckedByRelation")
+}
+
+/// Profil tambahan bagi user dengan role 'organizer'.
+model Organizer {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  name        String
+  slug        String   @unique
+  bankAccount String?  // Informasi rekening bank organizer untuk pembayaran
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events      Event[]
+}
+
+/// Representasi dari suatu Event / Acara.
+model Event {
+  id          String      @id @default(uuid())
+  organizerId String
+  title       String
+  slug        String      @unique
+  description String?     @db.Text
+  location    String
+  startDate   DateTime
+  endDate     DateTime
+  status      EventStatus @default(DRAFT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  organizer   Organizer   @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  ticketTypes TicketType[]
+  orders      Order[]
+  promoCodes  PromoCode[]
+  partners    AffiliatePartner[]
+}
+
+/// Tipe/Kategori Tiket yang tersedia pada suatu event.
+model TicketType {
+  id        String   @id @default(uuid())
+  eventId   String
+  name      String
+  price     Float
+  quota     Int
+  soldCount Int      @default(0)
+  saleStart DateTime
+  saleEnd   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  tickets   Ticket[]
+}
+
+/// Model Order transaksi pembelian tiket.
+model Order {
+  id                 String            @id @default(uuid())
+  buyerEmail         String
+  buyerName          String
+  eventId            String
+  totalAmount        Float
+  status             OrderStatus       @default(PENDING)
+  promoCodeId        String?
+  affiliatePartnerId String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  event            Event             @relation(fields: [eventId], references: [id])
+  promoCode        PromoCode?        @relation(fields: [promoCodeId], references: [id])
+  affiliatePartner AffiliatePartner? @relation(fields: [affiliatePartnerId], references: [id])
+  orderItems       OrderItem[]
+  tickets          Ticket[]
+  payment          Payment?
+}
+
+/// Rincian item tiket di dalam satu pemesanan / Order.
+model OrderItem {
+  id           String   @id @default(uuid())
+  orderId      String
+  ticketTypeId String
+  qty          Int
+  price        Float
+  createdAt    DateTime @default(now())
+
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+}
+
+/// Lembaran tiket fisik digital (e-ticket) yang sah untuk check-in.
+model Ticket {
+  id           String       @id @default(uuid())
+  code         String       @unique // QR payload signed (HMAC)
+  orderId      String
+  ticketTypeId String
+  status       TicketStatus @default(ISSUED)
+  checkedInAt  DateTime?
+  checkedInBy  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+  staff      User?      @relation("CheckedByRelation", fields: [checkedInBy], references: [id])
+}
+
+/// Log transaksi pembayaran via payment gateway.
+model Payment {
+  id         String        @id @default(uuid())
+  orderId    String        @unique
+  gatewayRef String?       // Referensi kode transaksi dari Midtrans/Xendit
+  amount     Float
+  status     PaymentStatus @default(PENDING)
+  paidAt     DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  order      Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+/// Kode promo diskon harga tiket yang dibuat oleh organizer.
+model PromoCode {
+  id        String   @id @default(uuid())
+  eventId   String
+  code      String   @unique
+  discount  Float    // Persentase atau nominal diskon
+  maxUsage  Int
+  usedCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orders    Order[]
+}
+
+/// Partner afiliasi yang membantu penjualan tiket event.
+model AffiliatePartner {
+  id          String      @id @default(uuid())
+  eventId     String
+  name        String
+  type        PartnerType
+  uniqueLink  String      @unique
+  promoCode   String?     // Kode promo khusus yang diasosiasikan dengan partner
+  totalClicks Int         @default(0)
+  totalSales  Int         @default(0)
+  commission  Float       @default(0.0) // Total komisi terkumpul
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orders    Order[]
+  clicks    Click[]
+}
+
+/// Log pelacakan klik link afiliasi oleh pengunjung (utm tracking).
+model Click {
+  id        String   @id @default(uuid())
+  partnerId String
+  utmSource String?
+  utmMedium String?
+  clickedAt DateTime @default(now())
+  ipHash    String   // Hash IP address pengunjung untuk deduplikasi klik
+
+  partner   AffiliatePartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}

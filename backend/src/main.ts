@@ -1,15 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, HttpStatus } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // 1. Terapkan prefix routing global
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('v1');
 
   // 2. Keamanan: Aktifkan Helmet & CORS
   app.use(helmet());
@@ -24,13 +25,17 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     }),
   );
 
   // 4. Global Exception Filter untuk standarisasi format response error
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  // 5. Setup Swagger Auto-Documentation
+  // 5. Global Response Interceptor untuk standarisasi format response sukses
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // 6. Setup Swagger Auto-Documentation
   const config = new DocumentBuilder()
     .setTitle('TAQtix REST API')
     .setDescription('Dokumentasi API Core Engine Ticketing & Afiliasi TAQtix')
@@ -39,12 +44,12 @@ async function bootstrap() {
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('docs', app, document);
 
-  // 6. Jalankan server pada port terkonfigurasi
-  const port = process.env.PORT ?? 3001;
+  // 7. Jalankan server pada port terkonfigurasi
+  const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`TAQtix Backend berjalan pada: http://localhost:${port}/api/v1`);
-  console.log(`Dokumentasi API (Swagger) tersedia di: http://localhost:${port}/api/docs`);
+  console.log(`TAQtix Backend berjalan pada: http://localhost:${port}/v1`);
+  console.log(`Dokumentasi API (Swagger) tersedia di: http://localhost:${port}/docs`);
 }
 bootstrap();

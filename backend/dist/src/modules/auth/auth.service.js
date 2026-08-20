@@ -104,6 +104,22 @@ let AuthService = class AuthService {
         }
         return this.generateTokenPair(user.id, user.email, user.role);
     }
+    async gateLogin(dto) {
+        const user = await this.prisma.user.findUnique({
+            where: { email: dto.email },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('Kredensial login salah');
+        }
+        const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+        if (!passwordMatches) {
+            throw new common_1.UnauthorizedException('Kredensial login salah');
+        }
+        if (user.role !== 'gate_staff') {
+            throw new common_1.UnauthorizedException('Akses ditolak: Hanya untuk gate_staff');
+        }
+        return this.generateTokenPair(user.id, user.email, user.role);
+    }
     async refresh(dto) {
         try {
             const payload = await this.jwtService.verifyAsync(dto.refreshToken, {
@@ -123,6 +139,29 @@ let AuthService = class AuthService {
     }
     async logout() {
         return { message: 'Logout berhasil' };
+    }
+    async getMe(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                createdAt: true,
+                organizer: {
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        bankAccount: true,
+                    },
+                },
+            },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('Pengguna tidak ditemukan');
+        }
+        return user;
     }
     async generateTokenPair(userId, email, role) {
         const payload = { sub: userId, email, role };

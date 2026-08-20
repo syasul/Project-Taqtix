@@ -15,13 +15,14 @@ generator client {
 enum OrderStatus {
   PENDING
   PAID
+  EXPIRED
   CANCELLED
   REFUNDED
 }
 
 /// Status e-ticket individual.
 enum TicketStatus {
-  ISSUED
+  VALID
   CHECKED_IN
   CANCELLED
 }
@@ -30,14 +31,15 @@ enum TicketStatus {
 enum PaymentStatus {
   PENDING
   SUCCESS
-  EXPIRE
-  FAIL
+  FAILED
+  EXPIRED
 }
 
 /// Status kelayakan event.
 enum EventStatus {
   DRAFT
   PUBLISHED
+  ENDED
   CANCELLED
 }
 
@@ -46,7 +48,7 @@ enum PartnerType {
   AMBASSADOR
   COMMUNITY
   INFLUENCER
-  MEDIA
+  CORPORATE
 }
 
 // --- MODELS ---
@@ -60,8 +62,11 @@ model User {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   
-  organizer    Organizer?
-  checkedTickets Ticket[]   @relation("CheckedByRelation")
+  organizer            Organizer?
+  orders               Order[]
+  checkedTickets       Ticket[]           @relation("CheckedByRelation")
+  gateStaffAssignments GateStaff[]
+  scanLogs             ScanLog[]
 }
 
 /// Profil tambahan bagi user dengan role 'organizer'.
@@ -80,99 +85,111 @@ model Organizer {
 
 /// Representasi dari suatu Event / Acara.
 model Event {
-  id          String      @id @default(uuid())
-  organizerId String
-  title       String
-  slug        String      @unique
-  description String?     @db.Text
-  location    String
-  startDate   DateTime
-  endDate     DateTime
-  status      EventStatus @default(DRAFT)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id               String            @id @default(uuid())
+  organizerId      String
+  title            String
+  slug             String            @unique
+  description      String?           @db.Text
+  bannerUrl        String            @default("")
+  location         String
+  startDate        DateTime
+  endDate          DateTime
+  status           EventStatus       @default(DRAFT)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
-  organizer   Organizer   @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  ticketTypes TicketType[]
-  orders      Order[]
-  promoCodes  PromoCode[]
-  partners    AffiliatePartner[]
+  organizer        Organizer         @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  ticketCategories TicketCategory[]
+  orders           Order[]
+  promoCodes       PromoCode[]
+  partners         Partner[]
+  gateStaffs       GateStaff[]
+  workforceMembers WorkforceMember[]
+  tickets          Ticket[]
 }
 
-/// Tipe/Kategori Tiket yang tersedia pada suatu event.
-model TicketType {
-  id        String   @id @default(uuid())
-  eventId   String
-  name      String
-  price     Float
-  quota     Int
-  soldCount Int      @default(0)
-  saleStart DateTime
-  saleEnd   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/// Kategori/Tipe Tiket yang tersedia pada suatu event.
+model TicketCategory {
+  id          String   @id @default(uuid())
+  eventId     String
+  name        String
+  price       Float
+  quota       Int
+  sold        Int      @default(0)
+  maxPerOrder Int      @default(5)
+  saleStartAt DateTime
+  saleEndAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
-  tickets   Ticket[]
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
 }
 
 /// Model Order transaksi pembelian tiket.
 model Order {
-  id                 String            @id @default(uuid())
-  buyerEmail         String
-  buyerName          String
-  eventId            String
-  totalAmount        Float
-  status             OrderStatus       @default(PENDING)
-  promoCodeId        String?
-  affiliatePartnerId String?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
+  id             String            @id @default(uuid())
+  eventId        String
+  buyerId        String
+  totalAmount    Float
+  discountAmount Float             @default(0.0)
+  status         OrderStatus       @default(PENDING)
+  promoCodeId    String?
+  partnerId      String?
+  createdAt      DateTime          @default(now())
+  expiredAt      DateTime
+  updatedAt      DateTime          @updatedAt
 
-  event            Event             @relation(fields: [eventId], references: [id])
-  promoCode        PromoCode?        @relation(fields: [promoCodeId], references: [id])
-  affiliatePartner AffiliatePartner? @relation(fields: [affiliatePartnerId], references: [id])
-  orderItems       OrderItem[]
-  tickets          Ticket[]
-  payment          Payment?
+  event          Event             @relation(fields: [eventId], references: [id])
+  buyer          User              @relation(fields: [buyerId], references: [id])
+  promoCode      PromoCode?        @relation(fields: [promoCodeId], references: [id])
+  partner        Partner?          @relation(fields: [partnerId], references: [id])
+  orderItems     OrderItem[]
+  payment        Payment?
 }
 
 /// Rincian item tiket di dalam satu pemesanan / Order.
 model OrderItem {
-  id           String   @id @default(uuid())
-  orderId      String
-  ticketTypeId String
-  qty          Int
-  price        Float
-  createdAt    DateTime @default(now())
+  id               String         @id @default(uuid())
+  orderId          String
+  ticketCategoryId String
+  qty              Int
+  unitPrice        Float
+  attendeeName     String
+  attendeeEmail    String
+  attendeePhone    String
+  createdAt        DateTime       @default(now())
 
-  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketCategory   TicketCategory @relation(fields: [ticketCategoryId], references: [id])
+  tickets          Ticket[]
 }
 
 /// Lembaran tiket fisik digital (e-ticket) yang sah untuk check-in.
 model Ticket {
   id           String       @id @default(uuid())
-  code         String       @unique // QR payload signed (HMAC)
-  orderId      String
-  ticketTypeId String
-  status       TicketStatus @default(ISSUED)
+  orderItemId  String
+  eventId      String
+  qrPayload    String       @unique // Signed JWT format
+  status       TicketStatus @default(VALID)
   checkedInAt  DateTime?
   checkedInBy  String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
-  staff      User?      @relation("CheckedByRelation", fields: [checkedInBy], references: [id])
+  orderItem    OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  staff        User?        @relation("CheckedByRelation", fields: [checkedInBy], references: [id])
+  scanLogs     ScanLog[]
 }
 
 /// Log transaksi pembayaran via payment gateway.
 model Payment {
   id         String        @id @default(uuid())
   orderId    String        @unique
-  gatewayRef String?       // Referensi kode transaksi dari Midtrans/Xendit
+  provider   String        @default("midtrans") // "midtrans" | "xendit"
+  snapToken  String?       // Token Snap Midtrans
+  externalId String?       // Referensi kode transaksi dari Midtrans/Xendit (gatewayRef)
   amount     Float
   status     PaymentStatus @default(PENDING)
   paidAt     DateTime?
@@ -198,22 +215,25 @@ model PromoCode {
 }
 
 /// Partner afiliasi yang membantu penjualan tiket event.
-model AffiliatePartner {
-  id          String      @id @default(uuid())
-  eventId     String
-  name        String
-  type        PartnerType
-  uniqueLink  String      @unique
-  promoCode   String?     // Kode promo khusus yang diasosiasikan dengan partner
-  totalClicks Int         @default(0)
-  totalSales  Int         @default(0)
-  commission  Float       @default(0.0) // Total komisi terkumpul
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+model Partner {
+  id               String      @id @default(uuid())
+  eventId          String
+  name             String
+  type             PartnerType
+  uniqueCode       String      @unique
+  promoCode        String?     // Kode promo khusus yang diasosiasikan dengan partner
+  commissionType   String      @default("percentage") // "percentage" | "fixed"
+  commissionValue  Float       @default(10.0)
+  clicks           Int         @default(0)
+  conversions      Int         @default(0)
+  revenueGenerated Float       @default(0.0)
+  commissionEarned Float       @default(0.0)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
-  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  orders    Order[]
-  clicks    Click[]
+  event            Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orders           Order[]
+  clicksList       Click[]
 }
 
 /// Log pelacakan klik link afiliasi oleh pengunjung (utm tracking).
@@ -225,5 +245,50 @@ model Click {
   clickedAt DateTime @default(now())
   ipHash    String   // Hash IP address pengunjung untuk deduplikasi klik
 
-  partner   AffiliatePartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  partner   Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
 }
+
+// Penugasan staff pintu masuk untuk melakukan check-in tiket
+model GateStaff {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  gateName  String
+  createdAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+// Log validasi/scan tiket masuk untuk check-in
+model ScanLog {
+  id          String   @id @default(uuid())
+  ticketId    String
+  scannedById String
+  result      String   // VALID, DUPLICATE, INVALID
+  scannedAt   DateTime @default(now())
+  synced      Boolean  @default(true)
+
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  scannedBy   User     @relation(fields: [scannedById], references: [id], onDelete: Cascade)
+}
+
+// Model untuk Workforce Member (Phase 2 Operate)
+model WorkforceMember {
+  id        String   @id @default(uuid())
+  eventId   String
+  name      String
+  phone     String
+  division  String
+  role      String
+  shiftId   String
+  qrPayload String
+  status    String   // "not_checked_in" | "present" | "late" | "checked_out"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+

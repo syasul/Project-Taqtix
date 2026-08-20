@@ -1,10 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 /**
  * Controller untuk menangani routing otentikasi user platform TAQtix.
@@ -35,6 +36,16 @@ export class AuthController {
   }
 
   @Public()
+  @Post('gate-login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Masuk log khusus gate staff' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Login berhasil, mengembalikan token JWT.' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Kredensial login salah atau bukan gate staff.' })
+  async gateLogin(@Body() dto: LoginDto) {
+    return this.authService.gateLogin(dto);
+  }
+
+  @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mendapatkan access token baru menggunakan refresh token' })
@@ -42,6 +53,15 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Refresh token tidak valid atau kedaluwarsa.' })
   async refresh(@Body() dto: RefreshDto) {
     return this.authService.refresh(dto);
+  }
+
+  @Get('me')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan data profil user yang sedang login' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Profil berhasil didapatkan.' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Token tidak valid atau kedaluwarsa.' })
+  async me(@CurrentUser('id') userId: string) {
+    return this.authService.getMe(userId);
   }
 
   @Post('logout')

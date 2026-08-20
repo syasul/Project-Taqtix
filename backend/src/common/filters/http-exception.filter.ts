@@ -32,24 +32,32 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const resObj = exceptionResponse as any;
         message = resObj.message || message;
         details = resObj.error || resObj.details || undefined;
+        code = resObj.code || code;
         
-        // Peta kode error berdasarkan HTTP status
-        if (status === HttpStatus.BAD_REQUEST) {
-          code = 'BAD_REQUEST';
-          // Jika ini hasil validasi class-validator (array of string)
-          if (Array.isArray(resObj.message)) {
+        // Peta kode error berdasarkan HTTP status jika kode belum diset secara eksplisit
+        if (!resObj.code) {
+          if (status === HttpStatus.BAD_REQUEST) {
+            code = 'BAD_REQUEST';
+            if (Array.isArray(resObj.message)) {
+              code = 'VALIDATION_ERROR';
+              message = 'Validasi input gagal';
+              details = resObj.message;
+            }
+          } else if (status === HttpStatus.UNPROCESSABLE_ENTITY) {
             code = 'VALIDATION_ERROR';
-            message = 'Validasi input gagal';
-            details = resObj.message;
+            if (Array.isArray(resObj.message)) {
+              message = 'Validasi input gagal';
+              details = resObj.message;
+            }
+          } else if (status === HttpStatus.UNAUTHORIZED) {
+            code = 'UNAUTHORIZED';
+          } else if (status === HttpStatus.FORBIDDEN) {
+            code = 'FORBIDDEN';
+          } else if (status === HttpStatus.NOT_FOUND) {
+            code = 'NOT_FOUND';
+          } else if (status === HttpStatus.CONFLICT) {
+            code = 'CONFLICT';
           }
-        } else if (status === HttpStatus.UNAUTHORIZED) {
-          code = 'UNAUTHORIZED';
-        } else if (status === HttpStatus.FORBIDDEN) {
-          code = 'FORBIDDEN';
-        } else if (status === HttpStatus.NOT_FOUND) {
-          code = 'NOT_FOUND';
-        } else if (status === HttpStatus.CONFLICT) {
-          code = 'CONFLICT';
         }
       }
     } else {
@@ -64,9 +72,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     response.status(status).json({
-      code,
-      message,
-      ...(details ? { details } : {}),
+      success: false,
+      error: {
+        code,
+        message,
+        ...(details ? { details } : {}),
+      },
     });
   }
 }

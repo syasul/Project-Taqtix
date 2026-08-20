@@ -84,6 +84,30 @@ export class AuthService {
   }
 
   /**
+   * Validasi kredensial pengguna khusus untuk peran gate_staff.
+   */
+  async gateLogin(dto: LoginDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Kredensial login salah');
+    }
+
+    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Kredensial login salah');
+    }
+
+    if (user.role !== 'gate_staff') {
+      throw new UnauthorizedException('Akses ditolak: Hanya untuk gate_staff');
+    }
+
+    return this.generateTokenPair(user.id, user.email, user.role);
+  }
+
+  /**
    * Mengeluarkan access token baru berdasarkan refresh token yang sah.
    */
   async refresh(dto: RefreshDto) {
@@ -111,6 +135,35 @@ export class AuthService {
    */
   async logout() {
     return { message: 'Logout berhasil' };
+  }
+
+  /**
+   * Mendapatkan data profil lengkap user aktif.
+   */
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        organizer: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            bankAccount: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Pengguna tidak ditemukan');
+    }
+
+    return user;
   }
 
   /**

@@ -15,9 +15,25 @@ export declare class AuthController {
         accessToken: string;
         refreshToken: string;
     }>;
+    gateLogin(dto: LoginDto): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }>;
     refresh(dto: RefreshDto): Promise<{
         accessToken: string;
         refreshToken: string;
+    }>;
+    me(userId: string): Promise<{
+        id: string;
+        email: string;
+        role: string;
+        createdAt: Date;
+        organizer: {
+            id: string;
+            name: string;
+            slug: string;
+            bankAccount: string | null;
+        } | null;
     }>;
     logout(): Promise<{
         message: string;

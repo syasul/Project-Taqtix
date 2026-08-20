@@ -20,6 +20,7 @@ const register_dto_1 = require("./dto/register.dto");
 const login_dto_1 = require("./dto/login.dto");
 const refresh_dto_1 = require("./dto/refresh.dto");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
+const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -31,8 +32,14 @@ let AuthController = class AuthController {
     async login(dto) {
         return this.authService.login(dto);
     }
+    async gateLogin(dto) {
+        return this.authService.gateLogin(dto);
+    }
     async refresh(dto) {
         return this.authService.refresh(dto);
+    }
+    async me(userId) {
+        return this.authService.getMe(userId);
     }
     async logout() {
         return this.authService.logout();
@@ -65,6 +72,18 @@ __decorate([
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('gate-login'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Masuk log khusus gate staff' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Login berhasil, mengembalikan token JWT.' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.UNAUTHORIZED, description: 'Kredensial login salah atau bukan gate staff.' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.LoginDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "gateLogin", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('refresh'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan access token baru menggunakan refresh token' }),
@@ -75,6 +94,17 @@ __decorate([
     __metadata("design:paramtypes", [refresh_dto_1.RefreshDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "refresh", null);
+__decorate([
+    (0, common_1.Get)('me'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data profil user yang sedang login' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Profil berhasil didapatkan.' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.UNAUTHORIZED, description: 'Token tidak valid atau kedaluwarsa.' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "me", null);
 __decorate([
     (0, common_1.Post)('logout'),
     (0, swagger_1.ApiBearerAuth)(),

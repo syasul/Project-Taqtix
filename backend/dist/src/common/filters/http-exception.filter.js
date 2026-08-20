@@ -57,9 +57,12 @@ let HttpExceptionFilter = class HttpExceptionFilter {
             }
         }
         response.status(status).json({
-            code,
-            message,
-            ...(details ? { details } : {}),
+            success: false,
+            error: {
+                code,
+                message,
+                ...(details ? { details } : {}),
+            },
         });
     }
 };

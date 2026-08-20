@@ -41,7 +41,9 @@ __decorate([
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)('health'),
-    (0, swagger_1.ApiOperation)({ summary: 'Memeriksa status kesehatan dan kelayakan servis backend' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Memeriksa status kesehatan dan kelayakan servis backend',
+    }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Servis backend berjalan normal.' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),

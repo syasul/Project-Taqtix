@@ -5,7 +5,10 @@ import { PrismaClient } from '@prisma/client';
  * Servis untuk mengelola koneksi lifecycle Prisma Client dengan NestJS.
  */
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   async onModuleInit() {
     await this.$connect();
   }

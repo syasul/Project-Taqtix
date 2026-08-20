@@ -28,7 +28,8 @@ import { RolesGuard } from './common/guards/roles.guard';
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const redisUrl = config.get<string>('REDIS_URL') || 'redis://localhost:6379';
+        const redisUrl =
+          config.get<string>('REDIS_URL') || 'redis://localhost:6379';
         try {
           const parsed = new URL(redisUrl);
           return {

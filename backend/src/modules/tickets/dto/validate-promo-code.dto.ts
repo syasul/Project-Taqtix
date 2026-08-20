@@ -2,7 +2,10 @@ import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ValidatePromoCodeDto {
-  @ApiProperty({ example: 'MERDEKA80', description: 'Kode promo yang diinput pembeli' })
+  @ApiProperty({
+    example: 'MERDEKA80',
+    description: 'Kode promo yang diinput pembeli',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Kode promo tidak boleh kosong' })
   code!: string;

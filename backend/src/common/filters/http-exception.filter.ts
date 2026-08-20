@@ -28,12 +28,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         const resObj = exceptionResponse as any;
         message = resObj.message || message;
         details = resObj.error || resObj.details || undefined;
         code = resObj.code || code;
-        
+
         // Peta kode error berdasarkan HTTP status jika kode belum diset secara eksplisit
         if (!resObj.code) {
           if (status === HttpStatus.BAD_REQUEST) {

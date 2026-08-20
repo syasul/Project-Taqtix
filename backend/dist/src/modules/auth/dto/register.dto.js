@@ -19,18 +19,27 @@ class RegisterDto {
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'buyer@taqtix.id', description: 'Alamat email user baru' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'buyer@taqtix.id',
+        description: 'Alamat email user baru',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Alamat email tidak valid' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'password123', description: 'Kata sandi user baru (min 6 karakter)' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'password123',
+        description: 'Kata sandi user baru (min 6 karakter)',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6, { message: 'Kata sandi minimal harus terdiri dari 6 karakter' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'buyer', description: 'Role user: buyer, organizer, gate_staff, atau partner' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'buyer',
+        description: 'Role user: buyer, organizer, gate_staff, atau partner',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['buyer', 'organizer', 'gate_staff', 'partner'], {
         message: 'Role harus berupa buyer, organizer, gate_staff, atau partner',

@@ -33,8 +33,13 @@ exports.EventsController = EventsController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar semua event publik yang terbit' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar event publik berhasil diambil.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar semua event publik yang terbit',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar event publik berhasil diambil.',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -43,8 +48,14 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)(':slug'),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan detail event publik berdasarkan slug' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Detail event publik berhasil diambil.' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.NOT_FOUND, description: 'Event tidak ditemukan.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Detail event publik berhasil diambil.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.NOT_FOUND,
+        description: 'Event tidak ditemukan.',
+    }),
     __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

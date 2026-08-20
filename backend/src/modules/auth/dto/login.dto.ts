@@ -5,7 +5,10 @@ import { ApiProperty } from '@nestjs/swagger';
  * Data Transfer Object untuk login kredensial email & password.
  */
 export class LoginDto {
-  @ApiProperty({ example: 'organizer@taqtix.id', description: 'Email pengguna' })
+  @ApiProperty({
+    example: 'organizer@taqtix.id',
+    description: 'Email pengguna',
+  })
   @IsEmail({}, { message: 'Alamat email tidak valid' })
   email!: string;
 

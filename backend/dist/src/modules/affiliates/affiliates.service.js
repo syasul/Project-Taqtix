@@ -73,36 +73,43 @@ let AffiliatesService = class AffiliatesService {
     }
     async create(eventId, dto, organizerUserId) {
         await this.verifyEventOwnership(eventId, organizerUserId);
-        const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const randomSuffix = Math.random()
+            .toString(36)
+            .substring(2, 7)
+            .toUpperCase();
         const cleanName = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        const uniqueLink = `${cleanName}-${randomSuffix}`;
-        return this.prisma.affiliatePartner.create({
+        const uniqueCode = `${cleanName}-${randomSuffix}`;
+        return this.prisma.partner.create({
             data: {
                 eventId,
                 name: dto.name,
                 type: dto.type,
-                uniqueLink,
+                uniqueCode,
                 promoCode: dto.promoCode || null,
-                commissionPct: dto.commissionPct ?? 10,
+                commissionType: 'percentage',
+                commissionValue: dto.commissionPct ?? 10,
             },
         });
     }
     async registerClickAndGetUrl(code, ipAddress, userAgent) {
-        const partner = await this.prisma.affiliatePartner.findUnique({
-            where: { uniqueLink: code },
+        const partner = await this.prisma.partner.findUnique({
+            where: { uniqueCode: code },
             include: { event: true },
         });
         if (!partner) {
             throw new common_1.NotFoundException('Partner afiliasi tidak ditemukan');
         }
         await this.prisma.$transaction(async (tx) => {
-            await tx.affiliatePartner.update({
+            await tx.partner.update({
                 where: { id: partner.id },
                 data: {
-                    totalClicks: { increment: 1 },
+                    clicks: { increment: 1 },
                 },
             });
-            const ipHash = crypto.createHash('sha256').update(ipAddress || 'unknown').digest('hex');
+            const ipHash = crypto
+                .createHash('sha256')
+                .update(ipAddress || 'unknown')
+                .digest('hex');
             await tx.click.create({
                 data: {
                     partnerId: partner.id,
@@ -110,24 +117,22 @@ let AffiliatesService = class AffiliatesService {
                 },
             });
         });
-        const frontendUrl = this.configService.get('TAQTIX_FRONTEND_URL') || 'http://localhost:3000';
+        const frontendUrl = this.configService.get('TAQTIX_FRONTEND_URL') ||
+            'http://localhost:3000';
         return `${frontendUrl}/events/${partner.event.slug}?aff=${code}`;
     }
     async findAll(eventId, organizerUserId) {
         await this.verifyEventOwnership(eventId, organizerUserId);
-        return this.prisma.affiliatePartner.findMany({
+        return this.prisma.partner.findMany({
             where: { eventId },
             orderBy: { createdAt: 'desc' },
         });
     }
     async getLeaderboard(eventId, organizerUserId) {
         await this.verifyEventOwnership(eventId, organizerUserId);
-        return this.prisma.affiliatePartner.findMany({
+        return this.prisma.partner.findMany({
             where: { eventId },
-            orderBy: [
-                { totalSales: 'desc' },
-                { commission: 'desc' },
-            ],
+            orderBy: [{ conversions: 'desc' }, { commissionEarned: 'desc' }],
         });
     }
 };

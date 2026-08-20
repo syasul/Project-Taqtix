@@ -14,18 +14,24 @@ const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
 class OrderItemDto {
-    ticketTypeId;
+    ticketCategoryId;
     qty;
 }
 exports.OrderItemDto = OrderItemDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'ticket-type-uuid-here', description: 'ID kategori tiket' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'ticket-category-uuid-here',
+        description: 'ID kategori tiket',
+    }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'Ticket Type ID tidak boleh kosong' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Ticket Category ID tidak boleh kosong' }),
     __metadata("design:type", String)
-], OrderItemDto.prototype, "ticketTypeId", void 0);
+], OrderItemDto.prototype, "ticketCategoryId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 2, description: 'Jumlah kuantitas tiket yang dipesan' }),
+    (0, swagger_1.ApiProperty)({
+        example: 2,
+        description: 'Jumlah kuantitas tiket yang dipesan',
+    }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1, { message: 'Kuantitas minimal harus 1' }),
     __metadata("design:type", Number)
@@ -47,26 +53,40 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "eventId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [OrderItemDto], description: 'Daftar tiket yang dibeli' }),
+    (0, swagger_1.ApiProperty)({
+        type: [OrderItemDto],
+        description: 'Daftar tiket yang dibeli',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => OrderItemDto),
     __metadata("design:type", Array)
 ], CreateOrderDto.prototype, "items", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'MERDEKA80', required: false, description: 'Kode promo jika ada' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'MERDEKA80',
+        required: false,
+        description: 'Kode promo jika ada',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "promoCode", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'PARTNERCODE', required: false, description: 'Kode unik afiliasi jika ada' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'PARTNERCODE',
+        required: false,
+        description: 'Kode unik afiliasi jika ada',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "affiliateCode", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'buyer@example.com', description: 'Alamat email pembeli' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'buyer@example.com',
+        description: 'Alamat email pembeli',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Alamat email tidak valid' }),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "buyerEmail", void 0);
@@ -77,7 +97,11 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "buyerName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '081234567890', required: false, description: 'Nomor HP/WhatsApp pembeli' }),
+    (0, swagger_1.ApiProperty)({
+        example: '081234567890',
+        required: false,
+        description: 'Nomor HP/WhatsApp pembeli',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

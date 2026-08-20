@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -71,7 +75,9 @@ export class EventsService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan pemilik event ini',
+      );
     }
 
     const updateData: any = {};
@@ -93,7 +99,8 @@ export class EventsService {
     if (dto.description !== undefined) updateData.description = dto.description;
     if (dto.bannerUrl !== undefined) updateData.bannerUrl = dto.bannerUrl;
     if (dto.location !== undefined) updateData.location = dto.location;
-    if (dto.startDate !== undefined) updateData.startDate = new Date(dto.startDate);
+    if (dto.startDate !== undefined)
+      updateData.startDate = new Date(dto.startDate);
     if (dto.endDate !== undefined) updateData.endDate = new Date(dto.endDate);
 
     return this.prisma.event.update({
@@ -117,7 +124,9 @@ export class EventsService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan pemilik event ini',
+      );
     }
 
     return this.prisma.event.update({
@@ -172,7 +181,9 @@ export class EventsService {
     });
 
     if (!event || event.status !== EventStatus.PUBLISHED) {
-      throw new NotFoundException('Event tidak ditemukan atau belum dipublikasikan');
+      throw new NotFoundException(
+        'Event tidak ditemukan atau belum dipublikasikan',
+      );
     }
 
     return event;

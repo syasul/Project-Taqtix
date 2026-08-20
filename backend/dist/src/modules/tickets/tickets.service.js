@@ -117,6 +117,80 @@ let TicketsService = class TicketsService {
             discount: promo.discount,
         };
     }
+    async getTicket(ticketId) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId },
+            include: {
+                orderItem: {
+                    include: {
+                        order: {
+                            include: {
+                                buyer: true,
+                            },
+                        },
+                        ticketCategory: true,
+                    },
+                },
+                event: {
+                    include: {
+                        organizer: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        if (!ticket) {
+            throw new common_1.NotFoundException('Tiket tidak ditemukan');
+        }
+        return {
+            ticketId: ticket.id,
+            ticketStatus: ticket.status,
+            ticketCategory: ticket.orderItem.ticketCategory.name,
+            buyerName: ticket.orderItem.attendeeName,
+            buyerEmail: ticket.orderItem.attendeeEmail,
+            eventTitle: ticket.event.title,
+            eventLocation: ticket.event.location,
+            eventStartDate: ticket.event.startDate,
+            eventEndDate: ticket.event.endDate,
+            organizerName: ticket.event.organizer.name,
+            signedQrPayload: ticket.qrPayload,
+        };
+    }
+    async getTicketsByOrder(orderId) {
+        const order = await this.prisma.order.findUnique({
+            where: { id: orderId },
+        });
+        if (!order) {
+            throw new common_1.NotFoundException('Pesanan tidak ditemukan');
+        }
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                orderItem: {
+                    orderId,
+                },
+            },
+            include: {
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+                event: true,
+            },
+        });
+        return tickets.map((ticket) => ({
+            ticketId: ticket.id,
+            ticketStatus: ticket.status,
+            ticketCategory: ticket.orderItem.ticketCategory.name,
+            buyerName: ticket.orderItem.attendeeName,
+            buyerEmail: ticket.orderItem.attendeeEmail,
+            eventTitle: ticket.event.title,
+            signedQrPayload: ticket.qrPayload,
+        }));
+    }
 };
 exports.TicketsService = TicketsService;
 exports.TicketsService = TicketsService = __decorate([

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { CreateAffiliateDto } from './dto/create-affiliate.dto';
@@ -32,29 +36,39 @@ export class AffiliatesService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan pemilik event ini',
+      );
     }
   }
 
   /**
    * Mendaftarkan partner afiliasi baru untuk event tertentu.
    */
-  async create(eventId: string, dto: CreateAffiliateDto, organizerUserId: string) {
+  async create(
+    eventId: string,
+    dto: CreateAffiliateDto,
+    organizerUserId: string,
+  ) {
     await this.verifyEventOwnership(eventId, organizerUserId);
 
-    // Generate uniqueCode / uniqueLink
-    const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+    // Generate uniqueCode
+    const randomSuffix = Math.random()
+      .toString(36)
+      .substring(2, 7)
+      .toUpperCase();
     const cleanName = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const uniqueLink = `${cleanName}-${randomSuffix}`;
+    const uniqueCode = `${cleanName}-${randomSuffix}`;
 
-    return this.prisma.affiliatePartner.create({
+    return this.prisma.partner.create({
       data: {
         eventId,
         name: dto.name,
         type: dto.type,
-        uniqueLink,
+        uniqueCode,
         promoCode: dto.promoCode || null,
-        commissionPct: dto.commissionPct ?? 10,
+        commissionType: 'percentage',
+        commissionValue: dto.commissionPct ?? 10,
       },
     });
   }
@@ -62,9 +76,13 @@ export class AffiliatesService {
   /**
    * Mencatat data klik tautan afiliasi dan mendapatkan URL redirect landing page.
    */
-  async registerClickAndGetUrl(code: string, ipAddress?: string, userAgent?: string) {
-    const partner = await this.prisma.affiliatePartner.findUnique({
-      where: { uniqueLink: code },
+  async registerClickAndGetUrl(
+    code: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    const partner = await this.prisma.partner.findUnique({
+      where: { uniqueCode: code },
       include: { event: true },
     });
 
@@ -74,14 +92,17 @@ export class AffiliatesService {
 
     // Naikkan counter klik & catat log Klik secara transaksional
     await this.prisma.$transaction(async (tx) => {
-      await tx.affiliatePartner.update({
+      await tx.partner.update({
         where: { id: partner.id },
         data: {
-          totalClicks: { increment: 1 },
+          clicks: { increment: 1 },
         },
       });
 
-      const ipHash = crypto.createHash('sha256').update(ipAddress || 'unknown').digest('hex');
+      const ipHash = crypto
+        .createHash('sha256')
+        .update(ipAddress || 'unknown')
+        .digest('hex');
 
       await tx.click.create({
         data: {
@@ -92,7 +113,9 @@ export class AffiliatesService {
     });
 
     // Buat redirect URL ke FE landing page event dengan query param aff
-    const frontendUrl = this.configService.get<string>('TAQTIX_FRONTEND_URL') || 'http://localhost:3000';
+    const frontendUrl =
+      this.configService.get<string>('TAQTIX_FRONTEND_URL') ||
+      'http://localhost:3000';
     return `${frontendUrl}/events/${partner.event.slug}?aff=${code}`;
   }
 
@@ -102,7 +125,7 @@ export class AffiliatesService {
   async findAll(eventId: string, organizerUserId: string) {
     await this.verifyEventOwnership(eventId, organizerUserId);
 
-    return this.prisma.affiliatePartner.findMany({
+    return this.prisma.partner.findMany({
       where: { eventId },
       orderBy: { createdAt: 'desc' },
     });
@@ -114,12 +137,9 @@ export class AffiliatesService {
   async getLeaderboard(eventId: string, organizerUserId: string) {
     await this.verifyEventOwnership(eventId, organizerUserId);
 
-    return this.prisma.affiliatePartner.findMany({
+    return this.prisma.partner.findMany({
       where: { eventId },
-      orderBy: [
-        { totalSales: 'desc' },
-        { commission: 'desc' },
-      ],
+      orderBy: [{ conversions: 'desc' }, { commissionEarned: 'desc' }],
     });
   }
 }

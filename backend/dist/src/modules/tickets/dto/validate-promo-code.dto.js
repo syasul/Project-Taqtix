@@ -18,7 +18,10 @@ class ValidatePromoCodeDto {
 }
 exports.ValidatePromoCodeDto = ValidatePromoCodeDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'MERDEKA80', description: 'Kode promo yang diinput pembeli' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'MERDEKA80',
+        description: 'Kode promo yang diinput pembeli',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Kode promo tidak boleh kosong' }),
     __metadata("design:type", String)

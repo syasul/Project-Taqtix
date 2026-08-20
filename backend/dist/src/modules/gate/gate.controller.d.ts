@@ -9,21 +9,35 @@ export declare class CreateGateStaffGlobalDto extends AssignGateStaffDto {
 export declare class GateController {
     private readonly gateService;
     constructor(gateService: GateService);
+    getAssignedEvents(staffUserId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        slug: string;
+        title: string;
+        description: string | null;
+        bannerUrl: string;
+        location: string;
+        startDate: Date;
+        endDate: Date;
+        status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
+    }[]>;
     validateTicket(dto: ValidateTicketDto, staffUserId: string): Promise<{
         success: boolean;
         message: string;
         ticketId: string;
-        buyerName: any;
-        ticketCategory: any;
-        eventTitle: any;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
     }>;
     manualCheckin(dto: ManualCheckinDto, staffUserId: string): Promise<{
         success: boolean;
         message: string;
         ticketId: string;
-        buyerName: any;
-        ticketCategory: any;
-        eventTitle: any;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
     }>;
     syncBatch(dto: SyncBatchDto, staffUserId: string): Promise<{
         success: boolean;
@@ -36,8 +50,20 @@ export declare class GateController {
         totalTicketsIssued: number;
         totalTicketsCheckedIn: number;
         attendanceRate: number;
-        breakdown: any;
+        breakdown: {
+            ticketCategoryId: string;
+            ticketCategoryName: string;
+            issuedCount: number;
+            checkedInCount: number;
+            attendanceRate: number;
+        }[];
     }>;
+    getManifest(eventId: string, staffUserId: string): Promise<{
+        ticketId: string;
+        qrPayload: string;
+        attendeeName: string;
+        ticketCategoryName: string;
+    }[]>;
     assignStaff(eventId: string, dto: AssignGateStaffDto, userId: string): Promise<{
         id: string;
         createdAt: Date;

@@ -36,21 +36,39 @@ let OrdersService = class OrdersService {
             let discountAmt = 0;
             let promoCodeId = undefined;
             let affiliatePartnerId = undefined;
+            let buyer = await tx.user.findUnique({
+                where: { email: dto.buyerEmail },
+            });
+            if (!buyer) {
+                buyer = await tx.user.create({
+                    data: {
+                        email: dto.buyerEmail,
+                        passwordHash: '',
+                        role: 'buyer',
+                    },
+                });
+            }
             if (dto.promoCode) {
                 const promo = await tx.promoCode.findUnique({
                     where: { code: dto.promoCode },
                 });
                 if (!promo || promo.eventId !== dto.eventId) {
-                    throw new common_1.BadRequestException('Kode promo tidak valid untuk event ini');
+                    throw new common_1.HttpException({
+                        code: 'INVALID_PROMO_CODE',
+                        message: 'Kode promo tidak valid untuk event ini',
+                    }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
                 }
                 if (promo.usedCount >= promo.maxUsage) {
-                    throw new common_1.BadRequestException('Kuota penggunaan kode promo sudah habis');
+                    throw new common_1.HttpException({
+                        code: 'INVALID_PROMO_CODE',
+                        message: 'Kuota penggunaan kode promo sudah habis',
+                    }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
                 }
                 promoCodeId = promo.id;
             }
             if (dto.affiliateCode) {
-                const affiliate = await tx.affiliatePartner.findUnique({
-                    where: { uniqueLink: dto.affiliateCode },
+                const affiliate = await tx.partner.findUnique({
+                    where: { uniqueCode: dto.affiliateCode },
                 });
                 if (affiliate && affiliate.eventId === dto.eventId) {
                     affiliatePartnerId = affiliate.id;
@@ -59,31 +77,34 @@ let OrdersService = class OrdersService {
             let basePriceTotal = 0;
             const verifiedItems = [];
             for (const item of dto.items) {
-                const ticketTypes = await tx.$queryRaw `
-          SELECT id, quota, "soldCount", name, price FROM "TicketType"
-          WHERE id = ${item.ticketTypeId} AND "eventId" = ${dto.eventId}
+                const ticketCategories = await tx.$queryRaw `
+          SELECT id, quota, sold, name, price FROM "TicketCategory"
+          WHERE id = ${item.ticketCategoryId} AND "eventId" = ${dto.eventId}
           FOR UPDATE
         `;
-                if (!ticketTypes || ticketTypes.length === 0) {
-                    throw new common_1.BadRequestException(`Kategori tiket ${item.ticketTypeId} tidak ditemukan pada event ini`);
+                if (!ticketCategories || ticketCategories.length === 0) {
+                    throw new common_1.BadRequestException(`Kategori tiket ${item.ticketCategoryId} tidak ditemukan pada event ini`);
                 }
-                const ticketType = ticketTypes[0];
-                const remaining = ticketType.quota - ticketType.soldCount;
+                const ticketCategory = ticketCategories[0];
+                const remaining = ticketCategory.quota - ticketCategory.sold;
                 if (remaining < item.qty) {
-                    throw new common_1.BadRequestException(`Kuota tiket kategori "${ticketType.name}" tidak mencukupi. Tersisa: ${remaining}, diminta: ${item.qty}`);
+                    throw new common_1.HttpException({
+                        code: 'TICKET_SOLD_OUT',
+                        message: `Kuota tiket kategori "${ticketCategory.name}" tidak mencukupi. Tersisa: ${remaining}, diminta: ${item.qty}`,
+                    }, common_1.HttpStatus.CONFLICT);
                 }
-                await tx.ticketType.update({
-                    where: { id: ticketType.id },
+                await tx.ticketCategory.update({
+                    where: { id: ticketCategory.id },
                     data: {
-                        soldCount: { increment: item.qty },
+                        sold: { increment: item.qty },
                     },
                 });
-                const itemTotal = ticketType.price * item.qty;
+                const itemTotal = ticketCategory.price * item.qty;
                 basePriceTotal += itemTotal;
                 verifiedItems.push({
-                    ticketTypeId: ticketType.id,
+                    ticketCategoryId: ticketCategory.id,
                     qty: item.qty,
-                    price: ticketType.price,
+                    price: ticketCategory.price,
                 });
             }
             if (dto.promoCode && promoCodeId) {
@@ -107,25 +128,29 @@ let OrdersService = class OrdersService {
                 }
             }
             const totalAmount = basePriceTotal - discountAmt;
+            const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
             const newOrder = await tx.order.create({
                 data: {
-                    buyerEmail: dto.buyerEmail,
-                    buyerName: dto.buyerName,
-                    buyerPhone: dto.buyerPhone,
+                    buyerId: buyer.id,
                     eventId: dto.eventId,
                     totalAmount,
+                    discountAmount: discountAmt,
                     status: client_1.OrderStatus.PENDING,
                     promoCodeId,
-                    affiliatePartnerId,
+                    partnerId: affiliatePartnerId,
+                    expiredAt,
                 },
             });
             for (const item of verifiedItems) {
                 await tx.orderItem.create({
                     data: {
                         orderId: newOrder.id,
-                        ticketTypeId: item.ticketTypeId,
+                        ticketCategoryId: item.ticketCategoryId,
                         qty: item.qty,
-                        price: item.price,
+                        unitPrice: item.price,
+                        attendeeName: dto.buyerName,
+                        attendeeEmail: dto.buyerEmail,
+                        attendeePhone: dto.buyerPhone || '',
                     },
                 });
             }
@@ -140,11 +165,12 @@ let OrdersService = class OrdersService {
             include: {
                 orderItems: {
                     include: {
-                        ticketType: true,
+                        ticketCategory: true,
                     },
                 },
                 event: true,
                 payment: true,
+                buyer: true,
             },
         });
         if (!order) {

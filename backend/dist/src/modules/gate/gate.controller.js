@@ -38,6 +38,9 @@ let GateController = class GateController {
     constructor(gateService) {
         this.gateService = gateService;
     }
+    async getAssignedEvents(staffUserId) {
+        return this.gateService.getAssignedEvents(staffUserId);
+    }
     async validateTicket(dto, staffUserId) {
         return this.gateService.validateTicket(dto, staffUserId);
     }
@@ -49,6 +52,9 @@ let GateController = class GateController {
     }
     async getAttendance(eventId, userId) {
         return this.gateService.getAttendance(eventId, userId);
+    }
+    async getManifest(eventId, staffUserId) {
+        return this.gateService.getManifest(eventId, staffUserId);
     }
     async assignStaff(eventId, dto, userId) {
         return this.gateService.assignStaff(eventId, dto, userId);
@@ -62,12 +68,29 @@ let GateController = class GateController {
 };
 exports.GateController = GateController;
 __decorate([
-    (0, common_1.Post)('gate/validate'),
+    (0, common_1.Get)('gate/events'),
+    (0, roles_decorator_1.Roles)('gate_staff', 'organizer'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar event yang ditugaskan ke staff gerbang',
+    }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], GateController.prototype, "getAssignedEvents", null);
+__decorate([
+    (0, common_1.Post)('gate/scan'),
     (0, roles_decorator_1.Roles)('gate_staff', 'organizer'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Validasi QR tiket elektronik untuk check-in masuk (Staff/Organizer)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Check-in sukses atau tiket ditolak.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Validasi QR tiket elektronik untuk check-in masuk (Staff/Organizer)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Check-in sukses atau tiket ditolak.',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -79,8 +102,13 @@ __decorate([
     (0, roles_decorator_1.Roles)('gate_staff', 'organizer'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Fallback check-in menggunakan input kode tiket manual' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Check-in manual sukses.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Fallback check-in menggunakan input kode tiket manual',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Check-in manual sukses.',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -88,7 +116,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GateController.prototype, "manualCheckin", null);
 __decorate([
-    (0, common_1.Post)('gate/sync-batch'),
+    (0, common_1.Post)('gate/scan/batch'),
     (0, roles_decorator_1.Roles)('gate_staff', 'organizer'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -101,23 +129,40 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GateController.prototype, "syncBatch", null);
 __decorate([
-    (0, common_1.Get)('events/:id/attendance'),
+    (0, common_1.Get)('gate/events/:eventId/live-count'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data statistik kehadiran real-time' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Statistik kehadiran.' }),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('eventId')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], GateController.prototype, "getAttendance", null);
 __decorate([
+    (0, common_1.Get)('gate/events/:eventId/manifest'),
+    (0, roles_decorator_1.Roles)('gate_staff', 'organizer'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan data manifest tiket untuk sinkronisasi offline (Staff/Organizer)',
+    }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Manifest data tiket.' }),
+    __param(0, (0, common_1.Param)('eventId')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], GateController.prototype, "getManifest", null);
+__decorate([
     (0, common_1.Post)('events/:id/gate-staff'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendaftarkan staff gerbang ke event tertentu' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Staf gerbang berhasil didaftarkan.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Staf gerbang berhasil didaftarkan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -141,8 +186,13 @@ __decorate([
     (0, common_1.Post)('gate-staff'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendaftarkan staff gerbang (Global path fallback)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Staf gerbang berhasil didaftarkan.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendaftarkan staff gerbang (Global path fallback)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Staf gerbang berhasil didaftarkan.',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),

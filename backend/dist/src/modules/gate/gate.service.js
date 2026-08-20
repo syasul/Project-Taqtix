@@ -96,38 +96,46 @@ let GateService = class GateService {
     async validateTicket(dto, staffUserId) {
         let decoded;
         try {
+            const qrSecret = this.configService.get('QR_SIGNING_SECRET') ||
+                this.configService.get('QR_SECRET') ||
+                'super-secret-qr-key-change-me';
             decoded = await this.jwtService.verifyAsync(dto.qrPayload, {
-                secret: this.configService.get('TAQTIX_JWT_ACCESS_SECRET'),
+                secret: qrSecret,
             });
         }
         catch (error) {
-            throw new common_1.BadRequestException('QR Code tidak valid atau tanda tangan palsu');
+            throw new common_1.HttpException({
+                code: 'QR_INVALID',
+                message: 'QR Code tidak valid, tanda tangan palsu, atau kedaluwarsa',
+            }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
         }
         const { ticketId } = decoded;
         return this.prisma.$transaction(async (tx) => {
             const ticket = await tx.ticket.findUnique({
                 where: { id: ticketId },
                 include: {
-                    ticketType: {
+                    orderItem: {
                         include: {
-                            event: true,
+                            ticketCategory: true,
+                            order: true,
                         },
                     },
-                    order: true,
                 },
             });
             if (!ticket) {
                 throw new common_1.NotFoundException('Tiket tidak terdaftar di sistem');
             }
-            const event = ticket.ticketType.event;
             const isOrganizer = await tx.organizer.findFirst({
-                where: { userId: staffUserId, id: event.organizerId },
+                where: {
+                    userId: staffUserId,
+                    id: ticket.orderItem.ticketCategory.eventId,
+                },
             });
             if (!isOrganizer) {
                 const isAssignedStaff = await tx.gateStaff.findUnique({
                     where: {
                         eventId_userId: {
-                            eventId: event.id,
+                            eventId: ticket.eventId,
                             userId: staffUserId,
                         },
                     },
@@ -144,9 +152,12 @@ let GateService = class GateService {
                         result: 'DUPLICATE',
                     },
                 });
-                throw new common_1.BadRequestException('Tiket sudah pernah digunakan / check-in sebelumnya');
+                throw new common_1.HttpException({
+                    code: 'QR_ALREADY_USED',
+                    message: 'Tiket sudah pernah digunakan / check-in sebelumnya',
+                }, common_1.HttpStatus.CONFLICT);
             }
-            if (ticket.status !== client_1.TicketStatus.ISSUED) {
+            if (ticket.status !== client_1.TicketStatus.VALID) {
                 await tx.scanLog.create({
                     data: {
                         ticketId: ticket.id,
@@ -154,7 +165,10 @@ let GateService = class GateService {
                         result: 'INVALID',
                     },
                 });
-                throw new common_1.BadRequestException(`Tiket tidak aktif (Status: ${ticket.status})`);
+                throw new common_1.HttpException({
+                    code: 'QR_INVALID',
+                    message: `Tiket tidak aktif (Status: ${ticket.status})`,
+                }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
             }
             await tx.ticket.update({
                 where: { id: ticket.id },
@@ -175,9 +189,9 @@ let GateService = class GateService {
                 success: true,
                 message: 'Check-in berhasil! Selamat menikmati acara.',
                 ticketId: ticket.id,
-                buyerName: ticket.order.buyerName,
-                ticketCategory: ticket.ticketType.name,
-                eventTitle: event.title,
+                buyerName: ticket.orderItem.attendeeName,
+                ticketCategory: ticket.orderItem.ticketCategory.name,
+                eventTitle: ticket.orderItem.ticketCategory.name,
             };
         });
     }
@@ -185,32 +199,31 @@ let GateService = class GateService {
         return this.prisma.$transaction(async (tx) => {
             const ticket = await tx.ticket.findFirst({
                 where: {
-                    OR: [
-                        { id: dto.code },
-                        { code: dto.code },
-                    ],
+                    OR: [{ id: dto.code }, { qrPayload: dto.code }],
                 },
                 include: {
-                    ticketType: {
+                    orderItem: {
                         include: {
-                            event: true,
+                            ticketCategory: true,
+                            order: true,
                         },
                     },
-                    order: true,
                 },
             });
             if (!ticket) {
                 throw new common_1.NotFoundException('Tiket tidak terdaftar di sistem');
             }
-            const event = ticket.ticketType.event;
             const isOrganizer = await tx.organizer.findFirst({
-                where: { userId: staffUserId, id: event.organizerId },
+                where: {
+                    userId: staffUserId,
+                    id: ticket.orderItem.ticketCategory.eventId,
+                },
             });
             if (!isOrganizer) {
                 const isAssignedStaff = await tx.gateStaff.findUnique({
                     where: {
                         eventId_userId: {
-                            eventId: event.id,
+                            eventId: ticket.eventId,
                             userId: staffUserId,
                         },
                     },
@@ -229,7 +242,7 @@ let GateService = class GateService {
                 });
                 throw new common_1.BadRequestException('Tiket sudah pernah digunakan / check-in sebelumnya');
             }
-            if (ticket.status !== client_1.TicketStatus.ISSUED) {
+            if (ticket.status !== client_1.TicketStatus.VALID) {
                 await tx.scanLog.create({
                     data: {
                         ticketId: ticket.id,
@@ -258,9 +271,9 @@ let GateService = class GateService {
                 success: true,
                 message: 'Check-in manual berhasil!',
                 ticketId: ticket.id,
-                buyerName: ticket.order.buyerName,
-                ticketCategory: ticket.ticketType.name,
-                eventTitle: event.title,
+                buyerName: ticket.orderItem.attendeeName,
+                ticketCategory: ticket.orderItem.ticketCategory.name,
+                eventTitle: ticket.orderItem.ticketCategory.name,
             };
         });
     }
@@ -268,17 +281,20 @@ let GateService = class GateService {
         let successCount = 0;
         for (const log of dto.logs) {
             try {
+                const qrSecret = this.configService.get('QR_SIGNING_SECRET') ||
+                    this.configService.get('QR_SECRET') ||
+                    'super-secret-qr-key-change-me';
                 const decoded = await this.jwtService.verifyAsync(log.qrPayload, {
-                    secret: this.configService.get('TAQTIX_JWT_ACCESS_SECRET'),
+                    secret: qrSecret,
                 });
                 const { ticketId } = decoded;
                 await this.prisma.$transaction(async (tx) => {
                     const ticket = await tx.ticket.findUnique({
                         where: { id: ticketId },
                         include: {
-                            ticketType: {
+                            orderItem: {
                                 include: {
-                                    event: true,
+                                    ticketCategory: true,
                                 },
                             },
                         },
@@ -286,13 +302,16 @@ let GateService = class GateService {
                     if (!ticket)
                         return;
                     const isOrganizer = await tx.organizer.findFirst({
-                        where: { userId: staffUserId, id: ticket.ticketType.event.organizerId },
+                        where: {
+                            userId: staffUserId,
+                            id: ticket.orderItem.ticketCategory.eventId,
+                        },
                     });
                     if (!isOrganizer) {
                         const isAssignedStaff = await tx.gateStaff.findUnique({
                             where: {
                                 eventId_userId: {
-                                    eventId: ticket.ticketType.eventId,
+                                    eventId: ticket.eventId,
                                     userId: staffUserId,
                                 },
                             },
@@ -312,7 +331,7 @@ let GateService = class GateService {
                         });
                         return;
                     }
-                    if (ticket.status === client_1.TicketStatus.ISSUED) {
+                    if (ticket.status === client_1.TicketStatus.VALID) {
                         await tx.ticket.update({
                             where: { id: ticket.id },
                             data: {
@@ -346,27 +365,33 @@ let GateService = class GateService {
     }
     async getAttendance(eventId, organizerUserId) {
         const event = await this.verifyEventOwnership(eventId, organizerUserId);
-        const ticketTypes = await this.prisma.ticketType.findMany({
+        const tickets = await this.prisma.ticket.findMany({
             where: { eventId },
             include: {
-                tickets: {
-                    select: { status: true },
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                    },
                 },
             },
         });
-        let totalTicketsIssued = 0;
-        let totalTicketsCheckedIn = 0;
-        const breakdown = ticketTypes.map((tt) => {
-            const issued = tt.tickets.length;
-            const checkedIn = tt.tickets.filter((t) => t.status === client_1.TicketStatus.CHECKED_IN).length;
-            totalTicketsIssued += issued;
-            totalTicketsCheckedIn += checkedIn;
+        const ticketCategories = await this.prisma.ticketCategory.findMany({
+            where: { eventId },
+        });
+        const totalTicketsIssued = tickets.length;
+        const totalTicketsCheckedIn = tickets.filter((t) => t.status === client_1.TicketStatus.CHECKED_IN).length;
+        const breakdown = ticketCategories.map((tc) => {
+            const categoryTickets = tickets.filter((t) => t.orderItem.ticketCategoryId === tc.id);
+            const issued = categoryTickets.length;
+            const checkedIn = categoryTickets.filter((t) => t.status === client_1.TicketStatus.CHECKED_IN).length;
             return {
-                ticketCategoryId: tt.id,
-                ticketCategoryName: tt.name,
+                ticketCategoryId: tc.id,
+                ticketCategoryName: tc.name,
                 issuedCount: issued,
                 checkedInCount: checkedIn,
-                attendanceRate: issued > 0 ? parseFloat(((checkedIn / issued) * 100).toFixed(2)) : 0.0,
+                attendanceRate: issued > 0
+                    ? parseFloat(((checkedIn / issued) * 100).toFixed(2))
+                    : 0.0,
             };
         });
         const attendanceRate = totalTicketsIssued > 0
@@ -380,6 +405,70 @@ let GateService = class GateService {
             attendanceRate,
             breakdown,
         };
+    }
+    async getManifest(eventId, staffUserId) {
+        const event = await this.prisma.event.findUnique({
+            where: { id: eventId },
+        });
+        if (!event) {
+            throw new common_1.NotFoundException('Event tidak ditemukan');
+        }
+        const isOrganizer = await this.prisma.organizer.findFirst({
+            where: { userId: staffUserId, id: event.organizerId },
+        });
+        if (!isOrganizer) {
+            const isAssignedStaff = await this.prisma.gateStaff.findUnique({
+                where: {
+                    eventId_userId: {
+                        eventId,
+                        userId: staffUserId,
+                    },
+                },
+            });
+            if (!isAssignedStaff) {
+                throw new common_1.ForbiddenException('Akses ditolak: Anda tidak ditugaskan di gerbang event ini');
+            }
+        }
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                eventId,
+                status: client_1.TicketStatus.VALID,
+            },
+            include: {
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+            },
+        });
+        return tickets.map((t) => ({
+            ticketId: t.id,
+            qrPayload: t.qrPayload,
+            attendeeName: t.orderItem.attendeeName,
+            ticketCategoryName: t.orderItem.ticketCategory.name,
+        }));
+    }
+    async getAssignedEvents(userId) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new common_1.NotFoundException('User tidak ditemukan');
+        }
+        if (user.role === 'organizer') {
+            const organizer = await this.prisma.organizer.findFirst({
+                where: { userId },
+            });
+            if (!organizer)
+                return [];
+            return this.prisma.event.findMany({
+                where: { organizerId: organizer.id },
+            });
+        }
+        const gateStaffs = await this.prisma.gateStaff.findMany({
+            where: { userId },
+            include: { event: true },
+        });
+        return gateStaffs.map((gs) => gs.event);
     }
 };
 exports.GateService = GateService;

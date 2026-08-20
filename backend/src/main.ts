@@ -42,7 +42,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
@@ -50,6 +50,8 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   console.log(`TAQtix Backend berjalan pada: http://localhost:${port}/v1`);
-  console.log(`Dokumentasi API (Swagger) tersedia di: http://localhost:${port}/docs`);
+  console.log(
+    `Dokumentasi API (Swagger) tersedia di: http://localhost:${port}/docs`,
+  );
 }
 bootstrap();

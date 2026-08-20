@@ -11,24 +11,84 @@ export declare class OrdersService {
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         eventId: string;
+        buyerId: string;
         totalAmount: number;
         discountAmount: number;
-        expiredAt: Date;
-        buyerId: string;
         promoCodeId: string | null;
         partnerId: string | null;
+        expiredAt: Date;
     }>;
     findOne(id: string): Promise<{
+        event: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            slug: string;
+            title: string;
+            description: string | null;
+            bannerUrl: string;
+            location: string;
+            startDate: Date;
+            endDate: Date;
+            status: import("@prisma/client").$Enums.EventStatus;
+            organizerId: string;
+        };
+        payment: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            orderId: string;
+            provider: string;
+            snapToken: string | null;
+            externalId: string | null;
+            amount: number;
+            paidAt: Date | null;
+        } | null;
+        buyer: {
+            id: string;
+            email: string;
+            passwordHash: string;
+            role: string;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+        orderItems: ({
+            ticketCategory: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                price: number;
+                eventId: string;
+                quota: number;
+                sold: number;
+                maxPerOrder: number;
+                saleStartAt: Date;
+                saleEndAt: Date;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            orderId: string;
+            ticketCategoryId: string;
+            qty: number;
+            unitPrice: number;
+            attendeeName: string;
+            attendeeEmail: string;
+            attendeePhone: string;
+        })[];
+    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
         eventId: string;
+        buyerId: string;
         totalAmount: number;
         discountAmount: number;
-        expiredAt: Date;
-        buyerId: string;
         promoCodeId: string | null;
         partnerId: string | null;
+        expiredAt: Date;
     }>;
 }

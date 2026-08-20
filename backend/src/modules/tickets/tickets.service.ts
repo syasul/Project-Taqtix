@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTicketCategoryDto } from './dto/create-ticket-category.dto';
 import { UpdateTicketCategoryDto } from './dto/update-ticket-category.dto';
@@ -29,14 +34,20 @@ export class TicketsService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan pemilik event ini',
+      );
     }
   }
 
   /**
    * Membuat kategori tiket baru untuk event tertentu.
    */
-  async createCategory(eventId: string, dto: CreateTicketCategoryDto, userId: string) {
+  async createCategory(
+    eventId: string,
+    dto: CreateTicketCategoryDto,
+    userId: string,
+  ) {
     await this.verifyEventOwnership(eventId, userId);
 
     return this.prisma.ticketCategory.create({
@@ -54,7 +65,11 @@ export class TicketsService {
   /**
    * Memperbarui detail kategori tiket.
    */
-  async updateCategory(id: string, dto: UpdateTicketCategoryDto, userId: string) {
+  async updateCategory(
+    id: string,
+    dto: UpdateTicketCategoryDto,
+    userId: string,
+  ) {
     const ticketCategory = await this.prisma.ticketCategory.findUnique({
       where: { id },
     });
@@ -69,7 +84,8 @@ export class TicketsService {
     if (dto.name !== undefined) updateData.name = dto.name;
     if (dto.price !== undefined) updateData.price = dto.price;
     if (dto.quota !== undefined) updateData.quota = dto.quota;
-    if (dto.saleStart !== undefined) updateData.saleStartAt = new Date(dto.saleStart);
+    if (dto.saleStart !== undefined)
+      updateData.saleStartAt = new Date(dto.saleStart);
     if (dto.saleEnd !== undefined) updateData.saleEndAt = new Date(dto.saleEnd);
 
     return this.prisma.ticketCategory.update({
@@ -99,7 +115,11 @@ export class TicketsService {
   /**
    * Membuat kode promo baru untuk event.
    */
-  async createPromoCode(eventId: string, dto: CreatePromoCodeDto, userId: string) {
+  async createPromoCode(
+    eventId: string,
+    dto: CreatePromoCodeDto,
+    userId: string,
+  ) {
     await this.verifyEventOwnership(eventId, userId);
 
     // Cek duplikasi kode promo global

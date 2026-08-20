@@ -45,10 +45,10 @@ let OrdersProcessor = class OrdersProcessor {
                     },
                 });
                 for (const item of order.orderItems) {
-                    await tx.ticketType.update({
-                        where: { id: item.ticketTypeId },
+                    await tx.ticketCategory.update({
+                        where: { id: item.ticketCategoryId },
                         data: {
-                            soldCount: { decrement: item.qty },
+                            sold: { decrement: item.qty },
                         },
                     });
                 }

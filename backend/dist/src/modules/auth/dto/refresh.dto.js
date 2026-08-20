@@ -17,7 +17,10 @@ class RefreshDto {
 }
 exports.RefreshDto = RefreshDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'jwt-refresh-token-here', description: 'Refresh token yang masih valid' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'jwt-refresh-token-here',
+        description: 'Refresh token yang masih valid',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Refresh token tidak boleh kosong' }),
     __metadata("design:type", String)

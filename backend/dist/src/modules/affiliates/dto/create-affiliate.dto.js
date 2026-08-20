@@ -21,18 +21,29 @@ class CreateAffiliateDto {
 }
 exports.CreateAffiliateDto = CreateAffiliateDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Sponsor Utama', description: 'Nama partner afiliasi' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Sponsor Utama',
+        description: 'Nama partner afiliasi',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama partner tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateAffiliateDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.PartnerType, example: client_1.PartnerType.INFLUENCER, description: 'Tipe partner' }),
+    (0, swagger_1.ApiProperty)({
+        enum: client_1.PartnerType,
+        example: client_1.PartnerType.INFLUENCER,
+        description: 'Tipe partner',
+    }),
     (0, class_validator_1.IsEnum)(client_1.PartnerType, { message: 'Tipe partner tidak valid' }),
     __metadata("design:type", String)
 ], CreateAffiliateDto.prototype, "type", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 10, required: false, description: 'Persentase komisi partner' }),
+    (0, swagger_1.ApiProperty)({
+        example: 10,
+        required: false,
+        description: 'Persentase komisi partner',
+    }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(0),
     (0, class_validator_1.Max)(100),
@@ -40,7 +51,11 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateAffiliateDto.prototype, "commissionPct", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'SPONSOR10', required: false, description: 'Kode promo yang diasosiasikan' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'SPONSOR10',
+        required: false,
+        description: 'Kode promo yang diasosiasikan',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

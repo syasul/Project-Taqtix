@@ -34,7 +34,10 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Jakarta Convention Center, Senayan', required: false }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Jakarta Convention Center, Senayan',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -52,7 +55,10 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "endDate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://images.taqtix.id/banners/event1.jpg', required: false }),
+    (0, swagger_1.ApiProperty)({
+        example: 'https://images.taqtix.id/banners/event1.jpg',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

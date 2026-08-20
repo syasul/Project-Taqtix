@@ -22,29 +22,40 @@ let HttpExceptionFilter = class HttpExceptionFilter {
             if (typeof exceptionResponse === 'string') {
                 message = exceptionResponse;
             }
-            else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+            else if (typeof exceptionResponse === 'object' &&
+                exceptionResponse !== null) {
                 const resObj = exceptionResponse;
                 message = resObj.message || message;
                 details = resObj.error || resObj.details || undefined;
-                if (status === common_1.HttpStatus.BAD_REQUEST) {
-                    code = 'BAD_REQUEST';
-                    if (Array.isArray(resObj.message)) {
-                        code = 'VALIDATION_ERROR';
-                        message = 'Validasi input gagal';
-                        details = resObj.message;
+                code = resObj.code || code;
+                if (!resObj.code) {
+                    if (status === common_1.HttpStatus.BAD_REQUEST) {
+                        code = 'BAD_REQUEST';
+                        if (Array.isArray(resObj.message)) {
+                            code = 'VALIDATION_ERROR';
+                            message = 'Validasi input gagal';
+                            details = resObj.message;
+                        }
                     }
-                }
-                else if (status === common_1.HttpStatus.UNAUTHORIZED) {
-                    code = 'UNAUTHORIZED';
-                }
-                else if (status === common_1.HttpStatus.FORBIDDEN) {
-                    code = 'FORBIDDEN';
-                }
-                else if (status === common_1.HttpStatus.NOT_FOUND) {
-                    code = 'NOT_FOUND';
-                }
-                else if (status === common_1.HttpStatus.CONFLICT) {
-                    code = 'CONFLICT';
+                    else if (status === common_1.HttpStatus.UNPROCESSABLE_ENTITY) {
+                        code = 'VALIDATION_ERROR';
+                        if (Array.isArray(resObj.message)) {
+                            message = 'Validasi input gagal';
+                            details = resObj.message;
+                        }
+                    }
+                    else if (status === common_1.HttpStatus.UNAUTHORIZED) {
+                        code = 'UNAUTHORIZED';
+                    }
+                    else if (status === common_1.HttpStatus.FORBIDDEN) {
+                        code = 'FORBIDDEN';
+                    }
+                    else if (status === common_1.HttpStatus.NOT_FOUND) {
+                        code = 'NOT_FOUND';
+                    }
+                    else if (status === common_1.HttpStatus.CONFLICT) {
+                        code = 'CONFLICT';
+                    }
                 }
             }
         }

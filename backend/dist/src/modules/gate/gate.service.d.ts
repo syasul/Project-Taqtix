@@ -35,17 +35,17 @@ export declare class GateService {
         success: boolean;
         message: string;
         ticketId: string;
-        buyerName: any;
-        ticketCategory: any;
-        eventTitle: any;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
     }>;
     manualCheckin(dto: ManualCheckinDto, staffUserId: string): Promise<{
         success: boolean;
         message: string;
         ticketId: string;
-        buyerName: any;
-        ticketCategory: any;
-        eventTitle: any;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
     }>;
     syncBatch(dto: SyncBatchDto, staffUserId: string): Promise<{
         success: boolean;
@@ -58,6 +58,32 @@ export declare class GateService {
         totalTicketsIssued: number;
         totalTicketsCheckedIn: number;
         attendanceRate: number;
-        breakdown: any;
+        breakdown: {
+            ticketCategoryId: string;
+            ticketCategoryName: string;
+            issuedCount: number;
+            checkedInCount: number;
+            attendanceRate: number;
+        }[];
     }>;
+    getManifest(eventId: string, staffUserId: string): Promise<{
+        ticketId: string;
+        qrPayload: string;
+        attendeeName: string;
+        ticketCategoryName: string;
+    }[]>;
+    getAssignedEvents(userId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        slug: string;
+        title: string;
+        description: string | null;
+        bannerUrl: string;
+        location: string;
+        startDate: Date;
+        endDate: Date;
+        status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
+    }[]>;
 }

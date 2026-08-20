@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -37,7 +44,9 @@ export class GateService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan pemilik event ini',
+      );
     }
 
     return event;
@@ -46,7 +55,11 @@ export class GateService {
   /**
    * Mendaftarkan staf gerbang baru untuk event tertentu.
    */
-  async assignStaff(eventId: string, dto: AssignGateStaffDto, organizerUserId: string) {
+  async assignStaff(
+    eventId: string,
+    dto: AssignGateStaffDto,
+    organizerUserId: string,
+  ) {
     await this.verifyEventOwnership(eventId, organizerUserId);
 
     const staffUser = await this.prisma.user.findUnique({
@@ -119,11 +132,21 @@ export class GateService {
 
     // 1. Verifikasi Signature JWT QR Payload
     try {
+      const qrSecret =
+        this.configService.get<string>('QR_SIGNING_SECRET') ||
+        this.configService.get<string>('QR_SECRET') ||
+        'super-secret-qr-key-change-me';
       decoded = await this.jwtService.verifyAsync(dto.qrPayload, {
-        secret: this.configService.get<string>('TAQTIX_JWT_ACCESS_SECRET'),
+        secret: qrSecret,
       });
     } catch (error) {
-      throw new BadRequestException('QR Code tidak valid atau tanda tangan palsu');
+      throw new HttpException(
+        {
+          code: 'QR_INVALID',
+          message: 'QR Code tidak valid, tanda tangan palsu, atau kedaluwarsa',
+        },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
 
     const { ticketId } = decoded;
@@ -148,7 +171,10 @@ export class GateService {
 
       // 3. Verifikasi apakah staffUserId terdaftar untuk scan event ini
       const isOrganizer = await tx.organizer.findFirst({
-        where: { userId: staffUserId, id: ticket.orderItem.ticketCategory.eventId },
+        where: {
+          userId: staffUserId,
+          id: ticket.orderItem.ticketCategory.eventId,
+        },
       });
 
       if (!isOrganizer) {
@@ -162,7 +188,9 @@ export class GateService {
         });
 
         if (!isAssignedStaff) {
-          throw new ForbiddenException('Akses ditolak: Anda tidak ditugaskan di gerbang event ini');
+          throw new ForbiddenException(
+            'Akses ditolak: Anda tidak ditugaskan di gerbang event ini',
+          );
         }
       }
 
@@ -176,7 +204,13 @@ export class GateService {
             result: 'DUPLICATE',
           },
         });
-        throw new BadRequestException('Tiket sudah pernah digunakan / check-in sebelumnya');
+        throw new HttpException(
+          {
+            code: 'QR_ALREADY_USED',
+            message: 'Tiket sudah pernah digunakan / check-in sebelumnya',
+          },
+          HttpStatus.CONFLICT,
+        );
       }
 
       if (ticket.status !== TicketStatus.VALID) {
@@ -188,7 +222,13 @@ export class GateService {
             result: 'INVALID',
           },
         });
-        throw new BadRequestException(`Tiket tidak aktif (Status: ${ticket.status})`);
+        throw new HttpException(
+          {
+            code: 'QR_INVALID',
+            message: `Tiket tidak aktif (Status: ${ticket.status})`,
+          },
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
       }
 
       // 5. Sukses Check-in: Update status tiket ke CHECKED_IN & Buat ScanLog
@@ -228,10 +268,7 @@ export class GateService {
       // Cari berdasarkan ID (UUID) atau jika qrPayload sama persis
       const ticket = await tx.ticket.findFirst({
         where: {
-          OR: [
-            { id: dto.code },
-            { qrPayload: dto.code },
-          ],
+          OR: [{ id: dto.code }, { qrPayload: dto.code }],
         },
         include: {
           orderItem: {
@@ -249,7 +286,10 @@ export class GateService {
 
       // Verifikasi otorisasi staff
       const isOrganizer = await tx.organizer.findFirst({
-        where: { userId: staffUserId, id: ticket.orderItem.ticketCategory.eventId },
+        where: {
+          userId: staffUserId,
+          id: ticket.orderItem.ticketCategory.eventId,
+        },
       });
 
       if (!isOrganizer) {
@@ -263,7 +303,9 @@ export class GateService {
         });
 
         if (!isAssignedStaff) {
-          throw new ForbiddenException('Akses ditolak: Anda tidak ditugaskan di gerbang event ini');
+          throw new ForbiddenException(
+            'Akses ditolak: Anda tidak ditugaskan di gerbang event ini',
+          );
         }
       }
 
@@ -276,7 +318,9 @@ export class GateService {
             result: 'DUPLICATE',
           },
         });
-        throw new BadRequestException('Tiket sudah pernah digunakan / check-in sebelumnya');
+        throw new BadRequestException(
+          'Tiket sudah pernah digunakan / check-in sebelumnya',
+        );
       }
 
       if (ticket.status !== TicketStatus.VALID) {
@@ -287,7 +331,9 @@ export class GateService {
             result: 'INVALID',
           },
         });
-        throw new BadRequestException(`Tiket tidak aktif (Status: ${ticket.status})`);
+        throw new BadRequestException(
+          `Tiket tidak aktif (Status: ${ticket.status})`,
+        );
       }
 
       // Update status & buat ScanLog
@@ -327,9 +373,13 @@ export class GateService {
 
     for (const log of dto.logs) {
       try {
-        // Dekode payload
+        // Dekode payload (menggunakan QR secret khusus)
+        const qrSecret =
+          this.configService.get<string>('QR_SIGNING_SECRET') ||
+          this.configService.get<string>('QR_SECRET') ||
+          'super-secret-qr-key-change-me';
         const decoded = await this.jwtService.verifyAsync(log.qrPayload, {
-          secret: this.configService.get<string>('TAQTIX_JWT_ACCESS_SECRET'),
+          secret: qrSecret,
         });
 
         const { ticketId } = decoded;
@@ -350,7 +400,10 @@ export class GateService {
 
           // Cek penugasan staff gerbang
           const isOrganizer = await tx.organizer.findFirst({
-            where: { userId: staffUserId, id: ticket.orderItem.ticketCategory.eventId },
+            where: {
+              userId: staffUserId,
+              id: ticket.orderItem.ticketCategory.eventId,
+            },
           });
 
           if (!isOrganizer) {
@@ -403,7 +456,10 @@ export class GateService {
           }
         });
       } catch (error) {
-        console.warn(`[Sync Batch] Gagal memproses sinkronisasi satu baris log:`, error);
+        console.warn(
+          `[Sync Batch] Gagal memproses sinkronisasi satu baris log:`,
+          error,
+        );
       }
     }
 
@@ -435,26 +491,37 @@ export class GateService {
       where: { eventId },
     });
 
-    let totalTicketsIssued = tickets.length;
-    let totalTicketsCheckedIn = tickets.filter((t) => t.status === TicketStatus.CHECKED_IN).length;
+    const totalTicketsIssued = tickets.length;
+    const totalTicketsCheckedIn = tickets.filter(
+      (t) => t.status === TicketStatus.CHECKED_IN,
+    ).length;
 
     const breakdown = ticketCategories.map((tc) => {
-      const categoryTickets = tickets.filter((t) => t.orderItem.ticketCategoryId === tc.id);
+      const categoryTickets = tickets.filter(
+        (t) => t.orderItem.ticketCategoryId === tc.id,
+      );
       const issued = categoryTickets.length;
-      const checkedIn = categoryTickets.filter((t) => t.status === TicketStatus.CHECKED_IN).length;
+      const checkedIn = categoryTickets.filter(
+        (t) => t.status === TicketStatus.CHECKED_IN,
+      ).length;
 
       return {
         ticketCategoryId: tc.id,
         ticketCategoryName: tc.name,
         issuedCount: issued,
         checkedInCount: checkedIn,
-        attendanceRate: issued > 0 ? parseFloat(((checkedIn / issued) * 100).toFixed(2)) : 0.0,
+        attendanceRate:
+          issued > 0
+            ? parseFloat(((checkedIn / issued) * 100).toFixed(2))
+            : 0.0,
       };
     });
 
     const attendanceRate =
       totalTicketsIssued > 0
-        ? parseFloat(((totalTicketsCheckedIn / totalTicketsIssued) * 100).toFixed(2))
+        ? parseFloat(
+            ((totalTicketsCheckedIn / totalTicketsIssued) * 100).toFixed(2),
+          )
         : 0.0;
 
     return {
@@ -494,7 +561,9 @@ export class GateService {
       });
 
       if (!isAssignedStaff) {
-        throw new ForbiddenException('Akses ditolak: Anda tidak ditugaskan di gerbang event ini');
+        throw new ForbiddenException(
+          'Akses ditolak: Anda tidak ditugaskan di gerbang event ini',
+        );
       }
     }
 
@@ -518,5 +587,33 @@ export class GateService {
       attendeeName: t.orderItem.attendeeName,
       ticketCategoryName: t.orderItem.ticketCategory.name,
     }));
+  }
+
+  /**
+   * Mendapatkan daftar event yang ditugaskan ke staff gerbang.
+   */
+  async getAssignedEvents(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User tidak ditemukan');
+    }
+
+    if (user.role === 'organizer') {
+      const organizer = await this.prisma.organizer.findFirst({
+        where: { userId },
+      });
+      if (!organizer) return [];
+      return this.prisma.event.findMany({
+        where: { organizerId: organizer.id },
+      });
+    }
+
+    // Role is gate_staff
+    const gateStaffs = await this.prisma.gateStaff.findMany({
+      where: { userId },
+      include: { event: true },
+    });
+
+    return gateStaffs.map((gs) => gs.event);
   }
 }

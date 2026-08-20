@@ -40,13 +40,13 @@ async function main() {
     console.log('Memulai proses seeding data awal...');
     console.log('Membersihkan database...');
     await prisma.click.deleteMany();
-    await prisma.affiliatePartner.deleteMany();
+    await prisma.partner.deleteMany();
     await prisma.promoCode.deleteMany();
     await prisma.payment.deleteMany();
     await prisma.ticket.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
-    await prisma.ticketType.deleteMany();
+    await prisma.ticketCategory.deleteMany();
     await prisma.event.deleteMany();
     await prisma.organizer.deleteMany();
     await prisma.user.deleteMany();
@@ -83,34 +83,34 @@ async function main() {
         },
     });
     console.log('Membuat kategori tiket...');
-    await prisma.ticketType.createMany({
+    await prisma.ticketCategory.createMany({
         data: [
             {
                 eventId: event.id,
                 name: 'Early Bird',
                 price: 100000,
                 quota: 100,
-                soldCount: 0,
-                saleStart: new Date('2026-08-01T00:00:00Z'),
-                saleEnd: new Date('2026-08-15T23:59:59Z'),
+                sold: 0,
+                saleStartAt: new Date('2026-08-01T00:00:00Z'),
+                saleEndAt: new Date('2026-08-15T23:59:59Z'),
             },
             {
                 eventId: event.id,
                 name: 'Regular Ticket',
                 price: 150000,
                 quota: 500,
-                soldCount: 0,
-                saleStart: new Date('2026-08-16T00:00:00Z'),
-                saleEnd: new Date('2026-09-10T23:59:59Z'),
+                sold: 0,
+                saleStartAt: new Date('2026-08-16T00:00:00Z'),
+                saleEndAt: new Date('2026-09-10T23:59:59Z'),
             },
             {
                 eventId: event.id,
                 name: 'VIP Experience',
                 price: 350000,
                 quota: 50,
-                soldCount: 0,
-                saleStart: new Date('2026-08-16T00:00:00Z'),
-                saleEnd: new Date('2026-09-10T23:59:59Z'),
+                sold: 0,
+                saleStartAt: new Date('2026-08-16T00:00:00Z'),
+                saleEndAt: new Date('2026-09-10T23:59:59Z'),
             },
         ],
     });

@@ -12,7 +12,10 @@ export class UpdateEventDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ example: 'Jakarta Convention Center, Senayan', required: false })
+  @ApiProperty({
+    example: 'Jakarta Convention Center, Senayan',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   location?: string;
@@ -27,7 +30,10 @@ export class UpdateEventDto {
   @IsOptional()
   endDate?: string;
 
-  @ApiProperty({ example: 'https://images.taqtix.id/banners/event1.jpg', required: false })
+  @ApiProperty({
+    example: 'https://images.taqtix.id/banners/event1.jpg',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   bannerUrl?: string;

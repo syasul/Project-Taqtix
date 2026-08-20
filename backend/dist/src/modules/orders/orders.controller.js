@@ -34,9 +34,17 @@ exports.OrdersController = OrdersController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Membuat pesanan baru dan mereservasi kuota tiket (Public/Buyer)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Pesanan berhasil dibuat.' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.BAD_REQUEST, description: 'Kuota tidak mencukupi atau kode promo tidak valid.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Membuat pesanan baru dan mereservasi kuota tiket (Public/Buyer)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Pesanan berhasil dibuat.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.BAD_REQUEST,
+        description: 'Kuota tidak mencukupi atau kode promo tidak valid.',
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
@@ -45,9 +53,17 @@ __decorate([
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)(':id'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan status dan rincian pesanan berdasarkan ID' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Detail pesanan berhasil diambil.' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.NOT_FOUND, description: 'Pesanan tidak ditemukan.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan status dan rincian pesanan berdasarkan ID',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Detail pesanan berhasil diambil.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.NOT_FOUND,
+        description: 'Pesanan tidak ditemukan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

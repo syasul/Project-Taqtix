@@ -17,7 +17,10 @@ class ManualCheckinDto {
 }
 exports.ManualCheckinDto = ManualCheckinDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'ticket-uuid-or-code', description: 'ID tiket atau kode tiket unik' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'ticket-uuid-or-code',
+        description: 'ID tiket atau kode tiket unik',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Kode tiket tidak boleh kosong' }),
     __metadata("design:type", String)

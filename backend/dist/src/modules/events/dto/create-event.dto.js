@@ -22,35 +22,55 @@ class CreateEventDto {
 }
 exports.CreateEventDto = CreateEventDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Taqwa Movement Concert 2026', description: 'Judul/Nama acara' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Taqwa Movement Concert 2026',
+        description: 'Judul/Nama acara',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Judul event tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Stress test pertama untuk ticketing.', required: false, description: 'Deskripsi lengkap acara' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Stress test pertama untuk ticketing.',
+        required: false,
+        description: 'Deskripsi lengkap acara',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Jakarta Convention Center, Senayan', description: 'Lokasi acara' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Jakarta Convention Center, Senayan',
+        description: 'Lokasi acara',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Lokasi tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "location", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '2026-09-12T13:00:00Z', description: 'Waktu mulai acara' }),
+    (0, swagger_1.ApiProperty)({
+        example: '2026-09-12T13:00:00Z',
+        description: 'Waktu mulai acara',
+    }),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal mulai tidak valid' }),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "startDate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '2026-09-12T22:00:00Z', description: 'Waktu selesai acara' }),
+    (0, swagger_1.ApiProperty)({
+        example: '2026-09-12T22:00:00Z',
+        description: 'Waktu selesai acara',
+    }),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal selesai tidak valid' }),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "endDate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'https://images.taqtix.id/banners/event1.jpg', required: false, description: 'URL banner event' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'https://images.taqtix.id/banners/event1.jpg',
+        required: false,
+        description: 'URL banner event',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

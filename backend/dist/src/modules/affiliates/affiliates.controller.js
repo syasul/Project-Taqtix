@@ -31,6 +31,12 @@ let AffiliatesController = class AffiliatesController {
         const redirectUrl = await this.affiliatesService.registerClickAndGetUrl(code, ipAddress, userAgent);
         return res.redirect(redirectUrl);
     }
+    async trackClick(code, req) {
+        const ipAddress = req.ip || req.headers['x-forwarded-for'] || undefined;
+        const userAgent = req.headers['user-agent'] || undefined;
+        await this.affiliatesService.registerClickAndGetUrl(code, ipAddress, userAgent);
+        return { success: true };
+    }
     async createAffiliate(eventId, dto, userId) {
         return this.affiliatesService.create(eventId, dto, userId);
     }
@@ -45,7 +51,9 @@ exports.AffiliatesController = AffiliatesController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)('r/:code'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mencatat klik afiliasi dan redirect ke landing page event (Public)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mencatat klik afiliasi dan redirect ke landing page event (Public)',
+    }),
     __param(0, (0, common_1.Param)('code')),
     __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Res)()),
@@ -54,11 +62,27 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AffiliatesController.prototype, "redirectAffiliate", null);
 __decorate([
-    (0, common_1.Post)('events/:id/affiliates'),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('track/click/:partnerCode'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Mencatat klik afiliasi via API (Public)' }),
+    __param(0, (0, common_1.Param)('partnerCode')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AffiliatesController.prototype, "trackClick", null);
+__decorate([
+    (0, common_1.Post)('organizer/events/:id/partners'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendaftarkan partner afiliasi baru (Organizer Only)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Partner afiliasi berhasil terdaftar.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendaftarkan partner afiliasi baru (Organizer Only)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Partner afiliasi berhasil terdaftar.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -67,11 +91,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AffiliatesController.prototype, "createAffiliate", null);
 __decorate([
-    (0, common_1.Get)('events/:id/affiliates'),
+    (0, common_1.Get)('organizer/events/:id/partners'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar partner afiliasi event (Organizer Only)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar partner afiliasi.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar partner afiliasi event (Organizer Only)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar partner afiliasi.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -79,11 +108,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AffiliatesController.prototype, "getAffiliates", null);
 __decorate([
-    (0, common_1.Get)('events/:id/affiliates/leaderboard'),
+    (0, common_1.Get)('organizer/events/:id/partners/leaderboard'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Leaderboard partner afiliasi.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Leaderboard partner afiliasi.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),

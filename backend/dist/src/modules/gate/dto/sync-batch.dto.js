@@ -19,13 +19,19 @@ class ScanLogItemDto {
 }
 exports.ScanLogItemDto = ScanLogItemDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', description: 'Payload signed QR token' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        description: 'Payload signed QR token',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'QR payload tidak boleh kosong' }),
     __metadata("design:type", String)
 ], ScanLogItemDto.prototype, "qrPayload", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '2026-08-20T03:10:00Z', description: 'Waktu pemindaian offline' }),
+    (0, swagger_1.ApiProperty)({
+        example: '2026-08-20T03:10:00Z',
+        description: 'Waktu pemindaian offline',
+    }),
     (0, class_validator_1.IsDateString)({}, { message: 'Format tanggal pemindaian tidak valid' }),
     __metadata("design:type", String)
 ], ScanLogItemDto.prototype, "scannedAt", void 0);
@@ -34,7 +40,10 @@ class SyncBatchDto {
 }
 exports.SyncBatchDto = SyncBatchDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [ScanLogItemDto], description: 'Daftar logs scan offline yang akan disinkronkan' }),
+    (0, swagger_1.ApiProperty)({
+        type: [ScanLogItemDto],
+        description: 'Daftar logs scan offline yang akan disinkronkan',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => ScanLogItemDto),

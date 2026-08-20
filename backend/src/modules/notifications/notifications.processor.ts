@@ -20,7 +20,9 @@ export class NotificationsProcessor {
   async handleSendTicketWhatsapp(job: Job<NotificationPayload>) {
     const { phone, buyerName, eventTitle, ticketCategory, qrUrl } = job.data;
 
-    console.log(`[BullMQ Processor] Memulai pengiriman WhatsApp ke ${phone}...`);
+    console.log(
+      `[BullMQ Processor] Memulai pengiriman WhatsApp ke ${phone}...`,
+    );
     // Simulasi delay pengiriman network
     await new Promise((resolve) => setTimeout(resolve, 1500));
 

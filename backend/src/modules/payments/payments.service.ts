@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -34,7 +38,9 @@ export class PaymentsService {
     }
 
     if (order.status !== OrderStatus.PENDING) {
-      throw new BadRequestException('Pesanan ini sudah diproses atau dibatalkan');
+      throw new BadRequestException(
+        'Pesanan ini sudah diproses atau dibatalkan',
+      );
     }
 
     // Ambil atau buat record Payment
@@ -49,14 +55,19 @@ export class PaymentsService {
       });
     }
 
-    const serverKey = this.configService.get<string>('TAQTIX_MIDTRANS_SERVER_KEY');
-    const isProd = this.configService.get<string>('TAQTIX_MIDTRANS_IS_PRODUCTION') === 'true';
+    const serverKey = this.configService.get<string>(
+      'TAQTIX_MIDTRANS_SERVER_KEY',
+    );
+    const isProd =
+      this.configService.get<string>('TAQTIX_MIDTRANS_IS_PRODUCTION') ===
+      'true';
 
     if (!serverKey) {
       throw new Error('Midtrans Server Key belum dikonfigurasi di environment');
     }
 
-    const authHeader = 'Basic ' + Buffer.from(serverKey + ':').toString('base64');
+    const authHeader =
+      'Basic ' + Buffer.from(serverKey + ':').toString('base64');
     const url = isProd
       ? 'https://app.midtrans.com/snap/v1/transactions'
       : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
@@ -71,8 +82,8 @@ export class PaymentsService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': authHeader,
+          Accept: 'application/json',
+          Authorization: authHeader,
         },
         body: JSON.stringify({
           transaction_details: {
@@ -126,17 +137,23 @@ export class PaymentsService {
       transaction_id,
     } = body;
 
-    const serverKey = this.configService.get<string>('TAQTIX_MIDTRANS_SERVER_KEY') || '';
+    const serverKey =
+      this.configService.get<string>('TAQTIX_MIDTRANS_SERVER_KEY') || '';
 
     // 1. Verifikasi Signature Key Midtrans
     const rawString = order_id + status_code + gross_amount + serverKey;
-    const computedSignature = crypto.createHash('sha512').update(rawString).digest('hex');
+    const computedSignature = crypto
+      .createHash('sha512')
+      .update(rawString)
+      .digest('hex');
 
     if (computedSignature !== signature_key) {
       throw new BadRequestException('Signature key tidak cocok');
     }
 
-    console.log(`[Midtrans Webhook] Verifikasi sukses untuk Order ID: ${order_id}, Status: ${transaction_status}`);
+    console.log(
+      `[Midtrans Webhook] Verifikasi sukses untuk Order ID: ${order_id}, Status: ${transaction_status}`,
+    );
 
     const isSuccess =
       transaction_status === 'settlement' ||
@@ -207,8 +224,12 @@ export class PaymentsService {
               },
             });
 
-            // Tandatangani QR payload menggunakan JWT
+            // Tandatangani QR payload menggunakan JWT (menggunakan QR secret khusus)
             const expSeconds = Math.floor(order.event.endDate.getTime() / 1000);
+            const qrSecret =
+              this.configService.get<string>('QR_SIGNING_SECRET') ||
+              this.configService.get<string>('QR_SECRET') ||
+              'super-secret-qr-key-change-me';
             const signedCode = await this.jwtService.signAsync(
               {
                 ticketId: ticket.id,
@@ -217,7 +238,7 @@ export class PaymentsService {
                 exp: expSeconds,
               },
               {
-                secret: this.configService.get<string>('TAQTIX_JWT_ACCESS_SECRET'),
+                secret: qrSecret,
               },
             );
 
@@ -245,10 +266,14 @@ export class PaymentsService {
           });
 
           if (partner) {
-            const totalQty = order.orderItems.reduce((acc, item) => acc + item.qty, 0);
+            const totalQty = order.orderItems.reduce(
+              (acc, item) => acc + item.qty,
+              0,
+            );
             let calculatedCommission = 0;
             if (partner.commissionType === 'percentage') {
-              calculatedCommission = order.totalAmount * (partner.commissionValue / 100);
+              calculatedCommission =
+                order.totalAmount * (partner.commissionValue / 100);
             } else {
               calculatedCommission = partner.commissionValue * totalQty;
             }
@@ -308,12 +333,12 @@ export class PaymentsService {
           return;
         }
 
-        // Update Payment status ke FAIL
+        // Update Payment status ke FAILED
         if (order.payment) {
           await tx.payment.update({
             where: { id: order.payment.id },
             data: {
-              status: PaymentStatus.FAIL,
+              status: PaymentStatus.FAILED,
             },
           });
         }
@@ -415,7 +440,7 @@ export class PaymentsService {
     let status = 'pending';
     if (order.payment) {
       if (order.payment.status === 'SUCCESS') status = 'success';
-      else if (order.payment.status === 'FAIL') status = 'failed';
+      else if (order.payment.status === 'FAILED') status = 'failed';
     }
     if (order.status === 'EXPIRED') status = 'expired';
 

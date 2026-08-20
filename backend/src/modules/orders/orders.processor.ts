@@ -28,7 +28,9 @@ export class OrdersProcessor {
 
         // Jika status pesanan bukan PENDING, abaikan pembatalan
         if (order.status !== OrderStatus.PENDING) {
-          console.log(`[BullMQ] Pesanan ${orderId} dilewati karena berstatus ${order.status}.`);
+          console.log(
+            `[BullMQ] Pesanan ${orderId} dilewati karena berstatus ${order.status}.`,
+          );
           return;
         }
 
@@ -60,7 +62,9 @@ export class OrdersProcessor {
           });
         }
 
-        console.log(`[BullMQ] Pesanan ${orderId} berhasil dibatalkan otomatis dan kuota dikembalikan.`);
+        console.log(
+          `[BullMQ] Pesanan ${orderId} berhasil dibatalkan otomatis dan kuota dikembalikan.`,
+        );
       });
     } catch (error) {
       console.error(`[BullMQ] Gagal membatalkan pesanan ${orderId}:`, error);

@@ -62,4 +62,26 @@ export declare class TicketsService {
         code: string;
         discount: number;
     }>;
+    getTicket(ticketId: string): Promise<{
+        ticketId: string;
+        ticketStatus: import("@prisma/client").$Enums.TicketStatus;
+        ticketCategory: string;
+        buyerName: string;
+        buyerEmail: string;
+        eventTitle: string;
+        eventLocation: string;
+        eventStartDate: Date;
+        eventEndDate: Date;
+        organizerName: string;
+        signedQrPayload: string;
+    }>;
+    getTicketsByOrder(orderId: string): Promise<{
+        ticketId: string;
+        ticketStatus: import("@prisma/client").$Enums.TicketStatus;
+        ticketCategory: string;
+        buyerName: string;
+        buyerEmail: string;
+        eventTitle: string;
+        signedQrPayload: string;
+    }[]>;
 }

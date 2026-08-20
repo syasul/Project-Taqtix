@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -44,7 +48,8 @@ export class AuthService {
 
       // Jika role organizer, buat profil organizer default
       if (dto.role === 'organizer') {
-        const slug = dto.email.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
+        const slug =
+          dto.email.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
         await tx.organizer.create({
           data: {
             userId: user.id,
@@ -75,7 +80,10 @@ export class AuthService {
       throw new UnauthorizedException('Kredensial login salah');
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!passwordMatches) {
       throw new UnauthorizedException('Kredensial login salah');
     }
@@ -95,7 +103,10 @@ export class AuthService {
       throw new UnauthorizedException('Kredensial login salah');
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!passwordMatches) {
       throw new UnauthorizedException('Kredensial login salah');
     }
@@ -126,7 +137,9 @@ export class AuthService {
 
       return this.generateTokenPair(user.id, user.email, user.role);
     } catch {
-      throw new UnauthorizedException('Refresh token tidak valid atau kedaluwarsa');
+      throw new UnauthorizedException(
+        'Refresh token tidak valid atau kedaluwarsa',
+      );
     }
   }
 

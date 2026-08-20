@@ -44,8 +44,13 @@ __decorate([
     (0, common_1.Get)('organizer/events/:id/dashboard'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan rangkuman data penjualan & revenue event (Organizer Only)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Rangkuman metrik dashboard.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan rangkuman data penjualan & revenue event (Organizer Only)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Rangkuman metrik dashboard.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -56,7 +61,9 @@ __decorate([
     (0, common_1.Get)('organizer/events/:id/buyers'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan database pembeli tiket event (Organizer Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan database pembeli tiket event (Organizer Only)',
+    }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Database pembeli.' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -68,7 +75,9 @@ __decorate([
     (0, common_1.Get)('organizer/events/:id/buyers/export'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mengekspor data pembeli tiket ke file CSV (Organizer Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengekspor data pembeli tiket ke file CSV (Organizer Only)',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __param(2, (0, common_1.Res)()),
@@ -80,8 +89,13 @@ __decorate([
     (0, common_1.Get)('organizer/events/:id/channel-performance'),
     (0, roles_decorator_1.Roles)('organizer'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data atribusi performa marketing channel (Organizer Only)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Statistik performa marketing channel.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan data atribusi performa marketing channel (Organizer Only)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Statistik performa marketing channel.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),

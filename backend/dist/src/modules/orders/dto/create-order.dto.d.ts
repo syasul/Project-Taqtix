@@ -1,5 +1,5 @@
 export declare class OrderItemDto {
-    ticketTypeId: string;
+    ticketCategoryId: string;
     qty: number;
 }
 export declare class CreateOrderDto {

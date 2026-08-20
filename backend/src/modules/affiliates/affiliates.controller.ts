@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Param, Body, HttpStatus, Res, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  HttpStatus,
+  Res,
+  Req,
+  HttpCode,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AffiliatesService } from './affiliates.service';
 import { CreateAffiliateDto } from './dto/create-affiliate.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -14,25 +29,54 @@ export class AffiliatesController {
 
   @Public()
   @Get('r/:code')
-  @ApiOperation({ summary: 'Mencatat klik afiliasi dan redirect ke landing page event (Public)' })
+  @ApiOperation({
+    summary:
+      'Mencatat klik afiliasi dan redirect ke landing page event (Public)',
+  })
   async redirectAffiliate(
     @Param('code') code: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
     // Tangkap IP Address dan User Agent dari request
-    const ipAddress = req.ip || (req.headers['x-forwarded-for'] as string) || undefined;
+    const ipAddress =
+      req.ip || (req.headers['x-forwarded-for'] as string) || undefined;
     const userAgent = req.headers['user-agent'] || undefined;
 
-    const redirectUrl = await this.affiliatesService.registerClickAndGetUrl(code, ipAddress, userAgent);
+    const redirectUrl = await this.affiliatesService.registerClickAndGetUrl(
+      code,
+      ipAddress,
+      userAgent,
+    );
     return res.redirect(redirectUrl);
   }
 
-  @Post('events/:id/affiliates')
+  @Public()
+  @Post('track/click/:partnerCode')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Mencatat klik afiliasi via API (Public)' })
+  async trackClick(@Param('partnerCode') code: string, @Req() req: Request) {
+    const ipAddress =
+      req.ip || (req.headers['x-forwarded-for'] as string) || undefined;
+    const userAgent = req.headers['user-agent'] || undefined;
+    await this.affiliatesService.registerClickAndGetUrl(
+      code,
+      ipAddress,
+      userAgent,
+    );
+    return { success: true };
+  }
+
+  @Post('organizer/events/:id/partners')
   @Roles('organizer')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendaftarkan partner afiliasi baru (Organizer Only)' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Partner afiliasi berhasil terdaftar.' })
+  @ApiOperation({
+    summary: 'Mendaftarkan partner afiliasi baru (Organizer Only)',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Partner afiliasi berhasil terdaftar.',
+  })
   async createAffiliate(
     @Param('id') eventId: string,
     @Body() dto: CreateAffiliateDto,
@@ -41,21 +85,38 @@ export class AffiliatesController {
     return this.affiliatesService.create(eventId, dto, userId);
   }
 
-  @Get('events/:id/affiliates')
+  @Get('organizer/events/:id/partners')
   @Roles('organizer')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan daftar partner afiliasi event (Organizer Only)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar partner afiliasi.' })
-  async getAffiliates(@Param('id') eventId: string, @CurrentUser('id') userId: string) {
+  @ApiOperation({
+    summary: 'Mendapatkan daftar partner afiliasi event (Organizer Only)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar partner afiliasi.',
+  })
+  async getAffiliates(
+    @Param('id') eventId: string,
+    @CurrentUser('id') userId: string,
+  ) {
     return this.affiliatesService.findAll(eventId, userId);
   }
 
-  @Get('events/:id/affiliates/leaderboard')
+  @Get('organizer/events/:id/partners/leaderboard')
   @Roles('organizer')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Leaderboard partner afiliasi.' })
-  async getLeaderboard(@Param('id') eventId: string, @CurrentUser('id') userId: string) {
+  @ApiOperation({
+    summary:
+      'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Leaderboard partner afiliasi.',
+  })
+  async getLeaderboard(
+    @Param('id') eventId: string,
+    @CurrentUser('id') userId: string,
+  ) {
     return this.affiliatesService.getLeaderboard(eventId, userId);
   }
 }

@@ -12,12 +12,16 @@ export declare class DashboardController {
     }>;
     getBuyers(eventId: string, userId: string): Promise<{
         orderId: string;
-        buyerName: any;
-        buyerEmail: any;
-        buyerPhone: any;
+        buyerName: string;
+        buyerEmail: string;
+        buyerPhone: string;
         totalAmount: number;
         purchaseDate: Date;
-        items: any;
+        items: {
+            ticketCategory: string;
+            qty: number;
+            price: number;
+        }[];
     }[]>;
     exportBuyers(eventId: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     getChannelPerformance(eventId: string, userId: string): Promise<{
@@ -27,7 +31,16 @@ export declare class DashboardController {
                 salesCount: number;
                 revenueGenerated: number;
             };
-            affiliates: any;
+            affiliates: {
+                partnerId: string;
+                partnerName: string;
+                partnerType: import("@prisma/client").$Enums.PartnerType;
+                clicks: number;
+                salesCount: number;
+                revenueGenerated: number;
+                commissionEarned: number;
+                conversionRate: number;
+            }[];
         };
     }>;
 }

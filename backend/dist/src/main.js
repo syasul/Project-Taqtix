@@ -22,6 +22,7 @@ async function bootstrap() {
         whitelist: true,
         transform: true,
         forbidNonWhitelisted: true,
+        errorHttpStatusCode: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
     }));
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
     app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor());

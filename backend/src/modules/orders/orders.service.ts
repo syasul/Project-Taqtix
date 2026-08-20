@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatus } from '@prisma/client';
@@ -51,14 +57,20 @@ export class OrdersService {
 
         if (!promo || promo.eventId !== dto.eventId) {
           throw new HttpException(
-            { code: 'INVALID_PROMO_CODE', message: 'Kode promo tidak valid untuk event ini' },
+            {
+              code: 'INVALID_PROMO_CODE',
+              message: 'Kode promo tidak valid untuk event ini',
+            },
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         }
 
         if (promo.usedCount >= promo.maxUsage) {
           throw new HttpException(
-            { code: 'INVALID_PROMO_CODE', message: 'Kuota penggunaan kode promo sudah habis' },
+            {
+              code: 'INVALID_PROMO_CODE',
+              message: 'Kuota penggunaan kode promo sudah habis',
+            },
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         }
@@ -79,7 +91,11 @@ export class OrdersService {
 
       // 3. Lock dan validasi kuota tiket
       let basePriceTotal = 0;
-      const verifiedItems: { ticketCategoryId: string; qty: number; price: number }[] = [];
+      const verifiedItems: {
+        ticketCategoryId: string;
+        qty: number;
+        price: number;
+      }[] = [];
 
       for (const item of dto.items) {
         // Lakukan pessimistic locking pada baris TicketCategory
@@ -90,7 +106,9 @@ export class OrdersService {
         `;
 
         if (!ticketCategories || ticketCategories.length === 0) {
-          throw new BadRequestException(`Kategori tiket ${item.ticketCategoryId} tidak ditemukan pada event ini`);
+          throw new BadRequestException(
+            `Kategori tiket ${item.ticketCategoryId} tidak ditemukan pada event ini`,
+          );
         }
 
         const ticketCategory = ticketCategories[0];

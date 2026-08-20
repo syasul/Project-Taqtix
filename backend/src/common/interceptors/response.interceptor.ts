@@ -14,7 +14,10 @@ export interface ResponseFormat<T> {
 }
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, ResponseFormat<T>> {
+export class ResponseInterceptor<T> implements NestInterceptor<
+  T,
+  ResponseFormat<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -35,7 +38,12 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, ResponseFormat
         }
 
         // Jika data memiliki format paginasi (data & meta)
-        if (data && typeof data === 'object' && 'data' in data && ('meta' in data || 'pagination' in data)) {
+        if (
+          data &&
+          typeof data === 'object' &&
+          'data' in data &&
+          ('meta' in data || 'pagination' in data)
+        ) {
           return {
             success: true,
             data: data.data,

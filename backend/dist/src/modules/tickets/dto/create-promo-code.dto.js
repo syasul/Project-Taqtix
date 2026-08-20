@@ -25,13 +25,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePromoCodeDto.prototype, "code", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 25000, description: 'Nilai diskon (bisa nominal atau persentase)' }),
+    (0, swagger_1.ApiProperty)({
+        example: 25000,
+        description: 'Nilai diskon (bisa nominal atau persentase)',
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1, { message: 'Diskon harus lebih besar dari 0' }),
     __metadata("design:type", Number)
 ], CreatePromoCodeDto.prototype, "discount", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 100, description: 'Batas maksimum penggunaan kode promo' }),
+    (0, swagger_1.ApiProperty)({
+        example: 100,
+        description: 'Batas maksimum penggunaan kode promo',
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1, { message: 'Maksimum penggunaan minimal 1' }),
     __metadata("design:type", Number)

@@ -12,12 +12,16 @@ export declare class DashboardService {
     }>;
     getBuyers(eventId: string, organizerUserId: string): Promise<{
         orderId: string;
-        buyerName: any;
-        buyerEmail: any;
-        buyerPhone: any;
+        buyerName: string;
+        buyerEmail: string;
+        buyerPhone: string;
         totalAmount: number;
         purchaseDate: Date;
-        items: any;
+        items: {
+            ticketCategory: string;
+            qty: number;
+            price: number;
+        }[];
     }[]>;
     getBuyersCsv(eventId: string, organizerUserId: string): Promise<string>;
     getChannelPerformance(eventId: string, organizerUserId: string): Promise<{
@@ -27,7 +31,16 @@ export declare class DashboardService {
                 salesCount: number;
                 revenueGenerated: number;
             };
-            affiliates: any;
+            affiliates: {
+                partnerId: string;
+                partnerName: string;
+                partnerType: import("@prisma/client").$Enums.PartnerType;
+                clicks: number;
+                salesCount: number;
+                revenueGenerated: number;
+                commissionEarned: number;
+                conversionRate: number;
+            }[];
         };
     }>;
 }

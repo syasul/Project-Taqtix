@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrderStatus } from '@prisma/client';
 
@@ -27,7 +31,9 @@ export class DashboardService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan pemilik event ini',
+      );
     }
 
     return event;
@@ -78,7 +84,7 @@ export class DashboardService {
       include: {
         orderItems: {
           include: {
-            ticketType: {
+            ticketCategory: {
               select: {
                 name: true,
               },
@@ -89,19 +95,22 @@ export class DashboardService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return orders.map((o) => ({
-      orderId: o.id,
-      buyerName: o.buyerName,
-      buyerEmail: o.buyerEmail,
-      buyerPhone: o.buyerPhone,
-      totalAmount: o.totalAmount,
-      purchaseDate: o.createdAt,
-      items: o.orderItems.map((item) => ({
-        ticketCategory: item.ticketType.name,
-        qty: item.qty,
-        price: item.price,
-      })),
-    }));
+    return orders.map((o) => {
+      const firstItem = o.orderItems[0];
+      return {
+        orderId: o.id,
+        buyerName: firstItem?.attendeeName || 'Guest',
+        buyerEmail: firstItem?.attendeeEmail || '',
+        buyerPhone: firstItem?.attendeePhone || '',
+        totalAmount: o.totalAmount,
+        purchaseDate: o.createdAt,
+        items: o.orderItems.map((item) => ({
+          ticketCategory: item.ticketCategory.name,
+          qty: item.qty,
+          price: item.unitPrice,
+        })),
+      };
+    });
   }
 
   /**
@@ -110,7 +119,8 @@ export class DashboardService {
   async getBuyersCsv(eventId: string, organizerUserId: string) {
     const buyers = await this.getBuyers(eventId, organizerUserId);
 
-    let csvContent = 'Nama,Email,No. WhatsApp,Total Bayar (Rp),Tanggal Pembelian\n';
+    let csvContent =
+      'Nama,Email,No. WhatsApp,Total Bayar (Rp),Tanggal Pembelian\n';
 
     for (const b of buyers) {
       const cleanName = b.buyerName.replace(/"/g, '""');
@@ -131,7 +141,7 @@ export class DashboardService {
     await this.verifyEventOwnership(eventId, organizerUserId);
 
     // 1. Dapatkan agregasi data afiliasi
-    const affiliates = await this.prisma.affiliatePartner.findMany({
+    const affiliates = await this.prisma.partner.findMany({
       where: { eventId },
       include: {
         orders: {
@@ -142,17 +152,23 @@ export class DashboardService {
 
     const affiliatePerformance = affiliates.map((aff) => {
       const salesCount = aff.orders.length;
-      const totalRevenue = aff.orders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const totalRevenue = aff.orders.reduce(
+        (sum, o) => sum + o.totalAmount,
+        0,
+      );
 
       return {
         partnerId: aff.id,
         partnerName: aff.name,
         partnerType: aff.type,
-        clicks: aff.totalClicks,
+        clicks: aff.clicks,
         salesCount,
         revenueGenerated: totalRevenue,
-        commissionEarned: aff.commission,
-        conversionRate: aff.totalClicks > 0 ? parseFloat(((salesCount / aff.totalClicks) * 100).toFixed(2)) : 0.0,
+        commissionEarned: aff.commissionEarned,
+        conversionRate:
+          aff.clicks > 0
+            ? parseFloat(((salesCount / aff.clicks) * 100).toFixed(2))
+            : 0.0,
       };
     });
 
@@ -161,11 +177,14 @@ export class DashboardService {
       where: {
         eventId,
         status: OrderStatus.PAID,
-        affiliatePartnerId: null,
+        partnerId: null,
       },
     });
 
-    const organicRevenue = organicOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const organicRevenue = organicOrders.reduce(
+      (sum, o) => sum + o.totalAmount,
+      0,
+    );
 
     return {
       eventId,

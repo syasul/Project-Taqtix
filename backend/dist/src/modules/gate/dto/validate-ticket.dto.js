@@ -17,7 +17,10 @@ class ValidateTicketDto {
 }
 exports.ValidateTicketDto = ValidateTicketDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', description: 'Payload signed QR token' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        description: 'Payload signed QR token',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'QR payload tidak boleh kosong' }),
     __metadata("design:type", String)

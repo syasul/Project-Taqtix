@@ -64,7 +64,7 @@ let DashboardService = class DashboardService {
             include: {
                 orderItems: {
                     include: {
-                        ticketType: {
+                        ticketCategory: {
                             select: {
                                 name: true,
                             },
@@ -74,19 +74,22 @@ let DashboardService = class DashboardService {
             },
             orderBy: { createdAt: 'desc' },
         });
-        return orders.map((o) => ({
-            orderId: o.id,
-            buyerName: o.buyerName,
-            buyerEmail: o.buyerEmail,
-            buyerPhone: o.buyerPhone,
-            totalAmount: o.totalAmount,
-            purchaseDate: o.createdAt,
-            items: o.orderItems.map((item) => ({
-                ticketCategory: item.ticketType.name,
-                qty: item.qty,
-                price: item.price,
-            })),
-        }));
+        return orders.map((o) => {
+            const firstItem = o.orderItems[0];
+            return {
+                orderId: o.id,
+                buyerName: firstItem?.attendeeName || 'Guest',
+                buyerEmail: firstItem?.attendeeEmail || '',
+                buyerPhone: firstItem?.attendeePhone || '',
+                totalAmount: o.totalAmount,
+                purchaseDate: o.createdAt,
+                items: o.orderItems.map((item) => ({
+                    ticketCategory: item.ticketCategory.name,
+                    qty: item.qty,
+                    price: item.unitPrice,
+                })),
+            };
+        });
     }
     async getBuyersCsv(eventId, organizerUserId) {
         const buyers = await this.getBuyers(eventId, organizerUserId);
@@ -102,7 +105,7 @@ let DashboardService = class DashboardService {
     }
     async getChannelPerformance(eventId, organizerUserId) {
         await this.verifyEventOwnership(eventId, organizerUserId);
-        const affiliates = await this.prisma.affiliatePartner.findMany({
+        const affiliates = await this.prisma.partner.findMany({
             where: { eventId },
             include: {
                 orders: {
@@ -117,18 +120,20 @@ let DashboardService = class DashboardService {
                 partnerId: aff.id,
                 partnerName: aff.name,
                 partnerType: aff.type,
-                clicks: aff.totalClicks,
+                clicks: aff.clicks,
                 salesCount,
                 revenueGenerated: totalRevenue,
-                commissionEarned: aff.commission,
-                conversionRate: aff.totalClicks > 0 ? parseFloat(((salesCount / aff.totalClicks) * 100).toFixed(2)) : 0.0,
+                commissionEarned: aff.commissionEarned,
+                conversionRate: aff.clicks > 0
+                    ? parseFloat(((salesCount / aff.clicks) * 100).toFixed(2))
+                    : 0.0,
             };
         });
         const organicOrders = await this.prisma.order.findMany({
             where: {
                 eventId,
                 status: client_1.OrderStatus.PAID,
-                affiliatePartnerId: null,
+                partnerId: null,
             },
         });
         const organicRevenue = organicOrders.reduce((sum, o) => sum + o.totalAmount, 0);

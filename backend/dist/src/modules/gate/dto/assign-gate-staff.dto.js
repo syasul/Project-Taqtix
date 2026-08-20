@@ -17,7 +17,10 @@ class AssignGateStaffDto {
 }
 exports.AssignGateStaffDto = AssignGateStaffDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'staff1@taqtix.id', description: 'Alamat email staf yang akan didaftarkan' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'staff1@taqtix.id',
+        description: 'Alamat email staf yang akan didaftarkan',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Email tidak boleh kosong' }),
     __metadata("design:type", String)

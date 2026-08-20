@@ -18,7 +18,10 @@ class LoginDto {
 }
 exports.LoginDto = LoginDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'organizer@taqtix.id', description: 'Email pengguna' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'organizer@taqtix.id',
+        description: 'Email pengguna',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Alamat email tidak valid' }),
     __metadata("design:type", String)
 ], LoginDto.prototype, "email", void 0);

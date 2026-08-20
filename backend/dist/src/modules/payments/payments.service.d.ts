@@ -18,14 +18,17 @@ export declare class PaymentsService {
     getTicket(ticketId: string): Promise<{
         ticketId: string;
         ticketStatus: import("@prisma/client").$Enums.TicketStatus;
-        ticketCategory: any;
-        buyerName: any;
-        buyerEmail: any;
-        eventTitle: string | undefined;
-        eventLocation: string | undefined;
-        eventStartDate: Date | undefined;
-        eventEndDate: Date | undefined;
-        organizerName: string | undefined;
-        signedQrPayload: any;
+        ticketCategory: string;
+        buyerName: string;
+        buyerEmail: string;
+        eventTitle: string;
+        eventLocation: string;
+        eventStartDate: Date;
+        eventEndDate: Date;
+        organizerName: string;
+        signedQrPayload: string;
+    }>;
+    getPaymentStatus(orderId: string): Promise<{
+        status: string;
     }>;
 }

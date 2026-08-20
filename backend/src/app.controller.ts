@@ -19,7 +19,9 @@ export class AppController {
 
   @Public()
   @Get('health')
-  @ApiOperation({ summary: 'Memeriksa status kesehatan dan kelayakan servis backend' })
+  @ApiOperation({
+    summary: 'Memeriksa status kesehatan dan kelayakan servis backend',
+  })
   @ApiResponse({ status: 200, description: 'Servis backend berjalan normal.' })
   getHealth() {
     return {

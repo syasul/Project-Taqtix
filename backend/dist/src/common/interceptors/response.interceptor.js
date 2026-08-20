@@ -20,7 +20,10 @@ let ResponseInterceptor = class ResponseInterceptor {
             if (data && typeof data === 'object' && 'success' in data) {
                 return data;
             }
-            if (data && typeof data === 'object' && 'data' in data && ('meta' in data || 'pagination' in data)) {
+            if (data &&
+                typeof data === 'object' &&
+                'data' in data &&
+                ('meta' in data || 'pagination' in data)) {
                 return {
                     success: true,
                     data: data.data,

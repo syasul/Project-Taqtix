@@ -25,11 +25,11 @@ let PaymentsController = class PaymentsController {
     async payOrder(orderId) {
         return this.paymentsService.pay(orderId);
     }
-    async handleWebhook(body) {
+    async handleWebhook(provider, body) {
         return this.paymentsService.handleWebhook(body);
     }
-    async getTicket(ticketId) {
-        return this.paymentsService.getTicket(ticketId);
+    async getPaymentStatus(orderId) {
+        return this.paymentsService.getPaymentStatus(orderId);
     }
 };
 exports.PaymentsController = PaymentsController;
@@ -37,9 +37,17 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('orders/:id/pay'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan link/token pembayaran Snap Midtrans untuk order (Public/Buyer)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Token Snap berhasil dibuat.' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.NOT_FOUND, description: 'Pesanan tidak ditemukan.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan link/token pembayaran Snap Midtrans untuk order (Public/Buyer)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Token Snap berhasil dibuat.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.NOT_FOUND,
+        description: 'Pesanan tidak ditemukan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -47,26 +55,37 @@ __decorate([
 ], PaymentsController.prototype, "payOrder", null);
 __decorate([
     (0, public_decorator_1.Public)(),
-    (0, common_1.Post)('payments/webhook'),
+    (0, common_1.Post)('payments/webhook/:provider'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Menerima notifikasi callback webhook dari Midtrans (Public/Webhook)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Menerima notifikasi callback webhook dari payment gateway (Public/Webhook)',
+    }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Webhook diproses.' }),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Param)('provider')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PaymentsController.prototype, "handleWebhook", null);
 __decorate([
     (0, public_decorator_1.Public)(),
-    (0, common_1.Get)('tickets/:id'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan detail e-ticket pembeli berdasarkan ID tiket (Public/Buyer)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Detail e-ticket berhasil didapatkan.' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.NOT_FOUND, description: 'Tiket tidak ditemukan.' }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)('payments/:orderId/status'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan status pembayaran pesanan secara polling (Public/Buyer)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Status pembayaran berhasil diambil.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.NOT_FOUND,
+        description: 'Pesanan tidak ditemukan.',
+    }),
+    __param(0, (0, common_1.Param)('orderId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], PaymentsController.prototype, "getTicket", null);
+], PaymentsController.prototype, "getPaymentStatus", null);
 exports.PaymentsController = PaymentsController = __decorate([
     (0, swagger_1.ApiTags)('Payments & Tickets'),
     (0, common_1.Controller)(),

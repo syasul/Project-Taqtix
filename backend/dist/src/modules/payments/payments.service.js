@@ -68,7 +68,11 @@ let PaymentsService = class PaymentsService {
     async pay(orderId) {
         const order = await this.prisma.order.findUnique({
             where: { id: orderId },
-            include: { payment: true },
+            include: {
+                payment: true,
+                buyer: true,
+                orderItems: true,
+            },
         });
         if (!order) {
             throw new common_1.NotFoundException('Pesanan tidak ditemukan');
@@ -87,7 +91,8 @@ let PaymentsService = class PaymentsService {
             });
         }
         const serverKey = this.configService.get('TAQTIX_MIDTRANS_SERVER_KEY');
-        const isProd = this.configService.get('TAQTIX_MIDTRANS_IS_PRODUCTION') === 'true';
+        const isProd = this.configService.get('TAQTIX_MIDTRANS_IS_PRODUCTION') ===
+            'true';
         if (!serverKey) {
             throw new Error('Midtrans Server Key belum dikonfigurasi di environment');
         }
@@ -95,13 +100,17 @@ let PaymentsService = class PaymentsService {
         const url = isProd
             ? 'https://app.midtrans.com/snap/v1/transactions'
             : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+        const firstItem = order.orderItems[0];
+        const buyerName = firstItem ? firstItem.attendeeName : 'Guest';
+        const buyerEmail = order.buyer.email;
+        const buyerPhone = firstItem ? firstItem.attendeePhone : '';
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': authHeader,
+                    Accept: 'application/json',
+                    Authorization: authHeader,
                 },
                 body: JSON.stringify({
                     transaction_details: {
@@ -109,9 +118,9 @@ let PaymentsService = class PaymentsService {
                         gross_amount: order.totalAmount,
                     },
                     customer_details: {
-                        first_name: order.buyerName,
-                        email: order.buyerEmail,
-                        phone: order.buyerPhone || undefined,
+                        first_name: buyerName,
+                        email: buyerEmail,
+                        phone: buyerPhone || undefined,
                     },
                 }),
             });
@@ -140,7 +149,10 @@ let PaymentsService = class PaymentsService {
         const { order_id, transaction_status, fraud_status, gross_amount, signature_key, status_code, transaction_id, } = body;
         const serverKey = this.configService.get('TAQTIX_MIDTRANS_SERVER_KEY') || '';
         const rawString = order_id + status_code + gross_amount + serverKey;
-        const computedSignature = crypto.createHash('sha512').update(rawString).digest('hex');
+        const computedSignature = crypto
+            .createHash('sha512')
+            .update(rawString)
+            .digest('hex');
         if (computedSignature !== signature_key) {
             throw new common_1.BadRequestException('Signature key tidak cocok');
         }
@@ -157,11 +169,12 @@ let PaymentsService = class PaymentsService {
                     include: {
                         orderItems: {
                             include: {
-                                ticketType: true,
+                                ticketCategory: true,
                             },
                         },
                         payment: true,
                         event: true,
+                        buyer: true,
                     },
                 });
                 if (!order) {
@@ -176,7 +189,7 @@ let PaymentsService = class PaymentsService {
                         data: {
                             status: client_1.PaymentStatus.SUCCESS,
                             paidAt: new Date(),
-                            gatewayRef: transaction_id,
+                            externalId: transaction_id,
                         },
                     });
                 }
@@ -191,62 +204,83 @@ let PaymentsService = class PaymentsService {
                     for (let i = 0; i < item.qty; i++) {
                         const ticket = await tx.ticket.create({
                             data: {
-                                orderId: order.id,
-                                ticketTypeId: item.ticketTypeId,
-                                status: client_1.TicketStatus.ISSUED,
-                                code: 'TEMP',
+                                orderItemId: item.id,
+                                eventId: order.eventId,
+                                status: client_1.TicketStatus.VALID,
+                                qrPayload: 'TEMP_' + crypto.randomUUID(),
                             },
                         });
+                        const expSeconds = Math.floor(order.event.endDate.getTime() / 1000);
+                        const qrSecret = this.configService.get('QR_SIGNING_SECRET') ||
+                            this.configService.get('QR_SECRET') ||
+                            'super-secret-qr-key-change-me';
                         const signedCode = await this.jwtService.signAsync({
                             ticketId: ticket.id,
-                            orderId: order.id,
+                            eventId: order.eventId,
+                            type: 'audience',
+                            exp: expSeconds,
                         }, {
-                            secret: this.configService.get('TAQTIX_JWT_ACCESS_SECRET'),
+                            secret: qrSecret,
                         });
                         const updatedTicket = await tx.ticket.update({
                             where: { id: ticket.id },
-                            data: { code: signedCode },
+                            data: { qrPayload: signedCode },
                             include: {
-                                ticketType: true,
+                                orderItem: {
+                                    include: {
+                                        ticketCategory: true,
+                                    },
+                                },
                             },
                         });
                         generatedTickets.push(updatedTicket);
                     }
                 }
-                if (order.affiliatePartnerId) {
-                    const affiliate = await tx.affiliatePartner.findUnique({
-                        where: { id: order.affiliatePartnerId },
+                if (order.partnerId) {
+                    const partner = await tx.partner.findUnique({
+                        where: { id: order.partnerId },
                     });
-                    if (affiliate) {
+                    if (partner) {
                         const totalQty = order.orderItems.reduce((acc, item) => acc + item.qty, 0);
-                        const calculatedCommission = order.totalAmount * (affiliate.commissionPct / 100);
-                        await tx.affiliatePartner.update({
-                            where: { id: affiliate.id },
+                        let calculatedCommission = 0;
+                        if (partner.commissionType === 'percentage') {
+                            calculatedCommission =
+                                order.totalAmount * (partner.commissionValue / 100);
+                        }
+                        else {
+                            calculatedCommission = partner.commissionValue * totalQty;
+                        }
+                        await tx.partner.update({
+                            where: { id: partner.id },
                             data: {
-                                totalSales: { increment: totalQty },
-                                commission: { increment: calculatedCommission },
+                                conversions: { increment: totalQty },
+                                revenueGenerated: { increment: order.totalAmount },
+                                commissionEarned: { increment: calculatedCommission },
                             },
                         });
                     }
                 }
                 for (const ticket of generatedTickets) {
                     const qrUrl = `${this.configService.get('TAQTIX_BASE_URL') || 'http://localhost:3001'}/api/v1/tickets/${ticket.id}`;
-                    if (order.buyerPhone) {
+                    const attendeePhone = ticket.orderItem.attendeePhone;
+                    const attendeeName = ticket.orderItem.attendeeName;
+                    const attendeeEmail = ticket.orderItem.attendeeEmail;
+                    if (attendeePhone) {
                         await this.notificationsQueue.add('send-ticket-whatsapp', {
                             ticketId: ticket.id,
-                            phone: order.buyerPhone,
-                            buyerName: order.buyerName,
+                            phone: attendeePhone,
+                            buyerName: attendeeName,
                             eventTitle: order.event.title,
-                            ticketCategory: ticket.ticketType.name,
+                            ticketCategory: ticket.orderItem.ticketCategory.name,
                             qrUrl,
                         });
                     }
                     await this.notificationsQueue.add('send-ticket-email', {
                         ticketId: ticket.id,
-                        email: order.buyerEmail,
-                        buyerName: order.buyerName,
+                        email: attendeeEmail,
+                        buyerName: attendeeName,
                         eventTitle: order.event.title,
-                        ticketCategory: ticket.ticketType.name,
+                        ticketCategory: ticket.orderItem.ticketCategory.name,
                         qrUrl,
                     });
                 }
@@ -268,7 +302,7 @@ let PaymentsService = class PaymentsService {
                     await tx.payment.update({
                         where: { id: order.payment.id },
                         data: {
-                            status: client_1.PaymentStatus.FAIL,
+                            status: client_1.PaymentStatus.FAILED,
                         },
                     });
                 }
@@ -279,10 +313,10 @@ let PaymentsService = class PaymentsService {
                     },
                 });
                 for (const item of order.orderItems) {
-                    await tx.ticketType.update({
-                        where: { id: item.ticketTypeId },
+                    await tx.ticketCategory.update({
+                        where: { id: item.ticketCategoryId },
                         data: {
-                            soldCount: { decrement: item.qty },
+                            sold: { decrement: item.qty },
                         },
                     });
                 }
@@ -302,36 +336,62 @@ let PaymentsService = class PaymentsService {
         const ticket = await this.prisma.ticket.findUnique({
             where: { id: ticketId },
             include: {
-                order: true,
-                ticketType: true,
+                orderItem: {
+                    include: {
+                        order: {
+                            include: {
+                                buyer: true,
+                            },
+                        },
+                        ticketCategory: true,
+                    },
+                },
+                event: {
+                    include: {
+                        organizer: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
             },
         });
         if (!ticket) {
             throw new common_1.NotFoundException('Tiket tidak ditemukan');
         }
-        const event = await this.prisma.event.findUnique({
-            where: { id: ticket.ticketType.eventId },
-            include: {
-                organizer: {
-                    select: {
-                        name: true,
-                    },
-                },
-            },
-        });
         return {
             ticketId: ticket.id,
             ticketStatus: ticket.status,
-            ticketCategory: ticket.ticketType.name,
-            buyerName: ticket.order.buyerName,
-            buyerEmail: ticket.order.buyerEmail,
-            eventTitle: event?.title,
-            eventLocation: event?.location,
-            eventStartDate: event?.startDate,
-            eventEndDate: event?.endDate,
-            organizerName: event?.organizer.name,
-            signedQrPayload: ticket.code,
+            ticketCategory: ticket.orderItem.ticketCategory.name,
+            buyerName: ticket.orderItem.attendeeName,
+            buyerEmail: ticket.orderItem.attendeeEmail,
+            eventTitle: ticket.event.title,
+            eventLocation: ticket.event.location,
+            eventStartDate: ticket.event.startDate,
+            eventEndDate: ticket.event.endDate,
+            organizerName: ticket.event.organizer.name,
+            signedQrPayload: ticket.qrPayload,
         };
+    }
+    async getPaymentStatus(orderId) {
+        const order = await this.prisma.order.findUnique({
+            where: { id: orderId },
+            include: { payment: true },
+        });
+        if (!order) {
+            throw new common_1.NotFoundException('Pesanan tidak ditemukan');
+        }
+        let status = 'pending';
+        if (order.payment) {
+            if (order.payment.status === 'SUCCESS')
+                status = 'success';
+            else if (order.payment.status === 'FAILED')
+                status = 'failed';
+        }
+        if (order.status === 'EXPIRED')
+            status = 'expired';
+        return { status };
     }
 };
 exports.PaymentsService = PaymentsService;

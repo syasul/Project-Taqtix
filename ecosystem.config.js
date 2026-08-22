@@ -3,8 +3,7 @@ module.exports = {
     {
       name: "taqtix-backend",
       cwd: "./backend",
-      script: "pnpm",
-      args: "start:prod",
+      script: "dist/main.js",
       env: {
         NODE_ENV: "production",
         PORT: 3001,
@@ -13,7 +12,7 @@ module.exports = {
     {
       name: "taqtix-frontend",
       cwd: "./apps/web",
-      script: "pnpm",
+      script: "node_modules/.bin/next",
       args: "start",
       env: {
         NODE_ENV: "production",
@@ -23,7 +22,7 @@ module.exports = {
     {
       name: "taqtix-admin",
       cwd: "./apps/admin",
-      script: "pnpm",
+      script: "node_modules/.bin/next",
       args: "start",
       env: {
         NODE_ENV: "production",

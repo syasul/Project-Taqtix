@@ -20,5 +20,15 @@ module.exports = {
         PORT: 3000,
       },
     },
+    {
+      name: "taqtix-admin",
+      cwd: "./apps/admin",
+      script: "pnpm",
+      args: "start",
+      env: {
+        NODE_ENV: "production",
+        PORT: 3002,
+      },
+    },
   ],
 };

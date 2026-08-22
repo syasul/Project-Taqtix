@@ -55,6 +55,17 @@ async function main() {
     },
   });
 
+  // 3c. Buat User Admin
+  console.log('Membuat user admin...');
+  const adminEmail = 'admin@taqtix.id';
+  const adminUser = await prisma.user.create({
+    data: {
+      email: adminEmail,
+      passwordHash: hashedPassword,
+      role: 'admin',
+    },
+  });
+
   // 4. Buat Event-Event dan Kategori Tiketnya
   console.log('Membuat event...');
   const eventsData = [
@@ -170,6 +181,9 @@ async function main() {
   console.log('Password: password123');
   console.log('Detail Akun Gate Staff:');
   console.log(`Email: ${staffEmail}`);
+  console.log('Password: password123');
+  console.log('Detail Akun Admin:');
+  console.log(`Email: ${adminEmail}`);
   console.log('Password: password123');
 }
 

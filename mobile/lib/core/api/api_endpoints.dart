@@ -1,9 +1,7 @@
 import 'dart:io';
 
 class ApiEndpoints {
-  static final String baseUrl = Platform.isAndroid
-      ? 'http://10.0.2.2:3001/v1'
-      : 'http://localhost:3001/v1';
+  static const String baseUrl = 'https://api-taqtix.inxdvi.com/v1';
   
   static const String login = '/auth/gate-login';
   static const String events = '/gate/events';

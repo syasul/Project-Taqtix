@@ -12,7 +12,7 @@ module.exports = {
     {
       name: "taqtix-frontend",
       cwd: "./apps/web",
-      script: "node_modules/.bin/next",
+      script: "node_modules/next/dist/bin/next",
       args: "start",
       env: {
         NODE_ENV: "production",
@@ -22,7 +22,7 @@ module.exports = {
     {
       name: "taqtix-admin",
       cwd: "./apps/admin",
-      script: "node_modules/.bin/next",
+      script: "node_modules/next/dist/bin/next",
       args: "start",
       env: {
         NODE_ENV: "production",

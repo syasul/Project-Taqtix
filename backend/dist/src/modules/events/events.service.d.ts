@@ -76,9 +76,9 @@ export declare class EventsService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            eventId: string;
             price: number;
             quota: number;
-            eventId: string;
             sold: number;
             maxPerOrder: number;
             saleStartAt: Date;

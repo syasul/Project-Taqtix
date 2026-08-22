@@ -118,6 +118,16 @@ let AuthService = class AuthService {
         if (user.role !== 'gate_staff') {
             throw new common_1.UnauthorizedException('Akses ditolak: Hanya untuk gate_staff');
         }
+        if (dto.deviceId && user.activeDeviceId && user.activeDeviceId !== dto.deviceId) {
+            throw new common_1.UnauthorizedException('Akun ini sedang aktif di perangkat lain');
+        }
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                activeDeviceId: dto.deviceId || null,
+                lastLoginAt: new Date(),
+            },
+        });
         return this.generateTokenPair(user.id, user.email, user.role);
     }
     async refresh(dto) {
@@ -137,7 +147,16 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Refresh token tidak valid atau kedaluwarsa');
         }
     }
-    async logout() {
+    async logout(userId) {
+        if (userId) {
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: {
+                    activeDeviceId: null,
+                    lastLogoutAt: new Date(),
+                },
+            });
+        }
         return { message: 'Logout berhasil' };
     }
     async getMe(userId) {

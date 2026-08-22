@@ -1,8 +1,10 @@
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/api/dio_client.dart';
+import '../../core/local_db/isar_service.dart';
 
 class AuthState {
   final bool isAuthenticated;
@@ -30,6 +32,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     checkAuth();
   }
 
+  Future<String> _getOrCreateDeviceId() async {
+    final storage = ref.read(secureStorageProvider);
+    var deviceId = await storage.read(key: 'gate_device_id');
+    if (deviceId == null || deviceId.isEmpty) {
+      final random = Random.secure();
+      final values = List<int>.generate(16, (i) => random.nextInt(256));
+      deviceId = values.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+      await storage.write(key: 'gate_device_id', value: deviceId);
+    }
+    return deviceId;
+  }
+
   Future<void> checkAuth() async {
     state = AuthState.loading();
     try {
@@ -52,12 +66,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<bool> login(String email, String password) async {
     try {
+      final deviceId = await _getOrCreateDeviceId();
       final dio = ref.read(dioProvider);
       final response = await dio.post(
         ApiEndpoints.login,
         data: {
           'email': email,
           'password': password,
+          'deviceId': deviceId,
         },
       );
 
@@ -87,8 +103,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    try {
+      final dio = ref.read(dioProvider);
+      await dio.post('/auth/logout');
+    } catch (_) {
+      // Abaikan error jaringan agar user tetap bisa logout secara lokal
+    }
+
     final storage = ref.read(secureStorageProvider);
     await storage.delete(key: 'gate_token');
+
+    // Bersihkan database Isar lokal (cache tiket & scan logs)
+    try {
+      final isar = ref.read(isarProvider);
+      await isar.writeTxn(() async {
+        await isar.clear();
+      });
+    } catch (_) {}
+
     state = AuthState.unauthenticated();
   }
 }

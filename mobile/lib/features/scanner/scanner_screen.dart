@@ -17,6 +17,7 @@ class ScannerScreen extends ConsumerStatefulWidget {
 class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   final MobileScannerController _cameraController = MobileScannerController();
   bool _isProcessing = false;
+  String _scanAction = 'in'; // 'in' (check-in) or 'out' (check-out)
 
   @override
   void dispose() {
@@ -47,6 +48,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       final result = await service.checkInQR(
         qrPayload: rawValue,
         eventId: activeEvent.id,
+        action: _scanAction,
       );
 
       // Trigger auto sync attempt if scan succeeds
@@ -153,13 +155,109 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
             },
           ),
 
+          // Sliding Action Segment Switcher (In / Out)
+          Positioned(
+            top: 24,
+            left: 24,
+            right: 24,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _scanAction = 'in';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _scanAction == 'in'
+                              ? const Color(0xFF6366F1)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(26),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.login,
+                              size: 16,
+                              color: _scanAction == 'in' ? Colors.white : Colors.white60,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Masuk (Check-In)',
+                              style: TextStyle(
+                                color: _scanAction == 'in' ? Colors.white : Colors.white60,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _scanAction = 'out';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _scanAction == 'out'
+                              ? const Color(0xFFEF4444)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(26),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.logout,
+                              size: 16,
+                              color: _scanAction == 'out' ? Colors.white : Colors.white60,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Keluar (Check-Out)',
+                              style: TextStyle(
+                                color: _scanAction == 'out' ? Colors.white : Colors.white60,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           // Visual scanner target frame overlay
           Center(
             child: Container(
               height: 260,
               width: 260,
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF6366F1), width: 2),
+                border: Border.all(
+                  color: _scanAction == 'out' ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Stack(
@@ -224,16 +322,18 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                   onTap: () => _cameraController.toggleTorch(),
                 ),
 
-                // Manual Check-in
+                // Manual Check-in / Check-out
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ManualCheckinScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => ManualCheckinScreen(action: _scanAction),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: _scanAction == 'out' ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

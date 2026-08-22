@@ -50,6 +50,9 @@ export declare class OrdersService {
             email: string;
             passwordHash: string;
             role: string;
+            activeDeviceId: string | null;
+            lastLoginAt: Date | null;
+            lastLogoutAt: Date | null;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -59,9 +62,9 @@ export declare class OrdersService {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                eventId: string;
                 price: number;
                 quota: number;
-                eventId: string;
                 sold: number;
                 maxPerOrder: number;
                 saleStartAt: Date;

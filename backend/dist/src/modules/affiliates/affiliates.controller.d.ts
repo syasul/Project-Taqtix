@@ -13,9 +13,9 @@ export declare class AffiliatesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        eventId: string;
         promoCode: string | null;
         type: import("@prisma/client").$Enums.PartnerType;
-        eventId: string;
         uniqueCode: string;
         commissionType: string;
         commissionValue: number;
@@ -29,9 +29,9 @@ export declare class AffiliatesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        eventId: string;
         promoCode: string | null;
         type: import("@prisma/client").$Enums.PartnerType;
-        eventId: string;
         uniqueCode: string;
         commissionType: string;
         commissionValue: number;
@@ -45,9 +45,9 @@ export declare class AffiliatesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        eventId: string;
         promoCode: string | null;
         type: import("@prisma/client").$Enums.PartnerType;
-        eventId: string;
         uniqueCode: string;
         commissionType: string;
         commissionValue: number;

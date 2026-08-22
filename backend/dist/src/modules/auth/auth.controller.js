@@ -41,8 +41,8 @@ let AuthController = class AuthController {
     async me(userId) {
         return this.authService.getMe(userId);
     }
-    async logout() {
-        return this.authService.logout();
+    async logout(userId) {
+        return this.authService.logout(userId);
     }
 };
 exports.AuthController = AuthController;
@@ -146,8 +146,9 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Keluar log dari platform' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Logout berhasil.' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
 exports.AuthController = AuthController = __decorate([

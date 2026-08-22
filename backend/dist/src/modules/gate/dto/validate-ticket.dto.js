@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 class ValidateTicketDto {
     qrPayload;
+    action;
 }
 exports.ValidateTicketDto = ValidateTicketDto;
 __decorate([
@@ -25,4 +26,15 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'QR payload tidak boleh kosong' }),
     __metadata("design:type", String)
 ], ValidateTicketDto.prototype, "qrPayload", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'in',
+        description: 'Aksi pemindaian: "in" untuk masuk, "out" untuk keluar',
+        required: false,
+        default: 'in',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ValidateTicketDto.prototype, "action", void 0);
 //# sourceMappingURL=validate-ticket.dto.js.map

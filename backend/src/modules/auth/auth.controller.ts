@@ -117,7 +117,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Keluar log dari platform' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Logout berhasil.' })
-  async logout() {
-    return this.authService.logout();
+  async logout(@CurrentUser('id') userId: string) {
+    return this.authService.logout(userId);
   }
 }

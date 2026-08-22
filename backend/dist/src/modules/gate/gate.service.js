@@ -144,6 +144,57 @@ let GateService = class GateService {
                     throw new common_1.ForbiddenException('Akses ditolak: Anda tidak ditugaskan di gerbang event ini');
                 }
             }
+            const isOut = dto.action === 'out';
+            if (isOut) {
+                if (ticket.status !== client_1.TicketStatus.CHECKED_IN) {
+                    await tx.scanLog.create({
+                        data: {
+                            ticketId: ticket.id,
+                            scannedById: staffUserId,
+                            result: 'INVALID_OUT',
+                        },
+                    });
+                    throw new common_1.HttpException({
+                        code: 'TICKET_NOT_INSIDE',
+                        message: 'Tiket belum check-in masuk (tidak bisa check-out)',
+                    }, common_1.HttpStatus.BAD_REQUEST);
+                }
+                const updatedTicket = await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: {
+                        status: client_1.TicketStatus.VALID,
+                        checkedOutAt: new Date(),
+                        checkedOutBy: staffUserId,
+                    },
+                });
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'CHECK_OUT',
+                    },
+                });
+                return {
+                    success: true,
+                    message: 'Check-out berhasil! Tiket dinonaktifkan sementara (bisa masuk kembali).',
+                    ticketId: ticket.id,
+                    buyerName: ticket.orderItem.attendeeName,
+                    ticketCategory: ticket.orderItem.ticketCategory.name,
+                    eventTitle: ticket.orderItem.ticketCategory.name,
+                    ticket: {
+                        id: ticket.id,
+                        status: updatedTicket.status,
+                        checkedInAt: updatedTicket.checkedInAt,
+                        checkedOutAt: updatedTicket.checkedOutAt,
+                        orderItem: {
+                            attendeeName: ticket.orderItem.attendeeName,
+                            ticketCategory: {
+                                name: ticket.orderItem.ticketCategory.name,
+                            },
+                        },
+                    },
+                };
+            }
             if (ticket.status === client_1.TicketStatus.CHECKED_IN) {
                 await tx.scanLog.create({
                     data: {
@@ -170,7 +221,7 @@ let GateService = class GateService {
                     message: `Tiket tidak aktif (Status: ${ticket.status})`,
                 }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
             }
-            await tx.ticket.update({
+            const updatedTicket = await tx.ticket.update({
                 where: { id: ticket.id },
                 data: {
                     status: client_1.TicketStatus.CHECKED_IN,
@@ -192,6 +243,18 @@ let GateService = class GateService {
                 buyerName: ticket.orderItem.attendeeName,
                 ticketCategory: ticket.orderItem.ticketCategory.name,
                 eventTitle: ticket.orderItem.ticketCategory.name,
+                ticket: {
+                    id: ticket.id,
+                    status: updatedTicket.status,
+                    checkedInAt: updatedTicket.checkedInAt,
+                    checkedOutAt: updatedTicket.checkedOutAt,
+                    orderItem: {
+                        attendeeName: ticket.orderItem.attendeeName,
+                        ticketCategory: {
+                            name: ticket.orderItem.ticketCategory.name,
+                        },
+                    },
+                },
             };
         });
     }
@@ -232,6 +295,54 @@ let GateService = class GateService {
                     throw new common_1.ForbiddenException('Akses ditolak: Anda tidak ditugaskan di gerbang event ini');
                 }
             }
+            const isOut = dto.action === 'out';
+            if (isOut) {
+                if (ticket.status !== client_1.TicketStatus.CHECKED_IN) {
+                    await tx.scanLog.create({
+                        data: {
+                            ticketId: ticket.id,
+                            scannedById: staffUserId,
+                            result: 'INVALID_OUT',
+                        },
+                    });
+                    throw new common_1.BadRequestException('Tiket belum check-in masuk (tidak bisa check-out)');
+                }
+                const updatedTicket = await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: {
+                        status: client_1.TicketStatus.VALID,
+                        checkedOutAt: new Date(),
+                        checkedOutBy: staffUserId,
+                    },
+                });
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'CHECK_OUT',
+                    },
+                });
+                return {
+                    success: true,
+                    message: 'Check-out manual berhasil!',
+                    ticketId: ticket.id,
+                    buyerName: ticket.orderItem.attendeeName,
+                    ticketCategory: ticket.orderItem.ticketCategory.name,
+                    eventTitle: ticket.orderItem.ticketCategory.name,
+                    ticket: {
+                        id: ticket.id,
+                        status: updatedTicket.status,
+                        checkedInAt: updatedTicket.checkedInAt,
+                        checkedOutAt: updatedTicket.checkedOutAt,
+                        orderItem: {
+                            attendeeName: ticket.orderItem.attendeeName,
+                            ticketCategory: {
+                                name: ticket.orderItem.ticketCategory.name,
+                            },
+                        },
+                    },
+                };
+            }
             if (ticket.status === client_1.TicketStatus.CHECKED_IN) {
                 await tx.scanLog.create({
                     data: {
@@ -252,7 +363,7 @@ let GateService = class GateService {
                 });
                 throw new common_1.BadRequestException(`Tiket tidak aktif (Status: ${ticket.status})`);
             }
-            await tx.ticket.update({
+            const updatedTicket = await tx.ticket.update({
                 where: { id: ticket.id },
                 data: {
                     status: client_1.TicketStatus.CHECKED_IN,
@@ -274,6 +385,18 @@ let GateService = class GateService {
                 buyerName: ticket.orderItem.attendeeName,
                 ticketCategory: ticket.orderItem.ticketCategory.name,
                 eventTitle: ticket.orderItem.ticketCategory.name,
+                ticket: {
+                    id: ticket.id,
+                    status: updatedTicket.status,
+                    checkedInAt: updatedTicket.checkedInAt,
+                    checkedOutAt: updatedTicket.checkedOutAt,
+                    orderItem: {
+                        attendeeName: ticket.orderItem.attendeeName,
+                        ticketCategory: {
+                            name: ticket.orderItem.ticketCategory.name,
+                        },
+                    },
+                },
             };
         });
     }

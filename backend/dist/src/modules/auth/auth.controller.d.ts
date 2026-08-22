@@ -35,7 +35,7 @@ export declare class AuthController {
             bankAccount: string | null;
         } | null;
     }>;
-    logout(): Promise<{
+    logout(userId: string): Promise<{
         message: string;
     }>;
 }

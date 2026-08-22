@@ -115,6 +115,20 @@ export class AuthService {
       throw new UnauthorizedException('Akses ditolak: Hanya untuk gate_staff');
     }
 
+    // Jika deviceId dikirim, periksa jika user sedang aktif di device lain
+    if (dto.deviceId && user.activeDeviceId && user.activeDeviceId !== dto.deviceId) {
+      throw new UnauthorizedException('Akun ini sedang aktif di perangkat lain');
+    }
+
+    // Update activeDeviceId dan lastLoginAt
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        activeDeviceId: dto.deviceId || null,
+        lastLoginAt: new Date(),
+      },
+    });
+
     return this.generateTokenPair(user.id, user.email, user.role);
   }
 
@@ -146,7 +160,16 @@ export class AuthService {
   /**
    * Logika logout platform.
    */
-  async logout() {
+  async logout(userId?: string) {
+    if (userId) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          activeDeviceId: null,
+          lastLogoutAt: new Date(),
+        },
+      });
+    }
     return { message: 'Logout berhasil' };
   }
 

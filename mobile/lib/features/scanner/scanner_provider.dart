@@ -17,7 +17,7 @@ class ScannerService {
 
   ScannerService(this.ref);
 
-  Future<ScanResult> checkInQR({required String qrPayload, required String eventId}) async {
+  Future<ScanResult> checkInQR({required String qrPayload, required String eventId, String action = 'in'}) async {
     final connectivity = await Connectivity().checkConnectivity();
     final isOnline = connectivity != ConnectivityResult.none;
 
@@ -31,6 +31,7 @@ class ScannerService {
           data: {
             'eventId': eventId,
             'qrPayload': qrPayload,
+            'action': action,
           },
         );
 
@@ -40,12 +41,27 @@ class ScannerService {
           final ticketId = ticketData['id'] as String;
           final attendee = ticketData['orderItem']?['attendeeName'] as String?;
           final category = ticketData['orderItem']?['ticketCategory']?['name'] as String?;
+          final checkedInAtStr = ticketData['checkedInAt'] as String?;
+          final checkedOutAtStr = ticketData['checkedOutAt'] as String?;
+
+          String? checkedInTime;
+          String? checkedOutTime;
+
+          if (checkedInAtStr != null) {
+            final dt = DateTime.parse(checkedInAtStr).toLocal();
+            checkedInTime = DateFormat('HH:mm:ss').format(dt);
+          }
+          if (checkedOutAtStr != null) {
+            final dt = DateTime.parse(checkedOutAtStr).toLocal();
+            checkedOutTime = DateFormat('HH:mm:ss').format(dt);
+          }
 
           // Update local cache
           await isar.writeTxn(() async {
             final cache = await isar.ticketCaches.filter().ticketIdEqualTo(ticketId).findFirst();
+            final newStatus = action == 'out' ? 'VALID' : 'CHECKED_IN';
             if (cache != null) {
-              cache.status = 'CHECKED_IN';
+              cache.status = newStatus;
               await isar.ticketCaches.put(cache);
             } else {
               await isar.ticketCaches.put(
@@ -55,7 +71,7 @@ class ScannerService {
                   ..qrPayload = qrPayload
                   ..buyerName = attendee ?? ''
                   ..categoryName = category ?? ''
-                  ..status = 'CHECKED_IN',
+                  ..status = newStatus,
               );
             }
 
@@ -66,16 +82,22 @@ class ScannerService {
                 ..qrPayload = qrPayload
                 ..scannedAt = DateTime.now()
                 ..synced = true
-                ..status = 'SUCCESS',
+                ..status = action == 'out' ? 'CHECK_OUT' : 'SUCCESS',
             );
           });
 
           return ScanResult(
             status: ScanResultStatus.valid,
-            title: 'TIKET VALID (ONLINE)',
-            message: 'Silakan masuk. Check-in berhasil diverifikasi di server.',
+            title: action == 'out' ? 'CHECK-OUT VALID (ONLINE)' : 'TIKET VALID (ONLINE)',
+            message: action == 'out'
+                ? 'Check-out berhasil diverifikasi di server.'
+                : 'Silakan masuk. Check-in berhasil diverifikasi di server.',
             attendee: attendee,
             category: category,
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: action == 'out' ? 'Waktu Keluar' : 'Waktu Masuk',
+            checkedInTime: checkedInTime,
+            checkedOutTime: checkedOutTime,
           );
         } else {
           final error = data?['error'];
@@ -98,6 +120,8 @@ class ScannerService {
               status: ScanResultStatus.duplicate,
               title: 'DUPLIKAT SCAN (ONLINE)',
               message: message,
+              time: DateFormat('HH:mm:ss').format(DateTime.now()),
+              timeLabel: 'Waktu Masuk',
             );
           }
 
@@ -105,6 +129,8 @@ class ScannerService {
             status: ScanResultStatus.invalid,
             title: 'TIKET INVALID (ONLINE)',
             message: message,
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Scan',
           );
         }
       } on DioException catch (e) {
@@ -117,6 +143,8 @@ class ScannerService {
             status: ScanResultStatus.duplicate,
             title: 'DUPLIKAT SCAN (ONLINE)',
             message: message,
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Masuk',
           );
         }
 
@@ -124,6 +152,8 @@ class ScannerService {
           status: ScanResultStatus.invalid,
           title: 'TIKET INVALID (ONLINE)',
           message: message,
+          time: DateFormat('HH:mm:ss').format(DateTime.now()),
+          timeLabel: 'Waktu Scan',
         );
       } catch (e) {
         // Fallback to local check if online request fails
@@ -155,6 +185,59 @@ class ScannerService {
         status: ScanResultStatus.invalid,
         title: 'TIKET INVALID (OFFLINE)',
         message: 'Tiket tidak ditemukan di cache manifest event ini. Pastikan manifest sudah diunduh.',
+        time: DateFormat('HH:mm:ss').format(DateTime.now()),
+        timeLabel: 'Waktu Scan',
+      );
+    }
+
+    final isOut = action == 'out';
+
+    if (isOut) {
+      if (cache.status != 'CHECKED_IN') {
+        await isar.writeTxn(() async {
+          await isar.scanLogs.put(
+            ScanLog()
+              ..ticketId = cache.ticketId
+              ..qrPayload = cache.qrPayload
+              ..scannedAt = DateTime.now()
+              ..synced = false
+              ..status = 'INVALID_OUT',
+          );
+        });
+        return ScanResult(
+          status: ScanResultStatus.invalid,
+          title: 'CHECK-OUT INVALID (OFFLINE)',
+          message: 'Tiket belum check-in masuk (tidak bisa check-out).',
+          attendee: cache.buyerName,
+          category: cache.categoryName,
+          time: DateFormat('HH:mm:ss').format(DateTime.now()),
+          timeLabel: 'Waktu Keluar',
+        );
+      }
+
+      // Valid check-out offline
+      await isar.writeTxn(() async {
+        cache.status = 'VALID';
+        await isar.ticketCaches.put(cache);
+
+        await isar.scanLogs.put(
+          ScanLog()
+            ..ticketId = cache.ticketId
+            ..qrPayload = cache.qrPayload
+            ..scannedAt = DateTime.now()
+            ..synced = false
+            ..status = 'CHECK_OUT',
+        );
+      });
+
+      return ScanResult(
+        status: ScanResultStatus.valid,
+        title: 'CHECK-OUT VALID (OFFLINE)',
+        message: 'Check-out sukses. Disimpan di cache lokal (belum ter-sync).',
+        attendee: cache.buyerName,
+        category: cache.categoryName,
+        time: DateFormat('HH:mm:ss').format(DateTime.now()),
+        timeLabel: 'Waktu Keluar',
       );
     }
 
@@ -172,7 +255,7 @@ class ScannerService {
       });
 
       final logs = await isar.scanLogs.filter().ticketIdEqualTo(cache.ticketId).sortByScannedAtDesc().findFirst();
-      final timeStr = logs != null ? DateFormat('HH:mm').format(logs.scannedAt) : null;
+      final timeStr = logs != null ? DateFormat('HH:mm:ss').format(logs.scannedAt) : DateFormat('HH:mm:ss').format(DateTime.now());
 
       return ScanResult(
         status: ScanResultStatus.duplicate,
@@ -181,6 +264,7 @@ class ScannerService {
         attendee: cache.buyerName,
         category: cache.categoryName,
         time: timeStr,
+        timeLabel: 'Waktu Masuk',
       );
     }
 
@@ -205,10 +289,12 @@ class ScannerService {
       message: 'Check-in sukses. Disimpan di cache lokal (belum ter-sync).',
       attendee: cache.buyerName,
       category: cache.categoryName,
+      time: DateFormat('HH:mm:ss').format(DateTime.now()),
+      timeLabel: 'Waktu Masuk',
     );
   }
 
-  Future<ScanResult> checkInManual({required String ticketId, required String eventId}) async {
+  Future<ScanResult> checkInManual({required String ticketId, required String eventId, String action = 'in'}) async {
     final connectivity = await Connectivity().checkConnectivity();
     final isOnline = connectivity != ConnectivityResult.none;
 
@@ -222,6 +308,7 @@ class ScannerService {
           data: {
             'eventId': eventId,
             'ticketId': ticketId,
+            'action': action,
           },
         );
 
@@ -230,12 +317,27 @@ class ScannerService {
           final ticketData = data['data']['ticket'];
           final attendee = ticketData['orderItem']?['attendeeName'] as String?;
           final category = ticketData['orderItem']?['ticketCategory']?['name'] as String?;
+          final checkedInAtStr = ticketData['checkedInAt'] as String?;
+          final checkedOutAtStr = ticketData['checkedOutAt'] as String?;
+
+          String? checkedInTime;
+          String? checkedOutTime;
+
+          if (checkedInAtStr != null) {
+            final dt = DateTime.parse(checkedInAtStr).toLocal();
+            checkedInTime = DateFormat('HH:mm:ss').format(dt);
+          }
+          if (checkedOutAtStr != null) {
+            final dt = DateTime.parse(checkedOutAtStr).toLocal();
+            checkedOutTime = DateFormat('HH:mm:ss').format(dt);
+          }
 
           // Update local cache
           await isar.writeTxn(() async {
             final cache = await isar.ticketCaches.filter().ticketIdEqualTo(ticketId).findFirst();
+            final newStatus = action == 'out' ? 'VALID' : 'CHECKED_IN';
             if (cache != null) {
-              cache.status = 'CHECKED_IN';
+              cache.status = newStatus;
               await isar.ticketCaches.put(cache);
             } else {
               await isar.ticketCaches.put(
@@ -245,7 +347,7 @@ class ScannerService {
                   ..qrPayload = ticketId
                   ..buyerName = attendee ?? ''
                   ..categoryName = category ?? ''
-                  ..status = 'CHECKED_IN',
+                  ..status = newStatus,
               );
             }
 
@@ -256,16 +358,22 @@ class ScannerService {
                 ..qrPayload = ticketId
                 ..scannedAt = DateTime.now()
                 ..synced = true
-                ..status = 'SUCCESS',
+                ..status = action == 'out' ? 'CHECK_OUT' : 'SUCCESS',
             );
           });
 
           return ScanResult(
             status: ScanResultStatus.valid,
-            title: 'CHECK-IN MANUAL BERHASIL (ONLINE)',
-            message: 'Check-in manual berhasil diverifikasi di server.',
+            title: action == 'out' ? 'CHECK-OUT MANUAL BERHASIL (ONLINE)' : 'CHECK-IN MANUAL BERHASIL (ONLINE)',
+            message: action == 'out'
+                ? 'Check-out manual berhasil diverifikasi di server.'
+                : 'Check-in manual berhasil diverifikasi di server.',
             attendee: attendee,
             category: category,
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: action == 'out' ? 'Waktu Keluar' : 'Waktu Masuk',
+            checkedInTime: checkedInTime,
+            checkedOutTime: checkedOutTime,
           );
         } else {
           final error = data?['error'];
@@ -284,6 +392,8 @@ class ScannerService {
               status: ScanResultStatus.duplicate,
               title: 'DUPLIKAT CHECK-IN (ONLINE)',
               message: message,
+              time: DateFormat('HH:mm:ss').format(DateTime.now()),
+              timeLabel: 'Waktu Masuk',
             );
           }
 
@@ -291,6 +401,8 @@ class ScannerService {
             status: ScanResultStatus.invalid,
             title: 'TIKET INVALID (ONLINE)',
             message: message,
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Scan',
           );
         }
       } on DioException catch (e) {
@@ -303,6 +415,8 @@ class ScannerService {
             status: ScanResultStatus.duplicate,
             title: 'DUPLIKAT CHECK-IN (ONLINE)',
             message: message,
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Masuk',
           );
         }
 
@@ -310,6 +424,8 @@ class ScannerService {
           status: ScanResultStatus.invalid,
           title: 'TIKET INVALID (ONLINE)',
           message: message,
+          time: DateFormat('HH:mm:ss').format(DateTime.now()),
+          timeLabel: 'Waktu Scan',
         );
       } catch (e) {
         // Fallback to local check
@@ -335,6 +451,59 @@ class ScannerService {
         status: ScanResultStatus.invalid,
         title: 'KODE INVALID (OFFLINE)',
         message: 'Kode tiket tidak ditemukan di cache manifest event ini.',
+        time: DateFormat('HH:mm:ss').format(DateTime.now()),
+        timeLabel: 'Waktu Scan',
+      );
+    }
+
+    final isOut = action == 'out';
+
+    if (isOut) {
+      if (cache.status != 'CHECKED_IN') {
+        await isar.writeTxn(() async {
+          await isar.scanLogs.put(
+            ScanLog()
+              ..ticketId = ticketId
+              ..qrPayload = cache.qrPayload
+              ..scannedAt = DateTime.now()
+              ..synced = false
+              ..status = 'INVALID_OUT',
+          );
+        });
+        return ScanResult(
+          status: ScanResultStatus.invalid,
+          title: 'CHECK-OUT INVALID (OFFLINE)',
+          message: 'Tiket belum check-in masuk (tidak bisa check-out).',
+          attendee: cache.buyerName,
+          category: cache.categoryName,
+          time: DateFormat('HH:mm:ss').format(DateTime.now()),
+          timeLabel: 'Waktu Keluar',
+        );
+      }
+
+      // Valid check-out offline
+      await isar.writeTxn(() async {
+        cache.status = 'VALID';
+        await isar.ticketCaches.put(cache);
+
+        await isar.scanLogs.put(
+          ScanLog()
+            ..ticketId = ticketId
+            ..qrPayload = cache.qrPayload
+            ..scannedAt = DateTime.now()
+            ..synced = false
+            ..status = 'CHECK_OUT',
+        );
+      });
+
+      return ScanResult(
+        status: ScanResultStatus.valid,
+        title: 'CHECK-OUT MANUAL BERHASIL (OFFLINE)',
+        message: 'Check-out manual berhasil disimpan lokal (belum ter-sync).',
+        attendee: cache.buyerName,
+        category: cache.categoryName,
+        time: DateFormat('HH:mm:ss').format(DateTime.now()),
+        timeLabel: 'Waktu Keluar',
       );
     }
 
@@ -351,7 +520,7 @@ class ScannerService {
       });
 
       final logs = await isar.scanLogs.filter().ticketIdEqualTo(ticketId).sortByScannedAtDesc().findFirst();
-      final timeStr = logs != null ? DateFormat('HH:mm').format(logs.scannedAt) : null;
+      final timeStr = logs != null ? DateFormat('HH:mm:ss').format(logs.scannedAt) : DateFormat('HH:mm:ss').format(DateTime.now());
 
       return ScanResult(
         status: ScanResultStatus.duplicate,
@@ -360,6 +529,7 @@ class ScannerService {
         attendee: cache.buyerName,
         category: cache.categoryName,
         time: timeStr,
+        timeLabel: 'Waktu Masuk',
       );
     }
 
@@ -383,6 +553,8 @@ class ScannerService {
       message: 'Check-in manual berhasil disimpan lokal (belum ter-sync).',
       attendee: cache.buyerName,
       category: cache.categoryName,
+      time: DateFormat('HH:mm:ss').format(DateTime.now()),
+      timeLabel: 'Waktu Masuk',
     );
   }
 }

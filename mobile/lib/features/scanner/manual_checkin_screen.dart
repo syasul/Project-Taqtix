@@ -5,7 +5,8 @@ import 'scanner_provider.dart';
 import 'scan_result_widget.dart';
 
 class ManualCheckinScreen extends ConsumerStatefulWidget {
-  const ManualCheckinScreen({super.key});
+  final String action;
+  const ManualCheckinScreen({super.key, required this.action});
 
   @override
   ConsumerState<ManualCheckinScreen> createState() => _ManualCheckinScreenState();
@@ -38,6 +39,7 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
       final result = await service.checkInManual(
         ticketId: code,
         eventId: activeEvent.id,
+        action: widget.action,
       );
 
       if (mounted) {
@@ -77,12 +79,14 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
   @override
   Widget build(BuildContext context) {
     final activeEvent = ref.watch(activeEventProvider);
+    final isOut = widget.action == 'out';
+    final accentColor = isOut ? const Color(0xFFEF4444) : const Color(0xFF6366F1);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Input Kode Tiket',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          isOut ? 'Input Manual Keluar' : 'Input Manual Masuk',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -122,7 +126,7 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16.0),
-                    borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
+                    borderSide: BorderSide(color: accentColor, width: 1.5),
                   ),
                 ),
                 validator: (value) {
@@ -139,9 +143,9 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                backgroundColor: const Color(0xFF6366F1),
+                backgroundColor: accentColor,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: const Color(0xFF6366F1).withOpacity(0.5),
+                disabledBackgroundColor: accentColor.withOpacity(0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                 ),
@@ -155,9 +159,9 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : const Text(
-                      'Check-in Tiket',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  : Text(
+                      isOut ? 'Check-out Tiket' : 'Check-in Tiket',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),
           ],

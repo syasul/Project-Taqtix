@@ -15,6 +15,7 @@ const swagger_1 = require("@nestjs/swagger");
 class LoginDto {
     email;
     password;
+    deviceId;
 }
 exports.LoginDto = LoginDto;
 __decorate([
@@ -31,4 +32,14 @@ __decorate([
     (0, class_validator_1.MinLength)(6, { message: 'Kata sandi minimal harus terdiri dari 6 karakter' }),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'device-uuid-1234',
+        description: 'Unique identifier of the device',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], LoginDto.prototype, "deviceId", void 0);
 //# sourceMappingURL=login.dto.js.map

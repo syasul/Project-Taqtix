@@ -195,6 +195,66 @@ export class GateService {
       }
 
       // 4. Verifikasi status tiket
+      const isOut = dto.action === 'out';
+
+      if (isOut) {
+        if (ticket.status !== TicketStatus.CHECKED_IN) {
+          await tx.scanLog.create({
+            data: {
+              ticketId: ticket.id,
+              scannedById: staffUserId,
+              result: 'INVALID_OUT',
+            },
+          });
+          throw new HttpException(
+            {
+              code: 'TICKET_NOT_INSIDE',
+              message: 'Tiket belum check-in masuk (tidak bisa check-out)',
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        // Sukses Check-out: Update status tiket ke VALID & Buat ScanLog
+        const updatedTicket = await tx.ticket.update({
+          where: { id: ticket.id },
+          data: {
+            status: TicketStatus.VALID,
+            checkedOutAt: new Date(),
+            checkedOutBy: staffUserId,
+          },
+        });
+
+        await tx.scanLog.create({
+          data: {
+            ticketId: ticket.id,
+            scannedById: staffUserId,
+            result: 'CHECK_OUT',
+          },
+        });
+
+        return {
+          success: true,
+          message: 'Check-out berhasil! Tiket dinonaktifkan sementara (bisa masuk kembali).',
+          ticketId: ticket.id,
+          buyerName: ticket.orderItem.attendeeName,
+          ticketCategory: ticket.orderItem.ticketCategory.name,
+          eventTitle: ticket.orderItem.ticketCategory.name,
+          ticket: {
+            id: ticket.id,
+            status: updatedTicket.status,
+            checkedInAt: updatedTicket.checkedInAt,
+            checkedOutAt: updatedTicket.checkedOutAt,
+            orderItem: {
+              attendeeName: ticket.orderItem.attendeeName,
+              ticketCategory: {
+                name: ticket.orderItem.ticketCategory.name,
+              },
+            },
+          },
+        };
+      }
+
       if (ticket.status === TicketStatus.CHECKED_IN) {
         // Catat ScanLog gagal (DUPLICATE)
         await tx.scanLog.create({
@@ -232,7 +292,7 @@ export class GateService {
       }
 
       // 5. Sukses Check-in: Update status tiket ke CHECKED_IN & Buat ScanLog
-      await tx.ticket.update({
+      const updatedTicket = await tx.ticket.update({
         where: { id: ticket.id },
         data: {
           status: TicketStatus.CHECKED_IN,
@@ -256,6 +316,18 @@ export class GateService {
         buyerName: ticket.orderItem.attendeeName,
         ticketCategory: ticket.orderItem.ticketCategory.name,
         eventTitle: ticket.orderItem.ticketCategory.name, // Event title or default
+        ticket: {
+          id: ticket.id,
+          status: updatedTicket.status,
+          checkedInAt: updatedTicket.checkedInAt,
+          checkedOutAt: updatedTicket.checkedOutAt,
+          orderItem: {
+            attendeeName: ticket.orderItem.attendeeName,
+            ticketCategory: {
+              name: ticket.orderItem.ticketCategory.name,
+            },
+          },
+        },
       };
     });
   }
@@ -310,6 +382,62 @@ export class GateService {
       }
 
       // Verifikasi status tiket
+      const isOut = dto.action === 'out';
+
+      if (isOut) {
+        if (ticket.status !== TicketStatus.CHECKED_IN) {
+          await tx.scanLog.create({
+            data: {
+              ticketId: ticket.id,
+              scannedById: staffUserId,
+              result: 'INVALID_OUT',
+            },
+          });
+          throw new BadRequestException(
+            'Tiket belum check-in masuk (tidak bisa check-out)',
+          );
+        }
+
+        // Update status & buat ScanLog
+        const updatedTicket = await tx.ticket.update({
+          where: { id: ticket.id },
+          data: {
+            status: TicketStatus.VALID,
+            checkedOutAt: new Date(),
+            checkedOutBy: staffUserId,
+          },
+        });
+
+        await tx.scanLog.create({
+          data: {
+            ticketId: ticket.id,
+            scannedById: staffUserId,
+            result: 'CHECK_OUT',
+          },
+        });
+
+        return {
+          success: true,
+          message: 'Check-out manual berhasil!',
+          ticketId: ticket.id,
+          buyerName: ticket.orderItem.attendeeName,
+          ticketCategory: ticket.orderItem.ticketCategory.name,
+          eventTitle: ticket.orderItem.ticketCategory.name,
+          ticket: {
+            id: ticket.id,
+            status: updatedTicket.status,
+            checkedInAt: updatedTicket.checkedInAt,
+            checkedOutAt: updatedTicket.checkedOutAt,
+            orderItem: {
+              attendeeName: ticket.orderItem.attendeeName,
+              ticketCategory: {
+                name: ticket.orderItem.ticketCategory.name,
+              },
+            },
+          },
+        };
+      }
+
       if (ticket.status === TicketStatus.CHECKED_IN) {
         await tx.scanLog.create({
           data: {
@@ -337,7 +465,7 @@ export class GateService {
       }
 
       // Update status & buat ScanLog
-      await tx.ticket.update({
+      const updatedTicket = await tx.ticket.update({
         where: { id: ticket.id },
         data: {
           status: TicketStatus.CHECKED_IN,
@@ -361,6 +489,18 @@ export class GateService {
         buyerName: ticket.orderItem.attendeeName,
         ticketCategory: ticket.orderItem.ticketCategory.name,
         eventTitle: ticket.orderItem.ticketCategory.name,
+        ticket: {
+          id: ticket.id,
+          status: updatedTicket.status,
+          checkedInAt: updatedTicket.checkedInAt,
+          checkedOutAt: updatedTicket.checkedOutAt,
+          orderItem: {
+            attendeeName: ticket.orderItem.attendeeName,
+            ticketCategory: {
+              name: ticket.orderItem.ticketCategory.name,
+            },
+          },
+        },
       };
     });
   }

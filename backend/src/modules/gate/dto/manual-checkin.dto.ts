@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ManualCheckinDto {
@@ -9,4 +9,14 @@ export class ManualCheckinDto {
   @IsString()
   @IsNotEmpty({ message: 'Kode tiket tidak boleh kosong' })
   code!: string;
+
+  @ApiProperty({
+    example: 'in',
+    description: 'Aksi pemindaian: "in" untuk masuk, "out" untuk keluar',
+    required: false,
+    default: 'in',
+  })
+  @IsString()
+  @IsOptional()
+  action?: 'in' | 'out';
 }

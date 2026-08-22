@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -16,4 +16,13 @@ export class LoginDto {
   @IsString()
   @MinLength(6, { message: 'Kata sandi minimal harus terdiri dari 6 karakter' })
   password!: string;
+
+  @ApiProperty({
+    example: 'device-uuid-1234',
+    description: 'Unique identifier of the device',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  deviceId?: string;
 }

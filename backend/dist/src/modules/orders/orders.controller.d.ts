@@ -48,6 +48,9 @@ export declare class OrdersController {
             email: string;
             passwordHash: string;
             role: string;
+            activeDeviceId: string | null;
+            lastLoginAt: Date | null;
+            lastLogoutAt: Date | null;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -57,9 +60,9 @@ export declare class OrdersController {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                eventId: string;
                 price: number;
                 quota: number;
-                eventId: string;
                 sold: number;
                 maxPerOrder: number;
                 saleStartAt: Date;

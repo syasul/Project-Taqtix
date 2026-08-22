@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 class ManualCheckinDto {
     code;
+    action;
 }
 exports.ManualCheckinDto = ManualCheckinDto;
 __decorate([
@@ -25,4 +26,15 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'Kode tiket tidak boleh kosong' }),
     __metadata("design:type", String)
 ], ManualCheckinDto.prototype, "code", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'in',
+        description: 'Aksi pemindaian: "in" untuk masuk, "out" untuk keluar',
+        required: false,
+        default: 'in',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ManualCheckinDto.prototype, "action", void 0);
 //# sourceMappingURL=manual-checkin.dto.js.map

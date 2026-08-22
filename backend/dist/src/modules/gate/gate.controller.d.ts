@@ -30,6 +30,18 @@ export declare class GateController {
         buyerName: string;
         ticketCategory: string;
         eventTitle: string;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
     }>;
     manualCheckin(dto: ManualCheckinDto, staffUserId: string): Promise<{
         success: boolean;
@@ -38,6 +50,18 @@ export declare class GateController {
         buyerName: string;
         ticketCategory: string;
         eventTitle: string;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
     }>;
     syncBatch(dto: SyncBatchDto, staffUserId: string): Promise<{
         success: boolean;
@@ -68,8 +92,8 @@ export declare class GateController {
         id: string;
         createdAt: Date;
         userId: string;
-        eventId: string;
         gateName: string;
+        eventId: string;
     }>;
     getStaffList(eventId: string, userId: string): Promise<({
         user: {
@@ -81,14 +105,14 @@ export declare class GateController {
         id: string;
         createdAt: Date;
         userId: string;
-        eventId: string;
         gateName: string;
+        eventId: string;
     })[]>;
     assignStaffGlobal(dto: CreateGateStaffGlobalDto, userId: string): Promise<{
         id: string;
         createdAt: Date;
         userId: string;
-        eventId: string;
         gateName: string;
+        eventId: string;
     }>;
 }

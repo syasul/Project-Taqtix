@@ -9,6 +9,9 @@ class ScanResult {
   final String? category;
   final String? attendee;
   final String? time;
+  final String? timeLabel;
+  final String? checkedInTime;
+  final String? checkedOutTime;
 
   ScanResult({
     required this.status,
@@ -17,6 +20,9 @@ class ScanResult {
     this.category,
     this.attendee,
     this.time,
+    this.timeLabel,
+    this.checkedInTime,
+    this.checkedOutTime,
   });
 }
 
@@ -105,7 +111,15 @@ class ScanResultWidget extends StatelessWidget {
                     _buildDetailRow(context, 'Kategori Tiket', result.category!),
                   if (result.time != null) ...[
                     const Divider(height: 16),
-                    _buildDetailRow(context, 'Waktu Check-in', result.time!),
+                    _buildDetailRow(context, result.timeLabel ?? 'Waktu', result.time!),
+                  ],
+                  if (result.checkedInTime != null) ...[
+                    const Divider(height: 16),
+                    _buildDetailRow(context, 'Terakhir Masuk', result.checkedInTime!),
+                  ],
+                  if (result.checkedOutTime != null) ...[
+                    const Divider(height: 16),
+                    _buildDetailRow(context, 'Terakhir Keluar', result.checkedOutTime!),
                   ],
                 ],
               ),

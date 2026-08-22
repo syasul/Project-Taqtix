@@ -15,8 +15,8 @@ export declare class GateService {
         id: string;
         createdAt: Date;
         userId: string;
-        eventId: string;
         gateName: string;
+        eventId: string;
     }>;
     getStaffList(eventId: string, organizerUserId: string): Promise<({
         user: {
@@ -28,8 +28,8 @@ export declare class GateService {
         id: string;
         createdAt: Date;
         userId: string;
-        eventId: string;
         gateName: string;
+        eventId: string;
     })[]>;
     validateTicket(dto: ValidateTicketDto, staffUserId: string): Promise<{
         success: boolean;
@@ -38,6 +38,18 @@ export declare class GateService {
         buyerName: string;
         ticketCategory: string;
         eventTitle: string;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
     }>;
     manualCheckin(dto: ManualCheckinDto, staffUserId: string): Promise<{
         success: boolean;
@@ -46,6 +58,18 @@ export declare class GateService {
         buyerName: string;
         ticketCategory: string;
         eventTitle: string;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
     }>;
     syncBatch(dto: SyncBatchDto, staffUserId: string): Promise<{
         success: boolean;

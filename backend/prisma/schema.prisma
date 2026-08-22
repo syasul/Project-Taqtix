@@ -1,4 +1,4 @@
-// Hal ini merupakan konfigurasi database engine menggunakan PostgreSQL
+  // Hal ini merupakan konfigurasi database engine menggunakan PostgreSQL
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -7,6 +7,7 @@ datasource db {
 // Hal ini menghasilkan Prisma Client untuk digunakan di NestJS
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 // --- ENUMS ---
@@ -59,12 +60,16 @@ model User {
   email        String      @unique
   passwordHash String
   role         String      // 'buyer' | 'organizer' | 'gate_staff' | 'partner' | 'admin'
+  activeDeviceId String?
+  lastLoginAt    DateTime?
+  lastLogoutAt   DateTime?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   
   organizer            Organizer?
   orders               Order[]
   checkedTickets       Ticket[]           @relation("CheckedByRelation")
+  checkedOutTickets    Ticket[]           @relation("CheckedOutByRelation")
   gateStaffAssignments GateStaff[]
   scanLogs             ScanLog[]
 }
@@ -174,12 +179,15 @@ model Ticket {
   status       TicketStatus @default(VALID)
   checkedInAt  DateTime?
   checkedInBy  String?
+  checkedOutAt DateTime?
+  checkedOutBy String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
   orderItem    OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
   event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   staff        User?        @relation("CheckedByRelation", fields: [checkedInBy], references: [id])
+  checkedOutStaff User?     @relation("CheckedOutByRelation", fields: [checkedOutBy], references: [id])
   scanLogs     ScanLog[]
 }
 

@@ -14,6 +14,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -28,7 +29,18 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     
+    setState(() {
+      _isLoading = true;
+    });
+    
     final success = await ref.read(authProvider.notifier).login(email, password);
+    
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+    
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -79,14 +91,14 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'TAQtix Gate Staff',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -111,13 +123,13 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: 'Alamat Email',
                         labelStyle: const TextStyle(color: Colors.grey),
                         prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
                         filled: true,
-                        fillColor: const Color(0xFF1E1F29),
+                        fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16.0),
                           borderSide: BorderSide.none,
@@ -145,7 +157,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                       obscureText: _obscurePassword,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _submit(),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: 'Kata Sandi',
                         labelStyle: const TextStyle(color: Colors.grey),
@@ -162,7 +174,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                           },
                         ),
                         filled: true,
-                        fillColor: const Color(0xFF1E1F29),
+                        fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16.0),
                           borderSide: BorderSide.none,
@@ -186,7 +198,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
 
                     // Login Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : _submit,
+                      onPressed: _isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         backgroundColor: const Color(0xFF6366F1),
@@ -198,7 +210,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                         elevation: 4,
                         shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
                       ),
-                      child: authState.isLoading
+                      child: _isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,

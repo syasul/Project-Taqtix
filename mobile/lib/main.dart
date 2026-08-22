@@ -48,14 +48,18 @@ class TaqTixApp extends ConsumerWidget {
     return MaterialApp(
       title: 'TAQtix Gate Staff',
       debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.light,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color(0xFF6366F1), // Indigo branding
-        scaffoldBackgroundColor: const Color(0xFF090A0F), // Dark slate
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF6366F1),
+        brightness: Brightness.light,
+        primaryColor: const Color(0xFF4F46E5), // Indigo branding
+        scaffoldBackgroundColor: const Color(0xFFF9FAFB), // Soft gray/white
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF4F46E5),
           secondary: Color(0xFF10B981), // Emerald Accent
-          surface: Color(0xFF1E1F29),
+          surface: Colors.white,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Color(0xFF111827),
         ),
         useMaterial3: true,
       ),

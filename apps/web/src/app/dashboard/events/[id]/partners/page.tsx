@@ -105,8 +105,9 @@ export default function AffiliatePartnersPage() {
   });
 
   const handleCopyLink = (code: string) => {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
-    const redirectUrl = `${apiBaseUrl.replace('/api/v1', '')}/v1/r/${code}`;
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/v1';
+    const cleanBaseUrl = apiBaseUrl.endsWith('/v1') ? apiBaseUrl.slice(0, -3) : apiBaseUrl;
+    const redirectUrl = `${cleanBaseUrl}/v1/r/${code}`;
     
     navigator.clipboard.writeText(redirectUrl);
     toast.success('Tautan afiliasi unik berhasil disalin!');

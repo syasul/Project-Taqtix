@@ -32,8 +32,8 @@ export declare class EventsController {
             updatedAt: Date;
             name: string;
             price: number;
-            eventId: string;
             quota: number;
+            eventId: string;
             sold: number;
             maxPerOrder: number;
             saleStartAt: Date;

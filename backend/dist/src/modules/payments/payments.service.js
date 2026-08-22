@@ -261,7 +261,7 @@ let PaymentsService = class PaymentsService {
                     }
                 }
                 for (const ticket of generatedTickets) {
-                    const qrUrl = `${this.configService.get('TAQTIX_BASE_URL') || 'http://localhost:3001'}/api/v1/tickets/${ticket.id}`;
+                    const qrUrl = `${this.configService.get('TAQTIX_BASE_URL') || 'http://localhost:3001'}/v1/tickets/${ticket.id}`;
                     const attendeePhone = ticket.orderItem.attendeePhone;
                     const attendeeName = ticket.orderItem.attendeeName;
                     const attendeeEmail = ticket.orderItem.attendeeEmail;

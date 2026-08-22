@@ -1,5 +1,9 @@
+import 'dart:io';
+
 class ApiEndpoints {
-  static const String baseUrl = 'http://localhost:3000/v1'; // Default local development URL
+  static final String baseUrl = Platform.isAndroid
+      ? 'http://10.0.2.2:3001/v1'
+      : 'http://localhost:3001/v1';
   
   static const String login = '/auth/gate-login';
   static const String events = '/gate/events';

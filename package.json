@@ -7,6 +7,7 @@
     "dev:web": "pnpm --filter web dev",
     "dev:backend": "pnpm --filter backend dev",
     "db:migrate": "pnpm --filter backend prisma migrate dev",
+    "db:seed": "pnpm --filter backend exec prisma db seed",
     "db:studio": "pnpm --filter backend prisma studio"
   },
   "devDependencies": {

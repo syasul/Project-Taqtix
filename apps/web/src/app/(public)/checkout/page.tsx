@@ -219,20 +219,20 @@ function CheckoutContent() {
   if (pollingOrderId) {
     return (
       <div className="max-w-md mx-auto py-16 px-4">
-        <Card className="bg-slate-900/60 border-slate-800 shadow-2xl backdrop-blur-sm text-center">
+        <Card className="bg-white border-slate-200 shadow-sm text-center rounded-2xl">
           <CardHeader className="space-y-2">
-            <CardTitle className="text-xl font-bold text-slate-100">Status Transaksi</CardTitle>
-            <CardDescription className="text-slate-400 text-xs">
-              ID Pemesanan: <span className="font-mono text-slate-300 font-semibold">{pollingOrderId}</span>
+            <CardTitle className="text-xl font-bold text-slate-800">Status Transaksi</CardTitle>
+            <CardDescription className="text-slate-550 text-xs">
+              ID Pemesanan: <span className="font-semibold text-slate-650">{pollingOrderId}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-6 flex flex-col items-center">
             {pollingStatus === 'pending' && (
               <>
-                <Loader2 className="h-16 w-16 text-indigo-500 animate-spin" />
+                <Loader2 className="h-16 w-16 text-indigo-600 animate-spin" />
                 <div className="space-y-2">
-                  <h3 className="font-bold text-slate-200">Menunggu Pembayaran...</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="font-bold text-slate-800">Menunggu Pembayaran...</h3>
+                  <p className="text-xs text-slate-500">
                     Selesaikan pembayaran Anda di tab instruksi pembayaran payment gateway yang terbuka.
                   </p>
                 </div>
@@ -242,7 +242,7 @@ function CheckoutContent() {
                       const url = `https://app.sandbox.midtrans.com/snap/v2/vtweb/${orderDetails.payment.snapToken}`;
                       window.open(url, '_blank');
                     }}
-                    className="bg-indigo-600 hover:bg-indigo-500 rounded-xl w-full cursor-pointer py-2.5 font-bold"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl w-full cursor-pointer py-2.5 font-bold border-0"
                   >
                     Buka Ulang Halaman Bayar
                   </Button>
@@ -252,38 +252,38 @@ function CheckoutContent() {
 
             {pollingStatus === 'success' && (
               <>
-                <CheckCircle2 className="h-16 w-16 text-emerald-400" />
+                <CheckCircle2 className="h-16 w-16 text-emerald-600" />
                 <div className="space-y-2">
-                  <h3 className="font-bold text-slate-200 text-lg">Pembayaran Sukses!</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="font-bold text-slate-800 text-lg">Pembayaran Sukses!</h3>
+                  <p className="text-xs text-slate-500">
                     Tiket elektronik Anda telah diterbitkan. Kami juga mengirimkan QR Code lewat email & WhatsApp Anda.
                   </p>
                 </div>
 
                 {ticketsList.length > 0 && (
-                  <div className="w-full space-y-3 pt-4 border-t border-slate-850">
-                    <h4 className="text-xs font-bold text-slate-400 text-left uppercase tracking-wider">
+                  <div className="w-full space-y-3 pt-4 border-t border-slate-200">
+                    <h4 className="text-xs font-bold text-slate-500 text-left uppercase tracking-wider">
                       Tiket Elektronik Anda ({ticketsList.length})
                     </h4>
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                       {ticketsList.map((ticket: any) => (
                         <div
                           key={ticket.id}
-                          className="flex justify-between items-center p-3 border border-slate-850 bg-slate-900/30 rounded-xl"
+                          className="flex justify-between items-center p-3 border border-slate-200 bg-slate-50/50 rounded-xl"
                         >
                           <div className="text-left">
-                            <p className="text-xs font-bold text-slate-200">
+                            <p className="text-xs font-bold text-slate-800">
                               {ticket.orderItem?.ticketCategory?.name || 'Tiket'}
                             </p>
-                            <p className="text-[10px] text-slate-500 font-mono">{ticket.id.substring(0, 8)}...</p>
+                            <p className="text-[10px] text-slate-400 font-mono">{ticket.id.substring(0, 8)}...</p>
                           </div>
                           <a
                             href={`/e-ticket/${ticket.id}`}
                             target="_blank"
                             rel="noreferrer"
                             className={cn(
-                              buttonVariants({ size: 'sm', variant: 'ghost' }),
-                              "bg-slate-855 hover:bg-indigo-600 text-xs font-bold cursor-pointer rounded-lg px-3 h-auto py-1"
+                              buttonVariants({ size: 'sm', variant: 'default' }),
+                              "bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer rounded-lg px-3 h-auto py-1 border-0"
                             )}
                           >
                             Lihat QR
@@ -298,14 +298,14 @@ function CheckoutContent() {
 
             {(pollingStatus === 'failed' || pollingStatus === 'expired') && (
               <>
-                <AlertCircle className="h-16 w-16 text-rose-500" />
+                <AlertCircle className="h-16 w-16 text-rose-600" />
                 <div className="space-y-2">
-                  <h3 className="font-bold text-slate-200">Transaksi Gagal / Kedaluwarsa</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="font-bold text-slate-800">Transaksi Gagal / Kedaluwarsa</h3>
+                  <p className="text-xs text-slate-500">
                     Batas waktu pembayaran 15 menit telah habis atau transaksi dibatalkan oleh bank/gateway.
                   </p>
                 </div>
-                <Button onClick={() => router.push('/')} className="bg-slate-800 hover:bg-slate-700 w-full cursor-pointer rounded-xl py-2">
+                <Button onClick={() => router.push('/')} className="bg-indigo-600 hover:bg-indigo-700 text-white w-full cursor-pointer rounded-xl py-2 border-0">
                   Kembali ke Discovery
                 </Button>
               </>
@@ -322,8 +322,8 @@ function CheckoutContent() {
   if (eventLoading) {
     return (
       <div className="max-w-2xl mx-auto py-16 px-4 space-y-6">
-        <Skeleton className="h-8 w-1/3 bg-slate-900" />
-        <Skeleton className="h-64 w-full bg-slate-900" />
+        <Skeleton className="h-8 w-1/3 bg-slate-100" />
+        <Skeleton className="h-64 w-full bg-slate-100" />
       </div>
     );
   }
@@ -331,12 +331,12 @@ function CheckoutContent() {
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-extrabold text-slate-900">
           Checkout Tiket
         </h1>
         {event && (
-          <p className="text-sm text-slate-400 mt-2">
-            Mengamankan kuota tiket untuk event: <span className="font-bold text-slate-300">{event.title}</span>
+          <p className="text-sm text-slate-500 mt-2">
+            Mengamankan kuota tiket untuk event: <span className="font-bold text-slate-800">{event.title}</span>
           </p>
         )}
       </div>
@@ -344,10 +344,10 @@ function CheckoutContent() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Formulir (Left Column) */}
         <div className="lg:col-span-8 space-y-6">
-          <Card className="bg-slate-900/40 border-slate-855 shadow-xl backdrop-blur-sm">
-            <CardHeader className="border-b border-slate-855 pb-4">
-              <CardTitle className="text-lg font-bold text-slate-205">Data Diri Pembeli</CardTitle>
-              <CardDescription className="text-xs text-slate-400">
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-slate-200 pb-4">
+              <CardTitle className="text-lg font-bold text-slate-800">Data Diri Pembeli</CardTitle>
+              <CardDescription className="text-xs text-slate-500">
                 Data ini akan digunakan untuk mengirimkan e-ticket via WhatsApp dan email.
               </CardDescription>
             </CardHeader>
@@ -359,15 +359,15 @@ function CheckoutContent() {
                     name="buyerName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-300">Nama Lengkap</FormLabel>
+                        <FormLabel className="text-slate-700">Nama Lengkap</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Contoh: Budi Santoso"
-                            className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20"
+                            className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-rose-400 text-xs" />
+                        <FormMessage className="text-rose-600 text-xs" />
                       </FormItem>
                     )}
                   />
@@ -378,16 +378,16 @@ function CheckoutContent() {
                       name="buyerEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-300">Alamat Email</FormLabel>
+                          <FormLabel className="text-slate-700">Alamat Email</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="budi@contoh.com"
                               type="email"
-                              className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage className="text-rose-400 text-xs" />
+                          <FormMessage className="text-rose-600 text-xs" />
                         </FormItem>
                       )}
                     />
@@ -397,23 +397,23 @@ function CheckoutContent() {
                       name="buyerPhone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-300">Nomor WhatsApp</FormLabel>
+                          <FormLabel className="text-slate-700">Nomor WhatsApp</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Contoh: 081234567890"
-                              className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage className="text-rose-400 text-xs" />
+                          <FormMessage className="text-rose-600 text-xs" />
                         </FormItem>
                       )}
                     />
                   </div>
 
                   {/* Promo Code Input */}
-                  <div className="border-t border-slate-855 pt-6">
-                    <FormLabel className="text-slate-300">Kode Promo (Opsional)</FormLabel>
+                  <div className="border-t border-slate-200 pt-6">
+                    <FormLabel className="text-slate-700">Kode Promo (Opsional)</FormLabel>
                     <div className="flex gap-3 mt-1.5">
                       <FormField
                         control={form.control}
@@ -423,7 +423,7 @@ function CheckoutContent() {
                             <FormControl>
                               <Input
                                 placeholder="Contoh: DISKON10"
-                                className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 uppercase"
+                                className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20 uppercase"
                                 {...field}
                               />
                             </FormControl>
@@ -435,7 +435,7 @@ function CheckoutContent() {
                         onClick={handleCheckPromo}
                         disabled={promoChecking}
                         variant="secondary"
-                        className="bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-xl font-bold cursor-pointer shrink-0"
+                        className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl font-bold cursor-pointer shrink-0 shadow-sm"
                       >
                         {promoChecking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Gunakan'}
                       </Button>
@@ -445,7 +445,7 @@ function CheckoutContent() {
                   <Button
                     type="submit"
                     disabled={checkoutMutation.isPending}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-lg shadow-indigo-600/10 cursor-pointer active:scale-[0.98]"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
                   >
                     {checkoutMutation.isPending ? (
                       <>
@@ -467,10 +467,10 @@ function CheckoutContent() {
 
         {/* Ringkasan Belanja (Right Column) */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="bg-slate-900/40 border-slate-855 shadow-xl backdrop-blur-sm">
-            <CardHeader className="border-b border-slate-855 pb-4">
-              <CardTitle className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5 text-indigo-400" />
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-slate-200 pb-4">
+              <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-indigo-600" />
                 <span>Ringkasan Pesanan</span>
               </CardTitle>
             </CardHeader>
@@ -484,12 +484,12 @@ function CheckoutContent() {
                   return (
                     <div key={item.categoryId} className="flex justify-between items-center text-sm">
                       <div>
-                        <h4 className="font-bold text-slate-200">{cat.name}</h4>
+                        <h4 className="font-bold text-slate-850">{cat.name}</h4>
                         <span className="text-[10px] text-slate-500 font-mono">
                           {item.qty} tiket x {cat.price.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                         </span>
                       </div>
-                      <span className="font-bold text-slate-355 font-mono">
+                      <span className="font-bold text-slate-800">
                         {(cat.price * item.qty).toLocaleString('id-ID', {
                           style: 'currency',
                           currency: 'IDR',
@@ -502,10 +502,10 @@ function CheckoutContent() {
               </div>
 
               {/* Price Calculation */}
-              <div className="border-t border-slate-855 pt-4 space-y-2 text-xs">
-                <div className="flex justify-between text-slate-400">
+              <div className="border-t border-slate-200 pt-4 space-y-2 text-xs">
+                <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
-                  <span className="font-mono text-slate-300">
+                  <span className="font-semibold text-slate-700">
                     {subtotal.toLocaleString('id-ID', {
                       style: 'currency',
                       currency: 'IDR',
@@ -515,12 +515,12 @@ function CheckoutContent() {
                 </div>
 
                 {promoDiscount > 0 && (
-                  <div className="flex justify-between text-emerald-400">
-                    <span className="flex items-center gap-1">
+                  <div className="flex justify-between text-emerald-600">
+                    <span className="flex items-center gap-1 font-semibold">
                       <Percent className="h-3 w-3" />
                       <span>Diskon Promo ({appliedPromo})</span>
                     </span>
-                    <span className="font-mono">
+                    <span className="font-semibold">
                       -{promoDiscount.toLocaleString('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
@@ -530,9 +530,9 @@ function CheckoutContent() {
                   </div>
                 )}
 
-                <div className="flex justify-between text-sm font-extrabold text-slate-200 border-t border-slate-855/60 pt-3">
+                <div className="flex justify-between text-sm font-extrabold text-slate-800 border-t border-slate-200 pt-3">
                   <span>Total Bayar</span>
-                  <span className="font-mono text-indigo-400">
+                  <span className="text-indigo-650 font-extrabold text-base">
                     {total.toLocaleString('id-ID', {
                       style: 'currency',
                       currency: 'IDR',

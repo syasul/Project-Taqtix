@@ -229,9 +229,9 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Daftar Event Aktif Anda',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 20),
 
@@ -252,7 +252,10 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                         const SizedBox(height: 12),
                         ElevatedButton(
                           onPressed: _fetchEvents,
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E1F29)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                            foregroundColor: Theme.of(context).colorScheme.onSurface,
+                          ),
                           child: const Text('Coba Lagi'),
                         )
                       ],
@@ -285,7 +288,9 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 16),
-                        color: const Color(0xFF1E1F29),
+                        color: Theme.of(context).colorScheme.surface,
+                        elevation: 2,
+                        shadowColor: Colors.black.withOpacity(0.05),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
@@ -310,7 +315,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                                     Expanded(
                                       child: Text(
                                         event.title,
-                                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                                       ),
                                     ),
                                     const Icon(Icons.chevron_right_rounded, color: Colors.grey),

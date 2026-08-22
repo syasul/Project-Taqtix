@@ -12,8 +12,8 @@ export declare class TicketsController {
         updatedAt: Date;
         name: string;
         price: number;
-        eventId: string;
         quota: number;
+        eventId: string;
         sold: number;
         maxPerOrder: number;
         saleStartAt: Date;
@@ -25,8 +25,8 @@ export declare class TicketsController {
         updatedAt: Date;
         name: string;
         price: number;
-        eventId: string;
         quota: number;
+        eventId: string;
         sold: number;
         maxPerOrder: number;
         saleStartAt: Date;
@@ -38,8 +38,8 @@ export declare class TicketsController {
         updatedAt: Date;
         name: string;
         price: number;
-        eventId: string;
         quota: number;
+        eventId: string;
         sold: number;
         maxPerOrder: number;
         saleStartAt: Date;
@@ -49,10 +49,10 @@ export declare class TicketsController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        eventId: string;
         code: string;
         discount: number;
         maxUsage: number;
+        eventId: string;
         usedCount: number;
     }>;
     validatePromoCode(dto: ValidatePromoCodeDto): Promise<{

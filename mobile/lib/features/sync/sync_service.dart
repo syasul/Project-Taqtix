@@ -22,24 +22,29 @@ class SyncNotifier extends StateNotifier<bool> {
 
   Future<void> syncLogs() async {
     if (state) return; // Already syncing
-    
+
     final isar = ref.read(isarProvider);
-    final unsynced = await isar.scanLogs.filter().syncedEqualTo(false).findAll();
+    final unsynced = await isar.scanLogs
+        .filter()
+        .syncedEqualTo(false)
+        .findAll();
     if (unsynced.isEmpty) return;
 
     state = true;
     try {
       final dio = ref.read(dioProvider);
-      final payload = unsynced.map((log) => {
-        'qrPayload': log.qrPayload,
-        'scannedAt': log.scannedAt.toUtc().toIso8601String(),
-      }).toList();
+      final payload = unsynced
+          .map(
+            (log) => {
+              'qrPayload': log.qrPayload,
+              'scannedAt': log.scannedAt.toUtc().toIso8601String(),
+            },
+          )
+          .toList();
 
       final response = await dio.post(
         ApiEndpoints.scanBatch,
-        data: {
-          'logs': payload,
-        },
+        data: {'logs': payload},
       );
 
       final data = response.data;

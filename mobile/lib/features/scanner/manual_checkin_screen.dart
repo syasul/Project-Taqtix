@@ -97,9 +97,9 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
               ),
               const SizedBox(height: 16),
             ],
-            const Text(
+            Text(
               'Gunakan jika barcode/QR Code rusak dan tidak terbaca kamera scanner.',
-              style: TextStyle(fontSize: 13, color: Colors.white70),
+              style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
             ),
             const SizedBox(height: 32),
 
@@ -109,13 +109,13 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
                 controller: _codeController,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _submit(),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, letterSpacing: 1),
                 decoration: InputDecoration(
                   labelText: 'Kode Tiket (UUID / Ticket Code)',
                   labelStyle: const TextStyle(color: Colors.grey),
                   prefixIcon: const Icon(Icons.keyboard_outlined, color: Colors.grey),
                   filled: true,
-                  fillColor: const Color(0xFF1E1F29),
+                  fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16.0),
                     borderSide: BorderSide.none,

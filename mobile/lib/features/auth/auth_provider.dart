@@ -51,7 +51,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<bool> login(String email, String password) async {
-    state = AuthState.loading();
     try {
       final dio = ref.read(dioProvider);
       final response = await dio.post(

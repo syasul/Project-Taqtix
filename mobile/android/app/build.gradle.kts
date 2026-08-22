@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "id.taqtix.mobile"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

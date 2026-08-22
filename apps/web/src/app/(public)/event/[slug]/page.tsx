@@ -97,14 +97,14 @@ export default function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto py-12 px-4 space-y-8">
-        <Skeleton className="h-8 w-1/4 bg-slate-900" />
+        <Skeleton className="h-8 w-1/4 bg-slate-100" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-6">
-            <Skeleton className="h-80 w-full bg-slate-900 rounded-2xl" />
-            <Skeleton className="h-40 w-full bg-slate-900 rounded-2xl" />
+            <Skeleton className="h-80 w-full bg-slate-100 rounded-2xl" />
+            <Skeleton className="h-40 w-full bg-slate-100 rounded-2xl" />
           </div>
           <div className="lg:col-span-4">
-            <Skeleton className="h-60 w-full bg-slate-900 rounded-2xl" />
+            <Skeleton className="h-60 w-full bg-slate-100 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -115,8 +115,8 @@ export default function EventDetailPage() {
     return (
       <div className="max-w-xl mx-auto py-24 px-4 text-center space-y-4">
         <ShieldAlert className="h-16 w-16 text-rose-500 mx-auto" />
-        <h2 className="text-2xl font-bold text-slate-100">Event Tidak Ditemukan</h2>
-        <p className="text-slate-400">Event yang Anda cari tidak ada atau belum dipublikasikan.</p>
+        <h2 className="text-2xl font-bold text-slate-800">Event Tidak Ditemukan</h2>
+        <p className="text-slate-500">Event yang Anda cari tidak ada atau belum dipublikasikan.</p>
         <Button onClick={() => router.push('/')} className="bg-indigo-600 hover:bg-indigo-500 rounded-xl cursor-pointer">
           Kembali ke Discovery
         </Button>
@@ -140,10 +140,10 @@ export default function EventDetailPage() {
         <Button
           onClick={() => router.push('/')}
           variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl -ml-2 gap-2 cursor-pointer"
+          className="text-slate-500 hover:text-indigo-650 hover:bg-slate-100 rounded-xl -ml-2 gap-2 cursor-pointer text-xs font-semibold"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Kembali</span>
+          <span>Kembali ke Beranda</span>
         </Button>
       </div>
 
@@ -151,62 +151,62 @@ export default function EventDetailPage() {
         {/* Detail Event (Left Column) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Banner */}
-          <div className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-850">
+          <div className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden bg-slate-50 border border-slate-200">
             {event.bannerUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full bg-gradient-to-br from-indigo-900/20 to-purple-900/20 flex items-center justify-center">
-                <Calendar className="h-16 w-16 text-indigo-500/35" />
+              <div className="h-full w-full bg-gradient-to-br from-indigo-50 to-indigo-100/50 flex items-center justify-center">
+                <Calendar className="h-16 w-16 text-indigo-500/50" />
               </div>
             )}
           </div>
 
           {/* Info */}
-          <div className="bg-slate-900/30 border border-slate-855 rounded-2xl p-6 space-y-6">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-sm">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">{event.title}</h1>
-              <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mt-2">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">{event.title}</h1>
+              <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mt-2">
                 Diselenggarakan oleh: {event.organizer.name}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-slate-855 py-4 text-sm text-slate-300">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-slate-200 py-4 text-xs sm:text-sm text-slate-700">
               <div className="flex items-center space-x-3">
-                <Calendar className="h-5 w-5 text-indigo-400 shrink-0" />
+                <Calendar className="h-5 w-5 text-indigo-600 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-xs text-slate-500 uppercase">Tanggal & Waktu</h4>
-                  <p className="text-slate-300 font-medium">{formattedDateRange}</p>
+                  <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Tanggal & Waktu</h4>
+                  <p className="text-slate-800 font-semibold">{formattedDateRange}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-indigo-400 shrink-0" />
+                <MapPin className="h-5 w-5 text-indigo-600 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-xs text-slate-500 uppercase">Lokasi Penyelenggaraan</h4>
-                  <p className="text-slate-300 font-medium">{event.location}</p>
+                  <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Lokasi Penyelenggaraan</h4>
+                  <p className="text-slate-800 font-semibold">{event.location}</p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-3">
-              <h3 className="font-bold text-slate-200">Deskripsi Event</h3>
-              <p className="text-sm text-slate-400 leading-relaxed whitespace-pre-line">{event.description}</p>
+              <h3 className="font-bold text-slate-800 text-sm">Deskripsi Event</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">{event.description}</p>
             </div>
           </div>
         </div>
 
         {/* Kategori Tiket & Checkout (Right Column) */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="bg-slate-900/40 border-slate-855 shadow-xl backdrop-blur-sm">
-            <CardHeader className="border-b border-slate-855 pb-4">
-              <CardTitle className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <Ticket className="h-5 w-5 text-indigo-400" />
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-slate-200 pb-4">
+              <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Ticket className="h-5 w-5 text-indigo-600" />
                 <span>Pilih Kategori Tiket</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               {event.ticketCategories.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-6">Kategori tiket belum tersedia.</p>
+                <p className="text-xs text-slate-400 text-center py-6">Kategori tiket belum tersedia.</p>
               ) : (
                 <div className="space-y-4">
                   {event.ticketCategories.map((category) => {
@@ -217,12 +217,12 @@ export default function EventDetailPage() {
                     return (
                       <div
                         key={category.id}
-                        className="flex flex-col justify-between p-4 border border-slate-855/60 hover:border-slate-800 bg-slate-900/20 rounded-xl space-y-3"
+                        className="flex flex-col justify-between p-4 border border-slate-200 hover:border-slate-350 bg-slate-50/50 rounded-xl space-y-3"
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="text-sm font-bold text-slate-200">{category.name}</h4>
-                            <span className="text-slate-400 text-xs font-mono">
+                            <h4 className="text-xs sm:text-sm font-bold text-slate-800">{category.name}</h4>
+                            <span className="text-indigo-600 text-xs font-semibold">
                               {category.price.toLocaleString('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
@@ -231,11 +231,11 @@ export default function EventDetailPage() {
                             </span>
                           </div>
                           {isSoldOut ? (
-                            <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/25 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            <span className="text-[9px] font-bold text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
                               Habis
                             </span>
                           ) : (
-                            <span className="text-[10px] font-medium text-slate-500">
+                            <span className="text-[10px] font-medium text-slate-450">
                               Sisa {remaining} kuota
                             </span>
                           )}
@@ -246,19 +246,19 @@ export default function EventDetailPage() {
                             <button
                               onClick={() => handleQtyChange(category.id, -1, category.maxPerOrder)}
                               disabled={selected === 0}
-                              className="h-8 w-8 rounded-lg bg-slate-800 hover:bg-slate-700/80 border border-slate-750 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-slate-800 transition cursor-pointer"
+                              className="h-8 w-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-white transition cursor-pointer"
                             >
-                              <Minus className="h-4.5 w-4.5 text-slate-300" />
+                              <Minus className="h-4 w-4 text-slate-600" />
                             </button>
-                            <span className="w-6 text-center font-bold text-sm text-slate-200 font-mono">
+                            <span className="w-6 text-center font-bold text-xs sm:text-sm text-slate-800">
                               {selected}
                             </span>
                             <button
                               onClick={() => handleQtyChange(category.id, 1, Math.min(remaining, category.maxPerOrder))}
                               disabled={selected >= Math.min(remaining, category.maxPerOrder)}
-                              className="h-8 w-8 rounded-lg bg-slate-800 hover:bg-slate-700/80 border border-slate-750 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-slate-800 transition cursor-pointer"
+                              className="h-8 w-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-white transition cursor-pointer"
                             >
-                              <Plus className="h-4.5 w-4.5 text-slate-300" />
+                              <Plus className="h-4 w-4 text-slate-600" />
                             </button>
                           </div>
                         )}
@@ -270,10 +270,10 @@ export default function EventDetailPage() {
 
               {/* Summary */}
               {totalCost > 0 && (
-                <div className="border-t border-slate-855 pt-4 flex flex-col space-y-4">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400 font-medium">Total Harga</span>
-                    <span className="text-base font-extrabold text-indigo-400 font-mono">
+                <div className="border-t border-slate-200 pt-4 flex flex-col space-y-4">
+                  <div className="flex justify-between items-center text-xs sm:text-sm">
+                    <span className="text-slate-500 font-medium">Total Harga</span>
+                    <span className="text-base sm:text-lg font-extrabold text-indigo-650">
                       {totalCost.toLocaleString('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
@@ -283,7 +283,7 @@ export default function EventDetailPage() {
                   </div>
                   <Button
                     onClick={handleCheckout}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-lg shadow-indigo-600/10 cursor-pointer active:scale-[0.98]"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
                   >
                     Lanjutkan ke Checkout
                   </Button>

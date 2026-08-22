@@ -53,7 +53,7 @@ class ScanResultWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1F29),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
         border: Border(top: BorderSide(color: statusColor.withOpacity(0.5), width: 3)),
       ),
@@ -83,7 +83,7 @@ class ScanResultWidget extends StatelessWidget {
           // Message details
           Text(
             result.message,
-            style: const TextStyle(fontSize: 14, color: Colors.white70),
+            style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
           ),
           const SizedBox(height: 20),
 
@@ -92,20 +92,20 @@ class ScanResultWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.04),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 children: [
                   if (result.attendee != null)
-                    _buildDetailRow('Nama Pembeli', result.attendee!),
+                    _buildDetailRow(context, 'Nama Pembeli', result.attendee!),
                   if (result.attendee != null && result.category != null)
-                    const Divider(color: Colors.white10, height: 16),
+                    const Divider(height: 16),
                   if (result.category != null)
-                    _buildDetailRow('Kategori Tiket', result.category!),
+                    _buildDetailRow(context, 'Kategori Tiket', result.category!),
                   if (result.time != null) ...[
-                    const Divider(color: Colors.white10, height: 16),
-                    _buildDetailRow('Waktu Check-in', result.time!),
+                    const Divider(height: 16),
+                    _buildDetailRow(context, 'Waktu Check-in', result.time!),
                   ],
                 ],
               ),
@@ -132,12 +132,12 @@ class ScanResultWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
       ],
     );
   }

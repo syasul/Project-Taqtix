@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/use-auth';
+import { cn } from '@/lib/utils';
 import {
   Calendar,
   PlusCircle,
@@ -15,10 +16,15 @@ import {
   FolderOpen
 } from 'lucide-react';
 
+interface SidebarProps {
+  className?: string;
+  onItemClick?: () => void;
+}
+
 /**
  * Sidebar Dashboard untuk Organizer dan Partner portal.
  */
-export default function Sidebar() {
+export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
 
@@ -41,7 +47,7 @@ export default function Sidebar() {
   const inactiveLinkClass = 'border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200';
 
   return (
-    <aside className="w-64 border-r border-slate-850 bg-slate-950 flex flex-col h-[calc(100vh-4rem)] sticky top-16">
+    <aside className={cn("w-64 border-r border-slate-850 bg-slate-950 flex flex-col shrink-0", className)}>
       {/* Profil Ringkas */}
       <div className="p-6 border-b border-slate-850">
         <div className="flex items-center space-x-3">
@@ -73,6 +79,7 @@ export default function Sidebar() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={onItemClick}
                 className={`flex items-center space-x-3 px-3 py-3 border-l-2 rounded-r-xl transition text-sm ${
                   isActive ? activeLinkClass : inactiveLinkClass
                 }`}
@@ -91,6 +98,7 @@ export default function Sidebar() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={onItemClick}
                 className={`flex items-center space-x-3 px-3 py-3 border-l-2 rounded-r-xl transition text-sm ${
                   isActive ? activeLinkClass : inactiveLinkClass
                 }`}

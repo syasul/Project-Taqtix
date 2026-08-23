@@ -11,7 +11,7 @@ import {
   History,
 } from 'lucide-react';
 
-export default function SidebarNav() {
+export default function SidebarNav({ onItemClick }: { onItemClick?: () => void }) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -35,6 +35,7 @@ export default function SidebarNav() {
           <Link
             key={item.label}
             href={item.href}
+            onClick={onItemClick}
             className={`flex items-center gap-3 py-3 rounded-r-lg transition-all duration-200 text-sm group ${
               isActive
                 ? 'bg-red-50/70 border-l-4 border-red-600 text-red-700 pl-3 font-bold'

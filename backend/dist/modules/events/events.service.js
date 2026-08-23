@@ -19,6 +19,18 @@ let EventsService = class EventsService {
         this.prisma = prisma;
     }
     async getOrganizerOrThrow(userId) {
+        const member = await this.prisma.organizerMember.findFirst({
+            where: {
+                userId,
+                status: 'active',
+            },
+            include: {
+                organizer: true,
+            },
+        });
+        if (member?.organizer) {
+            return member.organizer;
+        }
         const organizer = await this.prisma.organizer.findUnique({
             where: { userId },
         });

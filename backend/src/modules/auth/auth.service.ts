@@ -205,7 +205,7 @@ export class AuthService {
   /**
    * Pembantu untuk membuat access token & refresh token.
    */
-  private async generateTokenPair(userId: string, email: string, role: string) {
+  async generateTokenPair(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
 
     const [accessToken, refreshToken] = await Promise.all([

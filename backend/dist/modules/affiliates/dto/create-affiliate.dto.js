@@ -15,6 +15,7 @@ const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 class CreateAffiliateDto {
     name;
+    email;
     type;
     commissionPct;
     promoCode;
@@ -29,6 +30,16 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama partner tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateAffiliateDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'partner@example.com',
+        required: false,
+        description: 'Email partner untuk login portal',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAffiliateDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         enum: client_1.PartnerType,

@@ -17,6 +17,7 @@ class ScannerScreen extends ConsumerStatefulWidget {
 class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   final MobileScannerController _cameraController = MobileScannerController();
   bool _isProcessing = false;
+  bool _isCrewMode = false;
   String _scanAction = 'in'; // 'in' (check-in) or 'out' (check-out)
 
   @override
@@ -45,11 +46,13 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       await _cameraController.stop();
 
       final service = ref.read(scannerProvider);
-      final result = await service.checkInQR(
-        qrPayload: rawValue,
-        eventId: activeEvent.id,
-        action: _scanAction,
-      );
+      final result = _isCrewMode
+          ? await service.checkInCrew(qrPayload: rawValue)
+          : await service.checkInQR(
+              qrPayload: rawValue,
+              eventId: activeEvent.id,
+              action: _scanAction,
+            );
 
       // Trigger auto sync attempt if scan succeeds
       ref.read(syncProvider.notifier).syncLogs();
@@ -160,91 +163,152 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
             top: 24,
             left: 24,
             right: 24,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.white12),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _scanAction = 'in';
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: _scanAction == 'in'
-                              ? const Color(0xFF6366F1)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(26),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.login,
-                              size: 16,
-                              color: _scanAction == 'in' ? Colors.white : Colors.white60,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Masuk (Check-In)',
-                              style: TextStyle(
-                                color: _scanAction == 'in' ? Colors.white : Colors.white60,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
+            child: _isCrewMode
+                ? Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'PENCATATAN KEHADIRAN CREW',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _scanAction = 'out';
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: _scanAction == 'out'
-                              ? const Color(0xFFEF4444)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(26),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.logout,
-                              size: 16,
-                              color: _scanAction == 'out' ? Colors.white : Colors.white60,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Keluar (Check-Out)',
-                              style: TextStyle(
-                                color: _scanAction == 'out' ? Colors.white : Colors.white60,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                  )
+                : Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _scanAction = 'in';
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _scanAction == 'in'
+                                    ? const Color(0xFF6366F1)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(26),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.login,
+                                    size: 16,
+                                    color: _scanAction == 'in' ? Colors.white : Colors.white60,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Masuk (Check-In)',
+                                    style: TextStyle(
+                                      color: _scanAction == 'in' ? Colors.white : Colors.white60,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _scanAction = 'out';
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _scanAction == 'out'
+                                    ? const Color(0xFFEF4444)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(26),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.logout,
+                                    size: 16,
+                                    color: _scanAction == 'out' ? Colors.white : Colors.white60,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Keluar (Check-Out)',
+                                    style: TextStyle(
+                                      color: _scanAction == 'out' ? Colors.white : Colors.white60,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+          ),
+
+          // Mode Selection Chips (Tickets vs Crew)
+          Positioned(
+            top: 88,
+            left: 24,
+            right: 24,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ChoiceChip(
+                  label: const Text(
+                    'Mode Tiket',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.white),
+                  ),
+                  selected: !_isCrewMode,
+                  selectedColor: const Color(0xFF6366F1),
+                  backgroundColor: Colors.black.withOpacity(0.6),
+                  onSelected: (selected) {
+                    setState(() {
+                      _isCrewMode = false;
+                    });
+                  },
+                ),
+                const SizedBox(width: 16),
+                ChoiceChip(
+                  label: const Text(
+                    'Mode Crew',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.white),
+                  ),
+                  selected: _isCrewMode,
+                  selectedColor: const Color(0xFF6366F1),
+                  backgroundColor: Colors.black.withOpacity(0.6),
+                  onSelected: (selected) {
+                    setState(() {
+                      _isCrewMode = true;
+                    });
+                  },
+                ),
+              ],
             ),
           ),
 

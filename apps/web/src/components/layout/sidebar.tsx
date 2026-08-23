@@ -28,7 +28,7 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  const isOrganizer = user?.role === 'organizer';
+  const isOrganizer = user?.role === 'organizer' || user?.role === 'organizer_member';
   const isPartner = user?.role === 'partner';
 
   // Menu untuk Organizer
@@ -36,6 +36,7 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
     { href: '/dashboard', label: 'Ringkasan', icon: LayoutDashboard },
     { href: '/dashboard/events', label: 'Daftar Event', icon: Calendar },
     { href: '/dashboard/events/new', label: 'Buat Event', icon: PlusCircle },
+    { href: '/dashboard/settings/team', label: 'Kelola Tim', icon: Settings },
   ];
 
   // Menu untuk Partner Afiliasi

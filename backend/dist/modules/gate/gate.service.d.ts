@@ -109,5 +109,8 @@ export declare class GateService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }[]>;
 }

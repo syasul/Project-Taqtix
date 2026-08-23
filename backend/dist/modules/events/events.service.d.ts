@@ -18,6 +18,9 @@ export declare class EventsService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
     update(id: string, dto: UpdateEventDto, userId: string): Promise<{
         description: string | null;
@@ -32,6 +35,9 @@ export declare class EventsService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
     publish(id: string, userId: string): Promise<{
         description: string | null;
@@ -46,6 +52,9 @@ export declare class EventsService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
     findAllPublic(): Promise<({
         organizer: {
@@ -65,6 +74,9 @@ export declare class EventsService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     })[]>;
     findOnePublicBySlug(slug: string): Promise<{
         organizer: {
@@ -76,9 +88,9 @@ export declare class EventsService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            eventId: string;
             price: number;
             quota: number;
-            eventId: string;
             sold: number;
             maxPerOrder: number;
             saleStartAt: Date;
@@ -97,6 +109,9 @@ export declare class EventsService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
     findAllOrganizerEvents(userId: string): Promise<{
         description: string | null;
@@ -111,5 +126,8 @@ export declare class EventsService {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }[]>;
 }

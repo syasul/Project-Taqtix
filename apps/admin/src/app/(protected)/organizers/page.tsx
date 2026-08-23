@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import {
@@ -18,6 +19,7 @@ interface Organizer {
   phone: string;
   status: 'pending' | 'active' | 'suspended';
   plan: 'starter' | 'pro' | 'enterprise';
+  segment: 'event_builder' | 'event_ip_owner' | 'campus_community' | 'enterprise' | null;
   createdAt: string;
   approvedAt: string | null;
   approvedBy: string | null;
@@ -28,6 +30,7 @@ export default function OrganizersPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [segmentFilter, setSegmentFilter] = useState<string>('all');
   const [showConfirmModal, setShowConfirmModal] = useState<{ id: string; action: 'approve' | 'suspend'; name: string } | null>(null);
 
   // Fetch Organizers
@@ -80,8 +83,39 @@ export default function OrganizersPage() {
       org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || org.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesSegment = segmentFilter === 'all' || org.segment === segmentFilter;
+    return matchesSearch && matchesStatus && matchesSegment;
   });
+
+  const getSegmentBadge = (segment: string | null) => {
+    switch (segment) {
+      case 'event_builder':
+        return 'bg-blue-50 text-blue-700 border border-blue-200';
+      case 'event_ip_owner':
+        return 'bg-purple-50 text-purple-700 border border-purple-200';
+      case 'campus_community':
+        return 'bg-orange-50 text-orange-700 border border-orange-200';
+      case 'enterprise':
+        return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+      default:
+        return 'bg-slate-50 text-slate-700 border border-slate-200';
+    }
+  };
+
+  const getSegmentLabel = (segment: string | null) => {
+    switch (segment) {
+      case 'event_builder':
+        return 'Event Builder';
+      case 'event_ip_owner':
+        return 'Event IP Owner';
+      case 'campus_community':
+        return 'Campus & Community';
+      case 'enterprise':
+        return 'Enterprise';
+      default:
+        return 'Unsegmented';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -118,6 +152,18 @@ export default function OrganizersPage() {
             <option value="active">Aktif</option>
             <option value="suspended">Ditangguhkan</option>
           </select>
+
+          <select
+            value={segmentFilter}
+            onChange={(e) => setSegmentFilter(e.target.value)}
+            className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:border-red-500 focus:bg-white transition-all text-sm cursor-pointer"
+          >
+            <option value="all">Semua Segment</option>
+            <option value="event_builder">Event Builder</option>
+            <option value="event_ip_owner">Event IP Owner</option>
+            <option value="campus_community">Campus & Community</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
         </div>
       </div>
 
@@ -139,6 +185,7 @@ export default function OrganizersPage() {
                 <tr className="border-b border-slate-200 text-slate-500 font-semibold bg-slate-50">
                   <th className="p-4">Nama Penyelenggara</th>
                   <th className="p-4">Kontak</th>
+                  <th className="p-4">Segment</th>
                   <th className="p-4">Paket Plan</th>
                   <th className="p-4">Status</th>
                   <th className="p-4">Event</th>
@@ -150,13 +197,21 @@ export default function OrganizersPage() {
                   <tr key={org.id} className="hover:bg-slate-50 transition-colors">
                     {/* Name */}
                     <td className="p-4">
-                      <div className="font-semibold text-slate-800">{org.name}</div>
+                      <Link href={`/organizers/${org.id}`} className="font-semibold text-slate-800 hover:text-red-500 transition-colors">
+                        {org.name}
+                      </Link>
                       <div className="text-xs text-slate-400 mt-0.5">ID: {org.id}</div>
                     </td>
                     {/* Contact */}
                     <td className="p-4">
                       <div className="text-slate-600">{org.email}</div>
                       <div className="text-xs text-slate-400 mt-0.5">{org.phone}</div>
+                    </td>
+                    {/* Segment */}
+                    <td className="p-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getSegmentBadge(org.segment)}`}>
+                        {getSegmentLabel(org.segment)}
+                      </span>
                     </td>
                     {/* Plan Plan */}
                     <td className="p-4">

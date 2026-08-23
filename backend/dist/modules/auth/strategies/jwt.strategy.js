@@ -26,6 +26,19 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         this.prisma = prisma;
     }
     async validate(payload) {
+        if (payload.role === 'partner') {
+            const partner = await this.prisma.partner.findUnique({
+                where: { id: payload.sub },
+            });
+            if (!partner) {
+                throw new common_1.UnauthorizedException('Partner tidak ditemukan');
+            }
+            return {
+                id: partner.id,
+                email: partner.email || '',
+                role: 'partner',
+            };
+        }
         const user = await this.prisma.user.findUnique({
             where: { id: payload.sub },
         });

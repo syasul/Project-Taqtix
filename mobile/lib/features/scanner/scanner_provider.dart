@@ -557,4 +557,97 @@ class ScannerService {
       timeLabel: 'Waktu Masuk',
     );
   }
+
+  Future<ScanResult> checkInCrew({required String qrPayload}) async {
+    final connectivity = await Connectivity().checkConnectivity();
+    final isOnline = connectivity != ConnectivityResult.none;
+
+    final isar = ref.read(isarProvider);
+
+    if (isOnline) {
+      try {
+        final dio = ref.read(dioProvider);
+        final response = await dio.post(
+          '/gate/workforce-scan',
+          data: {
+            'qrPayload': qrPayload,
+          },
+        );
+
+        final data = response.data;
+        if (data != null && data['success'] == true) {
+          final crewData = data['data'];
+          final name = crewData['name'] as String;
+          final division = crewData['division'] as String;
+          final role = crewData['role'] as String;
+
+          await isar.writeTxn(() async {
+            await isar.scanLogs.put(
+              ScanLog()
+                ..ticketId = qrPayload
+                ..qrPayload = qrPayload
+                ..scannedAt = DateTime.now()
+                ..synced = true
+                ..status = 'CREW_SUCCESS',
+            );
+          });
+
+          return ScanResult(
+            status: ScanResultStatus.valid,
+            title: 'CREW CHECK-IN (ONLINE)',
+            message: 'Check-in crew berhasil diverifikasi.',
+            attendee: name,
+            category: '$division - $role',
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Masuk',
+          );
+        }
+      } on DioException catch (e) {
+        final errData = e.response?.data;
+        final message = errData?['message'] as String? ?? 'Gagal memindai crew';
+
+        if (message == 'QR_ALREADY_USED') {
+          return ScanResult(
+            status: ScanResultStatus.duplicate,
+            title: 'CREW SUDAH CHECK-IN',
+            message: 'Crew bersangkutan sudah pernah check-in sebelumnya.',
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Scan',
+          );
+        } else if (message == 'QR_INVALID' || message == 'QR_NOT_WORKFORCE') {
+          return ScanResult(
+            status: ScanResultStatus.invalid,
+            title: 'QR CREW INVALID',
+            message: 'QR Code tidak valid atau bukan crew terdaftar.',
+            time: DateFormat('HH:mm:ss').format(DateTime.now()),
+            timeLabel: 'Waktu Scan',
+          );
+        }
+      } catch (e) {
+        // Fallback to offline
+      }
+    }
+
+    // Offline check-in
+    await isar.writeTxn(() async {
+      await isar.scanLogs.put(
+        ScanLog()
+          ..ticketId = qrPayload
+          ..qrPayload = qrPayload
+          ..scannedAt = DateTime.now()
+          ..synced = false
+          ..status = 'CREW_PENDING',
+      );
+    });
+
+    return ScanResult(
+      status: ScanResultStatus.valid,
+      title: 'CREW CHECK-IN (OFFLINE)',
+      message: 'Log kehadiran crew disimpan lokal (menunggu online).',
+      attendee: 'Crew Member',
+      category: 'Offline Sync',
+      time: DateFormat('HH:mm:ss').format(DateTime.now()),
+      timeLabel: 'Waktu Masuk',
+    );
+  }
 }

@@ -14,8 +14,13 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { GateModule } from './modules/gate/gate.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { AffiliatesModule } from './modules/affiliates/affiliates.module';
+import { TeamModule } from './modules/team/team.module';
+import { WorkforceModule } from './modules/workforce/workforce.module';
+import { CRMModule } from './modules/crm/crm.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { PermissionGuard } from './common/guards/permission.guard';
 
 /**
  * Modul utama / akar (root) aplikasi NestJS.
@@ -60,6 +65,10 @@ import { RolesGuard } from './common/guards/roles.guard';
     GateModule,
     DashboardModule,
     AffiliatesModule,
+    TeamModule,
+    WorkforceModule,
+    CRMModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
@@ -73,6 +82,11 @@ import { RolesGuard } from './common/guards/roles.guard';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    // Menjadikan PermissionGuard aktif secara global untuk mengontrol izin hak akses
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
     },
   ],
 })

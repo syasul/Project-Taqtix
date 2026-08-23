@@ -46,6 +46,18 @@ let AffiliatesController = class AffiliatesController {
     async getLeaderboard(eventId, userId) {
         return this.affiliatesService.getLeaderboard(eventId, userId);
     }
+    async requestMagicLink(email) {
+        const result = await this.affiliatesService.requestMagicLink(email);
+        return result;
+    }
+    async verifyMagicLink(token) {
+        const result = await this.affiliatesService.verifyMagicLink(token);
+        return { success: true, data: result };
+    }
+    async getPartnerStats(partnerId) {
+        const result = await this.affiliatesService.getPartnerStats(partnerId);
+        return { success: true, data: result };
+    }
 };
 exports.AffiliatesController = AffiliatesController;
 __decorate([
@@ -74,7 +86,7 @@ __decorate([
 ], AffiliatesController.prototype, "trackClick", null);
 __decorate([
     (0, common_1.Post)('organizer/events/:id/partners'),
-    (0, roles_decorator_1.Roles)('organizer'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({
         summary: 'Mendaftarkan partner afiliasi baru (Organizer Only)',
@@ -92,7 +104,7 @@ __decorate([
 ], AffiliatesController.prototype, "createAffiliate", null);
 __decorate([
     (0, common_1.Get)('organizer/events/:id/partners'),
-    (0, roles_decorator_1.Roles)('organizer'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({
         summary: 'Mendapatkan daftar partner afiliasi event (Organizer Only)',
@@ -109,7 +121,7 @@ __decorate([
 ], AffiliatesController.prototype, "getAffiliates", null);
 __decorate([
     (0, common_1.Get)('organizer/events/:id/partners/leaderboard'),
-    (0, roles_decorator_1.Roles)('organizer'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({
         summary: 'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
@@ -124,8 +136,38 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], AffiliatesController.prototype, "getLeaderboard", null);
+__decorate([
+    (0, common_1.Post)('partner/auth/request-magic-link'),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Meminta login magic link untuk partner' }),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AffiliatesController.prototype, "requestMagicLink", null);
+__decorate([
+    (0, common_1.Post)('partner/auth/verify-magic-link'),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Verifikasi magic link token dan berikan JWT' }),
+    __param(0, (0, common_1.Body)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AffiliatesController.prototype, "verifyMagicLink", null);
+__decorate([
+    (0, common_1.Get)('partner/stats'),
+    (0, roles_decorator_1.Roles)('partner'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data analitik performa partner' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AffiliatesController.prototype, "getPartnerStats", null);
 exports.AffiliatesController = AffiliatesController = __decorate([
-    (0, swagger_1.ApiTags)('Affiliates'),
+    (0, swagger_1.ApiTags)('Partners & Affiliates'),
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [affiliates_service_1.AffiliatesService])
 ], AffiliatesController);

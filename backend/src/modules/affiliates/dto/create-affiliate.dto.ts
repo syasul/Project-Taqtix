@@ -20,6 +20,15 @@ export class CreateAffiliateDto {
   name!: string;
 
   @ApiProperty({
+    example: 'partner@example.com',
+    required: false,
+    description: 'Email partner untuk login portal',
+  })
+  @IsString()
+  @IsOptional()
+  email?: string;
+
+  @ApiProperty({
     enum: PartnerType,
     example: PartnerType.INFLUENCER,
     description: 'Tipe partner',

@@ -10,11 +10,13 @@ exports.AffiliatesModule = void 0;
 const common_1 = require("@nestjs/common");
 const affiliates_service_1 = require("./affiliates.service");
 const affiliates_controller_1 = require("./affiliates.controller");
+const auth_module_1 = require("../auth/auth.module");
 let AffiliatesModule = class AffiliatesModule {
 };
 exports.AffiliatesModule = AffiliatesModule;
 exports.AffiliatesModule = AffiliatesModule = __decorate([
     (0, common_1.Module)({
+        imports: [auth_module_1.AuthModule],
         controllers: [affiliates_controller_1.AffiliatesController],
         providers: [affiliates_service_1.AffiliatesService],
         exports: [affiliates_service_1.AffiliatesService],

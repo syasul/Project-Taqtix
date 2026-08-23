@@ -46,20 +46,30 @@ exports.AffiliatesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const config_1 = require("@nestjs/config");
+const auth_service_1 = require("../auth/auth.service");
 const crypto = __importStar(require("crypto"));
 let AffiliatesService = class AffiliatesService {
     prisma;
     configService;
-    constructor(prisma, configService) {
+    authService;
+    constructor(prisma, configService, authService) {
         this.prisma = prisma;
         this.configService = configService;
+        this.authService = authService;
     }
     async verifyEventOwnership(eventId, organizerUserId) {
-        const organizer = await this.prisma.organizer.findUnique({
-            where: { userId: organizerUserId },
+        const member = await this.prisma.organizerMember.findFirst({
+            where: { userId: organizerUserId, status: 'active' },
         });
-        if (!organizer) {
-            throw new common_1.ForbiddenException('Akses ditolak: Anda bukan organizer');
+        let organizerId = member?.organizerId;
+        if (!organizerId) {
+            const organizer = await this.prisma.organizer.findUnique({
+                where: { userId: organizerUserId },
+            });
+            if (!organizer) {
+                throw new common_1.ForbiddenException('Akses ditolak: Anda bukan organizer');
+            }
+            organizerId = organizer.id;
         }
         const event = await this.prisma.event.findUnique({
             where: { id: eventId },
@@ -67,7 +77,7 @@ let AffiliatesService = class AffiliatesService {
         if (!event) {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
-        if (event.organizerId !== organizer.id) {
+        if (event.organizerId !== organizerId) {
             throw new common_1.ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
         }
     }
@@ -79,6 +89,14 @@ let AffiliatesService = class AffiliatesService {
             .toUpperCase();
         const cleanName = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const uniqueCode = `${cleanName}-${randomSuffix}`;
+        if (dto.email) {
+            const existingPartner = await this.prisma.partner.findUnique({
+                where: { email: dto.email },
+            });
+            if (existingPartner) {
+                throw new common_1.ConflictException('Email partner sudah terdaftar');
+            }
+        }
         return this.prisma.partner.create({
             data: {
                 eventId,
@@ -88,6 +106,7 @@ let AffiliatesService = class AffiliatesService {
                 promoCode: dto.promoCode || null,
                 commissionType: 'percentage',
                 commissionValue: dto.commissionPct ?? 10,
+                email: dto.email || null,
             },
         });
     }
@@ -135,11 +154,109 @@ let AffiliatesService = class AffiliatesService {
             orderBy: [{ conversions: 'desc' }, { commissionEarned: 'desc' }],
         });
     }
+    async requestMagicLink(email) {
+        const partner = await this.prisma.partner.findUnique({
+            where: { email },
+        });
+        if (!partner) {
+            throw new common_1.NotFoundException('EMAIL_NOT_REGISTERED');
+        }
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+        await this.prisma.partnerMagicLink.deleteMany({
+            where: { email },
+        });
+        await this.prisma.partnerMagicLink.create({
+            data: {
+                email,
+                token,
+                expiresAt,
+            },
+        });
+        console.log(`[PARTNER PORTAL MAGIC LINK]: http://localhost:3000/partner/verify?token=${token}`);
+        return { success: true, token };
+    }
+    async verifyMagicLink(token) {
+        const magicLink = await this.prisma.partnerMagicLink.findUnique({
+            where: { token },
+        });
+        if (!magicLink) {
+            throw new common_1.NotFoundException('Token magic link tidak valid');
+        }
+        if (magicLink.expiresAt < new Date()) {
+            throw new common_1.GoneException('Token magic link kedaluwarsa');
+        }
+        const partner = await this.prisma.partner.findUnique({
+            where: { email: magicLink.email },
+        });
+        if (!partner) {
+            throw new common_1.NotFoundException('Akun partner tidak ditemukan');
+        }
+        await this.prisma.partner.update({
+            where: { id: partner.id },
+            data: { lastLoginAt: new Date() },
+        });
+        await this.prisma.partnerMagicLink.delete({
+            where: { id: magicLink.id },
+        });
+        return this.authService.generateTokenPair(partner.id, partner.email || '', 'partner');
+    }
+    async getPartnerStats(partnerId) {
+        const partner = await this.prisma.partner.findUnique({
+            where: { id: partnerId },
+            include: {
+                event: {
+                    select: {
+                        title: true,
+                        slug: true,
+                        startDate: true,
+                    },
+                },
+            },
+        });
+        if (!partner) {
+            throw new common_1.NotFoundException('Partner tidak ditemukan');
+        }
+        const recentOrders = await this.prisma.order.findMany({
+            where: {
+                partnerId,
+                status: 'PAID',
+            },
+            select: {
+                id: true,
+                totalAmount: true,
+                createdAt: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: 10,
+        });
+        const recentSales = recentOrders.map((o) => ({
+            orderId: o.id,
+            amount: o.totalAmount,
+            date: o.createdAt,
+        }));
+        return {
+            partnerId: partner.id,
+            name: partner.name,
+            uniqueCode: partner.uniqueCode,
+            eventName: partner.event.title,
+            eventSlug: partner.event.slug,
+            clicks: partner.clicks,
+            conversions: partner.conversions,
+            revenueGenerated: partner.revenueGenerated,
+            commissionEarned: partner.commissionEarned,
+            commissionPct: partner.commissionValue,
+            recentSales,
+        };
+    }
 };
 exports.AffiliatesService = AffiliatesService;
 exports.AffiliatesService = AffiliatesService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        auth_service_1.AuthService])
 ], AffiliatesService);
 //# sourceMappingURL=affiliates.service.js.map

@@ -9,13 +9,16 @@ export declare class OrdersService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
         eventId: string;
+        status: import("@prisma/client").$Enums.OrderStatus;
         buyerId: string;
         totalAmount: number;
         discountAmount: number;
         promoCodeId: string | null;
         partnerId: string | null;
+        utmSource: string | null;
+        utmMedium: string | null;
+        utmCampaign: string | null;
         expiredAt: Date;
     }>;
     findOne(id: string): Promise<{
@@ -32,6 +35,9 @@ export declare class OrdersService {
             bannerUrl: string;
             organizerId: string;
             status: import("@prisma/client").$Enums.EventStatus;
+            geofenceLat: number | null;
+            geofenceLng: number | null;
+            geofenceRadius: number | null;
         };
         payment: {
             id: string;
@@ -62,9 +68,9 @@ export declare class OrdersService {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                eventId: string;
                 price: number;
                 quota: number;
-                eventId: string;
                 sold: number;
                 maxPerOrder: number;
                 saleStartAt: Date;
@@ -80,18 +86,22 @@ export declare class OrdersService {
             attendeeName: string;
             attendeeEmail: string;
             attendeePhone: string;
+            city: string | null;
         })[];
     } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
         eventId: string;
+        status: import("@prisma/client").$Enums.OrderStatus;
         buyerId: string;
         totalAmount: number;
         discountAmount: number;
         promoCodeId: string | null;
         partnerId: string | null;
+        utmSource: string | null;
+        utmMedium: string | null;
+        utmCampaign: string | null;
         expiredAt: Date;
     }>;
 }

@@ -3,11 +3,11 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2, DollarSign, Ticket, Activity, TrendingUp } from 'lucide-react';
+import { Loader2, DollarSign, Ticket, Activity, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { apiClient } from '@/lib/api-client';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import EventTabs from '@/components/layout/event-tabs';
 
 interface DashboardStats {
   eventId: string;
@@ -63,26 +63,7 @@ export default function SalesDashboardPage() {
 
   return (
     <div className="space-y-8 max-w-5xl">
-      {/* Top Back Nav */}
-      <div>
-        <Button
-          onClick={() => router.push('/dashboard/events')}
-          variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl -ml-2 gap-2 cursor-pointer text-xs"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Kembali ke Daftar Event</span>
-        </Button>
-      </div>
-
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-          Statistik Penjualan
-        </h1>
-        <p className="text-sm text-slate-400 mt-2">
-          Monitor pendapatan, jumlah tiket ter-reserve, dan grafik perbandingan penjualan tiket.
-        </p>
-      </div>
+      <EventTabs eventId={eventId} />
 
       {isLoading ? (
         <div className="flex justify-center items-center py-24">

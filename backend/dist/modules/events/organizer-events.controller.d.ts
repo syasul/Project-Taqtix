@@ -17,6 +17,9 @@ export declare class OrganizerEventsController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }[]>;
     createEvent(dto: CreateEventDto, userId: string): Promise<{
         description: string | null;
@@ -31,6 +34,9 @@ export declare class OrganizerEventsController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
     updateEvent(id: string, dto: UpdateEventDto, userId: string): Promise<{
         description: string | null;
@@ -45,6 +51,9 @@ export declare class OrganizerEventsController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
     publishEvent(id: string, userId: string): Promise<{
         description: string | null;
@@ -59,5 +68,8 @@ export declare class OrganizerEventsController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
 }

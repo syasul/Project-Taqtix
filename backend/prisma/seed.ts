@@ -41,6 +41,22 @@ async function main() {
       name: 'Taqwa Media Group',
       slug: 'taqwa-media-group',
       bankAccount: 'Bank Syariah Indonesia (BSI) - 7123456789 a.n Taqwa Media',
+      segment: 'event_builder',
+      plan: 'pro',
+    },
+  });
+
+  // 3a. Buat OrganizerMember (Owner)
+  console.log('Membuat member owner untuk organizer...');
+  await prisma.organizerMember.create({
+    data: {
+      organizerId: organizer.id,
+      userId: user.id,
+      email: organizerEmail,
+      role: 'owner',
+      status: 'active',
+      invitedBy: user.id,
+      joinedAt: new Date(),
     },
   });
 

@@ -66,6 +66,7 @@ model User {
   updatedAt    DateTime    @updatedAt
   
   organizer            Organizer?
+  organizerMembers     OrganizerMember[]
   orders               Order[]
   checkedTickets       Ticket[]           @relation("CheckedByRelation")
   checkedOutTickets    Ticket[]           @relation("CheckedOutByRelation")
@@ -75,16 +76,21 @@ model User {
 
 /// Profil tambahan bagi user dengan role 'organizer'.
 model Organizer {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  name        String
-  slug        String   @unique
-  bankAccount String?  // Informasi rekening bank organizer untuk pembayaran
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String            @id @default(uuid())
+  userId         String            @unique
+  name           String
+  slug           String            @unique
+  bankAccount    String?           // Informasi rekening bank organizer untuk pembayaran
+  segment        String?           // "event_builder" | "event_ip_owner" | "campus_community" | "enterprise"
+  plan           String            @default("starter") // "starter" | "pro" | "enterprise"
+  planStartedAt  DateTime?
+  planExpiresAt  DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  events      Event[]
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events         Event[]
+  members        OrganizerMember[]
 }
 
 /// Representasi dari suatu Event / Acara.
@@ -99,6 +105,9 @@ model Event {
   startDate        DateTime
   endDate          DateTime
   status           EventStatus       @default(DRAFT)
+  geofenceLat      Float?
+  geofenceLng      Float?
+  geofenceRadius   Float?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
@@ -110,6 +119,9 @@ model Event {
   gateStaffs       GateStaff[]
   workforceMembers WorkforceMember[]
   tickets          Ticket[]
+  segments         Segment[]
+  adSpends         AdSpend[]
+  trackEvents      TrackEvent[]
 }
 
 /// Kategori/Tipe Tiket yang tersedia pada suatu event.
@@ -140,6 +152,9 @@ model Order {
   status         OrderStatus       @default(PENDING)
   promoCodeId    String?
   partnerId      String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
   createdAt      DateTime          @default(now())
   expiredAt      DateTime
   updatedAt      DateTime          @updatedAt
@@ -162,6 +177,7 @@ model OrderItem {
   attendeeName     String
   attendeeEmail    String
   attendeePhone    String
+  city             String?
   createdAt        DateTime       @default(now())
 
   order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -235,6 +251,9 @@ model Partner {
   conversions      Int         @default(0)
   revenueGenerated Float       @default(0.0)
   commissionEarned Float       @default(0.0)
+  email            String?     @unique
+  passwordHash     String?
+  lastLoginAt      DateTime?
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -284,18 +303,126 @@ model ScanLog {
 
 // Model untuk Workforce Member (Phase 2 Operate)
 model WorkforceMember {
+  id              String    @id @default(uuid())
+  eventId         String
+  name            String
+  phone           String
+  division        String
+  role            String
+  shiftId         String
+  picUserId       String?   // ID dari OrganizerMember
+  qrPayload       String
+  status          String    // "not_checked_in" | "present" | "late" | "checked_out"
+  checkedInAt     DateTime?
+  checkedInMethod String?   // "gate_scan" | "self_service"
+  addedBy         String    @default("")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model OrganizerMember {
+  id          String    @id @default(uuid())
+  organizerId String
+  userId      String?
+  email       String
+  role        String    // "owner" | "admin" | "finance" | "marketing" | "viewer"
+  status      String    @default("pending") // "pending" | "active" | "removed"
+  inviteToken String?   @unique
+  invitedBy   String
+  invitedAt   DateTime  @default(now())
+  joinedAt    DateTime?
+  removedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  organizer   Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizerId, email])
+}
+
+model Segment {
   id        String   @id @default(uuid())
   eventId   String
   name      String
-  phone     String
-  division  String
-  role      String
-  shiftId   String
-  qrPayload String
-  status    String   // "not_checked_in" | "present" | "late" | "checked_out"
+  criteria  Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
+
+model AdSpend {
+  id          String   @id @default(uuid())
+  eventId     String
+  channel     String   // "meta_ads" | "tiktok_ads" | "google_ads" | "other"
+  amount      Float
+  periodStart DateTime
+  periodEnd   DateTime
+  inputBy     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EnterpriseLead {
+  id               String   @id @default(uuid())
+  name             String
+  organizationName String
+  email            String
+  phone            String
+  message          String
+  status           String   @default("new") // "new" | "contacted" | "negotiating" | "onboarded" | "not_interested"
+  assignedTo       String?  // admin user id
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model PartnerMagicLink {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model BroadcastJob {
+  id          String               @id @default(uuid())
+  segmentId   String
+  message     String
+  status      String               @default("queued") // "queued" | "processing" | "completed" | "failed"
+  targetCount Int                  @default(0)
+  sentCount   Int                  @default(0)
+  failedCount Int                  @default(0)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  recipients  BroadcastRecipient[]
+}
+
+model BroadcastRecipient {
+  id        String       @id @default(uuid())
+  jobId     String
+  name      String
+  email     String
+  phone     String
+  status    String       @default("pending") // "pending" | "sent" | "failed"
+  error     String?
+  sentAt    DateTime?
+  createdAt DateTime     @default(now())
+
+  job       BroadcastJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model TrackEvent {
+  id        String   @id @default(uuid())
+  eventId   String
+  type      String   // "page_view" | "checkout_start"
+  createdAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
 

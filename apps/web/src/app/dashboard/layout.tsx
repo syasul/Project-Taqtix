@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   // Jika token ada tapi profile belum di-decode atau bukan organizer
-  if (user && user.role !== 'organizer') {
+  if (user && user.role !== 'organizer' && user.role !== 'organizer_member') {
     return (
       <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center space-y-4">
         <ShieldAlert className="h-12 w-12 text-rose-500" />

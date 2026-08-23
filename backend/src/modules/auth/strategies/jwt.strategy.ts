@@ -24,6 +24,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Mengurai payload JWT menjadi data user aktif di request context.
    */
   async validate(payload: { sub: string; email: string; role: string }) {
+    if (payload.role === 'partner') {
+      const partner = await this.prisma.partner.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!partner) {
+        throw new UnauthorizedException('Partner tidak ditemukan');
+      }
+
+      return {
+        id: partner.id,
+        email: partner.email || '',
+        role: 'partner',
+      };
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });

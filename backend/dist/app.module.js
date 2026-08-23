@@ -23,8 +23,13 @@ const notifications_module_1 = require("./modules/notifications/notifications.mo
 const gate_module_1 = require("./modules/gate/gate.module");
 const dashboard_module_1 = require("./modules/dashboard/dashboard.module");
 const affiliates_module_1 = require("./modules/affiliates/affiliates.module");
+const team_module_1 = require("./modules/team/team.module");
+const workforce_module_1 = require("./modules/workforce/workforce.module");
+const crm_module_1 = require("./modules/crm/crm.module");
+const admin_module_1 = require("./modules/admin/admin.module");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const roles_guard_1 = require("./common/guards/roles.guard");
+const permission_guard_1 = require("./common/guards/permission.guard");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -69,6 +74,10 @@ exports.AppModule = AppModule = __decorate([
             gate_module_1.GateModule,
             dashboard_module_1.DashboardModule,
             affiliates_module_1.AffiliatesModule,
+            team_module_1.TeamModule,
+            workforce_module_1.WorkforceModule,
+            crm_module_1.CRMModule,
+            admin_module_1.AdminModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -80,6 +89,10 @@ exports.AppModule = AppModule = __decorate([
             {
                 provide: core_1.APP_GUARD,
                 useClass: roles_guard_1.RolesGuard,
+            },
+            {
+                provide: core_1.APP_GUARD,
+                useClass: permission_guard_1.PermissionGuard,
             },
         ],
     })

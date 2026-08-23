@@ -20,6 +20,9 @@ export declare class EventsController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     })[]>;
     getPublicEventBySlug(slug: string): Promise<{
         organizer: {
@@ -31,9 +34,9 @@ export declare class EventsController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            eventId: string;
             price: number;
             quota: number;
-            eventId: string;
             sold: number;
             maxPerOrder: number;
             saleStartAt: Date;
@@ -52,5 +55,8 @@ export declare class EventsController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }>;
 }

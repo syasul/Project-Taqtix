@@ -22,7 +22,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { Request, Response } from 'express';
 
-@ApiTags('Affiliates')
+@ApiTags('Partners & Affiliates')
 @Controller()
 export class AffiliatesController {
   constructor(private readonly affiliatesService: AffiliatesService) {}
@@ -30,8 +30,7 @@ export class AffiliatesController {
   @Public()
   @Get('r/:code')
   @ApiOperation({
-    summary:
-      'Mencatat klik afiliasi dan redirect ke landing page event (Public)',
+    summary: 'Mencatat klik afiliasi dan redirect ke landing page event (Public)',
   })
   async redirectAffiliate(
     @Param('code') code: string,
@@ -68,7 +67,7 @@ export class AffiliatesController {
   }
 
   @Post('organizer/events/:id/partners')
-  @Roles('organizer')
+  @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Mendaftarkan partner afiliasi baru (Organizer Only)',
@@ -86,7 +85,7 @@ export class AffiliatesController {
   }
 
   @Get('organizer/events/:id/partners')
-  @Roles('organizer')
+  @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Mendapatkan daftar partner afiliasi event (Organizer Only)',
@@ -103,11 +102,10 @@ export class AffiliatesController {
   }
 
   @Get('organizer/events/:id/partners/leaderboard')
-  @Roles('organizer')
+  @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
   @ApiOperation({
-    summary:
-      'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
+    summary: 'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -118,5 +116,34 @@ export class AffiliatesController {
     @CurrentUser('id') userId: string,
   ) {
     return this.affiliatesService.getLeaderboard(eventId, userId);
+  }
+
+  // --- PARTNER PORTAL API ---
+
+  @Post('partner/auth/request-magic-link')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Meminta login magic link untuk partner' })
+  async requestMagicLink(@Body('email') email: string) {
+    const result = await this.affiliatesService.requestMagicLink(email);
+    return result;
+  }
+
+  @Post('partner/auth/verify-magic-link')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verifikasi magic link token dan berikan JWT' })
+  async verifyMagicLink(@Body('token') token: string) {
+    const result = await this.affiliatesService.verifyMagicLink(token);
+    return { success: true, data: result };
+  }
+
+  @Get('partner/stats')
+  @Roles('partner')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan data analitik performa partner' })
+  async getPartnerStats(@CurrentUser('id') partnerId: string) {
+    const result = await this.affiliatesService.getPartnerStats(partnerId);
+    return { success: true, data: result };
   }
 }

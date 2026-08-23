@@ -33,32 +33,58 @@ class SyncNotifier extends StateNotifier<bool> {
     state = true;
     try {
       final dio = ref.read(dioProvider);
-      final payload = unsynced
-          .map(
-            (log) => {
-              'qrPayload': log.qrPayload,
-              'scannedAt': log.scannedAt.toUtc().toIso8601String(),
-            },
-          )
-          .toList();
 
-      final response = await dio.post(
-        ApiEndpoints.scanBatch,
-        data: {'logs': payload},
-      );
+      final ticketLogs = unsynced.where((log) => log.status != 'CREW_PENDING').toList();
+      final crewLogs = unsynced.where((log) => log.status == 'CREW_PENDING').toList();
 
-      final data = response.data;
-      if (data != null && data['success'] == true) {
-        // Sync succeeded
-        await isar.writeTxn(() async {
-          for (final log in unsynced) {
-            log.synced = true;
-            await isar.scanLogs.put(log);
+      // 1. Sync Ticket Logs in batch
+      if (ticketLogs.isNotEmpty) {
+        final payload = ticketLogs
+            .map(
+              (log) => {
+                'qrPayload': log.qrPayload,
+                'scannedAt': log.scannedAt.toUtc().toIso8601String(),
+              },
+            )
+            .toList();
+
+        final response = await dio.post(
+          ApiEndpoints.scanBatch,
+          data: {'logs': payload},
+        );
+
+        final data = response.data;
+        if (data != null && data['success'] == true) {
+          await isar.writeTxn(() async {
+            for (final log in ticketLogs) {
+              log.synced = true;
+              await isar.scanLogs.put(log);
+            }
+          });
+        }
+      }
+
+      // 2. Sync Crew Logs one by one
+      if (crewLogs.isNotEmpty) {
+        for (final log in crewLogs) {
+          try {
+            final response = await dio.post(
+              '/gate/workforce-scan',
+              data: {'qrPayload': log.qrPayload},
+            );
+            if (response.data != null && response.data['success'] == true) {
+              await isar.writeTxn(() async {
+                log.synced = true;
+                log.status = 'CREW_SUCCESS';
+                await isar.scanLogs.put(log);
+              });
+            }
+          } catch (e) {
+            // Keep unsynced for next retry
           }
-        });
+        }
       }
     } on DioException catch (e) {
-      // Ignored for background sync (retry later)
       print('Sync failed due to connectivity: ${e.message}');
     } catch (e) {
       print('Sync failed due to: $e');

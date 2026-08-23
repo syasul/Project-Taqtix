@@ -42,5 +42,8 @@ export declare class AuthService {
         id: string;
         createdAt: Date;
     }>;
-    private generateTokenPair;
+    generateTokenPair(userId: string, email: string, role: string): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }>;
 }

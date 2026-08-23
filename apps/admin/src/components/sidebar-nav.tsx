@@ -17,6 +17,9 @@ export default function SidebarNav({ onItemClick }: { onItemClick?: () => void }
   const menuItems = [
     { label: 'Dashboard', href: '/', icon: LayoutDashboard },
     { label: 'Organizer', href: '/organizers', icon: Users },
+    { label: 'Leads Pipeline', href: '/leads', icon: Users },
+    { label: 'Billing Control', href: '/billing', icon: DollarSign },
+    { label: 'Partner Audits', href: '/partners', icon: Users },
     { label: 'Event', href: '/events', icon: Calendar },
     { label: 'Order', href: '/orders', icon: FileSearch },
     { label: 'Settlement', href: '/settlements', icon: DollarSign },

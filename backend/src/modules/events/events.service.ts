@@ -16,6 +16,19 @@ export class EventsService {
    * Helper untuk mencari profil Organizer berdasarkan User ID.
    */
   private async getOrganizerOrThrow(userId: string) {
+    const member = await this.prisma.organizerMember.findFirst({
+      where: {
+        userId,
+        status: 'active',
+      },
+      include: {
+        organizer: true,
+      },
+    });
+    if (member?.organizer) {
+      return member.organizer;
+    }
+
     const organizer = await this.prisma.organizer.findUnique({
       where: { userId },
     });

@@ -22,6 +22,9 @@ export declare class GateController {
         bannerUrl: string;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
     }[]>;
     validateTicket(dto: ValidateTicketDto, staffUserId: string): Promise<{
         success: boolean;

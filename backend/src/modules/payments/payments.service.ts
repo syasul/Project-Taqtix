@@ -210,7 +210,7 @@ export class PaymentsService {
           },
         });
 
-        const generatedTickets = [];
+        const generatedTickets: any[] = [];
 
         // Generate tiket elektronik & signed payload
         for (const item of order.orderItems) {

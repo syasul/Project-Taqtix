@@ -190,7 +190,7 @@ export class DashboardService implements OnModuleInit {
 
     // Hitung trends pendapatan per bulan (6 bulan terakhir)
     const monthlyTrends: Record<string, number> = {};
-    const months = [];
+    const months: string[] = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);

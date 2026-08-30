@@ -18,11 +18,10 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 export default function Header() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const eoUrl = process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003';
 
   const handleLogout = () => {
     logout();
-    window.location.href = `${eoUrl}/login`;
+    router.push('/login');
   };
 
   return (
@@ -53,9 +52,9 @@ export default function Header() {
               Contact
             </Link>
             {user && (
-              <a href={`${eoUrl}/dashboard`} className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+              <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
                 Dashboard
-              </a>
+              </Link>
             )}
           </nav>
 
@@ -75,7 +74,7 @@ export default function Header() {
                       <p className="text-xs leading-none text-slate-500 capitalize">{user.role}</p>
                     </div>
                   </div>
-                  <DropdownMenuItem onClick={() => window.location.href = `${eoUrl}/dashboard`} className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer w-full flex items-center">
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')} className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer w-full flex items-center">
                     <LayoutDashboard className="mr-2 h-4 w-4 text-indigo-600" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
@@ -87,12 +86,12 @@ export default function Header() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-3">
-                <a href={`${eoUrl}/login`} className={cn(buttonVariants({ variant: 'ghost' }), "text-slate-600 hover:text-indigo-600 hover:bg-slate-50 cursor-pointer")}>
+                <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), "text-slate-600 hover:text-indigo-600 hover:bg-slate-50 cursor-pointer")}>
                   Masuk
-                </a>
-                <a href={`${eoUrl}/register`} className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer border border-transparent shadow-sm")}>
+                </Link>
+                <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer border border-transparent shadow-sm")}>
                   Daftar
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -119,9 +118,9 @@ export default function Header() {
                   </Link>
                   {user ? (
                     <>
-                      <a href={`${eoUrl}/dashboard`} className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                      <Link href="/dashboard" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
                         Dashboard
-                      </a>
+                      </Link>
                       <div className="border-t border-slate-200 pt-4 mt-4">
                         <p className="text-xs text-slate-500">{user.email}</p>
                         <button
@@ -135,12 +134,12 @@ export default function Header() {
                     </>
                   ) : (
                     <div className="flex flex-col space-y-3 pt-6 border-t border-slate-200">
-                      <a href={`${eoUrl}/login`} className={cn(buttonVariants({ variant: 'outline' }), "border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-700")}>
+                      <Link href="/login" className={cn(buttonVariants({ variant: 'outline' }), "border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-700")}>
                         Masuk
-                      </a>
-                      <a href={`${eoUrl}/register`} className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer border border-transparent shadow-sm")}>
+                      </Link>
+                      <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer border border-transparent shadow-sm")}>
                         Daftar
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </div>

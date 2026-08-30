@@ -30,19 +30,31 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <span className="text-xl font-extrabold text-indigo-650 tracking-wider">
-                TAQtix Organizer
+                TAQtix
               </span>
             </Link>
           </div>
 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center space-x-6">
+            <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+              Discovery
+            </Link>
+            <Link href="/about" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+              About
+            </Link>
+            <Link href="/help" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+              Help Center
+            </Link>
+            <Link href="/contact" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+              Contact
+            </Link>
             {user && (
-              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
-                Organizer Console
-              </span>
+              <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+                Dashboard
+              </Link>
             )}
           </nav>
 
@@ -92,10 +104,22 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-6 bg-white border-l border-slate-200 text-slate-800">
                 <div className="flex flex-col space-y-6 mt-8">
+                  <Link href="/" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                    Discovery
+                  </Link>
+                  <Link href="/about" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                    About
+                  </Link>
+                  <Link href="/help" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                    Help Center
+                  </Link>
+                  <Link href="/contact" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                    Contact
+                  </Link>
                   {user ? (
                     <>
                       <Link href="/dashboard" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
-                        Dashboard Home
+                        Dashboard
                       </Link>
                       <div className="border-t border-slate-200 pt-4 mt-4">
                         <p className="text-xs text-slate-500">{user.email}</p>

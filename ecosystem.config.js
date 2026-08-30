@@ -29,5 +29,15 @@ module.exports = {
         PORT: 3002,
       },
     },
+    {
+      name: "taqtix-eo",
+      cwd: "./apps/eo",
+      script: "node_modules/next/dist/bin/next",
+      args: "start",
+      env: {
+        NODE_ENV: "production",
+        PORT: 3003,
+      },
+    },
   ],
 };

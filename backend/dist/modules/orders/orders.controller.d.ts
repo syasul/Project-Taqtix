@@ -9,10 +9,10 @@ export declare class OrdersController {
         updatedAt: Date;
         eventId: string;
         status: import("@prisma/client").$Enums.OrderStatus;
+        promoCodeId: string | null;
         buyerId: string;
         totalAmount: number;
         discountAmount: number;
-        promoCodeId: string | null;
         partnerId: string | null;
         utmSource: string | null;
         utmMedium: string | null;
@@ -36,6 +36,7 @@ export declare class OrdersController {
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
+            allowTicketTransfer: boolean;
         };
         payment: {
             id: string;
@@ -77,6 +78,7 @@ export declare class OrdersController {
         } & {
             id: string;
             createdAt: Date;
+            facilities: import("@prisma/client/runtime/library").JsonValue | null;
             orderId: string;
             ticketCategoryId: string;
             qty: number;
@@ -85,6 +87,7 @@ export declare class OrdersController {
             attendeeEmail: string;
             attendeePhone: string;
             city: string | null;
+            customFieldAnswers: import("@prisma/client/runtime/library").JsonValue | null;
         })[];
     } & {
         id: string;
@@ -92,10 +95,10 @@ export declare class OrdersController {
         updatedAt: Date;
         eventId: string;
         status: import("@prisma/client").$Enums.OrderStatus;
+        promoCodeId: string | null;
         buyerId: string;
         totalAmount: number;
         discountAmount: number;
-        promoCodeId: string | null;
         partnerId: string | null;
         utmSource: string | null;
         utmMedium: string | null;

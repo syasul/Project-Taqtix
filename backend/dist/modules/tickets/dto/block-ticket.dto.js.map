@@ -1,0 +1,1 @@
+{"version":3,"file":"block-ticket.dto.js","sourceRoot":"","sources":["../../../../src/modules/tickets/dto/block-ticket.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,6CAAsD;AACtD,qDAAuD;AAEvD,MAAa,cAAc;IAIzB,MAAM,CAAU;CACjB;AALD,wCAKC;AADC;IAHC,IAAA,6BAAmB,EAAC,EAAE,OAAO,EAAE,iCAAiC,EAAE,WAAW,EAAE,0BAA0B,EAAE,CAAC;IAC5G,IAAA,4BAAU,GAAE;IACZ,IAAA,0BAAQ,GAAE;;8CACK"}

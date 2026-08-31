@@ -125,12 +125,12 @@ let CRMService = class CRMService {
         }
         return buyers;
     }
-    async createBroadcast(segmentId, message) {
+    async createBroadcast(segmentId, message, channel = 'whatsapp', subject) {
         const members = await this.getSegmentMembers(segmentId);
         const job = await this.prisma.broadcastJob.create({
             data: {
                 segmentId,
-                message,
+                message: subject ? `[${subject}]\n\n${message}` : message,
                 targetCount: members.length,
                 status: 'queued',
             },
@@ -155,12 +155,15 @@ let CRMService = class CRMService {
         const savedRecipients = await this.prisma.broadcastRecipient.findMany({
             where: { jobId: job.id },
         });
+        const queueJobName = channel === 'email' ? 'send-email' : 'send-whatsapp';
         for (const rec of savedRecipients) {
-            await this.broadcastQueue.add('send-whatsapp', {
+            await this.broadcastQueue.add(queueJobName, {
                 recipientId: rec.id,
+                channel,
+                subject: subject || 'Pemberitahuan Event',
                 message,
             }, {
-                jobId: rec.id,
+                jobId: `${job.id}_${rec.id}`,
             });
         }
         await this.prisma.broadcastJob.update({
@@ -169,6 +172,7 @@ let CRMService = class CRMService {
         });
         return {
             jobId: job.id,
+            channel,
             targetCount: members.length,
             status: 'processing',
         };

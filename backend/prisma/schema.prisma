@@ -25,6 +25,7 @@ enum TicketStatus {
   VALID
   CHECKED_IN
   CANCELLED
+  TRANSFER_PENDING
 }
 
 /// Status pembayaran transaksi.
@@ -91,37 +92,47 @@ model Organizer {
   user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   events         Event[]
   members        OrganizerMember[]
+  vouchers       Voucher[]
+  apiTokens      ApiToken[]
 }
 
 /// Representasi dari suatu Event / Acara.
 model Event {
-  id               String            @id @default(uuid())
-  organizerId      String
-  title            String
-  slug             String            @unique
-  description      String?           @db.Text
-  bannerUrl        String            @default("")
-  location         String
-  startDate        DateTime
-  endDate          DateTime
-  status           EventStatus       @default(DRAFT)
-  geofenceLat      Float?
-  geofenceLng      Float?
-  geofenceRadius   Float?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                  String            @id @default(uuid())
+  organizerId         String
+  title               String
+  slug                String            @unique
+  description         String?           @db.Text
+  bannerUrl           String            @default("")
+  location            String
+  startDate           DateTime
+  endDate             DateTime
+  status              EventStatus       @default(DRAFT)
+  geofenceLat         Float?
+  geofenceLng         Float?
+  geofenceRadius      Float?
+  allowTicketTransfer Boolean           @default(true)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
-  organizer        Organizer         @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  ticketCategories TicketCategory[]
-  orders           Order[]
-  promoCodes       PromoCode[]
-  partners         Partner[]
-  gateStaffs       GateStaff[]
-  workforceMembers WorkforceMember[]
-  tickets          Ticket[]
-  segments         Segment[]
-  adSpends         AdSpend[]
-  trackEvents      TrackEvent[]
+  organizer           Organizer         @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  ticketCategories    TicketCategory[]
+  orders              Order[]
+  promoCodes          PromoCode[]
+  partners            Partner[]
+  gateStaffs          GateStaff[]
+  workforceMembers    WorkforceMember[]
+  tickets             Ticket[]
+  segments            Segment[]
+  adSpends            AdSpend[]
+  trackEvents         TrackEvent[]
+  vouchers            Voucher[]
+  customFormFields    CustomFormField[]
+  facilities          EventFacility[]
+  lineup              LineUpItem[]
+  doorprizeItems      DoorprizeItem[]
+  cashTransactions    CashTransaction[]
+  posTransactions     PosTransaction[]
 }
 
 /// Kategori/Tipe Tiket yang tersedia pada suatu event.
@@ -169,41 +180,51 @@ model Order {
 
 /// Rincian item tiket di dalam satu pemesanan / Order.
 model OrderItem {
-  id               String         @id @default(uuid())
-  orderId          String
-  ticketCategoryId String
-  qty              Int
-  unitPrice        Float
-  attendeeName     String
-  attendeeEmail    String
-  attendeePhone    String
-  city             String?
-  createdAt        DateTime       @default(now())
+  id                 String         @id @default(uuid())
+  orderId            String
+  ticketCategoryId   String
+  qty                Int
+  unitPrice          Float
+  attendeeName       String
+  attendeeEmail      String
+  attendeePhone      String
+  city               String?
+  customFieldAnswers Json?          // Record<string, string>
+  facilities         Json?          // { facilityId: string; qty: number; price: number }[]
+  createdAt          DateTime       @default(now())
 
-  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  ticketCategory   TicketCategory @relation(fields: [ticketCategoryId], references: [id])
-  tickets          Ticket[]
+  order              Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketCategory     TicketCategory @relation(fields: [ticketCategoryId], references: [id])
+  tickets            Ticket[]
 }
 
 /// Lembaran tiket fisik digital (e-ticket) yang sah untuk check-in.
 model Ticket {
-  id           String       @id @default(uuid())
-  orderItemId  String
-  eventId      String
-  qrPayload    String       @unique // Signed JWT format
-  status       TicketStatus @default(VALID)
-  checkedInAt  DateTime?
-  checkedInBy  String?
-  checkedOutAt DateTime?
-  checkedOutBy String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id                 String          @id @default(uuid())
+  orderItemId        String
+  eventId            String
+  qrPayload          String          @unique // Signed JWT format
+  status             TicketStatus    @default(VALID)
+  checkedInAt        DateTime?
+  checkedInBy        String?
+  checkedOutAt       DateTime?
+  checkedOutBy       String?
+  wristbandCode      String?
+  wristbandPrintedAt DateTime?
+  isBlocked          Boolean         @default(false)
+  blockedReason      String?
+  blockedBy          String?
+  blockedAt          DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
-  orderItem    OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
-  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  staff        User?        @relation("CheckedByRelation", fields: [checkedInBy], references: [id])
-  checkedOutStaff User?     @relation("CheckedOutByRelation", fields: [checkedOutBy], references: [id])
-  scanLogs     ScanLog[]
+  orderItem          OrderItem       @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  event              Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  staff              User?           @relation("CheckedByRelation", fields: [checkedInBy], references: [id])
+  checkedOutStaff   User?           @relation("CheckedOutByRelation", fields: [checkedOutBy], references: [id])
+  scanLogs           ScanLog[]
+  transfers          TicketTransfer[]
+  doorprizeWins      DoorprizeWinner[]
 }
 
 /// Log transaksi pembayaran via payment gateway.
@@ -424,5 +445,168 @@ model TrackEvent {
 
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
+
+/// Model Voucher untuk diskon tiket yang reusable maupun event-scoped
+model Voucher {
+  id                 String    @id @default(uuid())
+  organizerId        String
+  eventId            String?
+  code               String
+  type               String    // "percentage" | "fixed"
+  value              Float
+  usageLimit         Int?
+  usageCount         Int       @default(0)
+  maxDiscountAmount  Float?
+  validFrom          DateTime
+  validUntil          DateTime
+  applicableEventIds Json?     // string[]
+  status             String    @default("active") // "active" | "inactive" | "expired"
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  organizer          Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  event              Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([organizerId, code])
+}
+
+/// Pencatatan transaksi kas manual/rekonsiliasi di lokasi event
+model CashTransaction {
+  id                      String   @id @default(uuid())
+  eventId                 String
+  type                    String   // "ticket_sale" | "merchandise_sale" | "facility_sale" | "other"
+  amount                  Float
+  relatedOrderId          String?
+  relatedPosTransactionId String?
+  recordedBy              String   // OrganizerMember id
+  note                    String?
+  createdAt               DateTime @default(now())
+
+  event                   Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Token API untuk akses integrasi pihak ketiga oleh organizer
+model ApiToken {
+  id           String    @id @default(uuid())
+  organizerId  String
+  name         String
+  tokenHash    String
+  tokenPreview String
+  scopes       Json      // string[]
+  lastUsedAt   DateTime?
+  createdBy    String
+  createdAt    DateTime  @default(now())
+  revokedAt    DateTime?
+
+  organizer    Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+}
+
+/// Formulir tambahan kustom per event
+model CustomFormField {
+  id        String   @id @default(uuid())
+  eventId   String
+  label     String
+  fieldType String   // "text" | "number" | "dropdown" | "checkbox" | "date"
+  options   Json?    // string[]
+  required  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Fasilitas/Addon yang dapat dibeli bersamaan dengan tiket event
+model EventFacility {
+  id                          String   @id @default(uuid())
+  eventId                     String
+  name                        String
+  description                 String?
+  price                       Float    @default(0)
+  quota                       Int?
+  sold                        Int      @default(0)
+  applicableTicketCategoryIds Json?    // string[]
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  event                       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Jadwal dan pengisi acara / lineup event
+model LineUpItem {
+  id          String   @id @default(uuid())
+  eventId     String
+  name        String
+  photoUrl    String?
+  performTime String?
+  stage       String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Riwayat dan proses transfer kepemilikan tiket
+model TicketTransfer {
+  id           String    @id @default(uuid())
+  ticketId     String
+  fromEmail    String
+  toName       String
+  toEmail      String
+  toPhone      String
+  status       String    @default("pending") // "pending" | "completed" | "cancelled" | "expired"
+  requestToken String    @unique
+  requestedAt  DateTime  @default(now())
+  completedAt  DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+
+  ticket       Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+/// Transaksi Point of Sale (POS) langsung di lokasi acara
+model PosTransaction {
+  id            String   @id @default(uuid())
+  eventId       String
+  items         Json     // { type, refId, name, qty, unitPrice }[]
+  totalAmount   Float
+  paymentMethod String   // "cash" | "qris" | "debit"
+  cashierId     String
+  buyerName     String?
+  buyerPhone    String?
+  createdAt     DateTime @default(now())
+
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+/// Hadiah undian doorprize
+model DoorprizeItem {
+  id                String            @id @default(uuid())
+  eventId           String
+  name              String
+  imageUrl          String?
+  quantity          Int               @default(1)
+  remainingQuantity Int               @default(1)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  event             Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  winners           DoorprizeWinner[]
+}
+
+/// Pemenang hasil undian doorprize
+model DoorprizeWinner {
+  id              String        @id @default(uuid())
+  doorprizeItemId String
+  ticketId        String
+  winnerName      String
+  drawnAt         DateTime      @default(now())
+  drawnBy         String
+
+  doorprizeItem   DoorprizeItem @relation(fields: [doorprizeItemId], references: [id], onDelete: Cascade)
+  ticket          Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
 
 

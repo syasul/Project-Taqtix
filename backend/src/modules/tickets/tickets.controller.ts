@@ -19,6 +19,7 @@ import { CreateTicketCategoryDto } from './dto/create-ticket-category.dto';
 import { UpdateTicketCategoryDto } from './dto/update-ticket-category.dto';
 import { CreatePromoCodeDto } from './dto/create-promo-code.dto';
 import { ValidatePromoCodeDto } from './dto/validate-promo-code.dto';
+import { BlockTicketDto } from './dto/block-ticket.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -156,5 +157,68 @@ export class TicketsController {
   })
   async getTicketsByOrder(@Param('orderId') orderId: string) {
     return this.ticketsService.getTicketsByOrder(orderId);
+  }
+
+  @Post('organizer/tickets/:id/block')
+  @Roles('organizer', 'organizer_member')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Memblokir tiket pengunjung' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Tiket berhasil diblokir.' })
+  async blockTicket(
+    @Param('id') ticketId: string,
+    @Body() dto: BlockTicketDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.ticketsService.blockTicket(ticketId, dto.reason, userId);
+  }
+
+  @Post('organizer/tickets/:id/unblock')
+  @Roles('organizer', 'organizer_member')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Membuka blokir tiket pengunjung' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Blokir tiket berhasil dibuka.' })
+  async unblockTicket(
+    @Param('id') ticketId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.ticketsService.unblockTicket(ticketId, userId);
+  }
+
+  @Get('organizer/events/:id/blocked-visitors')
+  @Roles('organizer', 'organizer_member')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan daftar pengunjung yang diblokir pada event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar tiket diblokir berhasil diambil.' })
+  async getBlockedVisitors(
+    @Param('id') eventId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.ticketsService.getBlockedVisitors(eventId, userId);
+  }
+
+  @Post('organizer/events/:id/tickets/generate-wristband-codes')
+  @Roles('organizer', 'organizer_member')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Generate kode wristband / gelang secara batch untuk tiket' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Kode wristband berhasil dibuat.' })
+  async generateWristbandCodes(
+    @Param('id') eventId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.ticketsService.generateWristbandCodes(eventId, userId);
+  }
+
+  @Get('organizer/events/:id/tickets/wristband-export')
+  @Roles('organizer', 'organizer_member')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Export data wristband tiket dalam format CSV' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Data export wristband berhasil dibuat.' })
+  async exportWristbandCsv(
+    @Param('id') eventId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.ticketsService.exportWristbandCsv(eventId, userId);
   }
 }

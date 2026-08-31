@@ -21,6 +21,7 @@ export declare class EventsService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
     update(id: string, dto: UpdateEventDto, userId: string): Promise<{
         description: string | null;
@@ -38,6 +39,7 @@ export declare class EventsService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
     publish(id: string, userId: string): Promise<{
         description: string | null;
@@ -55,6 +57,7 @@ export declare class EventsService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
     findAllPublic(): Promise<({
         organizer: {
@@ -77,6 +80,7 @@ export declare class EventsService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     })[]>;
     findOnePublicBySlug(slug: string): Promise<{
         organizer: {
@@ -96,6 +100,40 @@ export declare class EventsService {
             saleStartAt: Date;
             saleEndAt: Date;
         }[];
+        customFormFields: {
+            order: number;
+            required: boolean;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            eventId: string;
+            label: string;
+            fieldType: string;
+            options: import("@prisma/client/runtime/library").JsonValue | null;
+        }[];
+        facilities: {
+            description: string | null;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            eventId: string;
+            price: number;
+            quota: number | null;
+            sold: number;
+            applicableTicketCategoryIds: import("@prisma/client/runtime/library").JsonValue | null;
+        }[];
+        lineup: {
+            order: number;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            eventId: string;
+            photoUrl: string | null;
+            performTime: string | null;
+            stage: string | null;
+        }[];
     } & {
         description: string | null;
         title: string;
@@ -112,6 +150,7 @@ export declare class EventsService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
     findAllOrganizerEvents(userId: string): Promise<{
         description: string | null;
@@ -129,5 +168,6 @@ export declare class EventsService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }[]>;
 }

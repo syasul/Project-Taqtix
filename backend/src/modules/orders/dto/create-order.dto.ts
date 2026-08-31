@@ -9,7 +9,19 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class FacilityOrderDto {
+  @ApiProperty({ description: 'ID fasilitas/addon' })
+  @IsString()
+  @IsNotEmpty()
+  facilityId!: string;
+
+  @ApiProperty({ description: 'Jumlah kuantitas fasilitas' })
+  @IsInt()
+  @Min(1)
+  qty!: number;
+}
 
 export class OrderItemDto {
   @ApiProperty({
@@ -27,6 +39,22 @@ export class OrderItemDto {
   @IsInt()
   @Min(1, { message: 'Kuantitas minimal harus 1' })
   qty!: number;
+
+  @ApiPropertyOptional({
+    description: 'Jawaban formulir kustom per kategori/item { [customFormFieldId]: string }',
+  })
+  @IsOptional()
+  customFieldAnswers?: Record<string, string>;
+
+  @ApiPropertyOptional({
+    type: [FacilityOrderDto],
+    description: 'Fasilitas yang dipilih per tiket item',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FacilityOrderDto)
+  facilities?: FacilityOrderDto[];
 }
 
 export class CreateOrderDto {
@@ -44,10 +72,26 @@ export class CreateOrderDto {
   @Type(() => OrderItemDto)
   items!: OrderItemDto[];
 
+  @ApiPropertyOptional({
+    type: [FacilityOrderDto],
+    description: 'Fasilitas/addon level order',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FacilityOrderDto)
+  facilities?: FacilityOrderDto[];
+
+  @ApiPropertyOptional({
+    description: 'Jawaban formulir kustom level order { [customFormFieldId]: string }',
+  })
+  @IsOptional()
+  customFieldAnswers?: Record<string, string>;
+
   @ApiProperty({
     example: 'MERDEKA80',
     required: false,
-    description: 'Kode promo jika ada',
+    description: 'Kode voucher / promo jika ada',
   })
   @IsString()
   @IsOptional()
@@ -82,4 +126,24 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   buyerPhone?: string;
+
+  @ApiPropertyOptional({ example: 'Jakarta', description: 'Kota domisili pembeli' })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @ApiPropertyOptional({ description: 'UTM Source' })
+  @IsString()
+  @IsOptional()
+  utmSource?: string;
+
+  @ApiPropertyOptional({ description: 'UTM Medium' })
+  @IsString()
+  @IsOptional()
+  utmMedium?: string;
+
+  @ApiPropertyOptional({ description: 'UTM Campaign' })
+  @IsString()
+  @IsOptional()
+  utmCampaign?: string;
 }

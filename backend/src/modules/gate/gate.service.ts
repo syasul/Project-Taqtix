@@ -169,6 +169,24 @@ export class GateService {
         throw new NotFoundException('Tiket tidak terdaftar di sistem');
       }
 
+      // Periksa apakah tiket diblokir oleh penyelenggara
+      if (ticket.isBlocked) {
+        await tx.scanLog.create({
+          data: {
+            ticketId: ticket.id,
+            scannedById: staffUserId,
+            result: 'BLOCKED',
+          },
+        });
+        throw new HttpException(
+          {
+            code: 'TICKET_BLOCKED',
+            message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+          },
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
       // 3. Verifikasi apakah staffUserId terdaftar untuk scan event ini
       const isOrganizer = await tx.organizer.findFirst({
         where: {
@@ -354,6 +372,23 @@ export class GateService {
 
       if (!ticket) {
         throw new NotFoundException('Tiket tidak terdaftar di sistem');
+      }
+
+      if (ticket.isBlocked) {
+        await tx.scanLog.create({
+          data: {
+            ticketId: ticket.id,
+            scannedById: staffUserId,
+            result: 'BLOCKED',
+          },
+        });
+        throw new HttpException(
+          {
+            code: 'TICKET_BLOCKED',
+            message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+          },
+          HttpStatus.FORBIDDEN,
+        );
       }
 
       // Verifikasi otorisasi staff

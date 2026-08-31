@@ -34,8 +34,8 @@ let CRMController = class CRMController {
         const result = await this.crmService.getSegmentMembers(segmentId);
         return { success: true, data: result };
     }
-    async createBroadcast(segmentId, message) {
-        const result = await this.crmService.createBroadcast(segmentId, message);
+    async createBroadcast(segmentId, message, channel, subject) {
+        const result = await this.crmService.createBroadcast(segmentId, message, channel || 'whatsapp', subject);
         return { success: true, data: result };
     }
     async getBroadcastStatus(jobId) {
@@ -80,11 +80,13 @@ __decorate([
     (0, common_1.Post)('organizer/segments/:segmentId/broadcast'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, permissions_decorator_1.Permissions)('manage_audience_segments'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mengirim broadcast pesan ke segmen' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' }),
     __param(0, (0, common_1.Param)('segmentId')),
     __param(1, (0, common_1.Body)('message')),
+    __param(2, (0, common_1.Body)('channel')),
+    __param(3, (0, common_1.Body)('subject')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], CRMController.prototype, "createBroadcast", null);
 __decorate([

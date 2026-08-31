@@ -196,10 +196,146 @@ export default function ETicketPage() {
                 </div>
               </div>
             </div>
+
+            {/* Transfer Ticket Action */}
+            {ticket.ticketStatus === 'VALID' && (
+              <div className="pt-3 border-t border-slate-850">
+                <TransferModal ticketId={ticket.ticketId} currentEmail={ticket.buyerEmail} />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function TransferModal({ ticketId, currentEmail }: { ticketId: string; currentEmail: string }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [toName, setToName] = React.useState('');
+  const [toEmail, setToEmail] = React.useState('');
+  const [toPhone, setToPhone] = React.useState('');
+  const [transferSuccess, setTransferSuccess] = React.useState(false);
+
+  const handleTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSubmitting(true);
+      await apiClient.post(`/tickets/${ticketId}/transfer`, {
+        toName: toName.trim(),
+        toEmail: toEmail.trim(),
+        toPhone: toPhone.trim(),
+      });
+      setTransferSuccess(true);
+      toast.success('Permintaan transfer tiket telah dibuat!');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Gagal mengajukan transfer tiket');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      <Button
+        onClick={() => setIsOpen(true)}
+        variant="outline"
+        className="w-full border-slate-800 text-slate-300 hover:text-white hover:bg-slate-900 rounded-xl text-xs font-semibold gap-2 cursor-pointer"
+      >
+        <Share2 className="h-3.5 w-3.5 text-indigo-400" />
+        <span>Transfer Kepemilikan Tiket Ini</span>
+      </Button>
+
+      {isOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 text-slate-100 space-y-4">
+            <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
+              <Share2 className="h-4 w-4 text-indigo-400" />
+              Transfer Tiket ke Orang Lain
+            </h3>
+
+            {transferSuccess ? (
+              <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center space-y-2 text-xs">
+                <p className="font-bold text-emerald-400">Permintaan Transfer Dikirim!</p>
+                <p className="text-slate-300">
+                  QR Code lama Anda sementara dinonaktifkan hingga penerima mengonfirmasi transfer.
+                </p>
+                <Button
+                  onClick={() => {
+                    setIsOpen(false);
+                    window.location.reload();
+                  }}
+                  className="mt-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold w-full"
+                >
+                  Tutup
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleTransfer} className="space-y-3 text-xs">
+                <p className="text-slate-400">
+                  Masukkan identitas penerima baru. QR Code tiket Anda akan dinonaktifkan sementara dan penerima akan mendapatkan link konfirmasi.
+                </p>
+
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">Nama Lengkap Penerima</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Budi Santoso"
+                    value={toName}
+                    onChange={(e) => setToName(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">Email Penerima</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="budi@example.com"
+                    value={toEmail}
+                    onChange={(e) => setToEmail(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">No. WhatsApp Penerima</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="081234567890"
+                    value={toPhone}
+                    onChange={(e) => setToPhone(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsOpen(false)}
+                    className="w-1/2 text-slate-400 hover:text-slate-200 rounded-xl cursor-pointer"
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-1/2 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-white cursor-pointer"
+                  >
+                    {submitting ? 'Proses...' : 'Kirim Transfer'}
+                  </Button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

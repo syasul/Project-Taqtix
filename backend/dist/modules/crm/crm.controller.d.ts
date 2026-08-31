@@ -35,10 +35,16 @@ export declare class CRMController {
             categories: unknown[];
         }[];
     }>;
-    createBroadcast(segmentId: string, message: string): Promise<{
+    createBroadcast(segmentId: string, message: string, channel?: 'whatsapp' | 'email', subject?: string): Promise<{
         success: boolean;
         data: {
             jobId: string;
+            targetCount: number;
+            status: string;
+            channel?: undefined;
+        } | {
+            jobId: string;
+            channel: "email" | "whatsapp";
             targetCount: number;
             status: string;
         };

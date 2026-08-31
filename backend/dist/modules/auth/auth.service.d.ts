@@ -42,6 +42,10 @@ export declare class AuthService {
         id: string;
         createdAt: Date;
     }>;
+    changePassword(userId: string, currentPassword: string, newPassword: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     generateTokenPair(userId: string, email: string, role: string): Promise<{
         accessToken: string;
         refreshToken: string;

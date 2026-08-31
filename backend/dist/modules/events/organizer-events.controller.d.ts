@@ -20,6 +20,7 @@ export declare class OrganizerEventsController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }[]>;
     createEvent(dto: CreateEventDto, userId: string): Promise<{
         description: string | null;
@@ -37,6 +38,7 @@ export declare class OrganizerEventsController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
     updateEvent(id: string, dto: UpdateEventDto, userId: string): Promise<{
         description: string | null;
@@ -54,6 +56,7 @@ export declare class OrganizerEventsController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
     publishEvent(id: string, userId: string): Promise<{
         description: string | null;
@@ -71,5 +74,6 @@ export declare class OrganizerEventsController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
 }

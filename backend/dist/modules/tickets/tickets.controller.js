@@ -20,6 +20,7 @@ const create_ticket_category_dto_1 = require("./dto/create-ticket-category.dto")
 const update_ticket_category_dto_1 = require("./dto/update-ticket-category.dto");
 const create_promo_code_dto_1 = require("./dto/create-promo-code.dto");
 const validate_promo_code_dto_1 = require("./dto/validate-promo-code.dto");
+const block_ticket_dto_1 = require("./dto/block-ticket.dto");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
@@ -48,6 +49,21 @@ let TicketsController = class TicketsController {
     }
     async getTicketsByOrder(orderId) {
         return this.ticketsService.getTicketsByOrder(orderId);
+    }
+    async blockTicket(ticketId, dto, userId) {
+        return this.ticketsService.blockTicket(ticketId, dto.reason, userId);
+    }
+    async unblockTicket(ticketId, userId) {
+        return this.ticketsService.unblockTicket(ticketId, userId);
+    }
+    async getBlockedVisitors(eventId, userId) {
+        return this.ticketsService.getBlockedVisitors(eventId, userId);
+    }
+    async generateWristbandCodes(eventId, userId) {
+        return this.ticketsService.generateWristbandCodes(eventId, userId);
+    }
+    async exportWristbandCsv(eventId, userId) {
+        return this.ticketsService.exportWristbandCsv(eventId, userId);
     }
 };
 exports.TicketsController = TicketsController;
@@ -187,6 +203,69 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], TicketsController.prototype, "getTicketsByOrder", null);
+__decorate([
+    (0, common_1.Post)('organizer/tickets/:id/block'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Memblokir tiket pengunjung' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Tiket berhasil diblokir.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, block_ticket_dto_1.BlockTicketDto, String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "blockTicket", null);
+__decorate([
+    (0, common_1.Post)('organizer/tickets/:id/unblock'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Membuka blokir tiket pengunjung' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Blokir tiket berhasil dibuka.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "unblockTicket", null);
+__decorate([
+    (0, common_1.Get)('organizer/events/:id/blocked-visitors'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar pengunjung yang diblokir pada event' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar tiket diblokir berhasil diambil.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "getBlockedVisitors", null);
+__decorate([
+    (0, common_1.Post)('organizer/events/:id/tickets/generate-wristband-codes'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Generate kode wristband / gelang secara batch untuk tiket' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Kode wristband berhasil dibuat.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "generateWristbandCodes", null);
+__decorate([
+    (0, common_1.Get)('organizer/events/:id/tickets/wristband-export'),
+    (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Export data wristband tiket dalam format CSV' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Data export wristband berhasil dibuat.' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "exportWristbandCsv", null);
 exports.TicketsController = TicketsController = __decorate([
     (0, swagger_1.ApiTags)('Tickets & Promo'),
     (0, common_1.Controller)(),

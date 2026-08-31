@@ -2,6 +2,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
@@ -36,6 +37,10 @@ export declare class AuthController {
         createdAt: Date;
     }>;
     logout(userId: string): Promise<{
+        message: string;
+    }>;
+    changePassword(userId: string, dto: ChangePasswordDto): Promise<{
+        success: boolean;
         message: string;
     }>;
 }

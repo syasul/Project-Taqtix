@@ -127,12 +127,26 @@ function CheckoutContent() {
     },
   });
 
-  // Hitung subtotal harga dasar
-  const subtotal = checkoutItems.reduce((sum, item) => {
+  // State untuk custom fields answers & facilities add-ons
+  const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
+  const [selectedFacilities, setSelectedFacilities] = useState<Record<string, number>>({});
+
+  const customFormFields = event?.customFormFields || [];
+  const eventFacilities = event?.facilities || [];
+
+  // Hitung subtotal harga dasar tiket
+  const subtotalTickets = checkoutItems.reduce((sum, item) => {
     const cat = categories.find((c: any) => c.id === item.categoryId);
     return sum + (cat ? cat.price * item.qty : 0);
   }, 0);
 
+  // Hitung total fasilitas add-on
+  const subtotalFacilities = Object.entries(selectedFacilities).reduce((sum, [facId, qty]) => {
+    const fac = eventFacilities.find((f: any) => f.id === facId);
+    return sum + (fac ? fac.price * qty : 0);
+  }, 0);
+
+  const subtotal = subtotalTickets + subtotalFacilities;
   const total = Math.max(0, subtotal - promoDiscount);
 
   // Validasi Promo Code
@@ -180,6 +194,10 @@ function CheckoutContent() {
     mutationFn: async (values: CheckoutFormValues) => {
       const storedAff = eventId ? localStorage.getItem(`taqtix_aff_${eventId}`) : null;
 
+      const activeFacilities = Object.entries(selectedFacilities)
+        .filter(([_, qty]) => qty > 0)
+        .map(([facilityId, qty]) => ({ facilityId, qty }));
+
       const orderRes = await apiClient.post('/orders', {
         eventId,
         buyerName: values.buyerName,
@@ -187,6 +205,8 @@ function CheckoutContent() {
         buyerPhone: values.buyerPhone,
         promoCode: appliedPromo || undefined,
         affiliateCode: storedAff || undefined,
+        customFieldAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
+        facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
         items: checkoutItems.map((item) => ({
           ticketCategoryId: item.categoryId,
           qty: item.qty,
@@ -410,6 +430,99 @@ function CheckoutContent() {
                       )}
                     />
                   </div>
+
+                  {/* Dynamic Custom Form Fields */}
+                  {customFormFields.length > 0 && (
+                    <div className="border-t border-slate-200 pt-6 space-y-4">
+                      <h4 className="font-bold text-slate-800 text-sm">Informasi Tambahan Peserta</h4>
+                      {customFormFields.map((cf: any) => (
+                        <div key={cf.id} className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-700 block">
+                            {cf.label}{' '}
+                            {cf.required ? (
+                              <span className="text-rose-600 font-bold">*</span>
+                            ) : (
+                              <span className="text-slate-400 font-normal">(Opsional)</span>
+                            )}
+                          </label>
+
+                          {cf.fieldType === 'dropdown' ? (
+                            <select
+                              required={cf.required}
+                              value={customAnswers[cf.id] || ''}
+                              onChange={(e) =>
+                                setCustomAnswers({ ...customAnswers, [cf.id]: e.target.value })
+                              }
+                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none"
+                            >
+                              <option value="">-- Pilih {cf.label} --</option>
+                              {cf.options?.map((opt: string) => (
+                                <option key={opt} value={opt}>
+                                  {opt}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <Input
+                              type={cf.fieldType === 'number' ? 'number' : cf.fieldType === 'date' ? 'date' : 'text'}
+                              required={cf.required}
+                              value={customAnswers[cf.id] || ''}
+                              onChange={(e) =>
+                                setCustomAnswers({ ...customAnswers, [cf.id]: e.target.value })
+                              }
+                              placeholder={`Masukkan ${cf.label}`}
+                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20 text-xs"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Dynamic Facilities / Add-ons */}
+                  {eventFacilities.length > 0 && (
+                    <div className="border-t border-slate-200 pt-6 space-y-3">
+                      <h4 className="font-bold text-slate-800 text-sm">Fasilitas & Merchandise Tambahan (Opsional)</h4>
+                      <div className="space-y-2">
+                        {eventFacilities.map((fac: any) => {
+                          const isSelected = (selectedFacilities[fac.id] || 0) > 0;
+                          return (
+                            <div
+                              key={fac.id}
+                              className="p-3 border border-slate-200 rounded-xl flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition"
+                            >
+                              <div>
+                                <h5 className="text-xs font-bold text-slate-800">{fac.name}</h5>
+                                {fac.description && (
+                                  <p className="text-[11px] text-slate-500">{fac.description}</p>
+                                )}
+                                <span className="text-xs font-bold text-indigo-600 mt-1 block">
+                                  {fac.price > 0
+                                    ? `+ Rp ${fac.price.toLocaleString('id-ID')}`
+                                    : 'Gratis'}
+                                </span>
+                              </div>
+
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) =>
+                                    setSelectedFacilities({
+                                      ...selectedFacilities,
+                                      [fac.id]: e.target.checked ? 1 : 0,
+                                    })
+                                  }
+                                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                                />
+                                <span className="text-xs font-semibold text-slate-700">Pilih</span>
+                              </label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Promo Code Input */}
                   <div className="border-t border-slate-200 pt-6">

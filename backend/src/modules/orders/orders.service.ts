@@ -24,15 +24,36 @@ export class OrdersService {
   async create(dto: CreateOrderDto) {
     const event = await this.prisma.event.findUnique({
       where: { id: dto.eventId },
+      include: {
+        customFormFields: true,
+      },
     });
 
     if (!event) {
       throw new NotFoundException('Event tidak ditemukan');
     }
 
+    // Validasi Custom Form Fields yang required
+    if (event.customFormFields && event.customFormFields.length > 0) {
+      const requiredFields = event.customFormFields.filter((f) => f.required);
+      for (const reqField of requiredFields) {
+        // Cek apakah ada di level order atau di level items
+        const inOrder = dto.customFieldAnswers && dto.customFieldAnswers[reqField.id];
+        const inItems = dto.items.some(
+          (it) => it.customFieldAnswers && it.customFieldAnswers[reqField.id],
+        );
+        if (!inOrder && !inItems) {
+          throw new BadRequestException(
+            `Formulir "${reqField.label}" wajib diisi.`,
+          );
+        }
+      }
+    }
+
     const order = await this.prisma.$transaction(async (tx) => {
       let discountAmt = 0;
       let promoCodeId: string | undefined = undefined;
+      let voucherId: string | undefined = undefined;
       let affiliatePartnerId: string | undefined = undefined;
 
       // 0. Dapatkan atau buat user pembeli
@@ -49,33 +70,81 @@ export class OrdersService {
         });
       }
 
-      // 1. Validasi Promo Code jika ada
+      // 1. Validasi Promo Code / Voucher jika ada
       if (dto.promoCode) {
-        const promo = await tx.promoCode.findUnique({
-          where: { code: dto.promoCode },
+        const voucher = await tx.voucher.findFirst({
+          where: {
+            code: dto.promoCode.toUpperCase(),
+            organizerId: event.organizerId,
+          },
         });
 
-        if (!promo || promo.eventId !== dto.eventId) {
-          throw new HttpException(
-            {
-              code: 'INVALID_PROMO_CODE',
-              message: 'Kode promo tidak valid untuk event ini',
-            },
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-        }
+        if (voucher) {
+          if (voucher.status !== 'active') {
+            throw new HttpException(
+              {
+                code: 'INVALID_PROMO_CODE',
+                message: 'Voucher sudah tidak aktif atau kedaluwarsa',
+              },
+              HttpStatus.UNPROCESSABLE_ENTITY,
+            );
+          }
+          const now = new Date();
+          if (now < voucher.validFrom || now > voucher.validUntil) {
+            throw new HttpException(
+              {
+                code: 'INVALID_PROMO_CODE',
+                message: 'Voucher berada di luar periode masa berlaku',
+              },
+              HttpStatus.UNPROCESSABLE_ENTITY,
+            );
+          }
+          if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {
+            throw new HttpException(
+              {
+                code: 'INVALID_PROMO_CODE',
+                message: 'Kuota penggunaan voucher sudah habis',
+              },
+              HttpStatus.UNPROCESSABLE_ENTITY,
+            );
+          }
+          if (voucher.eventId && voucher.eventId !== dto.eventId) {
+            throw new HttpException(
+              {
+                code: 'INVALID_PROMO_CODE',
+                message: 'Voucher tidak berlaku untuk event ini',
+              },
+              HttpStatus.UNPROCESSABLE_ENTITY,
+            );
+          }
+          voucherId = voucher.id;
+        } else {
+          // Fallback ke legacy PromoCode
+          const promo = await tx.promoCode.findUnique({
+            where: { code: dto.promoCode },
+          });
 
-        if (promo.usedCount >= promo.maxUsage) {
-          throw new HttpException(
-            {
-              code: 'INVALID_PROMO_CODE',
-              message: 'Kuota penggunaan kode promo sudah habis',
-            },
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-        }
+          if (!promo || promo.eventId !== dto.eventId) {
+            throw new HttpException(
+              {
+                code: 'INVALID_PROMO_CODE',
+                message: 'Kode voucher/promo tidak valid untuk event ini',
+              },
+              HttpStatus.UNPROCESSABLE_ENTITY,
+            );
+          }
 
-        promoCodeId = promo.id;
+          if (promo.usedCount >= promo.maxUsage) {
+            throw new HttpException(
+              {
+                code: 'INVALID_PROMO_CODE',
+                message: 'Kuota penggunaan promo sudah habis',
+              },
+              HttpStatus.UNPROCESSABLE_ENTITY,
+            );
+          }
+          promoCodeId = promo.id;
+        }
       }
 
       // 2. Validasi Affiliate Code jika ada
@@ -95,10 +164,12 @@ export class OrdersService {
         ticketCategoryId: string;
         qty: number;
         price: number;
+        customFieldAnswers?: any;
+        facilities?: any;
       }[] = [];
 
       for (const item of dto.items) {
-        // Lakukan pessimistic locking pada baris TicketCategory
+        // Pessimistic locking pada baris TicketCategory
         const ticketCategories = await tx.$queryRaw<any[]>`
           SELECT id, quota, sold, name, price FROM "TicketCategory"
           WHERE id = ${item.ticketCategoryId} AND "eventId" = ${dto.eventId}
@@ -124,7 +195,6 @@ export class OrdersService {
           );
         }
 
-        // Increment sold
         await tx.ticketCategory.update({
           where: { id: ticketCategory.id },
           data: {
@@ -135,40 +205,82 @@ export class OrdersService {
         const itemTotal = ticketCategory.price * item.qty;
         basePriceTotal += itemTotal;
 
+        // Process item facilities if any
+        let itemFacilityCost = 0;
+        const verifiedItemFacilities: any[] = [];
+        if (item.facilities && item.facilities.length > 0) {
+          for (const fac of item.facilities) {
+            const facility = await tx.eventFacility.findUnique({
+              where: { id: fac.facilityId },
+            });
+            if (facility && facility.eventId === dto.eventId) {
+              if (facility.quota !== null && facility.quota - facility.sold < fac.qty) {
+                throw new BadRequestException(`Fasilitas "${facility.name}" sudah habis.`);
+              }
+              await tx.eventFacility.update({
+                where: { id: facility.id },
+                data: { sold: { increment: fac.qty } },
+              });
+              const cost = facility.price * fac.qty;
+              itemFacilityCost += cost;
+              verifiedItemFacilities.push({
+                facilityId: facility.id,
+                name: facility.name,
+                qty: fac.qty,
+                price: facility.price,
+              });
+            }
+          }
+        }
+
+        basePriceTotal += itemFacilityCost;
+
         verifiedItems.push({
           ticketCategoryId: ticketCategory.id,
           qty: item.qty,
           price: ticketCategory.price,
+          customFieldAnswers: item.customFieldAnswers || dto.customFieldAnswers || null,
+          facilities: verifiedItemFacilities.length > 0 ? verifiedItemFacilities : null,
         });
       }
 
-      // 4. Kalkulasi diskon promo code
-      if (dto.promoCode && promoCodeId) {
-        const promo = await tx.promoCode.findUnique({
-          where: { id: promoCodeId },
-        });
-        if (promo) {
-          if (promo.discount <= 100) {
-            // Diskon persentase
-            discountAmt = basePriceTotal * (promo.discount / 100);
+      // 4. Kalkulasi diskon voucher / promo code
+      if (voucherId) {
+        const voucher = await tx.voucher.findUnique({ where: { id: voucherId } });
+        if (voucher) {
+          if (voucher.type === 'percentage') {
+            discountAmt = (basePriceTotal * voucher.value) / 100;
+            if (voucher.maxDiscountAmount && discountAmt > voucher.maxDiscountAmount) {
+              discountAmt = voucher.maxDiscountAmount;
+            }
           } else {
-            // Diskon nominal flat
-            discountAmt = promo.discount;
+            discountAmt = voucher.value;
           }
-          // Diskon tidak boleh melebihi harga total dasar
           discountAmt = Math.min(discountAmt, basePriceTotal);
 
-          // Update kuota terpakai promo code
+          await tx.voucher.update({
+            where: { id: voucher.id },
+            data: { usageCount: { increment: 1 } },
+          });
+        }
+      } else if (promoCodeId) {
+        const promo = await tx.promoCode.findUnique({ where: { id: promoCodeId } });
+        if (promo) {
+          if (promo.discount <= 100) {
+            discountAmt = basePriceTotal * (promo.discount / 100);
+          } else {
+            discountAmt = promo.discount;
+          }
+          discountAmt = Math.min(discountAmt, basePriceTotal);
+
           await tx.promoCode.update({
             where: { id: promo.id },
-            data: {
-              usedCount: { increment: 1 },
-            },
+            data: { usedCount: { increment: 1 } },
           });
         }
       }
 
-      const totalAmount = basePriceTotal - discountAmt;
+      const totalAmount = Math.max(0, basePriceTotal - discountAmt);
       const expiredAt = new Date(Date.now() + 15 * 60 * 1000); // 15 menit
 
       // 5. Buat Order
@@ -181,6 +293,9 @@ export class OrdersService {
           status: OrderStatus.PENDING,
           promoCodeId,
           partnerId: affiliatePartnerId,
+          utmSource: dto.utmSource || null,
+          utmMedium: dto.utmMedium || null,
+          utmCampaign: dto.utmCampaign || null,
           expiredAt,
         },
       });
@@ -196,6 +311,9 @@ export class OrdersService {
             attendeeName: dto.buyerName,
             attendeeEmail: dto.buyerEmail,
             attendeePhone: dto.buyerPhone || '',
+            city: dto.city || null,
+            customFieldAnswers: item.customFieldAnswers,
+            facilities: item.facilities,
           },
         });
       }

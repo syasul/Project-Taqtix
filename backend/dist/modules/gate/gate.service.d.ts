@@ -112,5 +112,6 @@ export declare class GateService {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }[]>;
 }

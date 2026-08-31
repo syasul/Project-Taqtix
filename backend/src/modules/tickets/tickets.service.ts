@@ -144,13 +144,65 @@ export class TicketsService {
   /**
    * Memvalidasi apakah kode promo aktif, valid untuk event terkait, dan belum melebihi kuota.
    */
+  /**
+   * Memvalidasi apakah kode promo / voucher aktif, valid untuk event terkait, dan belum melebihi kuota.
+   */
   async validatePromoCode(dto: ValidatePromoCodeDto) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: dto.eventId },
+    });
+
+    if (!event) {
+      throw new BadRequestException('Event tidak ditemukan');
+    }
+
+    const voucher = await this.prisma.voucher.findFirst({
+      where: {
+        code: dto.code.toUpperCase(),
+        organizerId: event.organizerId,
+      },
+    });
+
+    if (voucher) {
+      if (voucher.status !== 'active') {
+        throw new BadRequestException('Voucher sudah tidak aktif atau kedaluwarsa');
+      }
+      const now = new Date();
+      if (now < voucher.validFrom || now > voucher.validUntil) {
+        throw new BadRequestException('Voucher berada di luar periode masa berlaku');
+      }
+      if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {
+        throw new BadRequestException('Kuota penggunaan voucher sudah habis');
+      }
+      if (voucher.eventId && voucher.eventId !== dto.eventId) {
+        throw new BadRequestException('Voucher tidak berlaku untuk event ini');
+      }
+      if (
+        voucher.applicableEventIds &&
+        Array.isArray(voucher.applicableEventIds) &&
+        voucher.applicableEventIds.length > 0 &&
+        !voucher.applicableEventIds.includes(dto.eventId)
+      ) {
+        throw new BadRequestException('Voucher tidak berlaku untuk event ini');
+      }
+
+      return {
+        valid: true,
+        voucherId: voucher.id,
+        code: voucher.code,
+        type: voucher.type,
+        value: voucher.value,
+        maxDiscountAmount: voucher.maxDiscountAmount,
+      };
+    }
+
+    // Fallback ke legacy PromoCode
     const promo = await this.prisma.promoCode.findUnique({
       where: { code: dto.code },
     });
 
     if (!promo || promo.eventId !== dto.eventId) {
-      throw new BadRequestException('Kode promo tidak valid untuk event ini');
+      throw new BadRequestException('Kode promo/voucher tidak valid untuk event ini');
     }
 
     if (promo.usedCount >= promo.maxUsage) {
@@ -250,5 +302,149 @@ export class TicketsService {
       eventTitle: ticket.event.title,
       signedQrPayload: ticket.qrPayload,
     }));
+  }
+
+  /**
+   * Memblokir tiket pengunjung (nonaktifkan pengunjung).
+   */
+  async blockTicket(ticketId: string, reason: string | undefined, userId: string) {
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: ticketId },
+      include: { event: true },
+    });
+
+    if (!ticket) {
+      throw new NotFoundException('Tiket tidak ditemukan');
+    }
+
+    await this.verifyEventOwnership(ticket.eventId, userId);
+
+    return this.prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        isBlocked: true,
+        blockedReason: reason || 'Diblokir oleh penyelenggara acara',
+        blockedBy: userId,
+        blockedAt: new Date(),
+      },
+    });
+  }
+
+  /**
+   * Membuka blokir tiket pengunjung.
+   */
+  async unblockTicket(ticketId: string, userId: string) {
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: ticketId },
+      include: { event: true },
+    });
+
+    if (!ticket) {
+      throw new NotFoundException('Tiket tidak ditemukan');
+    }
+
+    await this.verifyEventOwnership(ticket.eventId, userId);
+
+    return this.prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        isBlocked: false,
+        blockedReason: null,
+        blockedBy: null,
+        blockedAt: null,
+      },
+    });
+  }
+
+  /**
+   * Mendapatkan daftar pengunjung yang diblokir untuk suatu event.
+   */
+  async getBlockedVisitors(eventId: string, userId: string) {
+    await this.verifyEventOwnership(eventId, userId);
+
+    return this.prisma.ticket.findMany({
+      where: {
+        eventId,
+        isBlocked: true,
+      },
+      include: {
+        orderItem: {
+          include: {
+            ticketCategory: true,
+          },
+        },
+      },
+      orderBy: { blockedAt: 'desc' },
+    });
+  }
+
+  /**
+   * Generate kode wristband/gelang secara batch untuk tiket event.
+   */
+  async generateWristbandCodes(eventId: string, userId: string) {
+    await this.verifyEventOwnership(eventId, userId);
+
+    const ticketsWithoutCode = await this.prisma.ticket.findMany({
+      where: {
+        eventId,
+        wristbandCode: null,
+      },
+      select: { id: true },
+    });
+
+    let count = 0;
+    for (const t of ticketsWithoutCode) {
+      // Kode gelang format 6-8 digit alphanumeric
+      const code = `WB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      await this.prisma.ticket.update({
+        where: { id: t.id },
+        data: {
+          wristbandCode: code,
+          wristbandPrintedAt: new Date(),
+        },
+      });
+      count++;
+    }
+
+    return {
+      success: true,
+      message: `Berhasil men-generate ${count} kode gelang.`,
+      generatedCount: count,
+    };
+  }
+
+  /**
+   * Export data wristband tiket dalam format CSV.
+   */
+  async exportWristbandCsv(eventId: string, userId: string) {
+    await this.verifyEventOwnership(eventId, userId);
+
+    const tickets = await this.prisma.ticket.findMany({
+      where: { eventId },
+      include: {
+        orderItem: {
+          include: {
+            ticketCategory: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const headers = ['name', 'wristbandCode', 'category', 'ticketId', 'status'];
+    const rows = tickets.map((t) => [
+      `"${(t.orderItem.attendeeName || '').replace(/"/g, '""')}"`,
+      `"${t.wristbandCode || ''}"`,
+      `"${(t.orderItem.ticketCategory.name || '').replace(/"/g, '""')}"`,
+      `"${t.id}"`,
+      `"${t.status}"`,
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+
+    return {
+      filename: `wristband-export-${eventId}.csv`,
+      csv: csvContent,
+    };
   }
 }

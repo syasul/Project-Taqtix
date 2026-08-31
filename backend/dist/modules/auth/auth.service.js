@@ -182,6 +182,31 @@ let AuthService = class AuthService {
         }
         return user;
     }
+    async changePassword(userId, currentPassword, newPassword) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('Pengguna tidak ditemukan');
+        }
+        if (user.passwordHash) {
+            const match = await bcrypt.compare(currentPassword, user.passwordHash);
+            if (!match) {
+                throw new common_1.UnauthorizedException('Password saat ini tidak cocok');
+            }
+        }
+        const newHashed = await bcrypt.hash(newPassword, 10);
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                passwordHash: newHashed,
+            },
+        });
+        return {
+            success: true,
+            message: 'Password berhasil diperbarui',
+        };
+    }
     async generateTokenPair(userId, email, role) {
         const payload = { sub: userId, email, role };
         const [accessToken, refreshToken] = await Promise.all([

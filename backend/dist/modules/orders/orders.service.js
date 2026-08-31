@@ -28,13 +28,27 @@ let OrdersService = class OrdersService {
     async create(dto) {
         const event = await this.prisma.event.findUnique({
             where: { id: dto.eventId },
+            include: {
+                customFormFields: true,
+            },
         });
         if (!event) {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
+        if (event.customFormFields && event.customFormFields.length > 0) {
+            const requiredFields = event.customFormFields.filter((f) => f.required);
+            for (const reqField of requiredFields) {
+                const inOrder = dto.customFieldAnswers && dto.customFieldAnswers[reqField.id];
+                const inItems = dto.items.some((it) => it.customFieldAnswers && it.customFieldAnswers[reqField.id]);
+                if (!inOrder && !inItems) {
+                    throw new common_1.BadRequestException(`Formulir "${reqField.label}" wajib diisi.`);
+                }
+            }
+        }
         const order = await this.prisma.$transaction(async (tx) => {
             let discountAmt = 0;
             let promoCodeId = undefined;
+            let voucherId = undefined;
             let affiliatePartnerId = undefined;
             let buyer = await tx.user.findUnique({
                 where: { email: dto.buyerEmail },
@@ -49,22 +63,58 @@ let OrdersService = class OrdersService {
                 });
             }
             if (dto.promoCode) {
-                const promo = await tx.promoCode.findUnique({
-                    where: { code: dto.promoCode },
+                const voucher = await tx.voucher.findFirst({
+                    where: {
+                        code: dto.promoCode.toUpperCase(),
+                        organizerId: event.organizerId,
+                    },
                 });
-                if (!promo || promo.eventId !== dto.eventId) {
-                    throw new common_1.HttpException({
-                        code: 'INVALID_PROMO_CODE',
-                        message: 'Kode promo tidak valid untuk event ini',
-                    }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                if (voucher) {
+                    if (voucher.status !== 'active') {
+                        throw new common_1.HttpException({
+                            code: 'INVALID_PROMO_CODE',
+                            message: 'Voucher sudah tidak aktif atau kedaluwarsa',
+                        }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                    const now = new Date();
+                    if (now < voucher.validFrom || now > voucher.validUntil) {
+                        throw new common_1.HttpException({
+                            code: 'INVALID_PROMO_CODE',
+                            message: 'Voucher berada di luar periode masa berlaku',
+                        }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                    if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {
+                        throw new common_1.HttpException({
+                            code: 'INVALID_PROMO_CODE',
+                            message: 'Kuota penggunaan voucher sudah habis',
+                        }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                    if (voucher.eventId && voucher.eventId !== dto.eventId) {
+                        throw new common_1.HttpException({
+                            code: 'INVALID_PROMO_CODE',
+                            message: 'Voucher tidak berlaku untuk event ini',
+                        }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                    voucherId = voucher.id;
                 }
-                if (promo.usedCount >= promo.maxUsage) {
-                    throw new common_1.HttpException({
-                        code: 'INVALID_PROMO_CODE',
-                        message: 'Kuota penggunaan kode promo sudah habis',
-                    }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                else {
+                    const promo = await tx.promoCode.findUnique({
+                        where: { code: dto.promoCode },
+                    });
+                    if (!promo || promo.eventId !== dto.eventId) {
+                        throw new common_1.HttpException({
+                            code: 'INVALID_PROMO_CODE',
+                            message: 'Kode voucher/promo tidak valid untuk event ini',
+                        }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                    if (promo.usedCount >= promo.maxUsage) {
+                        throw new common_1.HttpException({
+                            code: 'INVALID_PROMO_CODE',
+                            message: 'Kuota penggunaan promo sudah habis',
+                        }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                    }
+                    promoCodeId = promo.id;
                 }
-                promoCodeId = promo.id;
             }
             if (dto.affiliateCode) {
                 const affiliate = await tx.partner.findUnique({
@@ -101,16 +151,62 @@ let OrdersService = class OrdersService {
                 });
                 const itemTotal = ticketCategory.price * item.qty;
                 basePriceTotal += itemTotal;
+                let itemFacilityCost = 0;
+                const verifiedItemFacilities = [];
+                if (item.facilities && item.facilities.length > 0) {
+                    for (const fac of item.facilities) {
+                        const facility = await tx.eventFacility.findUnique({
+                            where: { id: fac.facilityId },
+                        });
+                        if (facility && facility.eventId === dto.eventId) {
+                            if (facility.quota !== null && facility.quota - facility.sold < fac.qty) {
+                                throw new common_1.BadRequestException(`Fasilitas "${facility.name}" sudah habis.`);
+                            }
+                            await tx.eventFacility.update({
+                                where: { id: facility.id },
+                                data: { sold: { increment: fac.qty } },
+                            });
+                            const cost = facility.price * fac.qty;
+                            itemFacilityCost += cost;
+                            verifiedItemFacilities.push({
+                                facilityId: facility.id,
+                                name: facility.name,
+                                qty: fac.qty,
+                                price: facility.price,
+                            });
+                        }
+                    }
+                }
+                basePriceTotal += itemFacilityCost;
                 verifiedItems.push({
                     ticketCategoryId: ticketCategory.id,
                     qty: item.qty,
                     price: ticketCategory.price,
+                    customFieldAnswers: item.customFieldAnswers || dto.customFieldAnswers || null,
+                    facilities: verifiedItemFacilities.length > 0 ? verifiedItemFacilities : null,
                 });
             }
-            if (dto.promoCode && promoCodeId) {
-                const promo = await tx.promoCode.findUnique({
-                    where: { id: promoCodeId },
-                });
+            if (voucherId) {
+                const voucher = await tx.voucher.findUnique({ where: { id: voucherId } });
+                if (voucher) {
+                    if (voucher.type === 'percentage') {
+                        discountAmt = (basePriceTotal * voucher.value) / 100;
+                        if (voucher.maxDiscountAmount && discountAmt > voucher.maxDiscountAmount) {
+                            discountAmt = voucher.maxDiscountAmount;
+                        }
+                    }
+                    else {
+                        discountAmt = voucher.value;
+                    }
+                    discountAmt = Math.min(discountAmt, basePriceTotal);
+                    await tx.voucher.update({
+                        where: { id: voucher.id },
+                        data: { usageCount: { increment: 1 } },
+                    });
+                }
+            }
+            else if (promoCodeId) {
+                const promo = await tx.promoCode.findUnique({ where: { id: promoCodeId } });
                 if (promo) {
                     if (promo.discount <= 100) {
                         discountAmt = basePriceTotal * (promo.discount / 100);
@@ -121,13 +217,11 @@ let OrdersService = class OrdersService {
                     discountAmt = Math.min(discountAmt, basePriceTotal);
                     await tx.promoCode.update({
                         where: { id: promo.id },
-                        data: {
-                            usedCount: { increment: 1 },
-                        },
+                        data: { usedCount: { increment: 1 } },
                     });
                 }
             }
-            const totalAmount = basePriceTotal - discountAmt;
+            const totalAmount = Math.max(0, basePriceTotal - discountAmt);
             const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
             const newOrder = await tx.order.create({
                 data: {
@@ -138,6 +232,9 @@ let OrdersService = class OrdersService {
                     status: client_1.OrderStatus.PENDING,
                     promoCodeId,
                     partnerId: affiliatePartnerId,
+                    utmSource: dto.utmSource || null,
+                    utmMedium: dto.utmMedium || null,
+                    utmCampaign: dto.utmCampaign || null,
                     expiredAt,
                 },
             });
@@ -151,6 +248,9 @@ let OrdersService = class OrdersService {
                         attendeeName: dto.buyerName,
                         attendeeEmail: dto.buyerEmail,
                         attendeePhone: dto.buyerPhone || '',
+                        city: dto.city || null,
+                        customFieldAnswers: item.customFieldAnswers,
+                        facilities: item.facilities,
                     },
                 });
             }

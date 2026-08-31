@@ -18,6 +18,16 @@ import { TeamModule } from './modules/team/team.module';
 import { WorkforceModule } from './modules/workforce/workforce.module';
 import { CRMModule } from './modules/crm/crm.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { VouchersModule } from './modules/vouchers/vouchers.module';
+import { CashModule } from './modules/cash/cash.module';
+import { TokensModule } from './modules/tokens/tokens.module';
+import { CustomFieldsModule } from './modules/custom-fields/custom-fields.module';
+import { FacilitiesModule } from './modules/facilities/facilities.module';
+import { LineupModule } from './modules/lineup/lineup.module';
+import { TransfersModule } from './modules/transfers/transfers.module';
+import { PosModule } from './modules/pos/pos.module';
+import { DoorprizeModule } from './modules/doorprize/doorprize.module';
+import { ExportsModule } from './modules/exports/exports.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PermissionGuard } from './common/guards/permission.guard';
@@ -69,6 +79,16 @@ import { PermissionGuard } from './common/guards/permission.guard';
     WorkforceModule,
     CRMModule,
     AdminModule,
+    VouchersModule,
+    CashModule,
+    TokensModule,
+    CustomFieldsModule,
+    FacilitiesModule,
+    LineupModule,
+    TransfersModule,
+    PosModule,
+    DoorprizeModule,
+    ExportsModule,
   ],
   controllers: [AppController],
   providers: [

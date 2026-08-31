@@ -49,12 +49,19 @@ export class CRMController {
   @Post('organizer/segments/:segmentId/broadcast')
   @ApiBearerAuth()
   @Permissions('manage_audience_segments')
-  @ApiOperation({ summary: 'Mengirim broadcast pesan ke segmen' })
+  @ApiOperation({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' })
   async createBroadcast(
     @Param('segmentId') segmentId: string,
     @Body('message') message: string,
+    @Body('channel') channel?: 'whatsapp' | 'email',
+    @Body('subject') subject?: string,
   ) {
-    const result = await this.crmService.createBroadcast(segmentId, message);
+    const result = await this.crmService.createBroadcast(
+      segmentId,
+      message,
+      channel || 'whatsapp',
+      subject,
+    );
     return { success: true, data: result };
   }
 

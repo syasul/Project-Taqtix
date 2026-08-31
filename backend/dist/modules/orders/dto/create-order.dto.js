@@ -9,13 +9,32 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateOrderDto = exports.OrderItemDto = void 0;
+exports.CreateOrderDto = exports.OrderItemDto = exports.FacilityOrderDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
+class FacilityOrderDto {
+    facilityId;
+    qty;
+}
+exports.FacilityOrderDto = FacilityOrderDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID fasilitas/addon' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], FacilityOrderDto.prototype, "facilityId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Jumlah kuantitas fasilitas' }),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], FacilityOrderDto.prototype, "qty", void 0);
 class OrderItemDto {
     ticketCategoryId;
     qty;
+    customFieldAnswers;
+    facilities;
 }
 exports.OrderItemDto = OrderItemDto;
 __decorate([
@@ -36,14 +55,38 @@ __decorate([
     (0, class_validator_1.Min)(1, { message: 'Kuantitas minimal harus 1' }),
     __metadata("design:type", Number)
 ], OrderItemDto.prototype, "qty", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Jawaban formulir kustom per kategori/item { [customFormFieldId]: string }',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], OrderItemDto.prototype, "customFieldAnswers", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        type: [FacilityOrderDto],
+        description: 'Fasilitas yang dipilih per tiket item',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => FacilityOrderDto),
+    __metadata("design:type", Array)
+], OrderItemDto.prototype, "facilities", void 0);
 class CreateOrderDto {
     eventId;
     items;
+    facilities;
+    customFieldAnswers;
     promoCode;
     affiliateCode;
     buyerEmail;
     buyerName;
     buyerPhone;
+    city;
+    utmSource;
+    utmMedium;
+    utmCampaign;
 }
 exports.CreateOrderDto = CreateOrderDto;
 __decorate([
@@ -63,10 +106,28 @@ __decorate([
     __metadata("design:type", Array)
 ], CreateOrderDto.prototype, "items", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        type: [FacilityOrderDto],
+        description: 'Fasilitas/addon level order',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => FacilityOrderDto),
+    __metadata("design:type", Array)
+], CreateOrderDto.prototype, "facilities", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Jawaban formulir kustom level order { [customFormFieldId]: string }',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateOrderDto.prototype, "customFieldAnswers", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({
         example: 'MERDEKA80',
         required: false,
-        description: 'Kode promo jika ada',
+        description: 'Kode voucher / promo jika ada',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -106,4 +167,28 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "buyerPhone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Jakarta', description: 'Kota domisili pembeli' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'UTM Source' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "utmSource", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'UTM Medium' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "utmMedium", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'UTM Campaign' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "utmCampaign", void 0);
 //# sourceMappingURL=create-order.dto.js.map

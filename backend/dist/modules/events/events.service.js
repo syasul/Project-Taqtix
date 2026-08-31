@@ -157,6 +157,21 @@ let EventsService = class EventsService {
                         price: 'asc',
                     },
                 },
+                customFormFields: {
+                    orderBy: {
+                        order: 'asc',
+                    },
+                },
+                facilities: {
+                    orderBy: {
+                        price: 'asc',
+                    },
+                },
+                lineup: {
+                    orderBy: {
+                        order: 'asc',
+                    },
+                },
             },
         });
         if (!event || event.status !== client_1.EventStatus.PUBLISHED) {

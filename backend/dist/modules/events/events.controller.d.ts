@@ -23,6 +23,7 @@ export declare class EventsController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     })[]>;
     getPublicEventBySlug(slug: string): Promise<{
         organizer: {
@@ -42,6 +43,40 @@ export declare class EventsController {
             saleStartAt: Date;
             saleEndAt: Date;
         }[];
+        customFormFields: {
+            order: number;
+            required: boolean;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            eventId: string;
+            label: string;
+            fieldType: string;
+            options: import("@prisma/client/runtime/library").JsonValue | null;
+        }[];
+        facilities: {
+            description: string | null;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            eventId: string;
+            price: number;
+            quota: number | null;
+            sold: number;
+            applicableTicketCategoryIds: import("@prisma/client/runtime/library").JsonValue | null;
+        }[];
+        lineup: {
+            order: number;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            eventId: string;
+            photoUrl: string | null;
+            performTime: string | null;
+            stage: string | null;
+        }[];
     } & {
         description: string | null;
         title: string;
@@ -58,5 +93,6 @@ export declare class EventsController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }>;
 }

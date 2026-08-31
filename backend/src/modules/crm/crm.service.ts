@@ -141,13 +141,18 @@ export class CRMService {
   /**
    * Mengirim broadcast pesan ke seluruh anggota segmen (di-queue via BullMQ).
    */
-  async createBroadcast(segmentId: string, message: string) {
+  async createBroadcast(
+    segmentId: string,
+    message: string,
+    channel: 'whatsapp' | 'email' = 'whatsapp',
+    subject?: string,
+  ) {
     const members = await this.getSegmentMembers(segmentId);
 
     const job = await this.prisma.broadcastJob.create({
       data: {
         segmentId,
-        message,
+        message: subject ? `[${subject}]\n\n${message}` : message,
         targetCount: members.length,
         status: 'queued',
       },
@@ -177,16 +182,20 @@ export class CRMService {
       where: { jobId: job.id },
     });
 
+    const queueJobName = channel === 'email' ? 'send-email' : 'send-whatsapp';
+
     // Tambahkan setiap penerima ke antrean BullMQ
     for (const rec of savedRecipients) {
       await this.broadcastQueue.add(
-        'send-whatsapp',
+        queueJobName,
         {
           recipientId: rec.id,
+          channel,
+          subject: subject || 'Pemberitahuan Event',
           message,
         },
         {
-          jobId: rec.id,
+          jobId: `${job.id}_${rec.id}`,
         },
       );
     }
@@ -198,6 +207,7 @@ export class CRMService {
 
     return {
       jobId: job.id,
+      channel,
       targetCount: members.length,
       status: 'processing',
     };

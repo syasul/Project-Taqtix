@@ -125,6 +125,19 @@ let GateService = class GateService {
             if (!ticket) {
                 throw new common_1.NotFoundException('Tiket tidak terdaftar di sistem');
             }
+            if (ticket.isBlocked) {
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'BLOCKED',
+                    },
+                });
+                throw new common_1.HttpException({
+                    code: 'TICKET_BLOCKED',
+                    message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+                }, common_1.HttpStatus.FORBIDDEN);
+            }
             const isOrganizer = await tx.organizer.findFirst({
                 where: {
                     userId: staffUserId,
@@ -275,6 +288,19 @@ let GateService = class GateService {
             });
             if (!ticket) {
                 throw new common_1.NotFoundException('Tiket tidak terdaftar di sistem');
+            }
+            if (ticket.isBlocked) {
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'BLOCKED',
+                    },
+                });
+                throw new common_1.HttpException({
+                    code: 'TICKET_BLOCKED',
+                    message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+                }, common_1.HttpStatus.FORBIDDEN);
             }
             const isOrganizer = await tx.organizer.findFirst({
                 where: {

@@ -101,11 +101,52 @@ let TicketsService = class TicketsService {
         });
     }
     async validatePromoCode(dto) {
+        const event = await this.prisma.event.findUnique({
+            where: { id: dto.eventId },
+        });
+        if (!event) {
+            throw new common_1.BadRequestException('Event tidak ditemukan');
+        }
+        const voucher = await this.prisma.voucher.findFirst({
+            where: {
+                code: dto.code.toUpperCase(),
+                organizerId: event.organizerId,
+            },
+        });
+        if (voucher) {
+            if (voucher.status !== 'active') {
+                throw new common_1.BadRequestException('Voucher sudah tidak aktif atau kedaluwarsa');
+            }
+            const now = new Date();
+            if (now < voucher.validFrom || now > voucher.validUntil) {
+                throw new common_1.BadRequestException('Voucher berada di luar periode masa berlaku');
+            }
+            if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {
+                throw new common_1.BadRequestException('Kuota penggunaan voucher sudah habis');
+            }
+            if (voucher.eventId && voucher.eventId !== dto.eventId) {
+                throw new common_1.BadRequestException('Voucher tidak berlaku untuk event ini');
+            }
+            if (voucher.applicableEventIds &&
+                Array.isArray(voucher.applicableEventIds) &&
+                voucher.applicableEventIds.length > 0 &&
+                !voucher.applicableEventIds.includes(dto.eventId)) {
+                throw new common_1.BadRequestException('Voucher tidak berlaku untuk event ini');
+            }
+            return {
+                valid: true,
+                voucherId: voucher.id,
+                code: voucher.code,
+                type: voucher.type,
+                value: voucher.value,
+                maxDiscountAmount: voucher.maxDiscountAmount,
+            };
+        }
         const promo = await this.prisma.promoCode.findUnique({
             where: { code: dto.code },
         });
         if (!promo || promo.eventId !== dto.eventId) {
-            throw new common_1.BadRequestException('Kode promo tidak valid untuk event ini');
+            throw new common_1.BadRequestException('Kode promo/voucher tidak valid untuk event ini');
         }
         if (promo.usedCount >= promo.maxUsage) {
             throw new common_1.BadRequestException('Kuota penggunaan kode promo sudah habis');
@@ -190,6 +231,115 @@ let TicketsService = class TicketsService {
             eventTitle: ticket.event.title,
             signedQrPayload: ticket.qrPayload,
         }));
+    }
+    async blockTicket(ticketId, reason, userId) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId },
+            include: { event: true },
+        });
+        if (!ticket) {
+            throw new common_1.NotFoundException('Tiket tidak ditemukan');
+        }
+        await this.verifyEventOwnership(ticket.eventId, userId);
+        return this.prisma.ticket.update({
+            where: { id: ticketId },
+            data: {
+                isBlocked: true,
+                blockedReason: reason || 'Diblokir oleh penyelenggara acara',
+                blockedBy: userId,
+                blockedAt: new Date(),
+            },
+        });
+    }
+    async unblockTicket(ticketId, userId) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId },
+            include: { event: true },
+        });
+        if (!ticket) {
+            throw new common_1.NotFoundException('Tiket tidak ditemukan');
+        }
+        await this.verifyEventOwnership(ticket.eventId, userId);
+        return this.prisma.ticket.update({
+            where: { id: ticketId },
+            data: {
+                isBlocked: false,
+                blockedReason: null,
+                blockedBy: null,
+                blockedAt: null,
+            },
+        });
+    }
+    async getBlockedVisitors(eventId, userId) {
+        await this.verifyEventOwnership(eventId, userId);
+        return this.prisma.ticket.findMany({
+            where: {
+                eventId,
+                isBlocked: true,
+            },
+            include: {
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+            },
+            orderBy: { blockedAt: 'desc' },
+        });
+    }
+    async generateWristbandCodes(eventId, userId) {
+        await this.verifyEventOwnership(eventId, userId);
+        const ticketsWithoutCode = await this.prisma.ticket.findMany({
+            where: {
+                eventId,
+                wristbandCode: null,
+            },
+            select: { id: true },
+        });
+        let count = 0;
+        for (const t of ticketsWithoutCode) {
+            const code = `WB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+            await this.prisma.ticket.update({
+                where: { id: t.id },
+                data: {
+                    wristbandCode: code,
+                    wristbandPrintedAt: new Date(),
+                },
+            });
+            count++;
+        }
+        return {
+            success: true,
+            message: `Berhasil men-generate ${count} kode gelang.`,
+            generatedCount: count,
+        };
+    }
+    async exportWristbandCsv(eventId, userId) {
+        await this.verifyEventOwnership(eventId, userId);
+        const tickets = await this.prisma.ticket.findMany({
+            where: { eventId },
+            include: {
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'asc' },
+        });
+        const headers = ['name', 'wristbandCode', 'category', 'ticketId', 'status'];
+        const rows = tickets.map((t) => [
+            `"${(t.orderItem.attendeeName || '').replace(/"/g, '""')}"`,
+            `"${t.wristbandCode || ''}"`,
+            `"${(t.orderItem.ticketCategory.name || '').replace(/"/g, '""')}"`,
+            `"${t.id}"`,
+            `"${t.status}"`,
+        ]);
+        const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+        return {
+            filename: `wristband-export-${eventId}.csv`,
+            csv: csvContent,
+        };
     }
 };
 exports.TicketsService = TicketsService;

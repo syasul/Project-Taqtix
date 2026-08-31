@@ -25,6 +25,7 @@ export declare class GateController {
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
     }[]>;
     validateTicket(dto: ValidateTicketDto, staffUserId: string): Promise<{
         success: boolean;

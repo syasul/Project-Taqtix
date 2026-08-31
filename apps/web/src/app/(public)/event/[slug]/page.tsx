@@ -25,6 +25,14 @@ interface TicketCategory {
   saleEndAt: string;
 }
 
+interface LineUpItem {
+  id: string;
+  name: string;
+  photoUrl: string | null;
+  performTime: string | null;
+  stage: string | null;
+}
+
 interface EventDetail {
   id: string;
   title: string;
@@ -38,6 +46,7 @@ interface EventDetail {
     name: string;
   };
   ticketCategories: TicketCategory[];
+  lineup?: LineUpItem[];
 }
 
 export default function EventDetailPage() {
@@ -192,6 +201,49 @@ export default function EventDetailPage() {
               <h3 className="font-bold text-slate-800 text-sm">Deskripsi Event</h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">{event.description}</p>
             </div>
+
+            {/* Line Up Performers */}
+            {event.lineup && event.lineup.length > 0 && (
+              <div className="space-y-4 pt-4 border-t border-slate-200">
+                <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <span>Bintang Tamu & Pengisi Acara (Line Up)</span>
+                </h3>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {event.lineup.map((artist) => (
+                    <div
+                      key={artist.id}
+                      className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center flex flex-col items-center space-y-2"
+                    >
+                      {artist.photoUrl ? (
+                        <img
+                          src={artist.photoUrl}
+                          alt={artist.name}
+                          className="h-20 w-20 rounded-full object-cover border border-indigo-200 shadow-sm"
+                        />
+                      ) : (
+                        <div className="h-20 w-20 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-extrabold text-lg border border-indigo-200">
+                          {artist.name.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-800 line-clamp-1">{artist.name}</h4>
+                        {artist.performTime && (
+                          <span className="text-[10px] text-indigo-600 font-semibold block">
+                            {artist.performTime}
+                          </span>
+                        )}
+                        {artist.stage && (
+                          <span className="text-[9px] text-slate-400 block font-medium">
+                            {artist.stage}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

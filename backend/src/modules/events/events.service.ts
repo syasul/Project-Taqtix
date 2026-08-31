@@ -190,6 +190,21 @@ export class EventsService {
             price: 'asc',
           },
         },
+        customFormFields: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
+        facilities: {
+          orderBy: {
+            price: 'asc',
+          },
+        },
+        lineup: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 

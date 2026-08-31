@@ -203,6 +203,45 @@ export class AuthService {
   }
 
   /**
+   * Mengubah password akun pengguna yang sedang login.
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Pengguna tidak ditemukan');
+    }
+
+    // Jika user belum memiliki password (guest login), skip verifikasi currentPassword atau cek apakah passwordHash ada
+    if (user.passwordHash) {
+      const match = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!match) {
+        throw new UnauthorizedException('Password saat ini tidak cocok');
+      }
+    }
+
+    const newHashed = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: newHashed,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Password berhasil diperbarui',
+    };
+  }
+
+  /**
    * Pembantu untuk membuat access token & refresh token.
    */
   async generateTokenPair(userId: string, email: string, role: string) {

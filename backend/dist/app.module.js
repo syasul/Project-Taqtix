@@ -27,6 +27,16 @@ const team_module_1 = require("./modules/team/team.module");
 const workforce_module_1 = require("./modules/workforce/workforce.module");
 const crm_module_1 = require("./modules/crm/crm.module");
 const admin_module_1 = require("./modules/admin/admin.module");
+const vouchers_module_1 = require("./modules/vouchers/vouchers.module");
+const cash_module_1 = require("./modules/cash/cash.module");
+const tokens_module_1 = require("./modules/tokens/tokens.module");
+const custom_fields_module_1 = require("./modules/custom-fields/custom-fields.module");
+const facilities_module_1 = require("./modules/facilities/facilities.module");
+const lineup_module_1 = require("./modules/lineup/lineup.module");
+const transfers_module_1 = require("./modules/transfers/transfers.module");
+const pos_module_1 = require("./modules/pos/pos.module");
+const doorprize_module_1 = require("./modules/doorprize/doorprize.module");
+const exports_module_1 = require("./modules/exports/exports.module");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const roles_guard_1 = require("./common/guards/roles.guard");
 const permission_guard_1 = require("./common/guards/permission.guard");
@@ -78,6 +88,16 @@ exports.AppModule = AppModule = __decorate([
             workforce_module_1.WorkforceModule,
             crm_module_1.CRMModule,
             admin_module_1.AdminModule,
+            vouchers_module_1.VouchersModule,
+            cash_module_1.CashModule,
+            tokens_module_1.TokensModule,
+            custom_fields_module_1.CustomFieldsModule,
+            facilities_module_1.FacilitiesModule,
+            lineup_module_1.LineupModule,
+            transfers_module_1.TransfersModule,
+            pos_module_1.PosModule,
+            doorprize_module_1.DoorprizeModule,
+            exports_module_1.ExportsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

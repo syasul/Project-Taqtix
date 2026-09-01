@@ -98,40 +98,40 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
     { href: `/dashboard/partners/${user?.id || ''}`, label: 'Performa Link', icon: TrendingUp },
   ];
 
-  const activeLinkClass = 'bg-indigo-600/10 border-indigo-500 text-indigo-400 font-semibold';
+  const activeLinkClass = 'bg-[#08B4B5]/15 border-[#08B4B5] text-[#08B4B5] font-semibold';
   const inactiveLinkClass = 'border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200';
 
   return (
-    <aside className={cn('w-64 border-r border-slate-850 bg-slate-950 flex flex-col shrink-0', className)}>
+    <aside className={cn('w-64 border-r border-slate-800 bg-slate-950 flex flex-col shrink-0', className)}>
       {/* Header Sidebar / Context Header */}
       {isEventScope ? (
-        <div className="p-4 border-b border-slate-850 bg-slate-900/40">
+        <div className="p-4 border-b border-slate-800 bg-slate-900/40">
           <Link
             href="/dashboard/events"
             onClick={onItemClick}
-            className="flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition py-1.5 px-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 w-full mb-2"
+            className="flex items-center gap-2 text-xs font-bold text-[#08B4B5] hover:text-[#0abfc0] transition py-1.5 px-2.5 rounded-lg bg-[#08B4B5]/10 border border-[#08B4B5]/20 w-full mb-2"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Kembali ke Daftar Event</span>
           </Link>
           <div className="flex items-center gap-2 px-1">
-            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="h-2 w-2 rounded-full bg-[#08B4B5] animate-pulse" />
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
               Event Management
             </span>
           </div>
         </div>
       ) : (
-        <div className="p-5 border-b border-slate-850">
+        <div className="p-5 border-b border-slate-800">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
-              <Users className="h-5 w-5 text-indigo-400" />
+            <div className="h-10 w-10 rounded-xl bg-[#08B4B5]/15 border border-[#08B4B5]/30 flex items-center justify-center">
+              <Users className="h-5 w-5 text-[#08B4B5]" />
             </div>
             <div className="overflow-hidden">
               <h4 className="text-sm font-bold text-slate-200 truncate">
                 {user?.email?.split('@')[0] || 'Organizer'}
               </h4>
-              <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 mt-1 inline-block">
+              <span className="text-[10px] font-bold text-[#08B4B5] uppercase tracking-wider bg-[#08B4B5]/10 px-2 py-0.5 rounded-full border border-[#08B4B5]/20 mt-1 inline-block">
                 {user?.role || 'ORGANIZER'}
               </span>
             </div>

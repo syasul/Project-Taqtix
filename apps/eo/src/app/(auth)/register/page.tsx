@@ -2,18 +2,15 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
-import { apiClient } from '../../../lib/api-client';
-import { Input } from '../../../components/ui/input';
-import { Button } from '../../../components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../../components/ui/form';
+import { apiClient } from '@/lib/api-client';
+import { ArrowRight, Lock, Mail, UserCheck } from 'lucide-react';
 
-// Schema validasi form registrasi menggunakan Zod
 const registerSchema = z.object({
   email: z.string().email({ message: 'Alamat email tidak valid' }),
   password: z.string().min(6, { message: 'Kata sandi minimal 6 karakter' }),
@@ -24,21 +21,26 @@ const registerSchema = z.object({
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-/**
- * Halaman registrasi pengguna baru platform TAQtix.
- */
 export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<RegisterFormValues>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',
       password: '',
-      role: 'buyer',
+      role: 'organizer',
     },
   });
+
+  const selectedRole = watch('role');
 
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
@@ -54,151 +56,131 @@ export default function RegisterPage() {
     }
   };
 
-  const selectedRole = form.watch('role');
-
   return (
-    <Card className="w-full max-w-md bg-white border-slate-200 shadow-sm rounded-2xl">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight text-slate-800">
-          Buat Akun Baru
-        </CardTitle>
-        <CardDescription className="text-slate-500">
-          Silakan isi formulir di bawah untuk mendaftar
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-slate-700">Daftar Sebagai</FormLabel>
-                  <FormControl>
-                    <div className="grid grid-cols-3 gap-3">
-                      {([
-                        { value: 'buyer', label: 'Buyer' },
-                        { value: 'organizer', label: 'Organizer' },
-                        { value: 'partner', label: 'Partner' },
-                      ] as const).map((item) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          onClick={() => field.onChange(item.value)}
-                          className={`py-2.5 px-3 text-xs font-bold rounded-xl border transition duration-150 cursor-pointer ${
-                            selectedRole === item.value
-                              ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                              : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-sm'
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  </FormControl>
-                  <FormMessage className="text-rose-600 text-xs" />
-                </FormItem>
-              )}
-            />
+    <div className="w-full max-w-md bg-slate-900/85 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 relative overflow-hidden text-slate-100">
+      {/* Top Brand Accent Bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#08B4B5] via-[#0DAEAE] to-[#F1B829]" />
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-slate-700">Alamat Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="anda@contoh.com"
-                      type="email"
-                      className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-rose-600 text-xs" />
-                </FormItem>
-              )}
-            />
+      {/* Header & Logo */}
+      <div className="text-center mb-8">
+        <div className="flex justify-center mb-4">
+          <Image
+            src="/logo.png"
+            alt="TAQtix Logo"
+            width={160}
+            height={46}
+            className="h-9 w-auto object-contain"
+            priority
+          />
+        </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#08B4B5]/30 bg-[#08B4B5]/10 text-[10px] font-mono tracking-wider text-[#08B4B5] font-bold uppercase mb-3 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#08B4B5] animate-pulse" />
+          Registrasi Partner & Organizer
+        </div>
+        <h1 className="text-xl font-extrabold tracking-tight text-white">
+          Daftar Akun Baru
+        </h1>
+        <p className="text-xs text-slate-400 mt-1 font-medium">
+          Mulai publikasikan dan kelola tiket event Anda dalam hitungan menit.
+        </p>
+      </div>
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-slate-700">Kata Sandi</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="••••••••"
-                      type="password"
-                      className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-rose-600 text-xs" />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer border-0 active:scale-[0.98]"
-            >
-              {isLoading ? 'Sedang Memuat...' : 'Daftar Sekarang'}
-            </Button>
-          </form>
-        </Form>
-
-        {/* Divider */}
-        <div className="relative my-4 pt-2">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-slate-100" />
+      {/* Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Role Selector */}
+        <div>
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+            Daftar Sebagai
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {([
+              { value: 'organizer', label: 'Organizer' },
+              { value: 'partner', label: 'Affiliate' },
+              { value: 'buyer', label: 'Buyer' },
+            ] as const).map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => setValue('role', item.value)}
+                className={`py-2.5 px-3 text-xs font-bold rounded-xl border transition duration-150 cursor-pointer ${
+                  selectedRole === item.value
+                    ? 'bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] border-[#08B4B5] text-slate-950 shadow-md font-extrabold'
+                    : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
-          <div className="relative flex justify-center text-[10px] uppercase">
-            <span className="bg-white px-2 text-slate-400 font-semibold tracking-wider">Atau daftar dengan</span>
-          </div>
+          {errors.role && (
+            <p className="text-rose-400 text-[11px] font-semibold mt-1.5">{errors.role.message}</p>
+          )}
         </div>
 
-        {/* Google OAuth Button */}
-        <Button
-          type="button"
-          onClick={() => {
-            alert('Menghubungkan ke layanan Google OAuth sandbox...');
-          }}
-          variant="outline"
-          className="w-full flex items-center justify-center gap-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl py-2.5 cursor-pointer shadow-sm h-auto bg-white"
+        <div>
+          <label htmlFor="email" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            Alamat Email
+          </label>
+          <div className="relative">
+            <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              id="email"
+              type="email"
+              placeholder="organizer@taqtix.id"
+              {...register('email')}
+              className="w-full pl-10 pr-4 py-3 bg-slate-950/70 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#08B4B5] focus:bg-slate-900 focus:ring-1 focus:ring-[#08B4B5]/30 transition-all text-xs font-semibold"
+            />
+          </div>
+          {errors.email && (
+            <p className="text-rose-400 text-[11px] font-semibold mt-1.5">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            Kata Sandi
+          </label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              id="password"
+              type="password"
+              placeholder="Minimal 6 karakter"
+              {...register('password')}
+              className="w-full pl-10 pr-4 py-3 bg-slate-950/70 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#08B4B5] focus:bg-slate-900 focus:ring-1 focus:ring-[#08B4B5]/30 transition-all text-xs font-semibold"
+            />
+          </div>
+          {errors.password && (
+            <p className="text-rose-400 text-[11px] font-semibold mt-1.5">{errors.password.message}</p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold rounded-xl shadow-lg shadow-[#08B4B5]/20 hover:shadow-[#08B4B5]/35 transition-all duration-200 cursor-pointer flex justify-center items-center gap-2 group text-xs tracking-wider uppercase mt-3 active:scale-[0.99] disabled:opacity-50"
         >
-          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
-            <path
-              fill="#EA4335"
-              d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.65 1.4 7.56l3.85 2.99C6.18 7.35 8.85 5.04 12 5.04z"
-            />
-            <path
-              fill="#4285F4"
-              d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46c-.28 1.48-1.12 2.74-2.38 3.58l3.7 2.87c2.16-1.99 3.41-4.91 3.41-8.6z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.25 14.84c-.24-.72-.38-1.5-.38-2.31s.14-1.59.38-2.31L1.4 7.23C.51 9.01 0 11 0 13.12s.51 4.11 1.4 5.89l3.85-3.17z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c3.24 0 5.95-1.08 7.93-2.91l-3.7-2.87c-1.02.68-2.33 1.09-3.93 1.09-3.15 0-5.82-2.31-6.77-5.51l-3.85 3c1.97 3.91 5.95 6.56 10.77 6.56z"
-            />
-          </svg>
-          <span className="text-xs">Daftar dengan Google</span>
-        </Button>
-      </CardContent>
-      <CardFooter className="flex flex-wrap items-center justify-center gap-2 border-t border-slate-100 pt-6">
-        <span className="text-xs text-slate-500">Sudah punya akun?</span>
+          {isLoading ? (
+            <div className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
+          ) : (
+            <>
+              <span>Daftar Sekarang</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-slate-950" />
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Footer link */}
+      <div className="flex items-center justify-center gap-1.5 border-t border-slate-800/80 pt-6 mt-6 text-xs text-slate-400">
+        <span>Sudah memiliki akun?</span>
         <Link
           href="/login"
-          className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition duration-150"
+          className="font-bold text-[#08B4B5] hover:text-[#0abfc0] transition"
         >
           Masuk Disini
         </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

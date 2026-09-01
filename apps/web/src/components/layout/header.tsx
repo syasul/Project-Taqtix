@@ -45,20 +45,20 @@ export default function Header() {
 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+            <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-[#08B4B5] transition">
               Discovery
             </Link>
-            <Link href="/about" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+            <Link href="/about" className="text-sm font-semibold text-slate-600 hover:text-[#08B4B5] transition">
               About
             </Link>
-            <Link href="/help" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+            <Link href="/help" className="text-sm font-semibold text-slate-600 hover:text-[#08B4B5] transition">
               Help Center
             </Link>
-            <Link href="/contact" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+            <Link href="/contact" className="text-sm font-semibold text-slate-600 hover:text-[#08B4B5] transition">
               Contact
             </Link>
             {user && (
-              <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-indigo-605 transition">
+              <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-[#08B4B5] transition">
                 Dashboard
               </Link>
             )}
@@ -69,7 +69,7 @@ export default function Header() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger className={cn(buttonVariants({ variant: 'ghost' }), "relative h-10 w-10 rounded-full border border-slate-200 hover:bg-slate-50 bg-slate-50 p-0 overflow-hidden cursor-pointer")}>
-                  <span className="text-sm font-bold text-indigo-600 uppercase">
+                  <span className="text-sm font-bold text-[#08B4B5] uppercase">
                     {user.email[0]}
                   </span>
                 </DropdownMenuTrigger>
@@ -81,7 +81,7 @@ export default function Header() {
                     </div>
                   </div>
                   <DropdownMenuItem onClick={() => router.push('/dashboard')} className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer w-full flex items-center">
-                    <LayoutDashboard className="mr-2 h-4 w-4 text-indigo-600" />
+                    <LayoutDashboard className="mr-2 h-4 w-4 text-[#08B4B5]" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="hover:bg-rose-50 focus:bg-rose-50 text-rose-600 cursor-pointer">
@@ -92,10 +92,10 @@ export default function Header() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), "text-slate-600 hover:text-indigo-600 hover:bg-slate-50 cursor-pointer")}>
+                <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), "text-slate-600 hover:text-[#08B4B5] hover:bg-slate-50 cursor-pointer")}>
                   Masuk
                 </Link>
-                <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer border border-transparent shadow-sm")}>
+                <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold cursor-pointer border border-transparent shadow-sm")}>
                   Daftar
                 </Link>
               </div>
@@ -110,21 +110,21 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-6 bg-white border-l border-slate-200 text-slate-800">
                 <div className="flex flex-col space-y-6 mt-8">
-                  <Link href="/" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                  <Link href="/" className="text-lg font-medium text-slate-600 hover:text-[#08B4B5] transition">
                     Discovery
                   </Link>
-                  <Link href="/about" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                  <Link href="/about" className="text-lg font-medium text-slate-600 hover:text-[#08B4B5] transition">
                     About
                   </Link>
-                  <Link href="/help" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                  <Link href="/help" className="text-lg font-medium text-slate-600 hover:text-[#08B4B5] transition">
                     Help Center
                   </Link>
-                  <Link href="/contact" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                  <Link href="/contact" className="text-lg font-medium text-slate-600 hover:text-[#08B4B5] transition">
                     Contact
                   </Link>
                   {user ? (
                     <>
-                      <Link href="/dashboard" className="text-lg font-medium text-slate-600 hover:text-indigo-600 transition">
+                      <Link href="/dashboard" className="text-lg font-medium text-slate-600 hover:text-[#08B4B5] transition">
                         Dashboard
                       </Link>
                       <div className="border-t border-slate-200 pt-4 mt-4">
@@ -143,7 +143,7 @@ export default function Header() {
                       <Link href="/login" className={cn(buttonVariants({ variant: 'outline' }), "border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-700")}>
                         Masuk
                       </Link>
-                      <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold cursor-pointer border border-transparent shadow-sm")}>
+                      <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold cursor-pointer border border-transparent shadow-sm")}>
                         Daftar
                       </Link>
                     </div>

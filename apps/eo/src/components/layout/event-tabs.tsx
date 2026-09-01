@@ -102,8 +102,8 @@ export default function EventTabs({ eventId }: EventTabsProps) {
               className={cn(
                 "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer border",
                 tab.active
-                  ? "bg-indigo-600/10 border-indigo-500/30 text-indigo-400"
-                  : "bg-slate-900/20 border-slate-900 text-slate-400 hover:text-slate-250 hover:bg-slate-900/60"
+                  ? "bg-[#08B4B5]/15 border-[#08B4B5]/40 text-[#08B4B5]"
+                  : "bg-slate-900/20 border-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
               )}
             >
               <Icon className="h-3.5 w-3.5" />

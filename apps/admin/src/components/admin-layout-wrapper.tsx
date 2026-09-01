@@ -107,7 +107,7 @@ export default function AdminLayoutWrapper({
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-red-50 border border-red-200 text-red-600 uppercase tracking-widest">
+            <div className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#08B4B5]/10 border border-[#08B4B5]/30 text-[#08B4B5] uppercase tracking-widest">
               Secured Console
             </div>
           </div>

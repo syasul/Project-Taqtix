@@ -1,7 +1,7 @@
 import 'dart:io';
 
 class ApiEndpoints {
-  static const String baseUrl = 'https://api-taqtix.inxdvi.com/v1';
+  static const String baseUrl = 'https://api.taqtix.id/v1';
   
   static const String login = '/auth/gate-login';
   static const String events = '/gate/events';

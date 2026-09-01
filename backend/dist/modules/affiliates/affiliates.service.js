@@ -137,7 +137,7 @@ let AffiliatesService = class AffiliatesService {
             });
         });
         const frontendUrl = this.configService.get('TAQTIX_FRONTEND_URL') ||
-            'http://localhost:3000';
+            'https://taqtix.id';
         return `${frontendUrl}/events/${partner.event.slug}?aff=${code}`;
     }
     async findAll(eventId, organizerUserId) {

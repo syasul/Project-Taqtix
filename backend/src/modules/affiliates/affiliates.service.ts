@@ -137,7 +137,7 @@ export class AffiliatesService {
     // Buat redirect URL ke FE landing page event dengan query param aff
     const frontendUrl =
       this.configService.get<string>('TAQTIX_FRONTEND_URL') ||
-      'http://localhost:3000';
+      'https://taqtix.id';
     return `${frontendUrl}/events/${partner.event.slug}?aff=${code}`;
   }
 

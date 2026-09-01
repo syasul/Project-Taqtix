@@ -12,7 +12,10 @@ export interface ApiResponse<T = any> {
   };
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/v1';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'https://api.taqtix.id/v1';
 
 export class ApiError extends Error {
   code: string;

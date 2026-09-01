@@ -291,7 +291,7 @@ export class PaymentsService {
 
         // Pemicuan pengiriman e-ticket asinkron via BullMQ
         for (const ticket of generatedTickets) {
-          const qrUrl = `${this.configService.get<string>('TAQTIX_BASE_URL') || 'http://localhost:3001'}/v1/tickets/${ticket.id}`;
+          const qrUrl = `${this.configService.get<string>('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/v1/tickets/${ticket.id}`;
           const attendeePhone = ticket.orderItem.attendeePhone;
           const attendeeName = ticket.orderItem.attendeeName;
           const attendeeEmail = ticket.orderItem.attendeeEmail;

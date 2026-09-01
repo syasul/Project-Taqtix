@@ -70,7 +70,9 @@ export default function PartnerDashboardPage() {
 
   const handleCopyLink = () => {
     if (!stats) return;
-    const link = `http://localhost:3001/v1/r/${stats.uniqueCode}`;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.taqtix.id/v1';
+    const cleanBaseUrl = apiBase.endsWith('/v1') ? apiBase.slice(0, -3) : apiBase;
+    const link = `${cleanBaseUrl}/v1/r/${stats.uniqueCode}`;
     navigator.clipboard.writeText(link);
     toast.success('Link referral disalin ke clipboard');
   };

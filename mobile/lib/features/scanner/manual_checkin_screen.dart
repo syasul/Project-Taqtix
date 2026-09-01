@@ -80,7 +80,7 @@ class _ManualCheckinScreenState extends ConsumerState<ManualCheckinScreen> {
   Widget build(BuildContext context) {
     final activeEvent = ref.watch(activeEventProvider);
     final isOut = widget.action == 'out';
-    final accentColor = isOut ? const Color(0xFFEF4444) : const Color(0xFF6366F1);
+    final accentColor = isOut ? const Color(0xFFEF4444) : const Color(0xFF08B4B5);
 
     return Scaffold(
       appBar: AppBar(

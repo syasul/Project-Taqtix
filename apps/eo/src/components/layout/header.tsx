@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { LogOut, LayoutDashboard, Menu } from 'lucide-react';
@@ -31,9 +32,14 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-extrabold text-indigo-650 tracking-wider">
-                TAQtix
-              </span>
+              <Image
+                src="/logo.png"
+                alt="TAQtix Logo"
+                width={120}
+                height={34}
+                className="h-8 w-auto object-contain"
+                priority
+              />
             </Link>
           </div>
 

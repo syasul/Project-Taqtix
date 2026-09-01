@@ -77,25 +77,18 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
             children: [
               // Logo/Header Area
               Center(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.qr_code_scanner_rounded,
-                    size: 64,
-                    color: Color(0xFF6366F1),
-                  ),
+                child: Image.asset(
+                  'assets/logo.png',
+                  height: 64,
+                  fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Text(
-                'TAQtix Gate Staff',
+                'Gate Staff Portal',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
                   color: Theme.of(context).colorScheme.onSurface,
@@ -107,10 +100,10 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey,
+                  color: Colors.grey.shade600,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
 
               // Form
               Form(
@@ -136,7 +129,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16.0),
-                          borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
+                          borderSide: const BorderSide(color: Color(0xFF08B4B5), width: 1.5),
                         ),
                       ),
                       validator: (value) {
@@ -181,7 +174,7 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16.0),
-                          borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
+                          borderSide: const BorderSide(color: Color(0xFF08B4B5), width: 1.5),
                         ),
                       ),
                       validator: (value) {
@@ -201,14 +194,14 @@ class _GateLoginScreenState extends ConsumerState<GateLoginScreen> {
                       onPressed: _isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        backgroundColor: const Color(0xFF6366F1),
+                        backgroundColor: const Color(0xFF08B4B5),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: const Color(0xFF6366F1).withOpacity(0.5),
+                        disabledBackgroundColor: const Color(0xFF08B4B5).withOpacity(0.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
                         elevation: 4,
-                        shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
+                        shadowColor: const Color(0xFF08B4B5).withOpacity(0.3),
                       ),
                       child: _isLoading
                           ? const SizedBox(

@@ -12,6 +12,13 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "TAQtix — Event Growth Infrastructure",
   description: "Sell Tickets. Build Audience. Grow Events.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -203,7 +203,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
                                 color: _scanAction == 'in'
-                                    ? const Color(0xFF6366F1)
+                                    ? const Color(0xFF08B4B5)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(26),
                               ),
@@ -285,7 +285,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.white),
                   ),
                   selected: !_isCrewMode,
-                  selectedColor: const Color(0xFF6366F1),
+                  selectedColor: const Color(0xFF08B4B5),
                   backgroundColor: Colors.black.withOpacity(0.6),
                   onSelected: (selected) {
                     setState(() {
@@ -300,7 +300,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.white),
                   ),
                   selected: _isCrewMode,
-                  selectedColor: const Color(0xFF6366F1),
+                  selectedColor: const Color(0xFF08B4B5),
                   backgroundColor: Colors.black.withOpacity(0.6),
                   onSelected: (selected) {
                     setState(() {
@@ -319,7 +319,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
               width: 260,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: _scanAction == 'out' ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
+                  color: _scanAction == 'out' ? const Color(0xFFEF4444) : const Color(0xFF08B4B5),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(24),
@@ -397,7 +397,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _scanAction == 'out' ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
+                    backgroundColor: _scanAction == 'out' ? const Color(0xFFEF4444) : const Color(0xFF08B4B5),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

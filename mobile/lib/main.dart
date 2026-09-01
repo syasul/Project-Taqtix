@@ -36,7 +36,7 @@ class TaqTixApp extends ConsumerWidget {
     if (authState.isLoading) {
       homeWidget = const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+          child: CircularProgressIndicator(color: Color(0xFF08B4B5)),
         ),
       );
     } else if (authState.isAuthenticated) {
@@ -46,19 +46,19 @@ class TaqTixApp extends ConsumerWidget {
     }
 
     return MaterialApp(
-      title: 'TAQtix Gate Staff',
+      title: 'TAQtix',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: const Color(0xFF4F46E5), // Indigo branding
-        scaffoldBackgroundColor: const Color(0xFFF9FAFB), // Soft gray/white
+        primaryColor: const Color(0xFF08B4B5), // Teal branding
+        scaffoldBackgroundColor: const Color(0xFFF9FAFB),
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFF4F46E5),
-          secondary: Color(0xFF10B981), // Emerald Accent
+          primary: Color(0xFF08B4B5), // Teal
+          secondary: Color(0xFFF1B829), // Amber / Gold
           surface: Colors.white,
           onPrimary: Colors.white,
-          onSecondary: Colors.white,
+          onSecondary: Colors.black,
           onSurface: Color(0xFF111827),
         ),
         useMaterial3: true,

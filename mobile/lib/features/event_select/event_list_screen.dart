@@ -217,7 +217,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _fetchEvents,
-        color: const Color(0xFF6366F1),
+        color: const Color(0xFF08B4B5),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -239,7 +239,7 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
               if (_isLoading)
                 const Expanded(
                   child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                    child: CircularProgressIndicator(color: Color(0xFF08B4B5)),
                   ),
                 )
               else if (_error != null)
@@ -380,9 +380,9 @@ class _EventListScreenState extends ConsumerState<EventListScreen> {
                                     ElevatedButton.icon(
                                       onPressed: isSyncing ? null : () => _downloadManifest(event),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF6366F1),
+                                        backgroundColor: const Color(0xFF08B4B5),
                                         foregroundColor: Colors.white,
-                                        disabledBackgroundColor: const Color(0xFF6366F1).withOpacity(0.4),
+                                        disabledBackgroundColor: const Color(0xFF08B4B5).withOpacity(0.4),
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                       ),

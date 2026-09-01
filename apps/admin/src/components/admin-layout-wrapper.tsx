@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { ShieldCheck, LogOut, Menu, X } from 'lucide-react';
 import SidebarNav from './sidebar-nav';
 
@@ -20,14 +21,18 @@ export default function AdminLayoutWrapper({
       <div>
         {/* Logo / Branding */}
         <div className="p-6 border-b border-slate-200 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-8 h-8 text-red-650" />
-            <div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-800">TAQtix</span>
-              <span className="block text-[10px] text-red-600 font-mono tracking-widest font-bold uppercase">
-                Admin Panel
-              </span>
-            </div>
+          <div className="flex flex-col gap-1">
+            <Image
+              src="/logo.png"
+              alt="TAQtix Logo"
+              width={120}
+              height={34}
+              className="h-7 w-auto object-contain"
+              priority
+            />
+            <span className="text-[9px] text-[#08B4B5] font-mono tracking-widest font-bold uppercase pl-0.5">
+              Admin Platform
+            </span>
           </div>
           {isMobile && (
             <button

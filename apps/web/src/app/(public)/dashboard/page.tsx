@@ -154,27 +154,26 @@ export default function UserDashboardPage() {
   return (
     <div className="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
       {/* Top Profile Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#08B4B5]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="bg-white border border-slate-200 text-slate-900 rounded-3xl p-8 sm:p-10 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#08B4B5] to-[#0DAEAE] flex items-center justify-center text-2xl font-black text-slate-950 shadow-lg shadow-[#08B4B5]/20 uppercase">
+            <div className="w-16 h-16 rounded-2xl bg-[#08B4B5] flex items-center justify-center text-2xl font-black text-white uppercase shadow-sm">
               {user.email[0]}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-extrabold text-white">Akun Pengguna</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#08B4B5]/20 text-[#08B4B5] border border-[#08B4B5]/30">
+                <h1 className="text-2xl font-extrabold text-slate-900">Akun Pengguna</h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#08B4B5]/10 text-[#08B4B5] border border-[#08B4B5]/20">
                   {user.role}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-1">{user.email}</p>
+              <p className="text-xs text-slate-500 mt-1 font-medium">{user.email}</p>
             </div>
           </div>
           <Button
             onClick={handleLogout}
-            variant="ghost"
-            className="text-slate-300 hover:text-rose-400 hover:bg-slate-800/80 rounded-xl gap-2 cursor-pointer text-xs"
+            variant="outline"
+            className="border-slate-200 text-slate-600 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 rounded-xl gap-2 cursor-pointer text-xs"
           >
             <LogOut className="w-4 h-4" />
             <span>Keluar Akun</span>
@@ -238,7 +237,7 @@ export default function UserDashboardPage() {
                   Anda belum memiliki tiket acara aktif. Jelajahi berbagai acara menarik di TAQtix sekarang!
                 </p>
                 <Link href="/">
-                  <Button className="bg-[#08B4B5] hover:bg-[#079f9f] text-slate-950 font-bold rounded-xl cursor-pointer text-xs mt-2">
+                  <Button className="bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold rounded-xl cursor-pointer text-xs mt-2">
                     Jelajahi Event
                   </Button>
                 </Link>
@@ -294,9 +293,9 @@ export default function UserDashboardPage() {
                       <Link href={`/e-ticket/${ticket.id}`}>
                         <Button
                           size="sm"
-                          className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl gap-1.5 cursor-pointer text-xs font-bold"
+                          className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl gap-1.5 cursor-pointer text-xs font-bold border-0"
                         >
-                          <QrCode className="w-3.5 h-3.5 text-[#08B4B5]" />
+                          <QrCode className="w-3.5 h-3.5 text-white" />
                           <span>Buka E-Ticket</span>
                         </Button>
                       </Link>

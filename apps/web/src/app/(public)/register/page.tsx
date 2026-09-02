@@ -89,13 +89,10 @@ function RegisterForm() {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 p-8 sm:p-10 relative overflow-hidden">
-        {/* Top Accent Gradient Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#08B4B5] via-[#0DAEAE] to-[#F1B829]" />
-
+      <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-8 sm:p-10 relative overflow-hidden">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#08B4B5]/10 text-[#08B4B5] mb-4 shadow-sm">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 text-[#08B4B5] mb-4">
             <UserPlus className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -122,7 +119,7 @@ function RegisterForm() {
                 type="email"
                 placeholder="nama@email.com"
                 {...register('email')}
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:bg-white focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
               />
             </div>
             {errors.email && (
@@ -146,7 +143,7 @@ function RegisterForm() {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Minimal 6 karakter"
                 {...register('password')}
-                className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:bg-white focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
+                className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
               />
               <button
                 type="button"
@@ -177,7 +174,7 @@ function RegisterForm() {
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Ulangi kata sandi"
                 {...register('confirmPassword')}
-                className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:bg-white focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
+                className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
               />
               <button
                 type="button"
@@ -201,14 +198,14 @@ function RegisterForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold rounded-xl shadow-md shadow-[#08B4B5]/20 hover:shadow-lg hover:shadow-[#08B4B5]/30 transition-all duration-200 cursor-pointer flex justify-center items-center gap-2 group text-xs tracking-wider uppercase mt-4 active:scale-[0.99] disabled:opacity-50 h-auto"
+            className="w-full py-3 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold rounded-xl transition-all duration-150 cursor-pointer flex justify-center items-center gap-2 group text-xs tracking-wider uppercase mt-4 active:scale-[0.99] disabled:opacity-50 h-auto border-0"
           >
             {isLoading ? (
-              <div className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
                 <span>Daftar Akun Baru</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-slate-950" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-white" />
               </>
             )}
           </Button>

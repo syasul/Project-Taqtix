@@ -6,7 +6,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 w-full bg-slate-50">
+      <main className="flex-1 w-full bg-white">
         {children}
       </main>
       <footer className="border-t border-slate-200 bg-white py-8 text-xs text-slate-500">
@@ -16,9 +16,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <p className="text-slate-400 text-[10px]">Event Growth Infrastructure MVP</p>
           </div>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-medium">
-            <Link href="/about" className="hover:text-indigo-600 transition">Tentang Kami</Link>
-            <Link href="/help" className="hover:text-indigo-600 transition">Pusat Bantuan (FAQ)</Link>
-            <Link href="/contact" className="hover:text-indigo-600 transition">Hubungi Kami</Link>
+            <Link href="/about" className="hover:text-[#08B4B5] transition">Tentang Kami</Link>
+            <Link href="/help" className="hover:text-[#08B4B5] transition">Pusat Bantuan (FAQ)</Link>
+            <Link href="/contact" className="hover:text-[#08B4B5] transition">Hubungi Kami</Link>
           </div>
         </div>
       </footer>

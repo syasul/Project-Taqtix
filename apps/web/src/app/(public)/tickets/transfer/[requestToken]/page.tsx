@@ -64,15 +64,15 @@ export default function ClaimTransferPage() {
 
   return (
     <div className="max-w-xl mx-auto py-16 px-4 space-y-6">
-      <Card className="bg-white border-slate-200 shadow-md rounded-2xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100/50 border-b border-slate-200 p-6 text-center space-y-2">
-          <div className="h-12 w-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-600 flex items-center justify-center mx-auto mb-1">
+      <Card className="bg-white border-slate-200 shadow-sm rounded-3xl overflow-hidden">
+        <CardHeader className="bg-white border-b border-slate-100 p-6 text-center space-y-2">
+          <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-200 text-[#08B4B5] flex items-center justify-center mx-auto mb-1">
             <ArrowLeftRight className="h-6 w-6" />
           </div>
           <CardTitle className="text-xl font-extrabold text-slate-900">
             Konfirmasi Transfer Tiket
           </CardTitle>
-          <CardDescription className="text-xs text-slate-600">
+          <CardDescription className="text-xs text-slate-500">
             Seseorang ingin mengalihkan e-tiket acara ini kepada Anda.
           </CardDescription>
         </CardHeader>
@@ -88,8 +88,8 @@ export default function ClaimTransferPage() {
             </div>
           ) : (
             <>
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs">
-                <div className="flex items-center gap-2 text-slate-700 font-semibold">
+              <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3 text-xs">
+                <div className="flex items-center gap-2 text-slate-800 font-semibold">
                   <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
                   <span>Jaminan Keamanan Tiket Resmi TAQtix</span>
                 </div>
@@ -102,7 +102,7 @@ export default function ClaimTransferPage() {
                 <Button
                   onClick={handleConfirm}
                   disabled={submitting || declining}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl cursor-pointer shadow-sm border-0 flex items-center justify-center gap-2"
+                  className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3.5 rounded-xl cursor-pointer shadow-sm border-0 flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

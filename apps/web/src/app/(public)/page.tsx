@@ -102,7 +102,7 @@ export default function MarketplacePage() {
               placeholder="Cari konser, festival, lokasi..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-4 py-3.5 text-slate-800 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 text-sm shadow-sm transition"
+              className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-4 py-3.5 text-slate-800 focus:border-[#08B4B5] focus:outline-none focus:ring-2 focus:ring-[#08B4B5]/20 text-sm shadow-sm transition"
             />
           </div>
           <div className="flex flex-wrap justify-center gap-2">
@@ -113,8 +113,8 @@ export default function MarketplacePage() {
                 className={cn(
                   "px-4 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer",
                   selectedCategory === cat
-                    ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
-                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-850"
+                    ? "bg-[#08B4B5] border-[#08B4B5] text-white shadow-sm"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
                 {cat}
@@ -125,21 +125,21 @@ export default function MarketplacePage() {
       </div>
 
       {/* Stat Counter */}
-      <div className="bg-slate-50 border border-slate-200 rounded-3xl py-8 px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div className="bg-white border border-slate-200 rounded-3xl py-8 px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center shadow-sm">
         <div className="space-y-1">
-          <p className="text-3xl font-extrabold text-indigo-600">10k+</p>
+          <p className="text-3xl font-extrabold text-[#08B4B5]">10k+</p>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tiket Terjual</p>
         </div>
         <div className="space-y-1 border-l border-slate-200">
-          <p className="text-3xl font-extrabold text-indigo-600">50+</p>
+          <p className="text-3xl font-extrabold text-[#08B4B5]">50+</p>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Event Sukses</p>
         </div>
         <div className="space-y-1 border-l border-slate-200">
-          <p className="text-3xl font-extrabold text-indigo-600">2.5k+</p>
+          <p className="text-3xl font-extrabold text-[#08B4B5]">2.5k+</p>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Partner Afiliasi</p>
         </div>
         <div className="space-y-1 border-l border-slate-200">
-          <p className="text-3xl font-extrabold text-indigo-600">99.9%</p>
+          <p className="text-3xl font-extrabold text-[#08B4B5]">99.9%</p>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sistem Uptime</p>
         </div>
       </div>
@@ -155,11 +155,11 @@ export default function MarketplacePage() {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="h-full w-full bg-gradient-to-br from-indigo-50 to-indigo-100/50 flex items-center justify-center p-8 min-h-[250px]">
-                <Ticket className="h-16 w-16 text-indigo-600/30" />
+              <div className="h-full w-full bg-slate-50 flex items-center justify-center p-8 min-h-[250px]">
+                <Ticket className="h-16 w-16 text-[#08B4B5]/30" />
               </div>
             )}
-            <span className="absolute top-4 left-4 text-xs font-bold text-white bg-indigo-600 px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+            <span className="absolute top-4 left-4 text-xs font-bold text-white bg-[#08B4B5] px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
               EVENT PILIHAN
             </span>
           </div>
@@ -171,29 +171,29 @@ export default function MarketplacePage() {
               <h3 className="text-2xl font-extrabold text-slate-900 leading-tight">
                 {featuredEvent.title}
               </h3>
-              <p className="text-slate-550 text-sm leading-relaxed line-clamp-3">
+              <p className="text-slate-600 text-sm leading-relaxed line-clamp-3">
                 {featuredEvent.description}
               </p>
-              <div className="grid grid-cols-2 gap-4 pt-2 text-xs font-medium text-slate-650">
+              <div className="grid grid-cols-2 gap-4 pt-2 text-xs font-medium text-slate-600">
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-indigo-600 shrink-0" />
+                  <Calendar className="h-4 w-4 text-[#08B4B5] shrink-0" />
                   <span>
                     {format(new Date(featuredEvent.startDate), 'd MMMM yyyy, HH:mm', { locale: localeId })} WIB
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-indigo-600 shrink-0" />
+                  <MapPin className="h-4 w-4 text-[#08B4B5] shrink-0" />
                   <span className="truncate">{featuredEvent.location}</span>
                 </div>
               </div>
             </div>
             <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
-              <span className="text-xs text-slate-500">Tiket mulai dari <strong className="text-indigo-600 text-sm sm:text-base font-extrabold">Rp 100.000</strong></span>
+              <span className="text-xs text-slate-500">Tiket mulai dari <strong className="text-[#08B4B5] text-sm sm:text-base font-extrabold">Rp 100.000</strong></span>
               <Link
                 href={`/event/${featuredEvent.slug}`}
                 className={cn(
                   buttonVariants({ variant: 'default' }),
-                  "bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm border-0 flex items-center gap-2 cursor-pointer text-xs"
+                  "bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm border-0 flex items-center gap-2 cursor-pointer text-xs"
                 )}
               >
                 <span>Beli Tiket Sekarang</span>
@@ -227,11 +227,11 @@ export default function MarketplacePage() {
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-12 border border-dashed border-slate-200 rounded-2xl bg-slate-50">
+          <div className="text-center py-12 border border-dashed border-slate-200 rounded-2xl bg-white">
             <p className="text-rose-600 text-sm">Gagal memuat event. Silakan coba beberapa saat lagi.</p>
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-16 border border-dashed border-slate-200 rounded-2xl bg-slate-50">
+          <div className="text-center py-16 border border-dashed border-slate-200 rounded-2xl bg-white">
             <p className="text-slate-500 text-sm">Tidak ada event yang ditemukan matching pencarian Anda.</p>
           </div>
         ) : (
@@ -257,18 +257,18 @@ export default function MarketplacePage() {
                           className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
                         />
                       ) : (
-                        <div className="h-full w-full bg-indigo-50/50 flex items-center justify-center">
-                          <Calendar className="h-10 w-10 text-indigo-500/50" />
+                        <div className="h-full w-full bg-slate-50 flex items-center justify-center">
+                          <Calendar className="h-10 w-10 text-slate-300" />
                         </div>
                       )}
-                      <span className="absolute top-4 left-4 text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                      <span className="absolute top-4 left-4 text-[10px] font-bold text-[#08B4B5] bg-white border border-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
                         {event.organizer.name}
                       </span>
                     </div>
 
                     {/* Content */}
                     <CardContent className="p-6 space-y-4">
-                      <h3 className="text-base font-bold text-slate-800 line-clamp-2 group-hover:text-indigo-600 transition">
+                      <h3 className="text-base font-bold text-slate-800 line-clamp-2 group-hover:text-[#08B4B5] transition">
                         {event.title}
                       </h3>
 
@@ -290,7 +290,7 @@ export default function MarketplacePage() {
                       href={`/event/${event.slug}`}
                       className={cn(
                         buttonVariants({ variant: 'default' }),
-                        "w-full bg-indigo-600 hover:bg-indigo-700 text-white transition flex items-center justify-center gap-2 rounded-xl py-2.5 font-bold cursor-pointer h-auto border-0 shadow-sm"
+                        "w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white transition flex items-center justify-center gap-2 rounded-xl py-2.5 font-bold cursor-pointer h-auto border-0 shadow-sm"
                       )}
                     >
                       <span>Detail & Beli Tiket</span>
@@ -314,7 +314,7 @@ export default function MarketplacePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-4">
-            <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <h3 className="font-bold text-slate-800 text-lg">Anti Double-Booking</h3>
@@ -323,7 +323,7 @@ export default function MarketplacePage() {
             </p>
           </Card>
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-4">
-            <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <Users className="h-6 w-6" />
             </div>
             <h3 className="font-bold text-slate-800 text-lg">Afiliasi Transparan</h3>
@@ -332,7 +332,7 @@ export default function MarketplacePage() {
             </p>
           </Card>
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-4">
-            <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <Zap className="h-6 w-6" />
             </div>
             <h3 className="font-bold text-slate-800 text-lg">E-Tiket via WhatsApp</h3>
@@ -353,7 +353,7 @@ export default function MarketplacePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-10 w-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shadow-sm">
+            <div className="h-10 w-10 rounded-full bg-[#08B4B5] text-white font-bold flex items-center justify-center shadow-sm">
               1
             </div>
             <h4 className="font-bold text-slate-800 text-base">Pilih Event</h4>
@@ -362,7 +362,7 @@ export default function MarketplacePage() {
             </p>
           </div>
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-10 w-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shadow-sm">
+            <div className="h-10 w-10 rounded-full bg-[#08B4B5] text-white font-bold flex items-center justify-center shadow-sm">
               2
             </div>
             <h4 className="font-bold text-slate-800 text-base">Bayar Instan</h4>
@@ -371,7 +371,7 @@ export default function MarketplacePage() {
             </p>
           </div>
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-10 w-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shadow-sm">
+            <div className="h-10 w-10 rounded-full bg-[#08B4B5] text-white font-bold flex items-center justify-center shadow-sm">
               3
             </div>
             <h4 className="font-bold text-slate-800 text-base">Terima E-Tiket</h4>
@@ -392,29 +392,29 @@ export default function MarketplacePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-4">
-            <p className="text-slate-650 italic text-xs sm:text-sm leading-relaxed">
+            <p className="text-slate-600 italic text-xs sm:text-sm leading-relaxed">
               "Sebelum menggunakan TAQtix, kami sering pusing menangani keluhan pembeli karena tiket ganda (overbook). Dengan sistem antrean real-time TAQtix, konser sholawat kami berjalan lancar tanpa satu pun komplain tiket!"
             </p>
             <div className="flex items-center space-x-3 pt-2">
-              <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-indigo-650 text-sm shrink-0">
+              <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center font-bold text-[#08B4B5] text-sm shrink-0">
                 AH
               </div>
               <div>
-                <h5 className="font-bold text-slate-850 text-sm">Ahmad Hidayat</h5>
+                <h5 className="font-bold text-slate-800 text-sm">Ahmad Hidayat</h5>
                 <p className="text-[10px] text-slate-500">Ketua Yayasan Taqwa Media Group</p>
               </div>
             </div>
           </Card>
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-4">
-            <p className="text-slate-655 italic text-xs sm:text-sm leading-relaxed">
+            <p className="text-slate-600 italic text-xs sm:text-sm leading-relaxed">
               "Proses belinya gampang banget. Begitu pembayaran terkonfirmasi via QRIS, e-ticket langsung masuk ke WhatsApp saya dalam hitungan detik. Gak perlu buka email atau install aplikasi baru!"
             </p>
             <div className="flex items-center space-x-3 pt-2">
-              <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-indigo-650 text-sm shrink-0">
+              <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center font-bold text-[#08B4B5] text-sm shrink-0">
                 SF
               </div>
               <div>
-                <h5 className="font-bold text-slate-850 text-sm">Siti Fatimah</h5>
+                <h5 className="font-bold text-slate-800 text-sm">Siti Fatimah</h5>
                 <p className="text-[10px] text-slate-500">Pembeli Tiket Konser & Kajian</p>
               </div>
             </div>
@@ -423,7 +423,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Newsletter Subscription */}
-      <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-10 space-y-6 text-center max-w-3xl mx-auto shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-3xl p-8 md:p-10 space-y-6 text-center max-w-3xl mx-auto shadow-sm">
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-slate-900">Jangan Lewatkan Event Menarik Selanjutnya</h3>
           <p className="text-slate-500 text-xs max-w-md mx-auto leading-relaxed">
@@ -434,11 +434,11 @@ export default function MarketplacePage() {
           <input
             type="email"
             placeholder="Masukkan alamat email Anda"
-            className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-indigo-650 focus:outline-none text-xs shadow-inner"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
           />
           <button
             onClick={() => alert('Terima kasih telah berlangganan!')}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm shrink-0 border-0"
+            className="bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm shrink-0 border-0"
           >
             Berlangganan
           </button>
@@ -446,17 +446,17 @@ export default function MarketplacePage() {
       </div>
 
       {/* Call to Action */}
-      <div className="bg-indigo-900 text-white rounded-3xl p-8 md:p-12 text-center md:text-left md:flex md:items-center md:justify-between gap-8 shadow-md">
+      <div className="bg-white border border-slate-200 rounded-3xl p-8 md:p-12 text-center md:text-left md:flex md:items-center md:justify-between gap-8 shadow-sm">
         <div className="space-y-4 max-w-2xl">
-          <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">Ingin Mengadakan Event Sendiri?</h3>
-          <p className="text-indigo-200 text-sm leading-relaxed">
+          <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Ingin Mengadakan Event Sendiri?</h3>
+          <p className="text-slate-600 text-sm leading-relaxed">
             Gunakan TAQtix untuk mempermudah penjualan tiket secara terintegrasi, atur program promosi afiliasi, dan pantau data kehadiran secara langsung di gerbang masuk.
           </p>
         </div>
         <div className="mt-6 md:mt-0 shrink-0">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-indigo-950 font-bold px-6 py-3 rounded-2xl transition shadow-sm cursor-pointer text-sm"
+            className="inline-flex items-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-3 rounded-2xl transition shadow-sm cursor-pointer text-sm border-0"
           >
             <span>Mulai Buat Event</span>
             <ArrowRight className="h-4 w-4" />

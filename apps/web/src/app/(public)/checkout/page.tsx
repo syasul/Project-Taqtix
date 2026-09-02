@@ -263,14 +263,14 @@ function CheckoutContent() {
         <Card className="bg-white border-slate-200 shadow-sm text-center rounded-2xl">
           <CardHeader className="space-y-2">
             <CardTitle className="text-xl font-bold text-slate-800">Status Transaksi</CardTitle>
-            <CardDescription className="text-slate-550 text-xs">
-              ID Pemesanan: <span className="font-semibold text-slate-650">{pollingOrderId}</span>
+            <CardDescription className="text-slate-500 text-xs">
+              ID Pemesanan: <span className="font-semibold text-slate-700">{pollingOrderId}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-6 flex flex-col items-center">
             {pollingStatus === 'pending' && (
               <>
-                <Loader2 className="h-16 w-16 text-indigo-600 animate-spin" />
+                <Loader2 className="h-16 w-16 text-[#08B4B5] animate-spin" />
                 <div className="space-y-2">
                   <h3 className="font-bold text-slate-800">Menunggu Pembayaran...</h3>
                   <p className="text-xs text-slate-500">
@@ -283,7 +283,7 @@ function CheckoutContent() {
                       const url = `https://app.sandbox.midtrans.com/snap/v2/vtweb/${orderDetails.payment.snapToken}`;
                       window.open(url, '_blank');
                     }}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl w-full cursor-pointer py-2.5 font-bold border-0"
+                    className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl w-full cursor-pointer py-2.5 font-bold border-0"
                   >
                     Buka Ulang Halaman Bayar
                   </Button>
@@ -310,7 +310,7 @@ function CheckoutContent() {
                       {ticketsList.map((ticket: any) => (
                         <div
                           key={ticket.id}
-                          className="flex justify-between items-center p-3 border border-slate-200 bg-slate-50/50 rounded-xl"
+                          className="flex justify-between items-center p-3 border border-slate-200 bg-white rounded-xl"
                         >
                           <div className="text-left">
                             <p className="text-xs font-bold text-slate-800">
@@ -324,7 +324,7 @@ function CheckoutContent() {
                             rel="noreferrer"
                             className={cn(
                               buttonVariants({ size: 'sm', variant: 'default' }),
-                              "bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer rounded-lg px-3 h-auto py-1 border-0"
+                              "bg-[#08B4B5] hover:bg-[#079b9c] text-white text-xs font-bold cursor-pointer rounded-lg px-3 h-auto py-1 border-0"
                             )}
                           >
                             Lihat QR
@@ -346,7 +346,7 @@ function CheckoutContent() {
                     Batas waktu pembayaran 15 menit telah habis atau transaksi dibatalkan oleh bank/gateway.
                   </p>
                 </div>
-                <Button onClick={() => router.push('/')} className="bg-indigo-600 hover:bg-indigo-700 text-white w-full cursor-pointer rounded-xl py-2 border-0">
+                <Button onClick={() => router.push('/')} className="bg-[#08B4B5] hover:bg-[#079b9c] text-white w-full cursor-pointer rounded-xl py-2 border-0">
                   Kembali ke Discovery
                 </Button>
               </>
@@ -475,7 +475,7 @@ function CheckoutContent() {
                         <FormControl>
                           <Input
                             placeholder="Contoh: Budi Santoso"
-                            className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
+                            className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
                             {...field}
                           />
                         </FormControl>
@@ -495,7 +495,7 @@ function CheckoutContent() {
                             <Input
                               placeholder="budi@contoh.com"
                               type="email"
-                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
                               {...field}
                             />
                           </FormControl>
@@ -513,7 +513,7 @@ function CheckoutContent() {
                           <FormControl>
                             <Input
                               placeholder="Contoh: 081234567890"
-                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
                               {...field}
                             />
                           </FormControl>
@@ -545,7 +545,7 @@ function CheckoutContent() {
                               onChange={(e) =>
                                 setCustomAnswers({ ...customAnswers, [cf.id]: e.target.value })
                               }
-                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none"
+                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:border-[#08B4B5] focus:outline-none"
                             >
                               <option value="">-- Pilih {cf.label} --</option>
                               {cf.options?.map((opt: string) => (
@@ -567,7 +567,7 @@ function CheckoutContent() {
                                     [cf.id]: e.target.checked ? 'true' : 'false',
                                   })
                                 }
-                                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 text-[#08B4B5] focus:ring-[#08B4B5] cursor-pointer"
                               />
                               <label
                                 htmlFor={`cf-${cf.id}`}
@@ -591,7 +591,7 @@ function CheckoutContent() {
                                 setCustomAnswers({ ...customAnswers, [cf.id]: e.target.value })
                               }
                               placeholder={`Masukkan ${cf.label}`}
-                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
                             />
                           )}
                         </div>
@@ -615,14 +615,14 @@ function CheckoutContent() {
                           return (
                             <div
                               key={fac.id}
-                              className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/50"
+                              className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-white"
                             >
                               <div className="space-y-0.5">
                                 <h5 className="font-bold text-xs text-slate-800">{fac.name}</h5>
                                 {fac.description && (
                                   <p className="text-[11px] text-slate-500">{fac.description}</p>
                                 )}
-                                <p className="text-xs font-semibold text-indigo-600">
+                                <p className="text-xs font-bold text-[#08B4B5]">
                                   {fac.price > 0
                                     ? fac.price.toLocaleString('id-ID', {
                                         style: 'currency',
@@ -686,7 +686,7 @@ function CheckoutContent() {
                             <FormControl>
                               <Input
                                 placeholder="Contoh: DISKON10"
-                                className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20 uppercase"
+                                className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20 uppercase"
                                 {...field}
                               />
                             </FormControl>
@@ -716,7 +716,7 @@ function CheckoutContent() {
                     >
                       <Button
                         type="button"
-                        className="w-full bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold py-3.5 px-4 rounded-xl transition duration-150 shadow-md cursor-pointer active:scale-[0.98] border-0 flex items-center justify-center gap-2"
+                        className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0 flex items-center justify-center gap-2"
                       >
                         <Lock className="h-4 w-4" />
                         <span>Masuk Akun untuk Memesan Tiket</span>
@@ -726,7 +726,7 @@ function CheckoutContent() {
                     <Button
                       type="submit"
                       disabled={checkoutMutation.isPending}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
+                      className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
                     >
                       {checkoutMutation.isPending ? (
                         <>
@@ -752,7 +752,7 @@ function CheckoutContent() {
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
             <CardHeader className="border-b border-slate-200 pb-4">
               <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5 text-indigo-600" />
+                <ShoppingBag className="h-5 w-5 text-[#08B4B5]" />
                 <span>Ringkasan Pesanan</span>
               </CardTitle>
             </CardHeader>
@@ -766,7 +766,7 @@ function CheckoutContent() {
                   return (
                     <div key={item.categoryId} className="flex justify-between items-center text-sm">
                       <div>
-                        <h4 className="font-bold text-slate-850">{cat.name}</h4>
+                        <h4 className="font-bold text-slate-800">{cat.name}</h4>
                         <span className="text-[10px] text-slate-500 font-mono">
                           {item.qty} tiket x {cat.price.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                         </span>
@@ -814,7 +814,7 @@ function CheckoutContent() {
 
                 <div className="flex justify-between text-sm font-extrabold text-slate-800 border-t border-slate-200 pt-3">
                   <span>Total Bayar</span>
-                  <span className="text-indigo-650 font-extrabold text-base">
+                  <span className="text-slate-900 font-extrabold text-base">
                     {total.toLocaleString('id-ID', {
                       style: 'currency',
                       currency: 'IDR',
@@ -835,7 +835,7 @@ export default function CheckoutPage() {
   return (
     <Suspense fallback={
       <div className="max-w-2xl mx-auto py-24 flex justify-center items-center">
-        <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+        <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
       </div>
     }>
       <CheckoutContent />

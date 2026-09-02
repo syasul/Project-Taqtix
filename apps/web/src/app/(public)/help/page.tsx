@@ -82,7 +82,7 @@ export default function HelpPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-indigo-650 transition cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-[#08B4B5] transition cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -113,7 +113,7 @@ export default function HelpPage() {
               className={cn(
                 "p-4 rounded-2xl border text-center flex flex-col items-center justify-center space-y-2.5 transition cursor-pointer",
                 activeCategory === cat.name
-                  ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/10"
+                  ? "bg-[#08B4B5] border-[#08B4B5] text-white shadow-sm"
                   : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
               )}
             >
@@ -147,7 +147,7 @@ export default function HelpPage() {
                 )}
               </button>
               {isOpen && (
-                <div className="px-6 pb-4 text-xs text-slate-550 leading-relaxed border-t border-slate-100 pt-3">
+                <div className="px-6 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
                   {faq.answer}
                 </div>
               )}
@@ -165,7 +165,7 @@ export default function HelpPage() {
         <div className="flex justify-center gap-4">
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm text-xs cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm text-xs cursor-pointer border-0"
           >
             Hubungi Customer Service
           </Link>

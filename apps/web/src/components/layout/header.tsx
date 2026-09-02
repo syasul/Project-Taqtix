@@ -92,10 +92,10 @@ export default function Header() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), "text-slate-600 hover:text-[#08B4B5] hover:bg-slate-50 cursor-pointer")}>
+                <Link href="/login" className={cn(buttonVariants({ variant: 'ghost' }), "text-slate-600 hover:text-[#08B4B5] hover:bg-slate-50 cursor-pointer text-xs font-semibold")}>
                   Masuk
                 </Link>
-                <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold cursor-pointer border border-transparent shadow-sm")}>
+                <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold cursor-pointer border border-transparent shadow-sm text-xs rounded-xl")}>
                   Daftar
                 </Link>
               </div>
@@ -140,10 +140,10 @@ export default function Header() {
                     </>
                   ) : (
                     <div className="flex flex-col space-y-3 pt-6 border-t border-slate-200">
-                      <Link href="/login" className={cn(buttonVariants({ variant: 'outline' }), "border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-700")}>
+                      <Link href="/login" className={cn(buttonVariants({ variant: 'outline' }), "border-slate-200 bg-white hover:bg-slate-50 cursor-pointer text-slate-700 text-xs font-semibold rounded-xl")}>
                         Masuk
                       </Link>
-                      <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold cursor-pointer border border-transparent shadow-sm")}>
+                      <Link href="/register" className={cn(buttonVariants({ variant: 'default' }), "bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold cursor-pointer border border-transparent shadow-sm text-xs rounded-xl")}>
                         Daftar
                       </Link>
                     </div>

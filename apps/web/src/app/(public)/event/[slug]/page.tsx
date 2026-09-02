@@ -138,7 +138,7 @@ export default function EventDetailPage() {
         <ShieldAlert className="h-16 w-16 text-rose-500 mx-auto" />
         <h2 className="text-2xl font-bold text-slate-800">Event Tidak Ditemukan</h2>
         <p className="text-slate-500">Event yang Anda cari tidak ada atau belum dipublikasikan.</p>
-        <Button onClick={() => router.push('/')} className="bg-indigo-600 hover:bg-indigo-500 rounded-xl cursor-pointer">
+        <Button onClick={() => router.push('/')} className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl cursor-pointer">
           Kembali ke Discovery
         </Button>
       </div>
@@ -161,7 +161,7 @@ export default function EventDetailPage() {
         <Button
           onClick={() => router.push('/')}
           variant="ghost"
-          className="text-slate-500 hover:text-indigo-650 hover:bg-slate-100 rounded-xl -ml-2 gap-2 cursor-pointer text-xs font-semibold"
+          className="text-slate-500 hover:text-[#08B4B5] hover:bg-slate-50 rounded-xl -ml-2 gap-2 cursor-pointer text-xs font-semibold"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -177,8 +177,8 @@ export default function EventDetailPage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={event.bannerUrl} alt={event.title} className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full bg-gradient-to-br from-indigo-50 to-indigo-100/50 flex items-center justify-center">
-                <Calendar className="h-16 w-16 text-indigo-500/50" />
+              <div className="h-full w-full bg-slate-50 flex items-center justify-center">
+                <Calendar className="h-16 w-16 text-slate-300" />
               </div>
             )}
           </div>
@@ -187,21 +187,21 @@ export default function EventDetailPage() {
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-sm">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">{event.title}</h1>
-              <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mt-2">
+              <p className="text-xs font-bold text-[#08B4B5] uppercase tracking-widest mt-2">
                 Diselenggarakan oleh: {event.organizer.name}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-slate-200 py-4 text-xs sm:text-sm text-slate-700">
               <div className="flex items-center space-x-3">
-                <Calendar className="h-5 w-5 text-indigo-600 shrink-0" />
+                <Calendar className="h-5 w-5 text-[#08B4B5] shrink-0" />
                 <div>
                   <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Tanggal & Waktu</h4>
                   <p className="text-slate-800 font-semibold">{formattedDateRange}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-indigo-600 shrink-0" />
+                <MapPin className="h-5 w-5 text-[#08B4B5] shrink-0" />
                 <div>
                   <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Lokasi Penyelenggaraan</h4>
                   <p className="text-slate-800 font-semibold">{event.location}</p>
@@ -225,23 +225,23 @@ export default function EventDetailPage() {
                   {event.lineup.map((artist) => (
                     <div
                       key={artist.id}
-                      className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center flex flex-col items-center space-y-2"
+                      className="bg-white border border-slate-200 rounded-xl p-3 text-center flex flex-col items-center space-y-2"
                     >
                       {artist.photoUrl ? (
                         <img
                           src={artist.photoUrl}
                           alt={artist.name}
-                          className="h-20 w-20 rounded-full object-cover border border-indigo-200 shadow-sm"
+                          className="h-20 w-20 rounded-full object-cover border border-slate-200 shadow-sm"
                         />
                       ) : (
-                        <div className="h-20 w-20 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-extrabold text-lg border border-indigo-200">
+                        <div className="h-20 w-20 rounded-full bg-slate-50 text-[#08B4B5] flex items-center justify-center font-extrabold text-lg border border-slate-200">
                           {artist.name.substring(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
                         <h4 className="text-xs font-bold text-slate-800 line-clamp-1">{artist.name}</h4>
                         {artist.performTime && (
-                          <span className="text-[10px] text-indigo-600 font-semibold block">
+                          <span className="text-[10px] text-[#08B4B5] font-semibold block">
                             {artist.performTime}
                           </span>
                         )}
@@ -264,7 +264,7 @@ export default function EventDetailPage() {
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
             <CardHeader className="border-b border-slate-200 pb-4">
               <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Ticket className="h-5 w-5 text-indigo-600" />
+                <Ticket className="h-5 w-5 text-[#08B4B5]" />
                 <span>Pilih Kategori Tiket</span>
               </CardTitle>
             </CardHeader>
@@ -293,12 +293,12 @@ export default function EventDetailPage() {
                     return (
                       <div
                         key={category.id}
-                        className="flex flex-col justify-between p-4 border border-slate-200 hover:border-slate-350 bg-slate-50/50 rounded-xl space-y-3"
+                        className="flex flex-col justify-between p-4 border border-slate-200 hover:border-slate-300 bg-white rounded-xl space-y-3"
                       >
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="text-xs sm:text-sm font-bold text-slate-800">{category.name}</h4>
-                            <span className="text-indigo-600 text-xs font-semibold">
+                            <span className="text-[#08B4B5] text-xs font-bold">
                               {category.price.toLocaleString('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
@@ -311,7 +311,7 @@ export default function EventDetailPage() {
                               Habis
                             </span>
                           ) : (
-                            <span className="text-[10px] font-medium text-slate-450">
+                            <span className="text-[10px] font-medium text-slate-400">
                               Sisa {remaining} kuota
                             </span>
                           )}
@@ -322,7 +322,7 @@ export default function EventDetailPage() {
                             <button
                               onClick={() => handleQtyChange(category.id, -1, category.maxPerOrder)}
                               disabled={selected === 0}
-                              className="h-8 w-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-white transition cursor-pointer"
+                              className="h-8 w-8 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-white transition cursor-pointer"
                             >
                               <Minus className="h-4 w-4 text-slate-600" />
                             </button>
@@ -332,7 +332,7 @@ export default function EventDetailPage() {
                             <button
                               onClick={() => handleQtyChange(category.id, 1, Math.min(remaining, category.maxPerOrder))}
                               disabled={selected >= Math.min(remaining, category.maxPerOrder)}
-                              className="h-8 w-8 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-white transition cursor-pointer"
+                              className="h-8 w-8 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center disabled:opacity-40 disabled:hover:bg-white transition cursor-pointer"
                             >
                               <Plus className="h-4 w-4 text-slate-600" />
                             </button>
@@ -349,7 +349,7 @@ export default function EventDetailPage() {
                 <div className="border-t border-slate-200 pt-4 flex flex-col space-y-4">
                   <div className="flex justify-between items-center text-xs sm:text-sm">
                     <span className="text-slate-500 font-medium">Total Harga</span>
-                    <span className="text-base sm:text-lg font-extrabold text-indigo-650">
+                    <span className="text-base sm:text-lg font-extrabold text-slate-900">
                       {totalCost.toLocaleString('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
@@ -359,7 +359,7 @@ export default function EventDetailPage() {
                   </div>
                   <Button
                     onClick={handleCheckout}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
+                    className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
                   >
                     Lanjutkan ke Checkout
                   </Button>

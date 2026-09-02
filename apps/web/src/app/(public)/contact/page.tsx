@@ -17,7 +17,7 @@ export default function ContactPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-indigo-650 transition cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-[#08B4B5] transition cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -42,27 +42,27 @@ export default function ContactPage() {
             
             <div className="space-y-4 text-xs sm:text-sm text-slate-600">
               <div className="flex items-start space-x-3">
-                <Mail className="h-5 w-5 text-indigo-650 shrink-0 mt-0.5" />
+                <Mail className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">Email Support</p>
-                  <a href="mailto:support@taqtix.id" className="hover:underline text-indigo-600">
+                  <a href="mailto:support@taqtix.id" className="hover:underline text-[#08B4B5]">
                     support@taqtix.id
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
-                <Phone className="h-5 w-5 text-indigo-650 shrink-0 mt-0.5" />
+                <Phone className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">WhatsApp Hotline</p>
-                  <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="hover:underline text-indigo-600">
+                  <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="hover:underline text-[#08B4B5]">
                     +62 812-3456-7890
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-indigo-650 shrink-0 mt-0.5" />
+                <MapPin className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">Kantor Pusat</p>
                   <p className="text-slate-500 text-xs leading-relaxed">
@@ -95,7 +95,7 @@ export default function ContactPage() {
                   <input
                     id="name"
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-indigo-650 focus:outline-none text-xs"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
                     placeholder="Contoh: Ahmad Fauzi"
                     required
                   />
@@ -105,7 +105,7 @@ export default function ContactPage() {
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-indigo-650 focus:outline-none text-xs"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
                     placeholder="Contoh: fauzi@email.com"
                     required
                   />
@@ -116,7 +116,7 @@ export default function ContactPage() {
                 <label htmlFor="subject" className="text-xs font-semibold text-slate-700">Subjek Kategori</label>
                 <select
                   id="subject"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-indigo-650 focus:outline-none text-xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
                   required
                 >
                   <option value="tiket">Masalah Pembelian Tiket & Pembayaran</option>
@@ -131,7 +131,7 @@ export default function ContactPage() {
                 <textarea
                   id="message"
                   rows={5}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-indigo-650 focus:outline-none text-xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
                   placeholder="Tuliskan keluhan atau pertanyaan Anda secara lengkap di sini..."
                   required
                 ></textarea>
@@ -140,7 +140,7 @@ export default function ContactPage() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm border-0"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm border-0"
                 >
                   <span>Kirim Pesan</span>
                   <Send className="h-4 w-4" />

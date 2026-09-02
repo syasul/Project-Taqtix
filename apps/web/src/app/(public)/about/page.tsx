@@ -12,7 +12,7 @@ export default function AboutPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-indigo-650 transition cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-[#08B4B5] transition cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -24,7 +24,7 @@ export default function AboutPage() {
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
           Tentang TAQtix
         </h1>
-        <p className="text-indigo-600 text-sm sm:text-base font-semibold uppercase tracking-wider">
+        <p className="text-[#08B4B5] text-sm sm:text-base font-semibold uppercase tracking-wider">
           Event Growth Infrastructure — Religi, Modern & Amanah.
         </p>
       </div>
@@ -44,7 +44,7 @@ export default function AboutPage() {
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Nilai Utama Kami</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-3">
-            <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <h3 className="font-bold text-slate-800 text-base">Amanah & Terpercaya</h3>
@@ -54,7 +54,7 @@ export default function AboutPage() {
           </Card>
 
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-3">
-            <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <Sparkles className="h-5 w-5" />
             </div>
             <h3 className="font-bold text-slate-800 text-base">Inovasi Berkelanjutan</h3>
@@ -64,7 +64,7 @@ export default function AboutPage() {
           </Card>
 
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-3">
-            <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <Heart className="h-5 w-5" />
             </div>
             <h3 className="font-bold text-slate-800 text-base">Pemberdayaan Umat</h3>
@@ -74,7 +74,7 @@ export default function AboutPage() {
           </Card>
 
           <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-3">
-            <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-[#08B4B5]">
               <Star className="h-5 w-5" />
             </div>
             <h3 className="font-bold text-slate-800 text-base">Kemudahan Mutlak</h3>
@@ -86,23 +86,23 @@ export default function AboutPage() {
       </div>
 
       {/* Target Audiences */}
-      <div className="bg-slate-50 rounded-2xl p-8 space-y-4 border border-slate-200">
+      <div className="bg-white rounded-2xl p-8 space-y-4 border border-slate-200 shadow-sm">
         <h3 className="text-lg font-bold text-slate-900">Siapa saja yang menggunakan TAQtix?</h3>
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-650 font-medium">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 font-medium">
           <li className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-indigo-600"></span>
+            <span className="h-2 w-2 rounded-full bg-[#08B4B5]"></span>
             <span>Promotor Event Musik & Festival</span>
           </li>
           <li className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-indigo-600"></span>
+            <span className="h-2 w-2 rounded-full bg-[#08B4B5]"></span>
             <span>Yayasan & Lembaga Dakwah Masjid</span>
           </li>
           <li className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-indigo-600"></span>
+            <span className="h-2 w-2 rounded-full bg-[#08B4B5]"></span>
             <span>Komunitas Pemuda Hijrah & Kreatif</span>
           </li>
           <li className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-indigo-600"></span>
+            <span className="h-2 w-2 rounded-full bg-[#08B4B5]"></span>
             <span>Penyedia Halal Expo & Kuliner</span>
           </li>
         </ul>
@@ -117,7 +117,7 @@ export default function AboutPage() {
         <div>
           <a
             href="mailto:support@taqtix.id"
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm text-sm"
+            className="inline-flex items-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm text-sm border-0"
           >
             Hubungi Kemitraan TAQtix
           </a>

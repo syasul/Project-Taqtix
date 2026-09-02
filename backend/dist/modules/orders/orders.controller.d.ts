@@ -1,9 +1,14 @@
+import type { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 export declare class OrdersController {
     private readonly ordersService;
-    constructor(ordersService: OrdersService);
-    createOrder(dto: CreateOrderDto): Promise<{
+    private readonly jwtService;
+    private readonly configService;
+    constructor(ordersService: OrdersService, jwtService: JwtService, configService: ConfigService);
+    createOrder(dto: CreateOrderDto, req: Request): Promise<{
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -19,6 +24,91 @@ export declare class OrdersController {
         utmCampaign: string | null;
         expiredAt: Date;
     }>;
+    getMyOrders(userId: string): Promise<({
+        event: {
+            title: string;
+            id: string;
+            slug: string;
+            location: string;
+            startDate: Date;
+            endDate: Date;
+            bannerUrl: string;
+        };
+        payment: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            orderId: string;
+            provider: string;
+            snapToken: string | null;
+            externalId: string | null;
+            amount: number;
+            paidAt: Date | null;
+        } | null;
+        orderItems: ({
+            ticketCategory: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                eventId: string;
+                price: number;
+                quota: number;
+                sold: number;
+                maxPerOrder: number;
+                saleStartAt: Date;
+                saleEndAt: Date;
+            };
+            tickets: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                eventId: string;
+                status: import("@prisma/client").$Enums.TicketStatus;
+                qrPayload: string;
+                orderItemId: string;
+                checkedInAt: Date | null;
+                checkedInBy: string | null;
+                checkedOutAt: Date | null;
+                checkedOutBy: string | null;
+                wristbandCode: string | null;
+                wristbandPrintedAt: Date | null;
+                isBlocked: boolean;
+                blockedReason: string | null;
+                blockedBy: string | null;
+                blockedAt: Date | null;
+            }[];
+        } & {
+            id: string;
+            createdAt: Date;
+            facilities: import("@prisma/client/runtime/library").JsonValue | null;
+            orderId: string;
+            ticketCategoryId: string;
+            qty: number;
+            unitPrice: number;
+            attendeeName: string;
+            attendeeEmail: string;
+            attendeePhone: string;
+            city: string | null;
+            customFieldAnswers: import("@prisma/client/runtime/library").JsonValue | null;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        eventId: string;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        promoCodeId: string | null;
+        buyerId: string;
+        totalAmount: number;
+        discountAmount: number;
+        partnerId: string | null;
+        utmSource: string | null;
+        utmMedium: string | null;
+        utmCampaign: string | null;
+        expiredAt: Date;
+    })[]>;
     getOrder(id: string): Promise<{
         event: {
             description: string | null;
@@ -31,6 +121,7 @@ export declare class OrdersController {
             startDate: Date;
             endDate: Date;
             bannerUrl: string;
+            requireLogin: boolean;
             organizerId: string;
             status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;

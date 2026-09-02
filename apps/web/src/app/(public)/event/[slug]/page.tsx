@@ -5,10 +5,11 @@ export const dynamic = 'force-dynamic';
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { Calendar, MapPin, Ticket, ShieldAlert, ArrowLeft, Plus, Minus } from 'lucide-react';
+import { Calendar, MapPin, Ticket, ShieldAlert, ArrowLeft, Plus, Minus, Lock, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { apiClient } from '@/lib/api-client';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,6 +43,7 @@ interface EventDetail {
   location: string;
   startDate: string;
   endDate: string;
+  requireLogin?: boolean;
   organizer: {
     name: string;
   };
@@ -54,6 +56,7 @@ export default function EventDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const slug = params?.slug as string;
+  const { user } = useAuth();
 
   // Tangkap affiliate partner code (?aff=...) jika di-share
   const affCode = searchParams?.get('aff') || '';
@@ -100,7 +103,16 @@ export default function EventDetailPage() {
 
     // Serialize parameter checkout
     const serializedItems = selectedItems.map((item) => `${item.categoryId}:${item.qty}`).join(',');
-    router.push(`/checkout?eventId=${event.id}&items=${serializedItems}`);
+    const checkoutUrl = `/checkout?eventId=${event.id}&items=${serializedItems}`;
+
+    // Cek jika event mewajibkan login dan user belum login
+    if (event.requireLogin && !user) {
+      toast.info('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.');
+      router.push(`/login?redirect=${encodeURIComponent(checkoutUrl)}`);
+      return;
+    }
+
+    router.push(checkoutUrl);
   };
 
   if (isLoading) {
@@ -257,6 +269,18 @@ export default function EventDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
+              {event.requireLogin && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2.5">
+                  <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold block text-amber-950">Wajib Masuk Akun</span>
+                    <span className="text-[11px] text-amber-800 leading-tight">
+                      Pemesanan tiket event ini mewajibkan Anda untuk masuk (login) akun TAQtix.
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {event.ticketCategories.length === 0 ? (
                 <p className="text-xs text-slate-400 text-center py-6">Kategori tiket belum tersedia.</p>
               ) : (

@@ -77,11 +77,14 @@ apiClient.interceptors.response.use(
           { refreshToken },
           { headers: { 'Content-Type': 'application/json' } },
         );
-
-        const { accessToken: newAccess, refreshToken: newRefresh } = response.data;
+        const tokenData = response.data?.data || response.data;
+        const newAccess = tokenData?.accessToken;
+        const newRefresh = tokenData?.refreshToken;
 
         // Perbarui Zustand auth store
-        useAuth.getState().setAuth(newAccess, newRefresh);
+        if (newAccess && newRefresh) {
+          useAuth.getState().setAuth(newAccess, newRefresh);
+        }
 
         // Proses request dalam antrean
         processQueue(null, newAccess);

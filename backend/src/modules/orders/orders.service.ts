@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -21,7 +22,7 @@ export class OrdersService {
   /**
    * Membuat pesanan baru dengan locking kuota tiket pesanan secara transaksional (SELECT FOR UPDATE).
    */
-  async create(dto: CreateOrderDto) {
+  async create(dto: CreateOrderDto, authenticatedUserId?: string) {
     const event = await this.prisma.event.findUnique({
       where: { id: dto.eventId },
       include: {
@@ -31,6 +32,13 @@ export class OrdersService {
 
     if (!event) {
       throw new NotFoundException('Event tidak ditemukan');
+    }
+
+    // Jika event mewajibkan login, pastikan pemesan sudah terotentikasi
+    if (event.requireLogin && !authenticatedUserId) {
+      throw new UnauthorizedException(
+        'Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu sebelum memesan tiket.',
+      );
     }
 
     // Validasi Custom Form Fields yang required
@@ -57,9 +65,19 @@ export class OrdersService {
       let affiliatePartnerId: string | undefined = undefined;
 
       // 0. Dapatkan atau buat user pembeli
-      let buyer = await tx.user.findUnique({
-        where: { email: dto.buyerEmail },
-      });
+      let buyer: any = null;
+      if (authenticatedUserId) {
+        buyer = await tx.user.findUnique({
+          where: { id: authenticatedUserId },
+        });
+      }
+
+      if (!buyer) {
+        buyer = await tx.user.findUnique({
+          where: { email: dto.buyerEmail },
+        });
+      }
+
       if (!buyer) {
         buyer = await tx.user.create({
           data: {
@@ -354,5 +372,39 @@ export class OrdersService {
     }
 
     return order;
+  }
+
+  /**
+   * Mengambil riwayat pesanan milik pengguna yang sedang login.
+   */
+  async findMyOrders(userId: string) {
+    return this.prisma.order.findMany({
+      where: {
+        buyerId: userId,
+      },
+      include: {
+        event: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            bannerUrl: true,
+            location: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+        payment: true,
+        orderItems: {
+          include: {
+            ticketCategory: true,
+            tickets: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 }

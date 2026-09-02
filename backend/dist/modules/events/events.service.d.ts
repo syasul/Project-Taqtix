@@ -16,6 +16,7 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
@@ -34,6 +35,7 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
@@ -52,6 +54,7 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
@@ -75,6 +78,7 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
@@ -82,7 +86,7 @@ export declare class EventsService {
         geofenceRadius: number | null;
         allowTicketTransfer: boolean;
     })[]>;
-    findOnePublicBySlug(slug: string): Promise<{
+    findOnePublicBySlug(slugOrId: string): Promise<{
         organizer: {
             name: string;
             slug: string;
@@ -145,6 +149,7 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
@@ -163,6 +168,7 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;

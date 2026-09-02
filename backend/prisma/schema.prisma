@@ -112,6 +112,7 @@ model Event {
   geofenceLng         Float?
   geofenceRadius      Float?
   allowTicketTransfer Boolean           @default(true)
+  requireLogin        Boolean           @default(false)
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

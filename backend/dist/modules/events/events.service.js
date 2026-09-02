@@ -61,6 +61,7 @@ let EventsService = class EventsService {
                 location: dto.location,
                 startDate: new Date(dto.startDate),
                 endDate: new Date(dto.endDate),
+                requireLogin: dto.requireLogin ?? false,
                 status: client_1.EventStatus.DRAFT,
             },
         });
@@ -101,6 +102,8 @@ let EventsService = class EventsService {
             updateData.startDate = new Date(dto.startDate);
         if (dto.endDate !== undefined)
             updateData.endDate = new Date(dto.endDate);
+        if (dto.requireLogin !== undefined)
+            updateData.requireLogin = dto.requireLogin;
         return this.prisma.event.update({
             where: { id },
             data: updateData,
@@ -142,9 +145,11 @@ let EventsService = class EventsService {
             },
         });
     }
-    async findOnePublicBySlug(slug) {
-        const event = await this.prisma.event.findUnique({
-            where: { slug },
+    async findOnePublicBySlug(slugOrId) {
+        const event = await this.prisma.event.findFirst({
+            where: {
+                OR: [{ slug: slugOrId }, { id: slugOrId }],
+            },
             include: {
                 organizer: {
                     select: {

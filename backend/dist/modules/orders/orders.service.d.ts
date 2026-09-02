@@ -5,7 +5,7 @@ export declare class OrdersService {
     private prisma;
     private orderExpirationQueue;
     constructor(prisma: PrismaService, orderExpirationQueue: Queue);
-    create(dto: CreateOrderDto): Promise<{
+    create(dto: CreateOrderDto, authenticatedUserId?: string): Promise<{
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -33,6 +33,7 @@ export declare class OrdersService {
             startDate: Date;
             endDate: Date;
             bannerUrl: string;
+            requireLogin: boolean;
             organizerId: string;
             status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;
@@ -107,4 +108,89 @@ export declare class OrdersService {
         utmCampaign: string | null;
         expiredAt: Date;
     }>;
+    findMyOrders(userId: string): Promise<({
+        event: {
+            title: string;
+            id: string;
+            slug: string;
+            location: string;
+            startDate: Date;
+            endDate: Date;
+            bannerUrl: string;
+        };
+        payment: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("@prisma/client").$Enums.PaymentStatus;
+            orderId: string;
+            provider: string;
+            snapToken: string | null;
+            externalId: string | null;
+            amount: number;
+            paidAt: Date | null;
+        } | null;
+        orderItems: ({
+            ticketCategory: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                eventId: string;
+                price: number;
+                quota: number;
+                sold: number;
+                maxPerOrder: number;
+                saleStartAt: Date;
+                saleEndAt: Date;
+            };
+            tickets: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                eventId: string;
+                status: import("@prisma/client").$Enums.TicketStatus;
+                qrPayload: string;
+                orderItemId: string;
+                checkedInAt: Date | null;
+                checkedInBy: string | null;
+                checkedOutAt: Date | null;
+                checkedOutBy: string | null;
+                wristbandCode: string | null;
+                wristbandPrintedAt: Date | null;
+                isBlocked: boolean;
+                blockedReason: string | null;
+                blockedBy: string | null;
+                blockedAt: Date | null;
+            }[];
+        } & {
+            id: string;
+            createdAt: Date;
+            facilities: import("@prisma/client/runtime/library").JsonValue | null;
+            orderId: string;
+            ticketCategoryId: string;
+            qty: number;
+            unitPrice: number;
+            attendeeName: string;
+            attendeeEmail: string;
+            attendeePhone: string;
+            city: string | null;
+            customFieldAnswers: import("@prisma/client/runtime/library").JsonValue | null;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        eventId: string;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        promoCodeId: string | null;
+        buyerId: string;
+        totalAmount: number;
+        discountAmount: number;
+        partnerId: string | null;
+        utmSource: string | null;
+        utmMedium: string | null;
+        utmCampaign: string | null;
+        expiredAt: Date;
+    })[]>;
 }

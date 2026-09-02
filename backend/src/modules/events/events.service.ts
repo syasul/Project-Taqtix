@@ -68,6 +68,7 @@ export class EventsService {
         location: dto.location,
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
+        requireLogin: dto.requireLogin ?? false,
         status: EventStatus.DRAFT,
       },
     });
@@ -115,6 +116,8 @@ export class EventsService {
     if (dto.startDate !== undefined)
       updateData.startDate = new Date(dto.startDate);
     if (dto.endDate !== undefined) updateData.endDate = new Date(dto.endDate);
+    if (dto.requireLogin !== undefined)
+      updateData.requireLogin = dto.requireLogin;
 
     return this.prisma.event.update({
       where: { id },
@@ -173,11 +176,13 @@ export class EventsService {
   }
 
   /**
-   * Mendapatkan detail event publik berdasarkan slug.
+   * Mendapatkan detail event publik berdasarkan slug atau ID.
    */
-  async findOnePublicBySlug(slug: string) {
-    const event = await this.prisma.event.findUnique({
-      where: { slug },
+  async findOnePublicBySlug(slugOrId: string) {
+    const event = await this.prisma.event.findFirst({
+      where: {
+        OR: [{ slug: slugOrId }, { id: slugOrId }],
+      },
       include: {
         organizer: {
           select: {

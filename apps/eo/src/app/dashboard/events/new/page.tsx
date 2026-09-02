@@ -22,6 +22,7 @@ const eventSchema = z.object({
   startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: 'Format tanggal mulai salah' }),
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: 'Format tanggal selesai salah' }),
   bannerUrl: z.string().url({ message: 'URL banner tidak valid' }).or(z.literal('')),
+  requireLogin: z.boolean().default(false),
 }).refine((data) => {
   return new Date(data.endDate) > new Date(data.startDate);
 }, {
@@ -43,6 +44,7 @@ export default function CreateEventPage() {
       startDate: '',
       endDate: '',
       bannerUrl: '',
+      requireLogin: false,
     },
   });
 
@@ -202,6 +204,49 @@ export default function CreateEventPage() {
                       />
                     </FormControl>
                     <FormMessage className="text-rose-400 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Requirement: Toggle Wajib Login Pengunjung */}
+              <FormField
+                control={form.control}
+                name="requireLogin"
+                render={({ field }) => (
+                  <FormItem className="rounded-2xl border border-slate-800 bg-slate-950/60 p-5 shadow-inner">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <FormLabel className="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
+                          <span>Wajibkan Pengunjung Login (Require Login)</span>
+                          {field.value && (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                              Aktif
+                            </span>
+                          )}
+                        </FormLabel>
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          Jika diaktifkan, calon pembeli harus masuk (login) atau mendaftar akun TAQtix sebelum dapat menyelesaikan pemesanan tiket untuk event ini.
+                        </p>
+                      </div>
+                      <FormControl>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={field.value}
+                          onClick={() => field.onChange(!field.value)}
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+                            field.value ? 'bg-indigo-600' : 'bg-slate-700'
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                              field.value ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </FormControl>
+                    </div>
                   </FormItem>
                 )}
               />

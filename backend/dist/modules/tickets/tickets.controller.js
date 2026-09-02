@@ -44,6 +44,9 @@ let TicketsController = class TicketsController {
     async validatePromoCode(dto) {
         return this.ticketsService.validatePromoCode(dto);
     }
+    async getMyTickets(userId) {
+        return this.ticketsService.getMyTickets(userId);
+    }
     async getTicket(ticketId) {
         return this.ticketsService.getTicket(ticketId);
     }
@@ -165,6 +168,21 @@ __decorate([
     __metadata("design:paramtypes", [validate_promo_code_dto_1.ValidatePromoCodeDto]),
     __metadata("design:returntype", Promise)
 ], TicketsController.prototype, "validatePromoCode", null);
+__decorate([
+    (0, common_1.Get)('tickets/my'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan semua e-ticket milik pengguna yang sedang login',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar e-ticket user berhasil didapatkan.',
+    }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "getMyTickets", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)('tickets/:id'),

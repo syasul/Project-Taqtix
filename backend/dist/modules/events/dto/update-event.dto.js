@@ -19,6 +19,7 @@ class UpdateEventDto {
     startDate;
     endDate;
     bannerUrl;
+    requireLogin;
 }
 exports.UpdateEventDto = UpdateEventDto;
 __decorate([
@@ -63,4 +64,14 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "bannerUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: false,
+        required: false,
+        description: 'Apakah pengunjung harus login sebelum membeli tiket',
+    }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpdateEventDto.prototype, "requireLogin", void 0);
 //# sourceMappingURL=update-event.dto.js.map

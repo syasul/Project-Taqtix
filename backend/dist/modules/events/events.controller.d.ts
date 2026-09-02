@@ -18,6 +18,7 @@ export declare class EventsController {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
@@ -88,6 +89,7 @@ export declare class EventsController {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        requireLogin: boolean;
         organizerId: string;
         status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;

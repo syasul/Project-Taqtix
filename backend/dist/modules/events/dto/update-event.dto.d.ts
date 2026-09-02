@@ -5,4 +5,5 @@ export declare class UpdateEventDto {
     startDate?: string;
     endDate?: string;
     bannerUrl?: string;
+    requireLogin?: boolean;
 }

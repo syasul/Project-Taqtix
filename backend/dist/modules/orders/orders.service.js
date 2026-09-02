@@ -25,7 +25,7 @@ let OrdersService = class OrdersService {
         this.prisma = prisma;
         this.orderExpirationQueue = orderExpirationQueue;
     }
-    async create(dto) {
+    async create(dto, authenticatedUserId) {
         const event = await this.prisma.event.findUnique({
             where: { id: dto.eventId },
             include: {
@@ -34,6 +34,9 @@ let OrdersService = class OrdersService {
         });
         if (!event) {
             throw new common_1.NotFoundException('Event tidak ditemukan');
+        }
+        if (event.requireLogin && !authenticatedUserId) {
+            throw new common_1.UnauthorizedException('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu sebelum memesan tiket.');
         }
         if (event.customFormFields && event.customFormFields.length > 0) {
             const requiredFields = event.customFormFields.filter((f) => f.required);
@@ -50,9 +53,17 @@ let OrdersService = class OrdersService {
             let promoCodeId = undefined;
             let voucherId = undefined;
             let affiliatePartnerId = undefined;
-            let buyer = await tx.user.findUnique({
-                where: { email: dto.buyerEmail },
-            });
+            let buyer = null;
+            if (authenticatedUserId) {
+                buyer = await tx.user.findUnique({
+                    where: { id: authenticatedUserId },
+                });
+            }
+            if (!buyer) {
+                buyer = await tx.user.findUnique({
+                    where: { email: dto.buyerEmail },
+                });
+            }
             if (!buyer) {
                 buyer = await tx.user.create({
                     data: {
@@ -277,6 +288,36 @@ let OrdersService = class OrdersService {
             throw new common_1.NotFoundException('Pesanan tidak ditemukan');
         }
         return order;
+    }
+    async findMyOrders(userId) {
+        return this.prisma.order.findMany({
+            where: {
+                buyerId: userId,
+            },
+            include: {
+                event: {
+                    select: {
+                        id: true,
+                        title: true,
+                        slug: true,
+                        bannerUrl: true,
+                        location: true,
+                        startDate: true,
+                        endDate: true,
+                    },
+                },
+                payment: true,
+                orderItems: {
+                    include: {
+                        ticketCategory: true,
+                        tickets: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
     }
 };
 exports.OrdersService = OrdersService;

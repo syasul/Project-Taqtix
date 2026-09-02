@@ -447,4 +447,40 @@ export class TicketsService {
       csv: csvContent,
     };
   }
+
+  /**
+   * Mengambil semua e-ticket milik pengguna yang sedang login.
+   */
+  async getMyTickets(userId: string) {
+    return this.prisma.ticket.findMany({
+      where: {
+        orderItem: {
+          order: {
+            buyerId: userId,
+          },
+        },
+      },
+      include: {
+        event: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            bannerUrl: true,
+            location: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+        orderItem: {
+          include: {
+            ticketCategory: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 }

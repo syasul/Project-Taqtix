@@ -192,4 +192,61 @@ export declare class TicketsService {
         filename: string;
         csv: string;
     }>;
+    getMyTickets(userId: string): Promise<({
+        event: {
+            title: string;
+            id: string;
+            slug: string;
+            location: string;
+            startDate: Date;
+            endDate: Date;
+            bannerUrl: string;
+        };
+        orderItem: {
+            ticketCategory: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                eventId: string;
+                price: number;
+                quota: number;
+                sold: number;
+                maxPerOrder: number;
+                saleStartAt: Date;
+                saleEndAt: Date;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            facilities: import("@prisma/client/runtime/library").JsonValue | null;
+            orderId: string;
+            ticketCategoryId: string;
+            qty: number;
+            unitPrice: number;
+            attendeeName: string;
+            attendeeEmail: string;
+            attendeePhone: string;
+            city: string | null;
+            customFieldAnswers: import("@prisma/client/runtime/library").JsonValue | null;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        eventId: string;
+        status: import("@prisma/client").$Enums.TicketStatus;
+        qrPayload: string;
+        orderItemId: string;
+        checkedInAt: Date | null;
+        checkedInBy: string | null;
+        checkedOutAt: Date | null;
+        checkedOutBy: string | null;
+        wristbandCode: string | null;
+        wristbandPrintedAt: Date | null;
+        isBlocked: boolean;
+        blockedReason: string | null;
+        blockedBy: string | null;
+        blockedAt: Date | null;
+    })[]>;
 }

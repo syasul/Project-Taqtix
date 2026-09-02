@@ -123,6 +123,19 @@ export class TicketsController {
     return this.ticketsService.validatePromoCode(dto);
   }
 
+  @Get('tickets/my')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Mendapatkan semua e-ticket milik pengguna yang sedang login',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar e-ticket user berhasil didapatkan.',
+  })
+  async getMyTickets(@CurrentUser('id') userId: string) {
+    return this.ticketsService.getMyTickets(userId);
+  }
+
   @Public()
   @Get('tickets/:id')
   @ApiOperation({

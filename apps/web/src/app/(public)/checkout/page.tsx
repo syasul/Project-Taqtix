@@ -1,15 +1,28 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { CreditCard, ShoppingBag, Percent, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import {
+  CreditCard,
+  ShoppingBag,
+  Percent,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  Lock,
+  LogIn,
+  UserCheck,
+  User,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { apiClient } from '@/lib/api-client';
+import { useAuth } from '@/hooks/use-auth';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -36,6 +49,7 @@ interface CheckoutItem {
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const eventId = searchParams?.get('eventId') || '';
   const itemsParam = searchParams?.get('items') || '';
   const pollingOrderId = searchParams?.get('orderId') || '';
@@ -121,11 +135,18 @@ function CheckoutContent() {
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       buyerName: '',
-      buyerEmail: '',
+      buyerEmail: user?.email || '',
       buyerPhone: '',
       promoCode: '',
     },
   });
+
+  // Otomatis isi email dari user jika sedang login
+  useEffect(() => {
+    if (user?.email && !form.getValues('buyerEmail')) {
+      form.setValue('buyerEmail', user.email);
+    }
+  }, [user, form]);
 
   // State untuk custom fields answers & facilities add-ons
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
@@ -371,7 +392,78 @@ function CheckoutContent() {
                 Data ini akan digunakan untuk mengirimkan e-ticket via WhatsApp dan email.
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-6 space-y-6">
+              {/* Event Require Login Alert */}
+              {event?.requireLogin && !user && (
+                <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-3 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-amber-950">
+                        Event Ini Mewajibkan Masuk Akun
+                      </h4>
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        Penyelenggara mewajibkan setiap pemesan tiket untuk masuk (login) akun TAQtix terlebih dahulu sebelum dapat menyelesaikan checkout tiket ini.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2.5 pt-1 pl-12">
+                    <Link
+                      href={`/login?redirect=${encodeURIComponent(
+                        typeof window !== 'undefined'
+                          ? window.location.pathname + window.location.search
+                          : ''
+                      )}`}
+                    >
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="bg-[#08B4B5] hover:bg-[#079f9f] text-slate-950 font-bold rounded-xl text-xs gap-1.5 cursor-pointer shadow-sm"
+                      >
+                        <LogIn className="w-3.5 h-3.5" />
+                        <span>Masuk ke Akun</span>
+                      </Button>
+                    </Link>
+                    <Link
+                      href={`/register?redirect=${encodeURIComponent(
+                        typeof window !== 'undefined'
+                          ? window.location.pathname + window.location.search
+                          : ''
+                      )}`}
+                    >
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-amber-300 bg-white hover:bg-amber-100 text-amber-950 font-bold rounded-xl text-xs cursor-pointer"
+                      >
+                        <span>Daftar Akun Baru</span>
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Logged in user info */}
+              {user && (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <div className="w-8 h-8 rounded-full bg-[#08B4B5]/15 text-[#08B4B5] flex items-center justify-center font-bold">
+                      <UserCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-slate-400 block">Memesan Sebagai:</span>
+                      <strong className="text-slate-900 font-semibold">{user.email}</strong>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#08B4B5]/10 text-[#08B4B5] uppercase border border-[#08B4B5]/20">
+                    {user.role}
+                  </span>
+                </div>
+              )}
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -462,16 +554,44 @@ function CheckoutContent() {
                                 </option>
                               ))}
                             </select>
+                          ) : cf.fieldType === 'checkbox' ? (
+                            <div className="flex items-center space-x-2 pt-1">
+                              <input
+                                type="checkbox"
+                                id={`cf-${cf.id}`}
+                                required={cf.required}
+                                checked={customAnswers[cf.id] === 'true'}
+                                onChange={(e) =>
+                                  setCustomAnswers({
+                                    ...customAnswers,
+                                    [cf.id]: e.target.checked ? 'true' : 'false',
+                                  })
+                                }
+                                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                              />
+                              <label
+                                htmlFor={`cf-${cf.id}`}
+                                className="text-xs text-slate-600 cursor-pointer"
+                              >
+                                Ya, saya setuju / konfirmasi
+                              </label>
+                            </div>
                           ) : (
                             <Input
-                              type={cf.fieldType === 'number' ? 'number' : cf.fieldType === 'date' ? 'date' : 'text'}
+                              type={
+                                cf.fieldType === 'number'
+                                  ? 'number'
+                                  : cf.fieldType === 'date'
+                                  ? 'date'
+                                  : 'text'
+                              }
                               required={cf.required}
                               value={customAnswers[cf.id] || ''}
                               onChange={(e) =>
                                 setCustomAnswers({ ...customAnswers, [cf.id]: e.target.value })
                               }
                               placeholder={`Masukkan ${cf.label}`}
-                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20 text-xs"
+                              className="bg-white border-slate-200 text-slate-800 focus:border-indigo-600 focus:ring-indigo-600/20"
                             />
                           )}
                         </div>
@@ -479,44 +599,74 @@ function CheckoutContent() {
                     </div>
                   )}
 
-                  {/* Dynamic Facilities / Add-ons */}
+                  {/* Addons/Fasilitas Tambahan */}
                   {eventFacilities.length > 0 && (
-                    <div className="border-t border-slate-200 pt-6 space-y-3">
-                      <h4 className="font-bold text-slate-800 text-sm">Fasilitas & Merchandise Tambahan (Opsional)</h4>
-                      <div className="space-y-2">
+                    <div className="border-t border-slate-200 pt-6 space-y-4">
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">Fasilitas & Add-on Tambahan</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Pilih fasilitas pendukung untuk meningkatkan kenyamanan Anda di event.
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
                         {eventFacilities.map((fac: any) => {
-                          const isSelected = (selectedFacilities[fac.id] || 0) > 0;
+                          const currentQty = selectedFacilities[fac.id] || 0;
                           return (
                             <div
                               key={fac.id}
-                              className="p-3 border border-slate-200 rounded-xl flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition"
+                              className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/50"
                             >
-                              <div>
-                                <h5 className="text-xs font-bold text-slate-800">{fac.name}</h5>
+                              <div className="space-y-0.5">
+                                <h5 className="font-bold text-xs text-slate-800">{fac.name}</h5>
                                 {fac.description && (
                                   <p className="text-[11px] text-slate-500">{fac.description}</p>
                                 )}
-                                <span className="text-xs font-bold text-indigo-600 mt-1 block">
+                                <p className="text-xs font-semibold text-indigo-600">
                                   {fac.price > 0
-                                    ? `+ Rp ${fac.price.toLocaleString('id-ID')}`
+                                    ? fac.price.toLocaleString('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                      })
                                     : 'Gratis'}
-                                </span>
+                                </p>
                               </div>
 
-                              <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={(e) =>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
                                     setSelectedFacilities({
                                       ...selectedFacilities,
-                                      [fac.id]: e.target.checked ? 1 : 0,
+                                      [fac.id]: Math.max(0, currentQty - 1),
                                     })
                                   }
-                                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                                />
-                                <span className="text-xs font-semibold text-slate-700">Pilih</span>
-                              </label>
+                                  disabled={currentQty === 0}
+                                  className="h-7 w-7 p-0 rounded-lg cursor-pointer"
+                                >
+                                  -
+                                </Button>
+                                <span className="text-xs font-bold w-4 text-center">
+                                  {currentQty}
+                                </span>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    setSelectedFacilities({
+                                      ...selectedFacilities,
+                                      [fac.id]: currentQty + 1,
+                                    })
+                                  }
+                                  className="h-7 w-7 p-0 rounded-lg cursor-pointer"
+                                >
+                                  +
+                                </Button>
+                              </div>
                             </div>
                           );
                         })}
@@ -555,23 +705,42 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={checkoutMutation.isPending}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
-                  >
-                    {checkoutMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Sedang Memproses...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="h-5 w-5" />
-                        <span>Buat Pesanan & Bayar</span>
-                      </>
-                    )}
-                  </Button>
+                  {event?.requireLogin && !user ? (
+                    <Link
+                      href={`/login?redirect=${encodeURIComponent(
+                        typeof window !== 'undefined'
+                          ? window.location.pathname + window.location.search
+                          : ''
+                      )}`}
+                      className="w-full block"
+                    >
+                      <Button
+                        type="button"
+                        className="w-full bg-gradient-to-r from-[#08B4B5] to-[#0DAEAE] hover:from-[#0abfc0] hover:to-[#0fb5b5] text-slate-950 font-extrabold py-3.5 px-4 rounded-xl transition duration-150 shadow-md cursor-pointer active:scale-[0.98] border-0 flex items-center justify-center gap-2"
+                      >
+                        <Lock className="h-4 w-4" />
+                        <span>Masuk Akun untuk Memesan Tiket</span>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      type="submit"
+                      disabled={checkoutMutation.isPending}
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
+                    >
+                      {checkoutMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Sedang Memproses...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-5 w-5" />
+                          <span>Buat Pesanan & Bayar</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </form>
               </Form>
             </CardContent>

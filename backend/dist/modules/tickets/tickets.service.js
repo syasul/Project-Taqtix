@@ -341,6 +341,38 @@ let TicketsService = class TicketsService {
             csv: csvContent,
         };
     }
+    async getMyTickets(userId) {
+        return this.prisma.ticket.findMany({
+            where: {
+                orderItem: {
+                    order: {
+                        buyerId: userId,
+                    },
+                },
+            },
+            include: {
+                event: {
+                    select: {
+                        id: true,
+                        title: true,
+                        slug: true,
+                        bannerUrl: true,
+                        location: true,
+                        startDate: true,
+                        endDate: true,
+                    },
+                },
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
 };
 exports.TicketsService = TicketsService;
 exports.TicketsService = TicketsService = __decorate([

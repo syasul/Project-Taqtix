@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersModule = void 0;
 const common_1 = require("@nestjs/common");
 const bull_1 = require("@nestjs/bull");
+const jwt_1 = require("@nestjs/jwt");
 const orders_service_1 = require("./orders.service");
 const orders_controller_1 = require("./orders.controller");
 const orders_processor_1 = require("./orders.processor");
@@ -21,6 +22,7 @@ exports.OrdersModule = OrdersModule = __decorate([
             bull_1.BullModule.registerQueue({
                 name: 'order-expiration',
             }),
+            jwt_1.JwtModule.register({}),
         ],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService, orders_processor_1.OrdersProcessor],

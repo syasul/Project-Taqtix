@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsDateString,
+  IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -54,4 +55,13 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   bannerUrl?: string;
+
+  @ApiProperty({
+    example: false,
+    required: false,
+    description: 'Apakah pengunjung harus login sebelum membeli tiket',
+  })
+  @IsBoolean()
+  @IsOptional()
+  requireLogin?: boolean;
 }

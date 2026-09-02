@@ -5,4 +5,5 @@ export declare class CreateEventDto {
     startDate: string;
     endDate: string;
     bannerUrl?: string;
+    requireLogin?: boolean;
 }

@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             useAuth.getState().logout();
             router.push('/login');
           }}
-          className="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
+          className="px-5 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer"
         >
           Logout & Login Kembali
         </button>

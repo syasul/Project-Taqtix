@@ -14,6 +14,7 @@ import {
   Banknote,
   Users,
 } from 'lucide-react';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 interface GuideSection {
   id: string;
@@ -30,8 +31,8 @@ const guides: GuideSection[] = [
     icon: Ticket,
     summary: 'Langkah awal menerbitkan event dengan berbagai kategori harga dan kuota.',
     steps: [
-      'Buka menu "Daftar Event" di sidebar organisasi lalu klik "+ Buat Event".',
-      'Isi informasi judul, deskripsi, tanggal mulai & selesai, lokasi acara, serta banner poster.',
+      'Buka menu "Daftar Event" di sidebar organisasi lalu klik "+ Buat Event Baru".',
+      'Isi informasi judul, deskripsi, tanggal mulai & selesai, lokasi acara, serta URL banner poster.',
       'Setelah event dibuat, masuk ke menu "Kategori Tiket" untuk menambahkan tiket (misal Early Bird, VIP, Presale) beserta kuota dan harga.',
       'Publikasikan event ke status PUBLISHED agar halaman penjualan aktif dan dapat diakses pembeli.',
     ],
@@ -105,17 +106,23 @@ export default function GuidePage() {
     setOpenSection(openSection === id ? null : id);
   };
 
+  const breadcrumbs = [
+    { label: 'Bantuan' },
+    { label: 'Panduan Penggunaan' },
+  ];
+
   return (
     <div className="max-w-4xl space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-100 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
-            <BookOpen className="h-6 w-6" />
-          </div>
+        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5 tracking-tight">
+          <BookOpen className="h-6 w-6 text-[#08B4B5]" />
           Panduan Penggunaan & Pusat Bantuan
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-xs mt-1">
           Pelajari seluruh alur kerja operasional event profesional mulai dari pembuatan tiket hingga eksekusi on-site.
         </p>
       </div>
@@ -129,8 +136,8 @@ export default function GuidePage() {
           return (
             <div
               key={g.id}
-              className={`border rounded-2xl transition overflow-hidden ${
-                isOpen ? 'bg-slate-900/80 border-indigo-500/40' : 'bg-slate-900/40 border-slate-850'
+              className={`border rounded-2xl transition overflow-hidden shadow-xs ${
+                isOpen ? 'bg-white border-[#08B4B5]/40 shadow-sm' : 'bg-white border-slate-200'
               }`}
             >
               <button
@@ -141,31 +148,31 @@ export default function GuidePage() {
                   <div
                     className={`p-2.5 rounded-xl border ${
                       isOpen
-                        ? 'bg-indigo-600/20 border-indigo-500/30 text-indigo-400'
-                        : 'bg-slate-800 border-slate-700 text-slate-400'
+                        ? 'bg-teal-50 border-[#08B4B5]/30 text-[#08B4B5]'
+                        : 'bg-slate-50 border-slate-200 text-slate-500'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-100">{g.title}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">{g.summary}</p>
+                    <h3 className="text-sm font-bold text-slate-900">{g.title}</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">{g.summary}</p>
                   </div>
                 </div>
 
                 {isOpen ? (
                   <ChevronUp className="h-5 w-5 text-slate-400" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-slate-500" />
+                  <ChevronDown className="h-5 w-5 text-slate-400" />
                 )}
               </button>
 
               {isOpen && (
-                <div className="px-6 pb-6 pt-2 border-t border-slate-850/60 text-xs text-slate-300">
-                  <ol className="space-y-2.5 list-decimal list-inside pl-1 text-slate-300">
+                <div className="px-6 pb-6 pt-2 border-t border-slate-100 text-xs text-slate-600 bg-slate-50/50">
+                  <ol className="space-y-2.5 list-decimal list-inside pl-1">
                     {g.steps.map((step, idx) => (
                       <li key={idx} className="leading-relaxed">
-                        <span className="text-slate-200 font-medium">{step}</span>
+                        <span className="text-slate-700 font-medium">{step}</span>
                       </li>
                     ))}
                   </ol>

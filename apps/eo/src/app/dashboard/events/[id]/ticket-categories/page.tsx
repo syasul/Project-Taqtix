@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { toast } from 'sonner';
 
 // Validasi Zod
@@ -156,42 +157,52 @@ export default function TicketCategoriesPage() {
     });
   };
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: eventResponse?.title || 'Event', href: `/dashboard/events/${eventId}/sales` },
+    { label: 'Kategori Tiket' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-6 max-w-5xl">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
       {/* Top Header */}
-      <div>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <Ticket className="w-6 h-6 text-[#08B4B5]" />
+            Kelola Kategori Tiket
+          </h1>
+          {eventResponse && (
+            <p className="text-xs text-slate-500 mt-1">
+              Event: <span className="font-bold text-slate-700">{eventResponse.title}</span>
+            </p>
+          )}
+        </div>
+
         <Button
           onClick={() => router.push('/dashboard/events')}
-          variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl -ml-2 gap-2 cursor-pointer text-xs"
+          variant="outline"
+          className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl gap-1.5 cursor-pointer text-xs font-bold"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Kembali ke Daftar Event</span>
+          <span>Kembali</span>
         </Button>
       </div>
 
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-          Kelola Kategori Tiket
-        </h1>
-        {eventResponse && (
-          <p className="text-sm text-slate-400 mt-2">
-            Event: <span className="font-bold text-slate-300">{eventResponse.title}</span>
-          </p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* List of categories */}
         <div className="lg:col-span-8 space-y-4">
-          <h3 className="font-bold text-slate-200 text-sm">Kategori Tiket Aktif</h3>
+          <h3 className="font-bold text-slate-900 text-sm">Kategori Tiket Aktif</h3>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+            <div className="flex justify-center items-center py-16">
+              <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
             </div>
           ) : categories.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-slate-855 rounded-2xl bg-slate-900/10 text-slate-500 text-xs">
+            <div className="text-center py-16 border border-dashed border-slate-200 rounded-2xl bg-white text-slate-400 text-xs shadow-sm">
               Belum ada kategori tiket terdaftar. Gunakan panel di sebelah kanan untuk menambahkan.
             </div>
           ) : (
@@ -202,14 +213,14 @@ export default function TicketCategoriesPage() {
                 const endStr = format(new Date(category.saleEndAt), 'd MMM yyyy, HH:mm', { locale: localeId });
 
                 return (
-                  <Card key={category.id} className="bg-slate-900/40 border-slate-855 p-6 relative group overflow-hidden">
+                  <Card key={category.id} className="bg-white border-slate-200 p-6 relative group overflow-hidden shadow-sm rounded-2xl">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <h4 className="text-base font-bold text-slate-205 flex items-center gap-2">
-                          <Ticket className="h-4.5 w-4.5 text-indigo-400" />
+                        <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                          <Ticket className="h-4.5 w-4.5 text-[#08B4B5]" />
                           <span>{category.name}</span>
                         </h4>
-                        <p className="text-xs font-semibold text-emerald-400 font-mono">
+                        <p className="text-xs font-bold text-emerald-600 font-mono">
                           {category.price.toLocaleString('id-ID', {
                             style: 'currency',
                             currency: 'IDR',
@@ -222,30 +233,31 @@ export default function TicketCategoriesPage() {
                         onClick={() => handleOpenEdit(category)}
                         size="sm"
                         variant="ghost"
-                        className="opacity-0 group-hover:opacity-100 transition text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 h-8 w-8 cursor-pointer"
+                        className="text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 rounded-xl p-1.5 h-8 w-8 cursor-pointer"
+                        title="Edit Kategori"
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
                     </div>
 
                     {/* Progress */}
-                    <div className="mt-6 space-y-2">
+                    <div className="mt-5 space-y-2">
                       <div className="flex justify-between text-xs font-semibold">
                         <span className="text-slate-400">Kuota Terjual</span>
-                        <span className="text-slate-350 font-mono">
+                        <span className="text-slate-700 font-mono font-bold">
                           {category.sold} / {category.quota} ({percent.toFixed(0)}%)
                         </span>
                       </div>
-                      <div className="w-full bg-slate-850 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
                         <div
-                          className="bg-indigo-500 h-full rounded-full transition-all duration-300"
+                          className="bg-[#08B4B5] h-full rounded-full transition-all duration-300"
                           style={{ width: `${percent}%` }}
                         />
                       </div>
                     </div>
 
                     {/* Dates */}
-                    <div className="mt-4 pt-3 border-t border-slate-855/50 flex flex-wrap gap-x-6 text-[10px] text-slate-500 font-mono">
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-x-6 text-[10px] text-slate-400 font-mono">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         <span>Mulai: {startStr}</span>
@@ -264,14 +276,14 @@ export default function TicketCategoriesPage() {
 
         {/* Add category panel */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="bg-slate-900/40 border-slate-855 shadow-xl backdrop-blur-sm">
-            <CardHeader className="border-b border-slate-855 pb-4">
-              <CardTitle className="text-md font-bold text-slate-200 flex items-center gap-2">
-                <Plus className="h-5 w-5 text-indigo-400" />
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-slate-100 pb-4 p-5">
+              <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Plus className="h-4 w-4 text-[#08B4B5]" />
                 <span>Tambah Kategori Baru</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-5">
               <Form {...newForm}>
                 <form onSubmit={newForm.handleSubmit((v) => addMutation.mutate(v))} className="space-y-4">
                   <FormField
@@ -279,15 +291,15 @@ export default function TicketCategoriesPage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-slate-400">Nama Kategori Tiket</FormLabel>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Kategori</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Contoh: VIP, Early Bird"
-                            className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs py-2"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs py-2"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-rose-400 text-[10px]" />
+                        <FormMessage className="text-rose-500 text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -297,16 +309,16 @@ export default function TicketCategoriesPage() {
                     name="price"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-slate-400">Harga Tiket (Rupiah)</FormLabel>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Harga Tiket (Rupiah)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
-                            className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
-                        <FormMessage className="text-rose-400 text-[10px]" />
+                        <FormMessage className="text-rose-500 text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -316,16 +328,16 @@ export default function TicketCategoriesPage() {
                     name="quota"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-slate-400">Kuota Kapasitas</FormLabel>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kuota Kapasitas</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
-                            className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
-                        <FormMessage className="text-rose-400 text-[10px]" />
+                        <FormMessage className="text-rose-500 text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -335,15 +347,15 @@ export default function TicketCategoriesPage() {
                     name="saleStart"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-slate-400">Mulai Penjualan</FormLabel>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Mulai Penjualan</FormLabel>
                         <FormControl>
                           <Input
                             type="datetime-local"
-                            className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-rose-400 text-[10px]" />
+                        <FormMessage className="text-rose-500 text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -353,15 +365,15 @@ export default function TicketCategoriesPage() {
                     name="saleEnd"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-slate-400">Selesai Penjualan</FormLabel>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Selesai Penjualan</FormLabel>
                         <FormControl>
                           <Input
                             type="datetime-local"
-                            className="bg-slate-800/30 border-slate-700 text-slate-255 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-rose-400 text-[10px]" />
+                        <FormMessage className="text-rose-500 text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -369,7 +381,7 @@ export default function TicketCategoriesPage() {
                   <Button
                     type="submit"
                     disabled={addMutation.isPending}
-                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition duration-150 cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-2.5 px-4 rounded-xl text-xs transition duration-150 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm border-0"
                   >
                     {addMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                     <span>Tambah Kategori</span>
@@ -383,49 +395,49 @@ export default function TicketCategoriesPage() {
 
       {/* Edit Category Modal Dialog */}
       <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-slate-200">
+        <DialogContent className="bg-white border-slate-200 text-slate-900 rounded-2xl shadow-xl max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Kategori Tiket</DialogTitle>
-            <DialogDescription className="text-xs text-slate-450">
+            <DialogTitle className="text-base font-bold text-slate-900">Edit Kategori Tiket</DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
               Modifikasi detail kapasitas kuota dan waktu aktif kategori.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit((v) => updateMutation.mutate(v))} className="space-y-4 mt-4">
+            <form onSubmit={editForm.handleSubmit((v) => updateMutation.mutate(v))} className="space-y-4 mt-2">
               <FormField
                 control={editForm.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-slate-400">Nama Kategori</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Kategori</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-slate-800 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs py-2"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs py-2"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-[10px]" />
+                    <FormMessage className="text-rose-500 text-[10px]" />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={editForm.control}
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-slate-400">Harga (Rupiah)</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Harga (Rupiah)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          className="bg-slate-800 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-[10px]" />
+                      <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
@@ -435,36 +447,36 @@ export default function TicketCategoriesPage() {
                   name="quota"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-slate-400">Kuota</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kuota</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          className="bg-slate-800 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-[10px]" />
+                      <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={editForm.control}
                   name="saleStart"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-slate-400">Mulai Penjualan</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Mulai Penjualan</FormLabel>
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          className="bg-slate-800 border-slate-700 text-slate-250 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-[10px]" />
+                      <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
@@ -474,33 +486,33 @@ export default function TicketCategoriesPage() {
                   name="saleEnd"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-slate-400">Selesai Penjualan</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Selesai Penjualan</FormLabel>
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          className="bg-slate-800 border-slate-700 text-slate-255 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-[10px]" />
+                      <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
               </div>
 
-              <div className="pt-4 flex gap-3 justify-end border-t border-slate-850">
+              <div className="pt-4 flex gap-3 justify-end border-t border-slate-100">
                 <Button
                   type="button"
                   onClick={() => setEditingCategory(null)}
-                  variant="ghost"
-                  className="hover:bg-slate-800 rounded-xl text-xs cursor-pointer font-bold"
+                  variant="outline"
+                  className="border-slate-200 hover:bg-slate-100 rounded-xl text-xs cursor-pointer font-bold text-slate-600"
                 >
                   Batal
                 </Button>
                 <Button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 px-4"
+                  className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 px-4 shadow-sm border-0"
                 >
                   {updateMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   <span>Simpan Perubahan</span>

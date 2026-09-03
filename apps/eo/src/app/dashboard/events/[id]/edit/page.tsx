@@ -6,12 +6,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Calendar, Send, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Calendar, Send, ShieldAlert, Edit3 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { toast } from 'sonner';
 
 // Validasi Form menggunakan Zod
@@ -146,19 +147,19 @@ export default function EditEventPage() {
 
   if (listLoading) {
     return (
-      <div className="max-w-3xl mx-auto py-12 flex justify-center items-center">
-        <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+      <div className="max-w-3xl mx-auto py-16 flex justify-center items-center">
+        <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className="max-w-xl mx-auto py-24 text-center space-y-4">
-        <ShieldAlert className="h-16 w-16 text-rose-500 mx-auto" />
-        <h2 className="text-2xl font-bold text-slate-100">Event Tidak Ditemukan</h2>
-        <p className="text-slate-400">Event yang ingin Anda ubah tidak terdaftar atau tidak dimiliki oleh akun Anda.</p>
-        <Button onClick={() => router.push('/dashboard/events')} className="bg-indigo-600 hover:bg-indigo-500 rounded-xl cursor-pointer">
+      <div className="max-w-xl mx-auto py-24 text-center space-y-4 bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+        <ShieldAlert className="h-12 w-12 text-rose-500 mx-auto" />
+        <h2 className="text-xl font-bold text-slate-900">Event Tidak Ditemukan</h2>
+        <p className="text-slate-500 text-xs">Event yang ingin Anda ubah tidak terdaftar atau tidak dimiliki oleh akun Anda.</p>
+        <Button onClick={() => router.push('/dashboard/events')} className="bg-[#08B4B5] hover:bg-[#079b9c] rounded-xl cursor-pointer text-xs text-white border-0 font-bold">
           Kembali ke Daftar Event
         </Button>
       </div>
@@ -167,50 +168,53 @@ export default function EditEventPage() {
 
   const isDraft = event.status.toUpperCase() === 'DRAFT';
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: event.title, href: `/dashboard/events/${eventId}/sales` },
+    { label: 'Ubah Detail Event' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-6 max-w-3xl">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
       {/* Top Navigation */}
       <div className="flex justify-between items-center">
-        <Button
-          onClick={() => router.push('/dashboard/events')}
-          variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl -ml-2 gap-2 cursor-pointer text-xs"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Kembali</span>
-        </Button>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <Edit3 className="w-6 h-6 text-[#08B4B5]" />
+            Ubah Detail Event
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Ubah detail informasi event. Status saat ini:{' '}
+            <span className="font-bold text-slate-700 uppercase font-mono">{event.status}</span>
+          </p>
+        </div>
 
-        {isDraft && (
-          <Button
-            onClick={handlePublish}
-            disabled={publishMutation.isPending}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold gap-2 cursor-pointer text-xs py-2 px-4 shadow-lg shadow-emerald-600/10 active:scale-[0.98]"
-          >
-            {publishMutation.isPending ? (
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
-            ) : (
-              <Send className="h-4.5 w-4.5" />
-            )}
-            <span>Publikasikan Event</span>
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {isDraft && (
+            <Button
+              onClick={handlePublish}
+              disabled={publishMutation.isPending}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold gap-1.5 cursor-pointer text-xs py-2 px-4 shadow-sm active:scale-[0.98] border-0"
+            >
+              {publishMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              <span>Publikasikan Event</span>
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-          Ubah Detail Event
-        </h1>
-        <p className="text-sm text-slate-400 mt-2">
-          Ubah detail kelayakan event. Status saat ini:{' '}
-          <span className="font-bold text-slate-355 uppercase">{event.status}</span>
-        </p>
-      </div>
-
-      <Card className="bg-slate-900/40 border-slate-855 shadow-xl backdrop-blur-sm">
-        <CardHeader className="border-b border-slate-855 pb-4">
-          <CardTitle className="text-lg font-bold text-slate-200">Edit Detail</CardTitle>
+      <Card className="bg-white border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-slate-100 p-6">
+          <CardTitle className="text-sm font-bold text-slate-900">Form Pengaturan Event</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 sm:p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -218,14 +222,14 @@ export default function EditEventPage() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Judul Event</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Judul Event *</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -235,15 +239,15 @@ export default function EditEventPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Deskripsi Lengkap</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Deskripsi Lengkap *</FormLabel>
                     <FormControl>
                       <textarea
                         rows={5}
-                        className="w-full rounded-xl border border-slate-700 bg-slate-800/30 px-4 py-2.5 text-slate-250 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm transition"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none text-xs transition"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -253,14 +257,14 @@ export default function EditEventPage() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Lokasi Penyelenggaraan</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Lokasi Penyelenggaraan *</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -271,15 +275,15 @@ export default function EditEventPage() {
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-300">Tanggal Mulai</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tanggal & Jam Mulai *</FormLabel>
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          className="bg-slate-800/30 border-slate-700 text-slate-250 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl font-mono text-sm"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl font-mono text-xs"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-xs" />
+                      <FormMessage className="text-rose-500 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -289,15 +293,15 @@ export default function EditEventPage() {
                   name="endDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-300">Tanggal Selesai</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tanggal & Jam Selesai *</FormLabel>
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          className="bg-slate-800/30 border-slate-700 text-slate-255 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl font-mono text-sm"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl font-mono text-xs"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-xs" />
+                      <FormMessage className="text-rose-500 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -308,14 +312,14 @@ export default function EditEventPage() {
                 name="bannerUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">URL Banner Image (Opsional)</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">URL Banner Image (Opsional)</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-sm"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -325,19 +329,19 @@ export default function EditEventPage() {
                 control={form.control}
                 name="requireLogin"
                 render={({ field }) => (
-                  <FormItem className="rounded-2xl border border-slate-800 bg-slate-950/60 p-5 shadow-inner">
+                  <FormItem className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                     <div className="flex items-center justify-between gap-4">
                       <div className="space-y-1">
-                        <FormLabel className="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
+                        <FormLabel className="text-xs font-bold text-slate-900 flex items-center gap-2 cursor-pointer">
                           <span>Wajibkan Pengunjung Login (Require Login)</span>
                           {field.value && (
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#08B4B5] border border-[#08B4B5]/30">
                               Aktif
                             </span>
                           )}
                         </FormLabel>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          Jika diaktifkan, calon pembeli harus masuk (login) atau mendaftar akun TAQtix sebelum dapat menyelesaikan pemesanan tiket untuk event ini.
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Jika diaktifkan, calon pembeli harus masuk (login) atau mendaftar akun TAQtix sebelum dapat menyelesaikan checkout tiket.
                         </p>
                       </div>
                       <FormControl>
@@ -346,13 +350,13 @@ export default function EditEventPage() {
                           role="switch"
                           aria-checked={field.value}
                           onClick={() => field.onChange(!field.value)}
-                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
-                            field.value ? 'bg-indigo-600' : 'bg-slate-700'
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            field.value ? 'bg-[#08B4B5]' : 'bg-slate-300'
                           }`}
                         >
                           <span
                             aria-hidden="true"
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                               field.value ? 'translate-x-5' : 'translate-x-0'
                             }`}
                           />
@@ -366,7 +370,7 @@ export default function EditEventPage() {
               <Button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg shadow-indigo-600/10 cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2 text-xs border-0"
               >
                 {updateMutation.isPending ? (
                   <>

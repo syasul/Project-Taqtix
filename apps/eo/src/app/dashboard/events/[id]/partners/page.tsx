@@ -9,12 +9,13 @@ import * as z from 'zod';
 import { ArrowLeft, Loader2, Plus, Copy, Link as LinkIcon, HeartHandshake, Percent, TrendingUp, Trophy } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { toast } from 'sonner';
 
 // Validasi Form menggunakan Zod
@@ -113,50 +114,60 @@ export default function AffiliatePartnersPage() {
     toast.success('Tautan afiliasi unik berhasil disalin!');
   };
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Mitra & Afiliasi Event' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-6 max-w-5xl">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
       {/* Top Header */}
-      <div className="flex justify-between items-center">
-        <Button
-          onClick={() => router.push('/dashboard/events')}
-          variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl -ml-2 gap-2 cursor-pointer text-xs"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Kembali ke Daftar Event</span>
-        </Button>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <HeartHandshake className="w-6 h-6 text-[#08B4B5]" />
+            Manajemen Partner & Afiliasi
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Tambahkan duta promosi (Ambassador/Influencer), salin tautan pelacakan klik, dan hitung komisi konversi penjualan.
+          </p>
+        </div>
 
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl gap-2 font-bold cursor-pointer text-xs py-2 px-4 shadow-lg shadow-indigo-600/10 active:scale-[0.98]"
-        >
-          <Plus className="h-4.5 w-4.5" />
-          <span>Tambah Partner</span>
-        </Button>
-      </div>
-
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-          Manajemen Partner & Afiliasi
-        </h1>
-        <p className="text-sm text-slate-400 mt-2">
-          Tambahkan duta promosi (Ambassador/Influencer), salin tautan pelacakan klik, dan hitung komisi konversi penjualan.
-        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl gap-2 font-bold cursor-pointer text-xs py-2.5 px-4 shadow-sm active:scale-[0.98] border-0"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Tambah Partner</span>
+          </Button>
+          <Button
+            onClick={() => router.push('/dashboard/events')}
+            variant="outline"
+            className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl gap-1.5 cursor-pointer text-xs font-bold"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Kembali</span>
+          </Button>
+        </div>
       </div>
 
       {/* Leaderboard Summary */}
       {leaderboard.length > 0 && (
-        <Card className="bg-gradient-to-br from-indigo-950/20 to-purple-950/20 border-slate-800 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 rounded-3xl">
+        <Card className="bg-white border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-amber-500/10 border border-amber-500/25 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
-              <Trophy className="h-6 w-6 text-amber-400" />
+            <div className="h-12 w-12 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center shrink-0">
+              <Trophy className="h-6 w-6 text-amber-500" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-200">Mitra Afiliasi Terbaik</h3>
-              <p className="text-xs text-slate-450 mt-1">
+              <h3 className="text-sm font-bold text-slate-900">Mitra Afiliasi Terbaik</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
                 Performa konversi tertinggi dipegang oleh:{' '}
-                <span className="font-bold text-indigo-400">{leaderboard[0].name}</span> dengan{' '}
-                <span className="font-mono text-slate-200 font-semibold">{leaderboard[0].conversions}</span> tiket terjual.
+                <strong className="text-[#08B4B5]">{leaderboard[0].name}</strong> dengan{' '}
+                <strong className="font-mono text-slate-900">{leaderboard[0].conversions}</strong> tiket terjual.
               </p>
             </div>
           </div>
@@ -164,33 +175,33 @@ export default function AffiliatePartnersPage() {
       )}
 
       {/* Main Table List */}
-      <Card className="bg-slate-900/40 border-slate-855 shadow-xl">
-        <CardHeader className="border-b border-slate-855 pb-4">
-          <CardTitle className="text-md font-bold text-slate-200 flex items-center gap-2">
-            <HeartHandshake className="h-5 w-5 text-indigo-400" />
+      <Card className="bg-white border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-slate-100 p-5">
+          <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <HeartHandshake className="h-4 w-4 text-[#08B4B5]" />
             <span>Daftar Mitra Terdaftar</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {listLoading ? (
-            <div className="flex justify-center items-center py-24">
-              <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
             </div>
           ) : partners.length === 0 ? (
-            <div className="text-center py-16 text-slate-500 text-xs">
+            <div className="text-center py-16 text-slate-400 text-xs">
               Belum ada mitra afiliasi terdaftar untuk event ini.
             </div>
           ) : (
-            <div className="overflow-x-auto text-slate-300">
-              <Table className="min-w-full text-xs">
-                <TableHeader className="bg-slate-950/40 border-b border-slate-855">
-                  <TableRow className="border-b border-slate-855">
-                    <TableHead className="py-4 px-6 text-slate-400">Nama Partner</TableHead>
-                    <TableHead className="py-4 px-4 text-slate-400">Tipe</TableHead>
-                    <TableHead className="py-4 px-4 text-slate-400">Klik / Konversi</TableHead>
-                    <TableHead className="py-4 px-4 text-slate-400">Revenue</TableHead>
-                    <TableHead className="py-4 px-4 text-slate-400">Komisi</TableHead>
-                    <TableHead className="py-4 px-6 text-slate-400 text-right">Tautan</TableHead>
+            <div className="overflow-x-auto text-xs">
+              <Table className="min-w-full">
+                <TableHeader className="bg-slate-50 border-b border-slate-200">
+                  <TableRow className="border-b border-slate-200">
+                    <TableHead className="py-3.5 px-6 text-slate-500 font-bold uppercase text-[10px] tracking-wider">Nama Partner</TableHead>
+                    <TableHead className="py-3.5 px-4 text-slate-500 font-bold uppercase text-[10px] tracking-wider">Tipe</TableHead>
+                    <TableHead className="py-3.5 px-4 text-slate-500 font-bold uppercase text-[10px] tracking-wider">Klik / Konversi</TableHead>
+                    <TableHead className="py-3.5 px-4 text-slate-500 font-bold uppercase text-[10px] tracking-wider">Revenue</TableHead>
+                    <TableHead className="py-3.5 px-4 text-slate-500 font-bold uppercase text-[10px] tracking-wider">Komisi</TableHead>
+                    <TableHead className="py-3.5 px-6 text-slate-500 font-bold uppercase text-[10px] tracking-wider text-right">Tautan</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -199,27 +210,27 @@ export default function AffiliatePartnersPage() {
                     const conversionRate = clickCount > 0 ? ((partner.conversions / clickCount) * 100).toFixed(1) : '0';
 
                     return (
-                      <TableRow key={partner.id} className="border-b border-slate-855/50 hover:bg-slate-900/20 transition">
+                      <TableRow key={partner.id} className="border-b border-slate-100 hover:bg-slate-50/70 transition">
                         <TableCell className="py-4 px-6">
-                          <div className="flex flex-col space-y-1">
-                            <span className="font-bold text-slate-200 text-sm">{partner.name}</span>
-                            <span className="text-[10px] text-slate-500 font-mono">CODE: {partner.uniqueCode}</span>
+                          <div className="flex flex-col space-y-0.5">
+                            <span className="font-bold text-slate-900 text-xs">{partner.name}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">CODE: {partner.uniqueCode}</span>
                           </div>
                         </TableCell>
                         <TableCell className="py-4 px-4">
-                          <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase">
+                          <span className="text-[10px] font-bold text-[#08B4B5] bg-teal-50 border border-[#08B4B5]/30 px-2 py-0.5 rounded-full uppercase">
                             {partner.type}
                           </span>
                         </TableCell>
                         <TableCell className="py-4 px-4">
                           <div className="flex flex-col space-y-0.5">
-                            <span className="font-semibold text-slate-300">
+                            <span className="font-semibold text-slate-700">
                               {clickCount} klik / {partner.conversions} sales
                             </span>
-                            <span className="text-[9px] text-slate-500 font-mono">Rate: {conversionRate}%</span>
+                            <span className="text-[9px] text-slate-400 font-mono">Rate: {conversionRate}%</span>
                           </div>
                         </TableCell>
-                        <TableCell className="py-4 px-4 font-mono font-semibold text-slate-350">
+                        <TableCell className="py-4 px-4 font-mono font-bold text-slate-900">
                           {partner.revenueGenerated.toLocaleString('id-ID', {
                             style: 'currency',
                             currency: 'IDR',
@@ -228,14 +239,14 @@ export default function AffiliatePartnersPage() {
                         </TableCell>
                         <TableCell className="py-4 px-4">
                           <div className="flex flex-col space-y-0.5 font-mono">
-                            <span className="font-semibold text-indigo-400">
+                            <span className="font-bold text-emerald-600">
                               {partner.commissionEarned.toLocaleString('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0,
                               })}
                             </span>
-                            <span className="text-[9px] text-slate-500">
+                            <span className="text-[9px] text-slate-400 font-sans">
                               Rate: {partner.commissionValue}%
                             </span>
                           </div>
@@ -244,7 +255,7 @@ export default function AffiliatePartnersPage() {
                           <Button
                             onClick={() => handleCopyLink(partner.uniqueCode)}
                             size="sm"
-                            className="bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg gap-1 text-xs cursor-pointer font-bold px-3 py-1.5"
+                            className="bg-slate-50 hover:bg-[#08B4B5] text-slate-700 hover:text-white border border-slate-200 rounded-xl gap-1 text-xs cursor-pointer font-bold px-3 py-1.5 shadow-xs"
                           >
                             <Copy className="h-3 w-3" />
                             <span>Salin Link</span>
@@ -262,55 +273,55 @@ export default function AffiliatePartnersPage() {
 
       {/* Add Partner Dialog Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-slate-900 border-slate-855 text-slate-200">
+        <DialogContent className="bg-white border-slate-200 text-slate-900 rounded-2xl shadow-xl max-w-md">
           <DialogHeader>
-            <DialogTitle>Daftarkan Partner Baru</DialogTitle>
-            <DialogDescription className="text-xs text-slate-455">
+            <DialogTitle className="text-base font-bold text-slate-900">Daftarkan Partner Baru</DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
               Buat link pelacakan unik dan atur persentase komisi per tiket terjual.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((v) => addMutation.mutate(v))} className="space-y-4 mt-4">
+            <form onSubmit={form.handleSubmit((v) => addMutation.mutate(v))} className="space-y-4 mt-2">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-slate-400">Nama Partner / Afiliasi</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Partner / Afiliasi *</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Contoh: Influencer Hijrah, Budi Santoso"
-                        className="bg-slate-800 border-slate-700 text-slate-205 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs py-2"
+                        placeholder="Contoh: Influencer Dakwah, Budi Santoso"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs py-2"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-[10px]" />
+                    <FormMessage className="text-rose-500 text-[10px]" />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-slate-400">Tipe Partner</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tipe Partner</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-slate-800 border-slate-750 text-slate-250 text-xs rounded-xl focus:border-indigo-500">
+                          <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-900 text-xs rounded-xl focus:border-[#08B4B5] focus:bg-white">
                             <SelectValue placeholder="Pilih tipe" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-slate-900 border-slate-855 text-slate-250 text-xs">
+                        <SelectContent className="bg-white border-slate-200 text-slate-800 text-xs">
                           <SelectItem value="AMBASSADOR">Ambassador</SelectItem>
                           <SelectItem value="COMMUNITY">Community</SelectItem>
                           <SelectItem value="INFLUENCER">Influencer</SelectItem>
                           <SelectItem value="CORPORATE">Corporate</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage className="text-rose-400 text-[10px]" />
+                      <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
@@ -320,16 +331,16 @@ export default function AffiliatePartnersPage() {
                   name="commissionPct"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-slate-400">Komisi Penjualan (%)</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Komisi Penjualan (%) *</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          className="bg-slate-800 border-slate-755 text-slate-205 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs font-mono py-2"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-[10px]" />
+                      <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
@@ -340,32 +351,32 @@ export default function AffiliatePartnersPage() {
                 name="promoCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-slate-400">Kode Promo Terkait (Opsional)</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kode Promo Terkait (Opsional)</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Contoh: BUDIS10"
-                        className="bg-slate-800 border-slate-700 text-slate-205 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-xs uppercase py-2"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs uppercase py-2"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-[10px]" />
+                    <FormMessage className="text-rose-500 text-[10px]" />
                   </FormItem>
                 )}
               />
 
-              <div className="pt-4 flex gap-3 justify-end border-t border-slate-850">
+              <div className="pt-4 flex gap-3 justify-end border-t border-slate-100">
                 <Button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  variant="ghost"
-                  className="hover:bg-slate-800 rounded-xl text-xs cursor-pointer font-bold"
+                  variant="outline"
+                  className="border-slate-200 hover:bg-slate-100 rounded-xl text-xs cursor-pointer font-bold text-slate-600"
                 >
                   Batal
                 </Button>
                 <Button
                   type="submit"
                   disabled={addMutation.isPending}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 px-4"
+                  className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 px-4 shadow-sm border-0"
                 >
                   {addMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   <span>Daftarkan</span>

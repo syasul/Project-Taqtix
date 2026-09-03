@@ -32,7 +32,43 @@ export class ApiError extends Error {
 // ==========================================
 // MOCK DATA LAYER FOR DEV & STANDALONE DEMO
 // ==========================================
-let mockOrganizers = [
+export interface MockOrganizer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  status: 'active' | 'pending' | 'suspended';
+  plan: 'starter' | 'pro' | 'enterprise';
+  segment: 'event_builder' | 'event_ip_owner' | 'campus_community' | 'enterprise' | null;
+  bankAccount?: string;
+  createdAt: string;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  eventCount: number;
+}
+
+export interface MockPartner {
+  id: string;
+  name: string;
+  email?: string;
+  type: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
+  uniqueCode: string;
+  promoCode?: string | null;
+  commissionType: 'percentage' | 'fixed';
+  commissionValue: number;
+  clicks: number;
+  conversions: number;
+  revenueGenerated: number;
+  commissionEarned: number;
+  createdAt: string;
+  eventId: string;
+  event: {
+    id: string;
+    title: string;
+  };
+}
+
+let mockOrganizers: MockOrganizer[] = [
   {
     id: 'org-1',
     name: 'Taqwa Media Group',
@@ -91,7 +127,7 @@ let mockOrganizers = [
   },
 ];
 
-let mockPartners = [
+let mockPartners: MockPartner[] = [
   {
     id: 'ptn-1',
     name: 'Komunitas Hijrah Millennials',

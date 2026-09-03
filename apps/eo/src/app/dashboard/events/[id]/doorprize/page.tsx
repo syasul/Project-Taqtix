@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import {
   Gift,
@@ -14,8 +14,11 @@ import {
   User,
   PartyPopper,
   Users,
+  ArrowLeft,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 interface DoorprizeWinner {
   id: string;
@@ -35,6 +38,7 @@ interface DoorprizeItem {
 
 export default function DoorprizePage() {
   const params = useParams();
+  const router = useRouter();
   const eventId = params?.id as string;
 
   const [prizes, setPrizes] = useState<DoorprizeItem[]>([]);
@@ -98,7 +102,6 @@ export default function DoorprizePage() {
     setIsDrawingAnimation(true);
 
     try {
-      // Simulate rolling drum animation
       await new Promise((r) => setTimeout(r, 2000));
 
       const res = await apiClient.post(`/organizer/events/${eventId}/doorprize/${prizeId}/draw`, {
@@ -116,101 +119,118 @@ export default function DoorprizePage() {
     }
   };
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Pengundian Doorprize' },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
-              <Gift className="h-6 w-6" />
-            </div>
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5 tracking-tight">
+            <Gift className="h-6 w-6 text-[#08B4B5]" />
             Pengundian Doorprize Acara
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 text-xs mt-1">
             Undi hadiah secara acak dan transparan dari daftar tiket penonton yang telah melakukan check-in di lokasi.
           </p>
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20 cursor-pointer">
-            <Plus className="h-4 w-4" />
-            Tambah Hadiah Baru
-          </DialogTrigger>
-          <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <Gift className="h-5 w-5 text-indigo-400" />
-                Tambah Hadiah Doorprize
-              </DialogTitle>
-            </DialogHeader>
+        <div className="flex items-center gap-2">
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border-0">
+              <Plus className="h-4 w-4" />
+              <span>Tambah Hadiah Baru</span>
+            </DialogTrigger>
+            <DialogContent className="bg-white border-slate-200 text-slate-900 max-w-md rounded-2xl shadow-xl">
+              <DialogHeader>
+                <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Gift className="h-5 w-5 text-[#08B4B5]" />
+                  Tambah Hadiah Doorprize
+                </DialogTitle>
+              </DialogHeader>
 
-            <form onSubmit={handleCreate} className="space-y-4 mt-2">
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Nama Hadiah
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: iPhone 15 Pro Max, Smart TV 55 Inch"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
+              <form onSubmit={handleCreate} className="space-y-4 mt-2">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Nama Hadiah *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: iPhone 15, Smart TV 55 Inch"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+                  />
+                </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  URL Foto Hadiah (Opsional)
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={form.imageUrl}
-                  onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    URL Foto Hadiah (Opsional)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={form.imageUrl}
+                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+                  />
+                </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Kuantitas Hadiah
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  required
-                  value={form.quantity}
-                  onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Kuantitas Hadiah *
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    required
+                    value={form.quantity}
+                    onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none font-mono"
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan Hadiah'}
-              </button>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm border-0"
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan Hadiah'}
+                </button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Button
+            onClick={() => router.push('/dashboard/events')}
+            variant="outline"
+            className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl gap-1.5 cursor-pointer text-xs font-bold"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Kembali</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Winner Spotlight Banner (Revealed after Draw) */}
+      {/* Winner Spotlight Banner */}
       {drawnWinner && (
-        <div className="p-6 bg-gradient-to-r from-amber-500/20 via-indigo-600/20 to-emerald-500/20 border-2 border-amber-500/40 rounded-3xl relative overflow-hidden text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500 text-slate-950 text-xs font-black rounded-full uppercase tracking-wider">
+        <div className="p-6 bg-amber-50 border border-amber-300 rounded-2xl text-center space-y-2.5 shadow-sm">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full uppercase tracking-wider">
             <PartyPopper className="h-4 w-4" />
             Selamat Kepada Pemenang!
           </div>
-          <h2 className="text-3xl font-black text-slate-100">{drawnWinner.winnerName}</h2>
-          <p className="text-sm font-bold text-amber-300">
+          <h2 className="text-2xl font-black text-slate-900">{drawnWinner.winnerName}</h2>
+          <p className="text-sm font-bold text-amber-800">
             Memenangkan Hadiah: {drawnWinner.prizeName}
           </p>
-          <div className="flex items-center justify-center gap-4 text-xs text-slate-400 font-mono">
+          <div className="flex items-center justify-center gap-4 text-xs text-slate-500 font-mono">
             <span>Email: {drawnWinner.attendeeEmail}</span>
             <span>Telp: {drawnWinner.attendeePhone || '-'}</span>
           </div>
@@ -218,7 +238,7 @@ export default function DoorprizePage() {
       )}
 
       {errorMsg && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-xs flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -226,14 +246,14 @@ export default function DoorprizePage() {
 
       {/* Prizes Grid */}
       {loading ? (
-        <div className="p-12 flex justify-center">
-          <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+        <div className="p-16 flex justify-center">
+          <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
         </div>
       ) : prizes.length === 0 ? (
-        <div className="p-12 text-center bg-slate-900/30 border border-slate-850 rounded-2xl">
-          <Gift className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-slate-300 font-bold text-sm">Belum Ada Hadiah Doorprize</h3>
-          <p className="text-slate-500 text-xs mt-1">
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl shadow-sm">
+          <Gift className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+          <h3 className="text-slate-800 font-bold text-sm">Belum Ada Hadiah Doorprize</h3>
+          <p className="text-slate-400 text-xs mt-1">
             Tambahkan hadiah doorprize untuk diundi kepada penonton yang hadir di venue.
           </p>
         </div>
@@ -246,18 +266,18 @@ export default function DoorprizePage() {
             return (
               <div
                 key={p.id}
-                className="bg-slate-900/60 border border-slate-850 rounded-2xl p-5 hover:border-slate-750 transition flex flex-col justify-between"
+                className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition flex flex-col justify-between shadow-sm"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
                       Sisa: {p.remainingQuantity} / {p.quantity}
                     </span>
                     <span
-                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
+                      className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${
                         isRemaining
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                          : 'bg-slate-800 text-slate-500 border-slate-700'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-slate-100 text-slate-500 border-slate-200'
                       }`}
                     >
                       {isRemaining ? 'Tersedia' : 'Habis Terundi'}
@@ -268,27 +288,27 @@ export default function DoorprizePage() {
                     <img
                       src={p.imageUrl}
                       alt={p.name}
-                      className="w-full h-36 object-cover rounded-xl border border-slate-800 mb-3"
+                      className="w-full h-36 object-cover rounded-xl border border-slate-100 mb-3"
                     />
                   )}
 
-                  <h4 className="text-base font-bold text-slate-100">{p.name}</h4>
+                  <h4 className="text-base font-bold text-slate-900">{p.name}</h4>
 
                   {/* Winners history for this prize */}
                   {p.winners?.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-850 space-y-1.5">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                        <Trophy className="h-3 w-3 text-amber-400" />
+                    <div className="mt-3 pt-3 border-t border-slate-100 space-y-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                        <Trophy className="h-3 w-3 text-amber-500" />
                         Pemenang Terundi ({p.winners.length}):
                       </span>
                       <div className="space-y-1">
                         {p.winners.map((w) => (
                           <div
                             key={w.id}
-                            className="text-xs font-semibold text-slate-300 flex items-center justify-between bg-slate-950/60 px-2 py-1 rounded"
+                            className="text-xs font-semibold text-slate-700 flex items-center justify-between bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"
                           >
                             <span>{w.winnerName}</span>
-                            <span className="text-[10px] text-slate-500">
+                            <span className="text-[10px] text-slate-400 font-mono">
                               {new Date(w.drawnAt).toLocaleTimeString('id-ID', {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -301,21 +321,21 @@ export default function DoorprizePage() {
                   )}
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-slate-850">
+                <div className="pt-4 mt-4 border-t border-slate-100">
                   <button
                     disabled={!isRemaining || isCurrentlyDrawing}
                     onClick={() => handleDraw(p.id)}
-                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-40 cursor-pointer"
+                    className="w-full py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-40 cursor-pointer border-0"
                   >
                     {isCurrentlyDrawing ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-slate-950" />
-                        Mengundi Pemenang...
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        <span>Mengundi Pemenang...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="h-4 w-4" />
-                        Undi Pemenang Sekarang
+                        <span>Undi Pemenang Sekarang</span>
                       </>
                     )}
                   </button>

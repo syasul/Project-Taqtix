@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import EventTabs from '@/components/layout/event-tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { 
   PieChart, 
   Pie, 
@@ -16,7 +17,7 @@ import {
 } from 'recharts';
 import { Loader2, Share2, DollarSign, Users } from 'lucide-react';
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6'];
+const COLORS = ['#08B4B5', '#10b981', '#f59e0b', '#64748b', '#8b5cf6'];
 
 export default function DistributionAnalyticsPage() {
   const params = useParams();
@@ -47,37 +48,43 @@ export default function DistributionAnalyticsPage() {
     buyers: item.buyers,
   }));
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Atribusi Distribusi Tiket' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-6 max-w-5xl">
+      <Breadcrumb items={breadcrumbs} />
       <EventTabs eventId={eventId} />
 
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-          <Share2 className="h-5 w-5 text-indigo-500" />
+        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <Share2 className="h-5 w-5 text-[#08B4B5]" />
           Atribusi Distribusi Tiket
         </h2>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Analisis sumber pendapatan penjualan tiket berdasarkan marketing channel.
         </p>
       </div>
 
       {isLoading ? (
         <div className="py-24 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
           <span className="text-xs text-slate-400">Memuat analisis distribusi...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Chart Card */}
-          <Card className="lg:col-span-2 bg-slate-900/40 border-slate-850 p-6 flex flex-col justify-between">
+          <Card className="lg:col-span-2 bg-white border-slate-200 p-6 flex flex-col justify-between rounded-2xl shadow-sm">
             <div>
-              <CardTitle className="text-sm font-bold text-slate-200">Kontribusi Channel (Revenue)</CardTitle>
-              <CardDescription className="text-xs text-slate-500">Pangsa omzet penjualan tiket per channel</CardDescription>
+              <CardTitle className="text-sm font-bold text-slate-900">Kontribusi Channel (Revenue)</CardTitle>
+              <CardDescription className="text-xs text-slate-400">Pangsa omzet penjualan tiket per channel</CardDescription>
             </div>
 
             {chartData.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-slate-500 text-xs">
+              <div className="h-64 flex items-center justify-center text-slate-400 text-xs">
                 Belum ada data distribusi tercatat.
               </div>
             ) : (
@@ -98,7 +105,7 @@ export default function DistributionAnalyticsPage() {
                       ))}
                     </Pie>
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#0f172a' }}
                       formatter={(value: any) => [formatRupiah(Number(value)), 'Pendapatan']}
                     />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -109,24 +116,24 @@ export default function DistributionAnalyticsPage() {
           </Card>
 
           {/* List Card */}
-          <Card className="bg-slate-900/40 border-slate-850 p-6 space-y-6">
-            <h3 className="text-sm font-bold text-slate-250">Detail Sumber Pemasaran</h3>
-            <div className="space-y-4">
+          <Card className="bg-white border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm h-fit">
+            <h3 className="text-sm font-bold text-slate-900">Detail Sumber Pemasaran</h3>
+            <div className="space-y-3">
               {chartData.map((item: any, idx: number) => (
-                <div key={item.name} className="flex flex-col space-y-1.5 p-3.5 bg-slate-950 border border-slate-900 rounded-xl">
+                <div key={item.name} className="flex flex-col space-y-1.5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-200 truncate max-w-[150px]">{item.name}</span>
+                    <span className="text-xs font-bold text-slate-900 truncate max-w-[150px]">{item.name}</span>
                     <span 
-                      className="h-2 w-2 rounded-full" 
+                      className="h-2.5 w-2.5 rounded-full" 
                       style={{ backgroundColor: COLORS[idx % COLORS.length] }} 
                     />
                   </div>
-                  <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono">
+                  <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
                     <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3 text-slate-500" />
+                      <Users className="h-3 w-3 text-slate-400" />
                       <span>{item.buyers} Pembeli</span>
                     </div>
-                    <div className="flex items-center gap-1 font-bold text-slate-200">
+                    <div className="flex items-center gap-1 font-bold text-slate-900">
                       <span>{formatRupiah(item.value)}</span>
                     </div>
                   </div>

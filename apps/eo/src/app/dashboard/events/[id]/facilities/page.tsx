@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import {
   Sparkles,
@@ -12,8 +12,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Coins,
+  ArrowLeft,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 interface FacilityItem {
   id: string;
@@ -27,6 +30,7 @@ interface FacilityItem {
 
 export default function FacilitiesPage() {
   const params = useParams();
+  const router = useRouter();
   const eventId = params?.id as string;
 
   const [facilities, setFacilities] = useState<FacilityItem[]>([]);
@@ -93,121 +97,138 @@ export default function FacilitiesPage() {
     }
   };
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Fasilitas & Merchandise' },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
-              <Sparkles className="h-6 w-6" />
-            </div>
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5 tracking-tight">
+            <Sparkles className="h-6 w-6 text-[#08B4B5]" />
             Fasilitas Event (Add-ons)
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 text-xs mt-1">
             Sediakan fasilitas tambahan, paket merchandise, atau akses khusus untuk pembeli tiket.
           </p>
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20 cursor-pointer">
-            <Plus className="h-4 w-4" />
-            Tambah Fasilitas Baru
-          </DialogTrigger>
-          <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-indigo-400" />
-                Tambah Fasilitas / Add-on
-              </DialogTitle>
-            </DialogHeader>
+        <div className="flex items-center gap-2">
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border-0">
+              <Plus className="h-4 w-4" />
+              <span>Tambah Fasilitas Baru</span>
+            </DialogTrigger>
+            <DialogContent className="bg-white border-slate-200 text-slate-900 max-w-md rounded-2xl shadow-xl">
+              <DialogHeader>
+                <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-[#08B4B5]" />
+                  Tambah Fasilitas / Add-on
+                </DialogTitle>
+              </DialogHeader>
 
-            <form onSubmit={handleCreate} className="space-y-4 mt-2">
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Nama Fasilitas
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Official T-Shirt Bundle, Shuttle Bus Pass"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Deskripsi / Rincian
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Rincian yang didapat pembeli..."
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={handleCreate} className="space-y-4 mt-2">
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-1">
-                    Harga Tambahan (Rp)
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Nama Fasilitas *
                   </label>
                   <input
-                    type="number"
-                    min={0}
-                    value={form.price}
-                    onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
+                    type="text"
+                    required
+                    placeholder="Contoh: Official T-Shirt Bundle, Shuttle Bus Pass"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-1">
-                    Batas Kuota Stok
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    placeholder="Kosongkan jika ∞"
-                    value={form.quota}
-                    onChange={(e) => setForm({ ...form, quota: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none"
-                  />
-                </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan Fasilitas'}
-              </button>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Deskripsi / Rincian (Opsional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="Rincian yang didapat pembeli..."
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Harga Tambahan (Rp) *
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={form.price}
+                      onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Batas Kuota Stok
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      placeholder="Kosongkan jika ∞"
+                      value={form.quota}
+                      onChange={(e) => setForm({ ...form, quota: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none font-mono"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm border-0"
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan Fasilitas'}
+                </button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Button
+            onClick={() => router.push('/dashboard/events')}
+            variant="outline"
+            className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl gap-1.5 cursor-pointer text-xs font-bold"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Kembali</span>
+          </Button>
+        </div>
       </div>
 
       {successMsg && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4" />
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-xs flex items-center gap-2 font-medium">
+          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* Facilities List */}
       {loading ? (
-        <div className="p-12 flex justify-center">
-          <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+        <div className="p-16 flex justify-center">
+          <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
         </div>
       ) : facilities.length === 0 ? (
-        <div className="p-12 text-center bg-slate-900/30 border border-slate-850 rounded-2xl">
-          <Package className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-slate-300 font-bold text-sm">Belum Ada Fasilitas Tambahan</h3>
-          <p className="text-slate-500 text-xs mt-1">
-            Tambahkan paket merchandise atau layanan add-on untuk meningkatkan average order value.
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl shadow-sm">
+          <Package className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+          <h3 className="text-slate-800 font-bold text-sm">Belum Ada Fasilitas Tambahan</h3>
+          <p className="text-slate-400 text-xs mt-1">
+            Tambahkan paket merchandise atau layanan add-on untuk meningkatkan order value.
           </p>
         </div>
       ) : (
@@ -215,34 +236,35 @@ export default function FacilitiesPage() {
           {facilities.map((fac) => (
             <div
               key={fac.id}
-              className="bg-slate-900/60 border border-slate-850 rounded-2xl p-5 hover:border-slate-750 transition flex flex-col justify-between"
+              className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition flex flex-col justify-between shadow-sm"
             >
               <div>
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h4 className="text-sm font-bold text-slate-100">{fac.name}</h4>
+                  <h4 className="text-sm font-bold text-slate-900">{fac.name}</h4>
                   <button
                     onClick={() => handleDelete(fac.id)}
-                    className="text-slate-500 hover:text-rose-400 p-1 transition cursor-pointer"
+                    className="text-slate-400 hover:text-rose-500 p-1 transition cursor-pointer"
+                    title="Hapus fasilitas"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
 
                 {fac.description && (
-                  <p className="text-xs text-slate-400 mb-3">{fac.description}</p>
+                  <p className="text-xs text-slate-500 mb-3">{fac.description}</p>
                 )}
 
-                <div className="space-y-2 mt-4 pt-3 border-t border-slate-850">
+                <div className="space-y-2 mt-4 pt-3 border-t border-slate-100">
                   <div className="flex items-baseline justify-between text-xs">
                     <span className="text-slate-400">Harga Satuan:</span>
-                    <span className="font-black text-emerald-400">
+                    <span className="font-bold text-emerald-600 font-mono">
                       {fac.price > 0 ? `Rp ${fac.price.toLocaleString('id-ID')}` : 'Gratis / Free'}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-400">Terjual / Kuota:</span>
-                    <span className="font-semibold text-slate-200">
+                    <span className="font-semibold text-slate-700 font-mono">
                       {fac.sold} / {fac.quota !== null ? fac.quota : 'Unlimited'}
                     </span>
                   </div>

@@ -8,6 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { apiClient } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import EventTabs from '@/components/layout/event-tabs';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 interface DashboardStats {
   eventId: string;
@@ -55,102 +56,116 @@ export default function SalesDashboardPage() {
 
   const chartData = categories.map((cat) => ({
     name: cat.name,
-    'Kapasitas': cat.quota,
-    'Terjual': cat.sold,
+    'Kapasitas Kuota': cat.quota,
+    'Tiket Terjual': cat.sold,
   }));
 
   const isLoading = statsLoading || categoriesLoading;
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Statistik Penjualan' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-6 max-w-5xl">
+      <Breadcrumb items={breadcrumbs} />
       <EventTabs eventId={eventId} />
 
       {isLoading ? (
         <div className="flex justify-center items-center py-24">
-          <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
         </div>
       ) : (
         <>
           {/* Key Metrics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="bg-slate-900/40 border-slate-850">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Total Pendapatan
                 </CardTitle>
-                <DollarSign className="h-4 w-4 text-emerald-400" />
+                <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
+                  <DollarSign className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-extrabold text-slate-200 font-mono">
+                <div className="text-xl font-extrabold text-slate-900 font-mono">
                   {stats?.totalRevenue.toLocaleString('id-ID', {
                     style: 'currency',
                     currency: 'IDR',
                     minimumFractionDigits: 0,
                   })}
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">Dari transaksi berstatus sukses</p>
+                <p className="text-[10px] text-slate-400 mt-1">Transaksi sukses lunas</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/40 border-slate-850">
+            <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Tiket Terjual
                 </CardTitle>
-                <Ticket className="h-4 w-4 text-indigo-400" />
+                <div className="p-2 bg-teal-50 rounded-xl text-[#08B4B5]">
+                  <Ticket className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-extrabold text-slate-200 font-mono">
-                  {stats?.ticketsSold}
+                <div className="text-xl font-extrabold text-slate-900 font-mono">
+                  {stats?.ticketsSold} Lembar
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">Lembar tiket terkonfirmasi</p>
+                <p className="text-[10px] text-slate-400 mt-1">Tiket terkonfirmasi</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/40 border-slate-855">
+            <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-bold text-slate-505 uppercase tracking-wider">
+                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Transaksi Sukses
                 </CardTitle>
-                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-extrabold text-slate-200 font-mono">
+                <div className="text-xl font-extrabold text-slate-900 font-mono">
                   {stats?.completedTransactions}
                 </div>
-                <p className="text-[10px] text-slate-505 mt-1">Invoice terbayar lunas</p>
+                <p className="text-[10px] text-slate-400 mt-1">Invoice terbayar</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/40 border-slate-855">
+            <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-bold text-slate-505 uppercase tracking-wider">
+                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Transaksi Pending
                 </CardTitle>
-                <Activity className="h-4 w-4 text-amber-400" />
+                <div className="p-2 bg-amber-50 rounded-xl text-amber-600">
+                  <Activity className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-extrabold text-slate-200 font-mono">
+                <div className="text-xl font-extrabold text-slate-900 font-mono">
                   {stats?.pendingTransactions}
                 </div>
-                <p className="text-[10px] text-slate-505 mt-1">Menunggu pembayaran (15m limit)</p>
+                <p className="text-[10px] text-slate-400 mt-1">Menunggu bayar (15m limit)</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Recharts Graphical Analysis */}
-          <Card className="bg-slate-900/40 border-slate-855">
-            <CardHeader className="border-b border-slate-855 pb-4">
-              <CardTitle className="text-md font-bold text-slate-200">
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="text-sm font-bold text-slate-900">
                 Grafik Penjualan Tiket per Kategori
               </CardTitle>
-              <CardDescription className="text-xs text-slate-450">
+              <CardDescription className="text-xs text-slate-400">
                 Perbandingan kapasitas kuota maksimum dengan jumlah tiket terjual.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               {chartData.length === 0 ? (
-                <div className="text-center py-16 text-slate-500 text-xs">
+                <div className="text-center py-16 text-slate-400 text-xs">
                   Tidak ada data grafik kategori tiket.
                 </div>
               ) : (
@@ -160,20 +175,21 @@ export default function SalesDashboardPage() {
                       data={chartData}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                      <XAxis dataKey="name" stroke="#64748b" />
-                      <YAxis stroke="#64748b" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="name" stroke="#94a3b8" />
+                      <YAxis stroke="#94a3b8" />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: '#0f172a',
-                          borderColor: '#334155',
+                          backgroundColor: '#ffffff',
+                          borderColor: '#e2e8f0',
                           borderRadius: '12px',
-                          color: '#f1f5f9',
+                          color: '#0f172a',
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                         }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                      <Bar dataKey="Kapasitas" fill="#312e81" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="Terjual" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Kapasitas Kuota" fill="#cbd5e1" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="Tiket Terjual" fill="#08B4B5" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

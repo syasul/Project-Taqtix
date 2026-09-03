@@ -84,15 +84,15 @@ export default function EventTabs({ eventId }: EventTabsProps) {
       <div>
         <Link
           href="/dashboard/events"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Kembali ke Daftar Event
+          <span>Kembali ke Daftar Event</span>
         </Link>
       </div>
 
       {/* Tabs list */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-900 scrollbar-none">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 scrollbar-none">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -100,14 +100,14 @@ export default function EventTabs({ eventId }: EventTabsProps) {
               key={tab.href}
               href={tab.href}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer border",
+                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer border",
                 tab.active
-                  ? "bg-[#08B4B5]/15 border-[#08B4B5]/40 text-[#08B4B5]"
-                  : "bg-slate-900/20 border-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                  ? "bg-[#08B4B5]/10 border-[#08B4B5] text-[#08B4B5] shadow-xs"
+                  : "bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               )}
             >
               <Icon className="h-3.5 w-3.5" />
-              {tab.label}
+              <span>{tab.label}</span>
             </Link>
           );
         })}

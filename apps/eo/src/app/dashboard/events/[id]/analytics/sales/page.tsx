@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import EventTabs from '@/components/layout/event-tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { 
   AreaChart, 
   Area, 
@@ -43,57 +44,57 @@ export default function SalesAnalyticsPage() {
     }).format(val);
   };
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Analitik Penjualan' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-6 max-w-5xl">
+      <Breadcrumb items={breadcrumbs} />
       <EventTabs eventId={eventId} />
 
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-indigo-500" />
+        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-[#08B4B5]" />
           Analitik Penjualan Detail
         </h2>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Pantau grafik tren harian dan perbandingan kapasitas per kategori tiket.
         </p>
       </div>
 
       {isLoading ? (
         <div className="py-24 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
           <span className="text-xs text-slate-400">Memuat analisis penjualan...</span>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Trend Chart */}
-          <Card className="bg-slate-900/40 border-slate-850 p-6 space-y-4">
+          <Card className="bg-white border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm">
             <div>
-              <CardTitle className="text-sm font-bold text-slate-200">Grafik Penjualan Harian</CardTitle>
-              <CardDescription className="text-xs text-slate-500">Akumulasi penjualan tiket per hari</CardDescription>
+              <CardTitle className="text-sm font-bold text-slate-900">Grafik Penjualan Harian</CardTitle>
+              <CardDescription className="text-xs text-slate-400">Akumulasi penjualan tiket per hari</CardDescription>
             </div>
 
             {salesData.byDay.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-slate-500 text-xs">
+              <div className="h-64 flex items-center justify-center text-slate-400 text-xs">
                 Belum ada data penjualan tercatat.
               </div>
             ) : (
               <div className="h-64 w-full text-xs font-mono">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={salesData.byDay}>
-                    <defs>
-                      <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                    <XAxis dataKey="date" stroke="#64748b" />
-                    <YAxis stroke="#64748b" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="date" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#0f172a' }}
                       formatter={(value: any) => [formatRupiah(Number(value)), 'Pendapatan']}
                     />
-                    <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={2} fillOpacity={1} fill="url(#colorSales)" />
+                    <Area type="monotone" dataKey="revenue" stroke="#08B4B5" strokeWidth={2} fill="#e6f7f7" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -101,28 +102,28 @@ export default function SalesAnalyticsPage() {
           </Card>
 
           {/* Category Breakdown Chart */}
-          <Card className="bg-slate-900/40 border-slate-850 p-6 space-y-4">
+          <Card className="bg-white border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm">
             <div>
-              <CardTitle className="text-sm font-bold text-slate-200">Penjualan per Kategori</CardTitle>
-              <CardDescription className="text-xs text-slate-500">Pendapatan kotor per kategori tiket</CardDescription>
+              <CardTitle className="text-sm font-bold text-slate-900">Penjualan per Kategori</CardTitle>
+              <CardDescription className="text-xs text-slate-400">Pendapatan kotor per kategori tiket</CardDescription>
             </div>
 
             {salesData.byCategory.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-slate-500 text-xs">
+              <div className="h-64 flex items-center justify-center text-slate-400 text-xs">
                 Belum ada data kategori tiket.
               </div>
             ) : (
               <div className="h-64 w-full text-xs font-mono">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesData.byCategory}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                    <XAxis dataKey="categoryName" stroke="#64748b" />
-                    <YAxis stroke="#64748b" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="categoryName" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#0f172a' }}
                       formatter={(value: any) => [formatRupiah(Number(value)), 'Pendapatan']}
                     />
-                    <Bar dataKey="revenue" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="revenue" fill="#08B4B5" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

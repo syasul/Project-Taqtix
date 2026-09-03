@@ -2,6 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Mail,
@@ -42,13 +43,15 @@ function AffiliateLoginForm() {
     <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-sm p-8 sm:p-10 relative overflow-hidden text-slate-900">
       {/* Header & Logo */}
       <div className="text-center mb-7">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#08B4B5] to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-sm">
-            T
-          </div>
-          <span className="font-black text-2xl tracking-tight text-slate-900">
-            taqtix<span className="text-[#08B4B5]">.</span>
-          </span>
+        <div className="flex justify-center mb-4">
+          <Image
+            src="/logo.png"
+            alt="TAQtix Logo"
+            width={160}
+            height={46}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </div>
 
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#08B4B5]/30 bg-[#08B4B5]/10 text-[10px] font-mono tracking-wider text-[#08B4B5] font-extrabold uppercase mb-2 shadow-xs">

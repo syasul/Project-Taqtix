@@ -6,6 +6,13 @@ import LayoutShell from '@/components/layout-shell';
 export const metadata: Metadata = {
   title: 'Taqtix Affiliates - Portal Mitra Afiliasi',
   description: 'Dashboard kemitraan affiliator penjualan tiket event Taqtix',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    apple: '/apple-icon.png',
+  },
 };
 
 export default function RootLayout({

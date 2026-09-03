@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard,
   TicketPercent,
@@ -24,20 +25,20 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 flex flex-col justify-between">
         <div>
           {/* Logo */}
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#08B4B5] to-teal-400 flex items-center justify-center text-white font-black text-base shadow-sm">
-                T
-              </div>
-              <div>
-                <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
-                  taqtix<span className="text-[#08B4B5]">.</span>
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-[#08B4B5] block mt-1">
-                  Affiliates Portal
-                </span>
-              </div>
-            </div>
+          <div className="p-6 border-b border-slate-100">
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo.png"
+                alt="TAQtix Logo"
+                width={130}
+                height={36}
+                className="h-7 w-auto object-contain"
+                priority
+              />
+            </Link>
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#08B4B5] block mt-1.5 font-mono">
+              Affiliates Portal
+            </span>
           </div>
 
           {/* Menu Links */}

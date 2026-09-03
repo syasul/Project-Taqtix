@@ -20,24 +20,24 @@ export default function AdminLayoutWrapper({
     <>
       <div>
         {/* Logo / Branding */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between gap-3">
-          <div className="flex flex-col gap-1">
+        <div className="p-6 border-b border-slate-200 flex items-center justify-between relative">
+          <div className="w-full flex flex-col items-center justify-center text-center gap-1">
             <Image
               src="/logo.png"
               alt="TAQtix Logo"
               width={120}
               height={34}
-              className="h-7 w-auto object-contain"
+              className="h-7 w-auto object-contain mx-auto"
               priority
             />
-            <span className="text-[9px] text-[#08B4B5] font-mono tracking-widest font-bold uppercase pl-0.5">
+            <span className="text-[9px] text-[#08B4B5] font-mono tracking-widest font-bold uppercase text-center">
               Admin Platform
             </span>
           </div>
           {isMobile && (
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-650 hover:bg-slate-100 cursor-pointer md:hidden"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-650 hover:bg-slate-100 cursor-pointer md:hidden absolute right-4 top-6"
             >
               <X className="w-5 h-5" />
             </button>

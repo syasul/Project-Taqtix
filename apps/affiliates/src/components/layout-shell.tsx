@@ -25,18 +25,18 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 flex flex-col justify-between md:sticky md:top-0 md:h-screen md:overflow-y-auto">
         <div>
           {/* Logo */}
-          <div className="p-6 border-b border-slate-100">
-            <Link href="/" className="inline-block">
+          <div className="p-6 border-b border-slate-100 flex flex-col items-center justify-center text-center">
+            <Link href="/" className="inline-flex justify-center items-center">
               <Image
                 src="/logo.png"
                 alt="TAQtix Logo"
                 width={130}
                 height={36}
-                className="h-7 w-auto object-contain"
+                className="h-7 w-auto object-contain mx-auto"
                 priority
               />
             </Link>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#08B4B5] block mt-1.5 font-mono">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#08B4B5] block mt-1.5 font-mono text-center">
               Affiliates Portal
             </span>
           </div>

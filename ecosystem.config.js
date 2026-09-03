@@ -43,7 +43,7 @@ module.exports = {
       name: "taqtix-affiliates",
       cwd: "./apps/affiliates",
       script: "node_modules/next/dist/bin/next",
-      args: "start",
+      args: "start -p 3004",
       env: {
         NODE_ENV: "production",
         PORT: 3004,

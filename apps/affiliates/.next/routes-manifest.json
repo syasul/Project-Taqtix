@@ -48,6 +48,12 @@
       "namedRegex": "^/events(?:/)?$"
     },
     {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
       "page": "/payouts",
       "regex": "^/payouts(?:/)?$",
       "routeKeys": {},

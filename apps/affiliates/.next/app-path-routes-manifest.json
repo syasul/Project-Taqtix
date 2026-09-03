@@ -2,6 +2,7 @@
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
   "/events/page": "/events",
+  "/login/page": "/login",
   "/page": "/",
   "/payouts/page": "/payouts",
   "/promos/page": "/promos"

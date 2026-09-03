@@ -20,7 +20,8 @@ import { toast } from 'sonner';
 function AffiliateLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams?.get('redirect') || '/';
+  const rawRedirect = searchParams?.get('redirect');
+  const redirectPath = (!rawRedirect || rawRedirect === '/dashboard') ? '/' : rawRedirect;
 
   const [email, setEmail] = useState('affiliate@taqtix.id');
   const [password, setPassword] = useState('password123');

@@ -1,7 +1,9 @@
 {
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
+  "/dashboard/page": "/dashboard",
   "/events/page": "/events",
+  "/favicon.ico/route": "/favicon.ico",
   "/login/page": "/login",
   "/page": "/",
   "/payouts/page": "/payouts",

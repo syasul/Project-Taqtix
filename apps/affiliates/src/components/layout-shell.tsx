@@ -22,7 +22,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen flex flex-col md:flex-row antialiased bg-slate-50 text-slate-900">
       {/* Sidebar Nav */}
-      <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 flex flex-col justify-between">
+      <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 flex flex-col justify-between md:sticky md:top-0 md:h-screen md:overflow-y-auto">
         <div>
           {/* Logo */}
           <div className="p-6 border-b border-slate-100">

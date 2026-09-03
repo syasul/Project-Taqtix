@@ -75,7 +75,7 @@ export default function AdminLayoutWrapper({
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Desktop Sidebar (visible on md screens and up) */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 hidden md:flex">
+      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 hidden md:flex sticky top-0 h-screen overflow-y-auto">
         {sidebarContent(false)}
       </aside>
 

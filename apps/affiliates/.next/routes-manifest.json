@@ -12,6 +12,12 @@
       "priority": true,
       "statusCode": 308,
       "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/",
+      "statusCode": 307,
+      "regex": "^(?!/_next)/dashboard(?:/)?$"
     }
   ],
   "headers": [],
@@ -42,10 +48,22 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
       "page": "/events",
       "regex": "^/events(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/events(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
     },
     {
       "page": "/login",

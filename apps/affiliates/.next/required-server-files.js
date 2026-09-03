@@ -324,7 +324,14 @@ self.__SERVER_FILES_MANIFEST={
     "turbopack": {
       "root": "/Users/syamsul/Documents/Coding/Project/Project-Taqtix"
     },
-    "distDirRoot": ".next"
+    "distDirRoot": ".next",
+    "_originalRedirects": [
+      {
+        "source": "/dashboard",
+        "destination": "/",
+        "permanent": false
+      }
+    ]
   },
   "appDir": "/Users/syamsul/Documents/Coding/Project/Project-Taqtix/apps/affiliates",
   "relativeAppDir": "apps/affiliates",

@@ -6,12 +6,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Calendar, PlusCircle } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { toast } from 'sonner';
 
 // Validasi Form menggunakan Zod
@@ -67,34 +68,42 @@ export default function CreateEventPage() {
     mutation.mutate(values);
   };
 
+  const breadcrumbs = [
+    { label: 'Daftar Event', href: '/dashboard/events' },
+    { label: 'Buat Event Baru' },
+  ];
+
   return (
-    <div className="space-y-8 max-w-3xl">
-      {/* Back Button */}
-      <div>
+    <div className="space-y-6 max-w-3xl">
+      {/* Breadcrumbs */}
+      <Breadcrumb items={breadcrumbs} />
+
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <PlusCircle className="w-6 h-6 text-[#08B4B5]" />
+            Buat Event Baru
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Daftarkan event baru dengan mengisi rincian di bawah. Event yang dibuat pertama kali berstatus draft.
+          </p>
+        </div>
+
         <Button
           onClick={() => router.push('/dashboard/events')}
-          variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl -ml-2 gap-2 cursor-pointer text-xs"
+          variant="outline"
+          className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl gap-1.5 cursor-pointer text-xs font-bold"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Kembali ke Daftar Event</span>
+          <span>Kembali</span>
         </Button>
       </div>
 
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-          Buat Event Baru
-        </h1>
-        <p className="text-sm text-slate-400 mt-2">
-          Daftarkan event baru dengan mengisi detail di bawah. Event yang dibuat pertama kali berstatus draft.
-        </p>
-      </div>
-
-      <Card className="bg-slate-900/40 border-slate-855 shadow-xl backdrop-blur-sm">
-        <CardHeader className="border-b border-slate-855 pb-4">
-          <CardTitle className="text-lg font-bold text-slate-200">Form Detail Event</CardTitle>
+      <Card className="bg-white border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-slate-100 p-6">
+          <CardTitle className="text-sm font-bold text-slate-900">Form Detail & Konfigurasi Event</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 sm:p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -102,15 +111,15 @@ export default function CreateEventPage() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Judul Event</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Judul Event *</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Contoh: Taqwa Movement Concert 2026"
-                        className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -120,16 +129,16 @@ export default function CreateEventPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Deskripsi Lengkap</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Deskripsi Lengkap *</FormLabel>
                     <FormControl>
                       <textarea
                         placeholder="Tuliskan rincian acara, pembicara/artis, syarat masuk..."
                         rows={5}
-                        className="w-full rounded-xl border border-slate-700 bg-slate-800/30 px-4 py-2.5 text-slate-250 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm transition"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-[#08B4B5] focus:bg-white focus:outline-none text-xs transition"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -139,15 +148,15 @@ export default function CreateEventPage() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Lokasi Penyelenggaraan</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Lokasi Penyelenggaraan *</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Contoh: Jakarta Convention Center, Senayan, Jakarta"
-                        className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -158,15 +167,15 @@ export default function CreateEventPage() {
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-300">Tanggal Mulai</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tanggal & Jam Mulai *</FormLabel>
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          className="bg-slate-800/30 border-slate-700 text-slate-250 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl font-mono text-sm"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl font-mono text-xs"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-xs" />
+                      <FormMessage className="text-rose-500 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -176,15 +185,15 @@ export default function CreateEventPage() {
                   name="endDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-300">Tanggal Selesai</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tanggal & Jam Selesai *</FormLabel>
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          className="bg-slate-800/30 border-slate-700 text-slate-250 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl font-mono text-sm"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl font-mono text-xs"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-rose-400 text-xs" />
+                      <FormMessage className="text-rose-500 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -195,15 +204,15 @@ export default function CreateEventPage() {
                 name="bannerUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">URL Banner Image (Opsional)</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">URL Banner Image (Opsional)</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Contoh: https://ik.imagekit.io/taqtix/concert-banner.jpg"
-                        className="bg-slate-800/30 border-slate-700 text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 rounded-xl text-sm"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-rose-400 text-xs" />
+                    <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}
               />
@@ -213,19 +222,19 @@ export default function CreateEventPage() {
                 control={form.control}
                 name="requireLogin"
                 render={({ field }) => (
-                  <FormItem className="rounded-2xl border border-slate-800 bg-slate-950/60 p-5 shadow-inner">
+                  <FormItem className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                     <div className="flex items-center justify-between gap-4">
                       <div className="space-y-1">
-                        <FormLabel className="text-sm font-bold text-slate-100 flex items-center gap-2 cursor-pointer">
+                        <FormLabel className="text-xs font-bold text-slate-900 flex items-center gap-2 cursor-pointer">
                           <span>Wajibkan Pengunjung Login (Require Login)</span>
                           {field.value && (
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#08B4B5] border border-[#08B4B5]/30">
                               Aktif
                             </span>
                           )}
                         </FormLabel>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          Jika diaktifkan, calon pembeli harus masuk (login) atau mendaftar akun TAQtix sebelum dapat menyelesaikan pemesanan tiket untuk event ini.
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Jika diaktifkan, calon pembeli harus masuk (login) atau mendaftar akun TAQtix sebelum dapat menyelesaikan checkout tiket.
                         </p>
                       </div>
                       <FormControl>
@@ -234,13 +243,13 @@ export default function CreateEventPage() {
                           role="switch"
                           aria-checked={field.value}
                           onClick={() => field.onChange(!field.value)}
-                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
-                            field.value ? 'bg-indigo-600' : 'bg-slate-700'
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            field.value ? 'bg-[#08B4B5]' : 'bg-slate-300'
                           }`}
                         >
                           <span
                             aria-hidden="true"
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                               field.value ? 'translate-x-5' : 'translate-x-0'
                             }`}
                           />
@@ -254,7 +263,7 @@ export default function CreateEventPage() {
               <Button
                 type="submit"
                 disabled={mutation.isPending}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg shadow-indigo-600/10 cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2 text-xs border-0"
               >
                 {mutation.isPending ? (
                   <>

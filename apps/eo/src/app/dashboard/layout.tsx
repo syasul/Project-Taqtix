@@ -27,8 +27,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!isClient) {
     return (
-      <div className="h-screen w-screen bg-slate-950 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+      <div className="h-screen w-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
       </div>
     );
   }
@@ -36,16 +36,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Jika token ada tapi profile belum di-decode atau bukan organizer
   if (user && user.role !== 'organizer' && user.role !== 'organizer_member') {
     return (
-      <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center space-y-4">
-        <ShieldAlert className="h-12 w-12 text-rose-500" />
-        <h2 className="text-xl font-bold text-slate-100">Akses Ditolak</h2>
-        <p className="text-slate-400 text-sm">Halaman ini hanya dapat diakses oleh Event Organizer.</p>
+      <div className="h-screen w-screen bg-slate-50 flex flex-col items-center justify-center space-y-4 p-4 text-center">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl">
+          <ShieldAlert className="h-10 w-10 text-rose-500 mx-auto" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">Akses Ditolak</h2>
+        <p className="text-slate-500 text-xs max-w-sm">Halaman ini hanya dapat diakses oleh akun Event Organizer terdaftar.</p>
         <button
           onClick={() => {
             useAuth.getState().logout();
             router.push('/login');
           }}
-          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold cursor-pointer"
+          className="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
         >
           Logout & Login Kembali
         </button>
@@ -54,20 +56,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
       <Header />
-      
+
       {/* Mobile sub-header for dashboard navigation */}
-      <div className="md:hidden flex items-center justify-between px-6 py-3.5 bg-slate-955 border-b border-slate-900 text-slate-200">
-        <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-          Dashboard Portal
+      <div className="md:hidden flex items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200 text-slate-800">
+        <span className="text-xs font-bold uppercase tracking-wider text-[#08B4B5]">
+          Organizer Portal
         </span>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetTrigger className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 rounded-xl transition cursor-pointer">
-            <Menu className="h-4 w-4 text-indigo-400" />
+          <SheetTrigger className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition cursor-pointer">
+            <Menu className="h-4 w-4 text-[#08B4B5]" />
             Menu Dashboard
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 p-0 bg-slate-950 border-r border-slate-900 text-slate-200" showCloseButton={true}>
+          <SheetContent side="left" className="w-72 p-0 bg-white border-r border-slate-200 text-slate-800" showCloseButton={true}>
             <div className="pt-8 h-full">
               <Sidebar className="w-full h-full border-r-0" onItemClick={() => setIsSidebarOpen(false)} />
             </div>
@@ -76,8 +78,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       <div className="flex flex-1">
-        <Sidebar className="hidden md:flex h-[calc(100vh-4rem)] sticky top-16" />
-        <main className="flex-1 p-4 md:p-8 bg-slate-950 min-h-[calc(100vh-4rem)] overflow-y-auto">
+        <Sidebar className="hidden md:flex h-[calc(100vh-4rem)] sticky top-16 bg-white border-r border-slate-200" />
+        <main className="flex-1 p-4 md:p-8 bg-slate-50 min-h-[calc(100vh-4rem)] overflow-y-auto">
           {children}
         </main>
       </div>

@@ -38,11 +38,6 @@ interface SidebarProps {
   onItemClick?: () => void;
 }
 
-/**
- * Sidebar Dashboard 2-Level untuk Organizer:
- * 1. Level Organisasi (Overview, Events, Team, Voucher, Cash, Rekap, Password, Token, Guide)
- * 2. Level Event (Formulir, Fasilitas, Lineup, Staff, Scoped Vouchers & Cash, POS, Doorprize, etc.)
- */
 export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const pathname = usePathname() || '';
   const { user } = useAuth();
@@ -51,7 +46,6 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const isPartner = user?.role === 'partner';
 
   // Deteksi apakah sedang berada di dalam konteks 1 event spesifik
-  // Cocokkan: /dashboard/events/:id/... tapi BUKAN /dashboard/events atau /dashboard/events/new
   const eventMatch = pathname.match(/^\/dashboard\/events\/([^/]+)/);
   const eventId = eventMatch && eventMatch[1] !== 'new' ? eventMatch[1] : null;
   const isEventScope = Boolean(eventId);
@@ -98,37 +92,37 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
     { href: `/dashboard/partners/${user?.id || ''}`, label: 'Performa Link', icon: TrendingUp },
   ];
 
-  const activeLinkClass = 'bg-[#08B4B5]/15 border-[#08B4B5] text-[#08B4B5] font-semibold';
-  const inactiveLinkClass = 'border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200';
+  const activeLinkClass = 'bg-[#08B4B5]/10 border-[#08B4B5] text-[#08B4B5] font-bold';
+  const inactiveLinkClass = 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium';
 
   return (
-    <aside className={cn('w-64 border-r border-slate-800 bg-slate-950 flex flex-col shrink-0', className)}>
+    <aside className={cn('w-64 border-r border-slate-200 bg-white flex flex-col shrink-0', className)}>
       {/* Header Sidebar / Context Header */}
       {isEventScope ? (
-        <div className="p-4 border-b border-slate-800 bg-slate-900/40">
+        <div className="p-4 border-b border-slate-100 bg-slate-50/70">
           <Link
             href="/dashboard/events"
             onClick={onItemClick}
-            className="flex items-center gap-2 text-xs font-bold text-[#08B4B5] hover:text-[#0abfc0] transition py-1.5 px-2.5 rounded-lg bg-[#08B4B5]/10 border border-[#08B4B5]/20 w-full mb-2"
+            className="flex items-center gap-2 text-xs font-bold text-[#08B4B5] hover:text-[#079b9c] transition py-2 px-3 rounded-xl bg-white border border-slate-200 shadow-xs w-full mb-2.5"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Kembali ke Daftar Event</span>
           </Link>
           <div className="flex items-center gap-2 px-1">
-            <div className="h-2 w-2 rounded-full bg-[#08B4B5] animate-pulse" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
-              Event Management
+            <div className="h-2 w-2 rounded-full bg-[#08B4B5]" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+              Event Workspace
             </span>
           </div>
         </div>
       ) : (
-        <div className="p-5 border-b border-slate-800">
+        <div className="p-5 border-b border-slate-100">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-[#08B4B5]/15 border border-[#08B4B5]/30 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-xl bg-[#08B4B5]/10 border border-[#08B4B5]/20 flex items-center justify-center shrink-0">
               <Users className="h-5 w-5 text-[#08B4B5]" />
             </div>
             <div className="overflow-hidden">
-              <h4 className="text-sm font-bold text-slate-200 truncate">
+              <h4 className="text-sm font-bold text-slate-900 truncate">
                 {user?.email?.split('@')[0] || 'Organizer'}
               </h4>
               <span className="text-[10px] font-bold text-[#08B4B5] uppercase tracking-wider bg-[#08B4B5]/10 px-2 py-0.5 rounded-full border border-[#08B4B5]/20 mt-1 inline-block">
@@ -140,9 +134,9 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
       )}
 
       {/* Tautan Navigasi */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800">
-        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 block">
-          {isEventScope ? 'Menu Event' : 'Menu Organisasi'}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
+          {isEventScope ? 'Fitur Event' : 'Menu Organisasi'}
         </span>
 
         {/* Level Event */}
@@ -155,31 +149,33 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
                 key={link.href}
                 href={link.href}
                 onClick={onItemClick}
-                className={`flex items-center space-x-3 px-3 py-2.5 border-l-2 rounded-r-xl transition text-xs ${
+                className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
                   isActive ? activeLinkClass : inactiveLinkClass
                 }`}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
                 <span className="truncate">{link.label}</span>
               </Link>
             );
           })}
 
         {/* Level Organisasi */}
-        {!isEventScope && isOrganizer &&
+        {!isEventScope &&
+          isOrganizer &&
           organizationLinks.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
+            const isActive =
+              pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={onItemClick}
-                className={`flex items-center space-x-3 px-3 py-2.5 border-l-2 rounded-r-xl transition text-xs ${
+                className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
                   isActive ? activeLinkClass : inactiveLinkClass
                 }`}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
                 <span className="truncate">{link.label}</span>
               </Link>
             );
@@ -195,11 +191,11 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
                 key={link.href}
                 href={link.href}
                 onClick={onItemClick}
-                className={`flex items-center space-x-3 px-3 py-2.5 border-l-2 rounded-r-xl transition text-xs ${
+                className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
                   isActive ? activeLinkClass : inactiveLinkClass
                 }`}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
                 <span className="truncate">{link.label}</span>
               </Link>
             );
@@ -207,8 +203,8 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
       </nav>
 
       {/* Footer Sidebar */}
-      <div className="p-4 border-t border-slate-850 text-center">
-        <p className="text-[10px] text-slate-600 font-mono">TAQtix v2.0 • Professional EO</p>
+      <div className="p-4 border-t border-slate-100 text-center">
+        <p className="text-[10px] text-slate-400 font-mono font-medium">TAQtix v2.0 • Professional EO</p>
       </div>
     </aside>
   );

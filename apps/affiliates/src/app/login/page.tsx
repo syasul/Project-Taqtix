@@ -29,7 +29,6 @@ function AffiliateLoginForm() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login & set auth token
     setTimeout(() => {
       setIsLoading(false);
       localStorage.setItem('affiliate_auth_token', 'mock-affiliate-token');
@@ -40,11 +39,11 @@ function AffiliateLoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-xl p-8 sm:p-10 relative overflow-hidden text-slate-900">
-      {/* Top Banner Tag */}
-      <div className="text-center mb-8">
+    <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-sm p-8 sm:p-10 relative overflow-hidden text-slate-900">
+      {/* Header & Logo */}
+      <div className="text-center mb-7">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#08B4B5] to-teal-400 flex items-center justify-center text-white font-black text-lg shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#08B4B5] to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-sm">
             T
           </div>
           <span className="font-black text-2xl tracking-tight text-slate-900">
@@ -52,20 +51,20 @@ function AffiliateLoginForm() {
           </span>
         </div>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-teal-200 bg-teal-50 text-[10px] font-mono tracking-wider text-[#08B4B5] font-extrabold uppercase mb-2 shadow-xs">
-          <Sparkles className="w-3 h-3 text-[#08B4B5]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#08B4B5]/30 bg-[#08B4B5]/10 text-[10px] font-mono tracking-wider text-[#08B4B5] font-extrabold uppercase mb-2 shadow-xs">
+          <Sparkles className="w-3.5 h-3.5 text-[#08B4B5]" />
           <span>PORTAL MITRA AFILIASI & INFLUENCER</span>
         </div>
 
         <h1 className="text-2xl font-black tracking-tight text-slate-900 mt-2">
-          Masuk ke Akun Afiliasi
+          Masuk Akun Afiliasi
         </h1>
-        <p className="text-xs text-slate-500 mt-1.5 font-medium leading-relaxed">
-          Pantau komisi penjualan tiket, kelola kode promo tiap event, dan cairkan saldo pendapatan Anda.
+        <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
+          Kelola kode promo per event, pantau penjualan tiket audiens Anda, dan tarik saldo komisi secara real-time.
         </p>
       </div>
 
-      {/* Value Pillars Badges */}
+      {/* 3 Pillar Badges */}
       <div className="grid grid-cols-3 gap-2 mb-6 p-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-center text-[10px]">
         <div className="space-y-0.5">
           <span className="font-bold text-[#08B4B5] block">Kode Unik</span>
@@ -125,7 +124,7 @@ function AffiliateLoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full mt-2 py-3.5 px-4 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold text-xs rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+          className="w-full mt-2 py-3.5 px-4 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold text-xs rounded-xl shadow-xs transition duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
         >
           {isLoading ? (
             <>
@@ -141,8 +140,8 @@ function AffiliateLoginForm() {
         </button>
       </form>
 
-      {/* Footer link */}
-      <div className="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-500">
+      {/* Footer info */}
+      <div className="mt-6 pt-5 border-t border-slate-100 text-center text-xs text-slate-500">
         Belum terdaftar sebagai mitra affiliator?{' '}
         <a
           href="mailto:partner@taqtix.id"
@@ -157,14 +156,10 @@ function AffiliateLoginForm() {
 
 export default function AffiliateLoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
-      {/* Ambient glow effects */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#08B4B5]/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-4 sm:p-6 relative">
       <Suspense
         fallback={
-          <div className="w-full max-w-md p-10 bg-white rounded-3xl shadow-xl flex items-center justify-center">
+          <div className="w-full max-w-md p-10 bg-white rounded-3xl shadow-sm flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
           </div>
         }

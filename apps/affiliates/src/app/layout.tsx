@@ -1,17 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'sonner';
-import Link from 'next/link';
-import {
-  LayoutDashboard,
-  TicketPercent,
-  Banknote,
-  HeartHandshake,
-  ExternalLink,
-  Sparkles,
-  DollarSign,
-  TrendingUp,
-} from 'lucide-react';
+import LayoutShell from '@/components/layout-shell';
 
 export const metadata: Metadata = {
   title: 'Taqtix Affiliates - Portal Mitra Afiliasi',
@@ -25,85 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className="bg-slate-50 text-slate-900 min-h-screen flex flex-col md:flex-row antialiased">
-        {/* Sidebar Nav */}
-        <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 flex flex-col justify-between">
-          <div>
-            {/* Logo */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#08B4B5] to-teal-400 flex items-center justify-center text-white font-black text-base shadow-sm">
-                  T
-                </div>
-                <div>
-                  <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
-                    taqtix<span className="text-[#08B4B5]">.</span>
-                  </span>
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-[#08B4B5] block mt-1">
-                    Affiliates Portal
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Menu Links */}
-            <nav className="p-4 space-y-1.5 text-xs">
-              <Link
-                href="/"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition text-slate-700 hover:bg-slate-100 hover:text-slate-900"
-              >
-                <LayoutDashboard className="w-4 h-4 text-[#08B4B5]" />
-                <span>Dashboard Overview</span>
-              </Link>
-
-              <Link
-                href="/events"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition text-slate-700 hover:bg-slate-100 hover:text-slate-900"
-              >
-                <TicketPercent className="w-4 h-4 text-[#08B4B5]" />
-                <span>Event & Kode Promo</span>
-              </Link>
-
-              <Link
-                href="/payouts"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition text-slate-700 hover:bg-slate-100 hover:text-slate-900"
-              >
-                <Banknote className="w-4 h-4 text-[#08B4B5]" />
-                <span>Pencairan Komisi</span>
-              </Link>
-
-              <Link
-                href="/promos"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold transition text-slate-700 hover:bg-slate-100 hover:text-slate-900"
-              >
-                <Sparkles className="w-4 h-4 text-[#08B4B5]" />
-                <span>Manajemen Promo</span>
-              </Link>
-            </nav>
-          </div>
-
-          {/* User Profile Footer */}
-          <div className="p-4 border-t border-slate-100 bg-slate-50/50 m-3 rounded-2xl border">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#08B4B5]/15 text-[#08B4B5] flex items-center justify-center font-bold text-xs">
-                SM
-              </div>
-              <div className="truncate">
-                <p className="font-bold text-slate-900 text-xs truncate">Syamsul Ma’arif</p>
-                <p className="text-[10px] text-slate-400 truncate font-mono">syamsul.partner@gmail.com</p>
-              </div>
-            </div>
-            <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
-              <span className="text-slate-500 font-medium">Saldo Siap Tarik:</span>
-              <span className="font-mono font-bold text-emerald-600">Rp 2.733.750</span>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main View Area */}
-        <main className="flex-1 p-6 md:p-10 max-w-6xl overflow-y-auto">
-          {children}
-        </main>
+      <body className="bg-slate-50 text-slate-900 min-h-screen antialiased">
+        <LayoutShell>{children}</LayoutShell>
         <Toaster richColors position="top-right" />
       </body>
     </html>

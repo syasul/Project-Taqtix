@@ -221,11 +221,209 @@ let mockEvents = [
     slug: 'fest-hijrah-halal-culinary-2026',
     organizerName: 'Nusantara Hijrah Fest',
     location: 'ICE BSD, Tangerang',
-    status: 'draft',
+    status: 'pending_approval',
     startDate: '2026-11-20T10:00:00Z',
     endDate: '2026-11-22T22:00:00Z',
     ticketsSold: 0,
     quota: 4000,
+    category: 'Bazaar & Culinary',
+    description: 'Festival akbar kuliner halal nusantara dan pameran gaya hidup Islami terbesar tahun ini.',
+    priceRange: 'Rp 35.000 - Rp 150.000',
+  },
+  {
+    id: 'evt-4',
+    title: 'Jakarta Creative Workshop & Art Expo',
+    slug: 'jakarta-creative-workshop-2026',
+    organizerName: 'Dunia Halal Expo',
+    location: 'Senayan Park, Jakarta',
+    status: 'pending_approval',
+    startDate: '2026-12-05T09:00:00Z',
+    endDate: '2026-12-06T18:00:00Z',
+    ticketsSold: 0,
+    quota: 800,
+    category: 'Workshop',
+    description: 'Workshop interaktif seni kaligrafi modern, desain kreatif, dan fotografi bersama praktisi terkemuka.',
+    priceRange: 'Rp 150.000 - Rp 350.000',
+  },
+];
+
+export interface MockBanner {
+  id: string;
+  title: string;
+  imageUrl: string;
+  targetUrl: string;
+  position: 'home_hero' | 'event_top' | 'popup';
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+let mockBanners: MockBanner[] = [
+  {
+    id: 'bnr-1',
+    title: 'Taqwa Movement Concert 2026',
+    imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
+    targetUrl: '/events/taqwa-movement-2026',
+    position: 'home_hero',
+    order: 1,
+    isActive: true,
+    createdAt: '2026-08-01T00:00:00Z',
+  },
+  {
+    id: 'bnr-2',
+    title: 'Festival Hijrah & Halal Expo 2026',
+    imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
+    targetUrl: '/events/fest-hijrah-halal-culinary-2026',
+    position: 'home_hero',
+    order: 2,
+    isActive: true,
+    createdAt: '2026-08-10T00:00:00Z',
+  },
+  {
+    id: 'bnr-3',
+    title: 'Jakarta Creative Workshop & Art Expo',
+    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
+    targetUrl: '/events/jakarta-creative-workshop-2026',
+    position: 'home_hero',
+    order: 3,
+    isActive: true,
+    createdAt: '2026-08-15T00:00:00Z',
+  },
+];
+
+export interface MockPromo {
+  id: string;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  usageLimit: number | null;
+  usageCount: number;
+  eventId?: string | null;
+  eventTitle?: string;
+  partnerId?: string | null;
+  partnerName?: string | null;
+  partnerEmail?: string | null;
+  partnerCode?: string | null;
+  grossSalesGenerated: number;
+  status: 'active' | 'inactive' | 'expired';
+  createdAt: string;
+}
+
+let mockPromos: MockPromo[] = [
+  {
+    id: 'prm-1',
+    code: 'HIJRAH10',
+    type: 'percentage',
+    value: 10,
+    usageLimit: 500,
+    usageCount: 86,
+    eventId: 'evt-1',
+    eventTitle: 'Taqwa Movement Concert 2026',
+    partnerId: 'ptn-1',
+    partnerName: 'Komunitas Hijrah Millennials',
+    partnerEmail: 'partner.hijrah@millennials.org',
+    partnerCode: 'HIJRAH2026',
+    grossSalesGenerated: 12900000,
+    status: 'active',
+    createdAt: '2026-08-05T09:00:00Z',
+  },
+  {
+    id: 'prm-2',
+    code: 'GAUL50K',
+    type: 'fixed',
+    value: 50000,
+    usageLimit: 300,
+    usageCount: 140,
+    eventId: 'evt-2',
+    eventTitle: 'Kajian Akbar: Menjemput Hidayah',
+    partnerId: 'ptn-2',
+    partnerName: 'Influencer Dakwah Gaul',
+    partnerEmail: 'business@dakwahgaul.com',
+    partnerCode: 'DAKWAHGAUL',
+    grossSalesGenerated: 21000000,
+    status: 'active',
+    createdAt: '2026-08-10T14:20:00Z',
+  },
+  {
+    id: 'prm-3',
+    code: 'TRIP2026',
+    type: 'percentage',
+    value: 12.5,
+    usageLimit: 200,
+    usageCount: 45,
+    eventId: 'evt-1',
+    eventTitle: 'Taqwa Movement Concert 2026',
+    partnerId: 'ptn-3',
+    partnerName: 'Halal Travel Club Indonesia',
+    partnerEmail: 'kerjasama@halaltravel.id',
+    partnerCode: 'HALALTRIP',
+    grossSalesGenerated: 6750000,
+    status: 'active',
+    createdAt: '2026-08-15T11:00:00Z',
+  },
+  {
+    id: 'prm-4',
+    code: 'TAQTIXSPECIAL',
+    type: 'percentage',
+    value: 15,
+    usageLimit: 1000,
+    usageCount: 210,
+    eventId: null,
+    eventTitle: 'Semua Event (Platform Wide)',
+    partnerId: null,
+    partnerName: 'Promo Resmi Platform Taqtix',
+    partnerEmail: 'admin@taqtix.id',
+    partnerCode: 'DIRECT-TAQTIX',
+    grossSalesGenerated: 31500000,
+    status: 'active',
+    createdAt: '2026-08-01T00:00:00Z',
+  },
+];
+
+export interface MockAffiliatePayout {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  partnerEmail: string;
+  uniqueCode: string;
+  amount: number;
+  bankName: string;
+  accountNumber: string;
+  accountHolder: string;
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  notes?: string;
+  requestedAt: string;
+  processedAt?: string | null;
+}
+
+let mockAffiliatePayouts: MockAffiliatePayout[] = [
+  {
+    id: 'pay-1',
+    partnerId: 'ptn-1',
+    partnerName: 'Komunitas Hijrah Millennials',
+    partnerEmail: 'partner.hijrah@millennials.org',
+    uniqueCode: 'HIJRAH2026',
+    amount: 1000000,
+    bankName: 'BCA',
+    accountNumber: '8820192831',
+    accountHolder: 'Yayasan Hijrah Millennials',
+    status: 'pending',
+    requestedAt: '2026-08-28T10:00:00Z',
+  },
+  {
+    id: 'pay-2',
+    partnerId: 'ptn-2',
+    partnerName: 'Influencer Dakwah Gaul',
+    partnerEmail: 'business@dakwahgaul.com',
+    uniqueCode: 'DAKWAHGAUL',
+    amount: 1500000,
+    bankName: 'Mandiri',
+    accountNumber: '137001928374',
+    accountHolder: 'Achmad Fauzan',
+    status: 'paid',
+    notes: 'Transfer via Mandiri Bisnis ref #TX99120',
+    requestedAt: '2026-08-20T09:00:00Z',
+    processedAt: '2026-08-20T14:30:00Z',
   },
 ];
 
@@ -627,6 +825,38 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
     return { success: true, data: mockEvents };
   }
 
+  if (url.startsWith('/admin/events/') && url.endsWith('/approve')) {
+    const id = url.split('/')[3];
+    const event = mockEvents.find((e) => e.id === id);
+    if (event) {
+      event.status = 'published';
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'APPROVE_EVENT',
+        target: `${event.title} (${event.id})`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: event };
+    }
+  }
+
+  if (url.startsWith('/admin/events/') && url.endsWith('/reject')) {
+    const id = url.split('/')[3];
+    const event = mockEvents.find((e) => e.id === id);
+    if (event) {
+      event.status = 'cancelled';
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'REJECT_EVENT',
+        target: `${event.title} (${event.id}) - Alasan: ${body?.reason || 'Tidak memenuhi kualifikasi'}`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: event };
+    }
+  }
+
   if (url.startsWith('/admin/events/') && url.endsWith('/force-unpublish')) {
     const id = url.split('/')[3];
     const event = mockEvents.find((e) => e.id === id);
@@ -640,6 +870,160 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
         timestamp: new Date().toISOString(),
       });
       return { success: true, data: event };
+    }
+  }
+
+  // BANNERS CRUD
+  if (url === '/admin/banners' && method === 'GET') {
+    return { success: true, data: mockBanners };
+  }
+
+  if (url === '/admin/banners' && method === 'POST') {
+    const newBanner: MockBanner = {
+      id: `bnr-${Date.now().toString().slice(-4)}`,
+      title: body.title || 'Banner Baru',
+      imageUrl: body.imageUrl || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
+      targetUrl: body.targetUrl || '/events',
+      position: body.position || 'home_hero',
+      order: Number(body.order) || mockBanners.length + 1,
+      isActive: body.isActive !== undefined ? body.isActive : true,
+      createdAt: new Date().toISOString(),
+    };
+    mockBanners.unshift(newBanner);
+    mockAuditLogs.unshift({
+      id: `log-${Date.now()}`,
+      adminEmail: 'admin@taqtix.id',
+      action: 'CREATE_BANNER',
+      target: `${newBanner.title} (${newBanner.id})`,
+      timestamp: new Date().toISOString(),
+    });
+    return { success: true, data: newBanner };
+  }
+
+  if (url.startsWith('/admin/banners/') && method === 'PATCH') {
+    const id = url.split('/')[3];
+    const idx = mockBanners.findIndex((b) => b.id === id);
+    if (idx !== -1) {
+      mockBanners[idx] = { ...mockBanners[idx], ...body };
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'UPDATE_BANNER',
+        target: `${mockBanners[idx].title} (${id})`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: mockBanners[idx] };
+    }
+    throw new ApiError('Banner tidak ditemukan', 'NOT_FOUND', 404);
+  }
+
+  if (url.startsWith('/admin/banners/') && method === 'DELETE') {
+    const id = url.split('/')[3];
+    const bnr = mockBanners.find((b) => b.id === id);
+    if (bnr) {
+      mockBanners = mockBanners.filter((b) => b.id !== id);
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'DELETE_BANNER',
+        target: `${bnr.title} (${id})`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: { id } };
+    }
+    throw new ApiError('Banner tidak ditemukan', 'NOT_FOUND', 404);
+  }
+
+  // PROMOS CRUD
+  if (url === '/admin/promos' && method === 'GET') {
+    return { success: true, data: mockPromos };
+  }
+
+  if (url === '/admin/promos' && method === 'POST') {
+    const linkedEvent = body.eventId ? mockEvents.find((e) => e.id === body.eventId) : null;
+    const newPromo: MockPromo = {
+      id: `prm-${Date.now().toString().slice(-4)}`,
+      code: (body.code || `PROMO${Date.now().toString().slice(-4)}`).toUpperCase(),
+      type: body.type || 'percentage',
+      value: Number(body.value) || 10,
+      usageLimit: body.usageLimit ? Number(body.usageLimit) : null,
+      usageCount: 0,
+      eventId: linkedEvent ? linkedEvent.id : null,
+      eventTitle: linkedEvent ? linkedEvent.title : 'Semua Event (Platform Wide)',
+      partnerId: body.partnerId || null,
+      partnerName: body.partnerName || 'Admin Promo',
+      partnerEmail: body.partnerEmail || null,
+      partnerCode: body.partnerCode || null,
+      grossSalesGenerated: 0,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    };
+    mockPromos.unshift(newPromo);
+    mockAuditLogs.unshift({
+      id: `log-${Date.now()}`,
+      adminEmail: 'admin@taqtix.id',
+      action: 'CREATE_PROMO',
+      target: `${newPromo.code} (${newPromo.id})`,
+      timestamp: new Date().toISOString(),
+    });
+    return { success: true, data: newPromo };
+  }
+
+  if (url.startsWith('/admin/promos/') && method === 'DELETE') {
+    const id = url.split('/')[3];
+    const p = mockPromos.find((pr) => pr.id === id);
+    if (p) {
+      mockPromos = mockPromos.filter((pr) => pr.id !== id);
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'DELETE_PROMO',
+        target: `${p.code} (${id})`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: { id } };
+    }
+    throw new ApiError('Promo tidak ditemukan', 'NOT_FOUND', 404);
+  }
+
+  // AFFILIATE PAYOUTS
+  if (url === '/admin/affiliate-payouts' && method === 'GET') {
+    return { success: true, data: mockAffiliatePayouts };
+  }
+
+  if (url.startsWith('/admin/affiliate-payouts/') && url.endsWith('/approve')) {
+    const id = url.split('/')[3];
+    const payout = mockAffiliatePayouts.find((p) => p.id === id);
+    if (payout) {
+      payout.status = 'paid';
+      payout.processedAt = new Date().toISOString();
+      payout.notes = body?.notes || 'Disetujui dan ditransfer via Admin Portal';
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'APPROVE_AFFILIATE_PAYOUT',
+        target: `${payout.partnerName} - Rp ${payout.amount.toLocaleString('id-ID')} (${id})`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: payout };
+    }
+  }
+
+  if (url.startsWith('/admin/affiliate-payouts/') && url.endsWith('/reject')) {
+    const id = url.split('/')[3];
+    const payout = mockAffiliatePayouts.find((p) => p.id === id);
+    if (payout) {
+      payout.status = 'rejected';
+      payout.processedAt = new Date().toISOString();
+      payout.notes = body?.reason || 'Permintaan penarikan ditolak oleh admin';
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'REJECT_AFFILIATE_PAYOUT',
+        target: `${payout.partnerName} (${id})`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: payout };
     }
   }
 

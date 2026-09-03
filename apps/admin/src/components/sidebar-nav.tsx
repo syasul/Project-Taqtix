@@ -9,6 +9,9 @@ import {
   FileSearch,
   DollarSign,
   History,
+  HeartHandshake,
+  TicketPercent,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 export default function SidebarNav({ onItemClick }: { onItemClick?: () => void }) {
@@ -17,12 +20,14 @@ export default function SidebarNav({ onItemClick }: { onItemClick?: () => void }
   const menuItems = [
     { label: 'Dashboard', href: '/', icon: LayoutDashboard },
     { label: 'Organizer', href: '/organizers', icon: Users },
-    { label: 'Leads Pipeline', href: '/leads', icon: Users },
-    { label: 'Billing Control', href: '/billing', icon: DollarSign },
-    { label: 'Partner Audits', href: '/partners', icon: Users },
-    { label: 'Event', href: '/events', icon: Calendar },
+    { label: 'Approval & Event', href: '/events', icon: Calendar },
+    { label: 'Partner & Afiliasi', href: '/partners', icon: HeartHandshake },
+    { label: 'Kelola Promo', href: '/promos', icon: TicketPercent },
+    { label: 'Kelola Banner', href: '/banners', icon: ImageIcon },
     { label: 'Order', href: '/orders', icon: FileSearch },
-    { label: 'Settlement', href: '/settlements', icon: DollarSign },
+    { label: 'Settlement & Payout', href: '/settlements', icon: DollarSign },
+    { label: 'Billing Control', href: '/billing', icon: DollarSign },
+    { label: 'Leads Pipeline', href: '/leads', icon: Users },
     { label: 'Audit Log', href: '/audit-log', icon: History },
   ];
 

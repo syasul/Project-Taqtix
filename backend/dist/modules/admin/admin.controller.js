@@ -23,8 +23,36 @@ let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
+    async getOrganizers() {
+        const result = await this.adminService.getOrganizers();
+        return { success: true, data: result };
+    }
+    async createOrganizer(dto) {
+        const result = await this.adminService.createOrganizer(dto);
+        return { success: true, data: result };
+    }
+    async deleteOrganizer(id) {
+        const result = await this.adminService.deleteOrganizer(id);
+        return { success: true, data: result };
+    }
     async updateOrganizer(id, dto) {
         const result = await this.adminService.updateOrganizerSegmentAndPlan(id, dto);
+        return { success: true, data: result };
+    }
+    async getPartners() {
+        const result = await this.adminService.getPartnersOversight();
+        return { success: true, data: result };
+    }
+    async createPartner(dto) {
+        const result = await this.adminService.createPartner(dto);
+        return { success: true, data: result };
+    }
+    async updatePartner(id, dto) {
+        const result = await this.adminService.updatePartner(id, dto);
+        return { success: true, data: result };
+    }
+    async deletePartner(id) {
+        const result = await this.adminService.deletePartner(id);
         return { success: true, data: result };
     }
     async createLead(dto) {
@@ -47,12 +75,49 @@ let AdminController = class AdminController {
         const result = await this.adminService.getBillingOversight();
         return { success: true, data: result };
     }
-    async getPartners() {
-        const result = await this.adminService.getPartnersOversight();
+    async getEvents() {
+        const result = await this.adminService.getEvents();
+        return { success: true, data: result };
+    }
+    async approveEvent(id) {
+        const result = await this.adminService.approveEvent(id);
+        return { success: true, data: result };
+    }
+    async rejectEvent(id, reason) {
+        const result = await this.adminService.rejectEvent(id, reason);
         return { success: true, data: result };
     }
 };
 exports.AdminController = AdminController;
+__decorate([
+    (0, common_1.Get)('admin/organizers'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar semua organizer (Admin Only)' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getOrganizers", null);
+__decorate([
+    (0, common_1.Post)('admin/organizers'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Membuat akun organizer / EO baru (Admin Only)' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "createOrganizer", null);
+__decorate([
+    (0, common_1.Delete)('admin/organizers/:id'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menghapus akun organizer (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteOrganizer", null);
 __decorate([
     (0, common_1.Patch)('admin/organizers/:id/segment'),
     (0, roles_decorator_1.Roles)('admin'),
@@ -64,6 +129,46 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "updateOrganizer", null);
+__decorate([
+    (0, common_1.Get)('admin/partners'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data audit/rekap partner afiliasi (Admin Only)' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getPartners", null);
+__decorate([
+    (0, common_1.Post)('admin/partners'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Membuat partner afiliasi baru (Admin Only)' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "createPartner", null);
+__decorate([
+    (0, common_1.Patch)('admin/partners/:id'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Memperbarui data partner afiliasi (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "updatePartner", null);
+__decorate([
+    (0, common_1.Delete)('admin/partners/:id'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menghapus partner afiliasi (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deletePartner", null);
 __decorate([
     (0, common_1.Post)('leads'),
     (0, public_decorator_1.Public)(),
@@ -114,14 +219,35 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getBilling", null);
 __decorate([
-    (0, common_1.Get)('admin/partners'),
+    (0, common_1.Get)('admin/events'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data audit/rekap partner afiliasi (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan seluruh event untuk moderasi (Admin Only)' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], AdminController.prototype, "getPartners", null);
+], AdminController.prototype, "getEvents", null);
+__decorate([
+    (0, common_1.Post)('admin/events/:id/approve'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menyetujui event untuk dipublikasikan (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "approveEvent", null);
+__decorate([
+    (0, common_1.Post)('admin/events/:id/reject'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menolak penerbitan event (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('reason')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "rejectEvent", null);
 exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admin Panel Console'),
     (0, common_1.Controller)(),

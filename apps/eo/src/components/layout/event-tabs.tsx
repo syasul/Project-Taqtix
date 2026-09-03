@@ -29,28 +29,34 @@ export default function EventTabs({ eventId }: EventTabsProps) {
       active: pathname === `/dashboard/events/${eventId}/sales`
     },
     {
+      label: 'Overview Hari H',
+      href: `/dashboard/events/${eventId}/live`,
+      icon: TrendingUp,
+      active: pathname === `/dashboard/events/${eventId}/live`
+    },
+    {
+      label: 'Formulir Kustom',
+      href: `/dashboard/events/${eventId}/custom-fields`,
+      icon: UserCheck,
+      active: pathname === `/dashboard/events/${eventId}/custom-fields`
+    },
+    {
+      label: 'Voucher & Promo',
+      href: `/dashboard/events/${eventId}/vouchers`,
+      icon: BarChart3,
+      active: pathname === `/dashboard/events/${eventId}/vouchers`
+    },
+    {
+      label: 'Leaderboard Partner',
+      href: `/dashboard/events/${eventId}/partners`,
+      icon: HeartHandshake,
+      active: pathname === `/dashboard/events/${eventId}/partners`
+    },
+    {
       label: 'Analitik Sales',
       href: `/dashboard/events/${eventId}/analytics/sales`,
       icon: TrendingUp,
       active: pathname === `/dashboard/events/${eventId}/analytics/sales`
-    },
-    {
-      label: 'Distribusi',
-      href: `/dashboard/events/${eventId}/analytics/distribution`,
-      icon: BarChart3,
-      active: pathname === `/dashboard/events/${eventId}/analytics/distribution`
-    },
-    {
-      label: 'Demografi',
-      href: `/dashboard/events/${eventId}/analytics/audience`,
-      icon: Users,
-      active: pathname === `/dashboard/events/${eventId}/analytics/audience`
-    },
-    {
-      label: 'Funnel',
-      href: `/dashboard/events/${eventId}/analytics/performance`,
-      icon: TrendingUp,
-      active: pathname === `/dashboard/events/${eventId}/analytics/performance`
     },
     {
       label: 'CRM Segmen',
@@ -70,12 +76,6 @@ export default function EventTabs({ eventId }: EventTabsProps) {
       icon: TrendingUp,
       active: pathname === `/dashboard/events/${eventId}/growth`
     },
-    {
-      label: 'Leaderboard Partner',
-      href: `/dashboard/events/${eventId}/partners`,
-      icon: HeartHandshake,
-      active: pathname === `/dashboard/events/${eventId}/partners`
-    }
   ];
 
   return (

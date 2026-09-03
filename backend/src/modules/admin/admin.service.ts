@@ -370,4 +370,53 @@ export class AdminService {
       orderBy: { revenueGenerated: 'desc' },
     });
   }
+
+  /**
+   * Mendapatkan daftar semua event untuk moderasi admin
+   */
+  async getEvents() {
+    const events = await this.prisma.event.findMany({
+      include: {
+        organizer: true,
+        ticketCategories: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return events.map((e) => ({
+      id: e.id,
+      title: e.title,
+      slug: e.slug,
+      organizerName: e.organizer.name,
+      location: e.location,
+      status: e.status.toLowerCase(),
+      startDate: e.startDate.toISOString(),
+      endDate: e.endDate.toISOString(),
+      ticketsSold: e.ticketCategories.reduce((s, tc) => s + tc.sold, 0),
+      quota: e.ticketCategories.reduce((s, tc) => s + tc.quota, 0),
+    }));
+  }
+
+  /**
+   * Menyetujui event untuk tayang di platform
+   */
+  async approveEvent(eventId: string) {
+    const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) throw new NotFoundException('Event tidak ditemukan');
+    return this.prisma.event.update({
+      where: { id: eventId },
+      data: { status: 'PUBLISHED' },
+    });
+  }
+
+  /**
+   * Menolak event
+   */
+  async rejectEvent(eventId: string, reason?: string) {
+    const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) throw new NotFoundException('Event tidak ditemukan');
+    return this.prisma.event.update({
+      where: { id: eventId },
+      data: { status: 'CANCELLED' },
+    });
+  }
 }

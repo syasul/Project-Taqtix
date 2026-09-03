@@ -13,9 +13,14 @@ import {
   AlertCircle,
   Clock,
   Search,
+  Sparkles,
+  ShoppingBag,
+  DollarSign,
+  HeartHandshake,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { toast } from 'sonner';
 
 interface VoucherItem {
   id: string;
@@ -29,6 +34,7 @@ interface VoucherItem {
   validUntil: string;
   status: 'active' | 'inactive' | 'expired';
   event?: { id: string; title: string } | null;
+  partner?: { name: string; uniqueCode: string } | null;
 }
 
 interface EventOption {
@@ -36,15 +42,23 @@ interface EventOption {
   title: string;
 }
 
+interface PartnerOption {
+  id: string;
+  name: string;
+  uniqueCode: string;
+  promoCode?: string;
+  conversions?: number;
+  revenueGenerated?: number;
+}
+
 export default function VouchersPage() {
   const [vouchers, setVouchers] = useState<VoucherItem[]>([]);
   const [events, setEvents] = useState<EventOption[]>([]);
+  const [partners, setPartners] = useState<PartnerOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
 
   const [form, setForm] = useState({
     code: '',
@@ -65,9 +79,22 @@ export default function VouchersPage() {
         apiClient.get('/organizer/events'),
       ]);
       setVouchers(vouchersRes.data?.data || vouchersRes.data || []);
-      setEvents(eventsRes.data?.data || eventsRes.data || []);
+      const eventList = eventsRes.data?.data || eventsRes.data || [];
+      setEvents(eventList);
+
+      // Fetch partners for first few events if any
+      if (eventList.length > 0) {
+        try {
+          const partnersRes = await apiClient.get(
+            `/organizer/events/${eventList[0].id}/partners`
+          );
+          setPartners(partnersRes.data?.data || partnersRes.data || []);
+        } catch {
+          // Ignore
+        }
+      }
     } catch (err: any) {
-      setErrorMsg(err?.response?.data?.message || 'Gagal memuat data voucher');
+      toast.error(err?.response?.data?.message || 'Gagal memuat data voucher');
     } finally {
       setLoading(false);
     }
@@ -77,10 +104,18 @@ export default function VouchersPage() {
     fetchData();
   }, []);
 
+  const handleGenerateCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'EO-';
+    for (let i = 0; i < 5; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setForm({ ...form, code });
+    toast.success('Kode promo acak berhasil digenerate');
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
     try {
       setSubmitting(true);
       const payload: any = {
@@ -97,7 +132,7 @@ export default function VouchersPage() {
       if (form.eventId) payload.eventId = form.eventId;
 
       await apiClient.post('/organizer/vouchers', payload);
-      setSuccessMsg('Voucher baru berhasil dibuat!');
+      toast.success('Voucher baru berhasil dibuat!');
       setIsOpen(false);
       setForm({
         code: '',
@@ -111,7 +146,7 @@ export default function VouchersPage() {
       });
       fetchData();
     } catch (err: any) {
-      setErrorMsg(err?.response?.data?.message || 'Gagal membuat voucher');
+      toast.error(err?.response?.data?.message || 'Gagal membuat voucher');
     } finally {
       setSubmitting(false);
     }
@@ -121,300 +156,309 @@ export default function VouchersPage() {
     if (!confirm('Apakah Anda yakin ingin menonaktifkan voucher ini?')) return;
     try {
       await apiClient.post(`/organizer/vouchers/${id}/deactivate`);
+      toast.success('Voucher berhasil dinonaktifkan');
       fetchData();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Gagal menonaktifkan voucher');
+      toast.error(err?.response?.data?.message || 'Gagal menonaktifkan voucher');
     }
   };
 
   const filteredVouchers = vouchers.filter((v) =>
-    v.code.toLowerCase().includes(searchTerm.toLowerCase()),
+    v.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const breadcrumbs = [
-    { label: 'Pemasaran' },
-    { label: 'Manajemen Voucher' },
-  ];
+  // Helper to find affiliate linked to this voucher code
+  const getLinkedPartner = (voucherCode: string) => {
+    return partners.find(
+      (p) =>
+        p.promoCode?.toUpperCase() === voucherCode.toUpperCase() ||
+        p.uniqueCode?.toUpperCase() === voucherCode.toUpperCase()
+    );
+  };
+
+  const breadcrumbs = [{ label: 'Pemasaran' }, { label: 'Manajemen Voucher & Promo' }];
 
   return (
     <div className="space-y-6 max-w-5xl">
-      {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbs} />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5 tracking-tight">
-            <TicketPercent className="h-6 w-6 text-[#08B4B5]" />
-            Manajemen Voucher & Promo
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            <TicketPercent className="w-6 h-6 text-[#08B4B5]" />
+            Manajemen Voucher & Promo EO
           </h1>
-          <p className="text-slate-500 text-xs mt-1">
-            Buat kode diskon promo yang dapat digunakan lintas event (organisasi) atau khusus event tertentu.
+          <p className="text-slate-500 text-xs sm:text-sm mt-1">
+            Buat kode diskon promosi untuk meningkatkan penjualan tiket. Pantau siapa affiliator yang menjual dan total tiket yang terjual.
           </p>
         </div>
 
+        <button
+          onClick={() => setIsOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer self-start sm:self-auto"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Buat Voucher Baru</span>
+        </button>
+
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border-0">
-            <Plus className="h-4 w-4" />
-            <span>Buat Voucher Baru</span>
-          </DialogTrigger>
-          <DialogContent className="bg-white border-slate-200 text-slate-900 max-w-md rounded-2xl shadow-xl">
+          <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <TicketPercent className="h-5 w-5 text-[#08B4B5]" />
-                Tambah Voucher Baru
+                <TicketPercent className="w-5 h-5 text-[#08B4B5]" />
+                Buat Voucher / Kode Promo
               </DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleCreate} className="space-y-4 mt-2">
+            <form onSubmit={handleCreate} className="space-y-4 pt-2 text-xs">
               <div>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                  Kode Voucher (Unik) *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-700">Kode Promo *</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateCode}
+                    className="text-[#08B4B5] hover:text-[#079b9c] font-bold flex items-center gap-1 text-[11px] cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    <span>Generate Otomatis</span>
+                  </button>
+                </div>
                 <input
                   type="text"
                   required
-                  placeholder="MISAL: DISKON50K"
                   value={form.code}
                   onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono font-bold focus:border-[#08B4B5] focus:bg-white focus:outline-none uppercase"
+                  placeholder="Contoh: MERDEKA20"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800 font-mono font-bold uppercase tracking-wider"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">Tipe Diskon</label>
+                  <label className="font-bold text-slate-700 block mb-1">Tipe Diskon</label>
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value as any })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none cursor-pointer"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800"
                   >
                     <option value="percentage">Persentase (%)</option>
                     <option value="fixed">Nominal Tetap (Rp)</option>
                   </select>
                 </div>
+
                 <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                    Nilai ({form.type === 'percentage' ? '%' : 'Rp'}) *
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Nilai Diskon {form.type === 'percentage' ? '(%)' : '(Rp)'}
                   </label>
                   <input
                     type="number"
+                    min="1"
                     required
-                    min={0}
                     value={form.value}
                     onChange={(e) => setForm({ ...form, value: Number(e.target.value) })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono font-bold focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800 font-bold"
                   />
                 </div>
               </div>
 
-              {form.type === 'percentage' && (
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                    Maksimum Potongan (Rp, Opsional)
-                  </label>
+                  <label className="font-bold text-slate-700 block mb-1">Batas Kuota Penggunaan</label>
                   <input
                     type="number"
-                    min={0}
-                    placeholder="Contoh: 50000 (Kosongkan jika unlimited)"
-                    value={form.maxDiscountAmount}
-                    onChange={(e) => setForm({ ...form, maxDiscountAmount: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none font-mono"
+                    min="1"
+                    value={form.usageLimit}
+                    onChange={(e) => setForm({ ...form, usageLimit: e.target.value })}
+                    placeholder="Contoh: 100 (Opsional)"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800"
                   />
                 </div>
-              )}
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                  Batas Kuota Penggunaan (Opsional)
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  placeholder="Contoh: 100 (Kosongkan jika tanpa batas)"
-                  value={form.usageLimit}
-                  onChange={(e) => setForm({ ...form, usageLimit: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                  Lingkup Berlaku
-                </label>
-                <select
-                  value={form.eventId}
-                  onChange={(e) => setForm({ ...form, eventId: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none cursor-pointer"
-                >
-                  <option value="">Berlaku Lintas Semua Event (Org-Wide)</option>
-                  {events.map((ev) => (
-                    <option key={ev.id} value={ev.id}>
-                      Khusus Event: {ev.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">Berlaku Dari</label>
+                  <label className="font-bold text-slate-700 block mb-1">Berlaku untuk Event</label>
+                  <select
+                    value={form.eventId}
+                    onChange={(e) => setForm({ ...form, eventId: e.target.value })}
+                    className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800"
+                  >
+                    <option value="">Semua Event Saya</option>
+                    {events.map((evt) => (
+                      <option key={evt.id} value={evt.id}>
+                        {evt.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Mulai Berlaku</label>
                   <input
                     type="date"
                     required
                     value={form.validFrom}
                     onChange={(e) => setForm({ ...form, validFrom: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800"
                   />
                 </div>
+
                 <div>
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1">Hingga</label>
+                  <label className="font-bold text-slate-700 block mb-1">Berakhir Pada</label>
                   <input
                     type="date"
                     required
                     value={form.validUntil}
                     onChange={(e) => setForm({ ...form, validUntil: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 border border-slate-200 rounded-xl focus:border-[#08B4B5] focus:outline-none text-slate-800"
                   />
                 </div>
               </div>
 
-              {errorMsg && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-xs flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm border-0"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan & Terbitkan Voucher'}
-              </button>
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+                >
+                  {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                  <span>Terbitkan Voucher</span>
+                </button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      {successMsg && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-xs flex items-center gap-2 font-medium">
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          <span>{successMsg}</span>
-        </div>
-      )}
-
       {/* Search Bar */}
-      <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 max-w-md shadow-xs">
-        <Search className="h-4 w-4 text-slate-400" />
-        <input
-          type="text"
-          placeholder="Cari kode voucher..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="bg-transparent text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none w-full"
-        />
+      <div className="flex gap-4 p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
+        <div className="flex-1 relative">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+          <input
+            type="text"
+            placeholder="Cari kode voucher..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:bg-white text-xs transition-all"
+          />
+        </div>
       </div>
 
-      {/* Voucher List */}
-      {loading ? (
-        <div className="p-16 flex justify-center">
-          <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
-        </div>
-      ) : filteredVouchers.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl shadow-sm">
-          <TicketPercent className="h-10 w-10 text-slate-400 mx-auto mb-3" />
-          <h3 className="text-slate-800 font-bold text-sm">Belum Ada Voucher</h3>
-          <p className="text-slate-400 text-xs mt-1">
-            Buat kode voucher diskon pertama Anda untuk meningkatkan konversi penjualan tiket.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredVouchers.map((v) => (
-            <div
-              key={v.id}
-              className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition flex flex-col justify-between shadow-sm"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <div>
-                    <span className="text-xs font-mono font-black text-[#08B4B5] bg-teal-50 px-2.5 py-1 rounded-lg border border-[#08B4B5]/30">
-                      {v.code}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
-                      v.status === 'active'
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                        : 'bg-slate-100 border-slate-200 text-slate-500'
-                    }`}
-                  >
-                    {v.status}
-                  </span>
-                </div>
-
-                <div className="space-y-2 mt-4">
-                  <div className="flex items-baseline justify-between text-xs">
-                    <span className="text-slate-400">Potongan Diskon:</span>
-                    <span className="font-bold text-slate-900 font-mono">
-                      {v.type === 'percentage'
-                        ? `${v.value}%`
-                        : `Rp ${v.value.toLocaleString('id-ID')}`}
-                      {v.maxDiscountAmount && (
-                        <span className="text-[10px] text-slate-400 block text-right font-normal">
-                          (maks Rp {v.maxDiscountAmount.toLocaleString('id-ID')})
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
+            <p className="text-slate-500 text-xs font-medium">Memuat daftar voucher...</p>
+          </div>
+        ) : filteredVouchers.length === 0 ? (
+          <div className="text-center py-16 text-slate-400 text-xs">
+            Belum ada voucher yang dibuat. Klik "Buat Voucher Baru" di atas.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-600">
+              <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-100 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th className="py-3.5 px-4">Kode Voucher</th>
+                  <th className="py-3.5 px-4">Diskon</th>
+                  <th className="py-3.5 px-4">Event</th>
+                  <th className="py-3.5 px-4">Affiliate Penjual</th>
+                  <th className="py-3.5 px-4">Terjual (Penggunaan)</th>
+                  <th className="py-3.5 px-4">Masa Berlaku</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredVouchers.map((v) => {
+                  const linkedPartner = getLinkedPartner(v.code);
+                  return (
+                    <tr key={v.id} className="hover:bg-slate-50/80 transition">
+                      <td className="py-3.5 px-4">
+                        <span className="font-mono font-bold text-[#08B4B5] bg-[#08B4B5]/10 px-2.5 py-1 rounded-lg border border-[#08B4B5]/20">
+                          {v.code}
                         </span>
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Penggunaan:</span>
-                    <span className="font-semibold text-slate-700 font-mono">
-                      {v.usageCount} / {v.usageLimit ? v.usageLimit : '∞'}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Lingkup Event:</span>
-                    <span className="font-semibold text-slate-700 truncate max-w-[150px]">
-                      {v.event ? v.event.title : 'Semua Event (Org-wide)'}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs pt-1 text-slate-400 font-mono">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Masa Berlaku:
-                    </span>
-                    <span>
-                      {new Date(v.validUntil).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {v.status === 'active' && (
-                <div className="pt-4 mt-4 border-t border-slate-100">
-                  <button
-                    onClick={() => handleDeactivate(v.id)}
-                    className="w-full flex items-center justify-center gap-2 py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-semibold transition cursor-pointer"
-                  >
-                    <PowerOff className="h-3.5 w-3.5" />
-                    Nonaktifkan
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+                      </td>
+                      <td className="py-3.5 px-4 font-bold text-slate-800">
+                        {v.type === 'percentage'
+                          ? `${v.value}%`
+                          : v.value.toLocaleString('id-ID', {
+                              style: 'currency',
+                              currency: 'IDR',
+                              minimumFractionDigits: 0,
+                            })}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-semibold text-slate-800 line-clamp-1">
+                          {v.event?.title || 'Semua Event Saya'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {linkedPartner ? (
+                          <div>
+                            <p className="font-bold text-slate-900">{linkedPartner.name}</p>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {linkedPartner.uniqueCode}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 italic">Promo EO Langsung</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-slate-900 font-mono">
+                          {v.usageCount} {v.usageLimit ? `/ ${v.usageLimit}` : 'kali'}
+                        </div>
+                        <span className="text-[10px] text-emerald-600 font-semibold">
+                          {v.usageCount} tiket terjual
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-[11px] text-slate-500">
+                        {new Date(v.validUntil).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {v.status === 'active' ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Aktif
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                            Nonaktif
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        {v.status === 'active' && (
+                          <button
+                            onClick={() => handleDeactivate(v.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                            title="Nonaktifkan Voucher"
+                          >
+                            <PowerOff className="w-4 h-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

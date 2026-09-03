@@ -194,4 +194,34 @@ export class AdminController {
     const result = await this.adminService.getBillingOversight();
     return { success: true, data: result };
   }
+
+  @Get('admin/events')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan seluruh event untuk moderasi (Admin Only)' })
+  async getEvents() {
+    const result = await this.adminService.getEvents();
+    return { success: true, data: result };
+  }
+
+  @Post('admin/events/:id/approve')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Menyetujui event untuk dipublikasikan (Admin Only)' })
+  async approveEvent(@Param('id') id: string) {
+    const result = await this.adminService.approveEvent(id);
+    return { success: true, data: result };
+  }
+
+  @Post('admin/events/:id/reject')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Menolak penerbitan event (Admin Only)' })
+  async rejectEvent(
+    @Param('id') id: string,
+    @Body('reason') reason?: string,
+  ) {
+    const result = await this.adminService.rejectEvent(id, reason);
+    return { success: true, data: result };
+  }
 }

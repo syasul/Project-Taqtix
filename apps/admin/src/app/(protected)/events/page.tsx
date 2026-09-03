@@ -9,6 +9,16 @@ import {
   AlertTriangle,
   Pause,
   ExternalLink,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Eye,
+  ShieldCheck,
+  Building2,
+  MapPin,
+  Ticket,
+  DollarSign,
+  Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,11 +28,14 @@ interface EventItem {
   slug: string;
   organizerName: string;
   location: string;
-  status: 'draft' | 'published' | 'ended' | 'cancelled';
+  status: 'draft' | 'published' | 'ended' | 'cancelled' | 'pending_approval';
   startDate: string;
   endDate: string;
   ticketsSold: number;
   quota: number;
+  category?: string;
+  description?: string;
+  priceRange?: string;
 }
 
 const formatDate = (isoString: string) => {
@@ -37,16 +50,49 @@ const formatDate = (isoString: string) => {
   );
 };
 
-export default function EventsPage() {
+export default function EventsApprovalPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [confirmUnpublishModal, setConfirmUnpublishModal] = useState<{ id: string; title: string } | null>(null);
+  const [detailEvent, setDetailEvent] = useState<EventItem | null>(null);
+  const [rejectModal, setRejectModal] = useState<EventItem | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   // Fetch Events
   const { data: events = [], isLoading } = useQuery<EventItem[]>({
     queryKey: ['admin-events'],
     queryFn: () => api.get<EventItem[]>('/admin/events'),
+  });
+
+  // Approve Mutation
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/admin/events/${id}/approve`),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+      toast.success('Event berhasil disetujui & tayang di platform!');
+      if (detailEvent?.id === data.data?.id) setDetailEvent(null);
+    },
+    onError: () => {
+      toast.error('Gagal menyetujui event');
+    },
+  });
+
+  // Reject Mutation
+  const rejectMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      api.post(`/admin/events/${id}/reject`, { reason }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+      setRejectModal(null);
+      setRejectReason('');
+      toast.success('Event berhasil ditolak');
+    },
+    onError: () => {
+      toast.error('Gagal menolak event');
+    },
   });
 
   // Force Unpublish Mutation
@@ -69,17 +115,87 @@ export default function EventsPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const pendingCount = events.filter((e) => e.status === 'pending_approval').length;
+  const publishedCount = events.filter((e) => e.status === 'published').length;
+  const draftCount = events.filter((e) => e.status === 'draft').length;
+
   return (
     <div className="space-y-6">
       {/* Title */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-          <Calendar className="w-6 h-6 text-[#08B4B5]" />
-          Moderasi & Pengawasan Event
-        </h1>
-        <p className="text-slate-500 text-sm mt-1">
-          Pantau seluruh event di platform dan lakukan tindakan moderasi (Force Unpublish) jika terdeteksi pelanggaran.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            <Calendar className="w-6 h-6 text-[#08B4B5]" />
+            Approval & Moderasi Event
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Tinjau pengajuan event baru dari EO, berikan persetujuan penerbitan (Publish), atau lakukan moderasi.
+          </p>
+        </div>
+
+        {pendingCount > 0 && (
+          <div className="flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 border border-amber-200 rounded-full text-amber-800 text-xs font-bold animate-pulse self-start md:self-auto">
+            <Clock className="w-4 h-4 text-amber-600" />
+            <span>{pendingCount} Event Menunggu Approval</span>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div
+          onClick={() => setStatusFilter('all')}
+          className={`p-4 rounded-xl border transition cursor-pointer ${
+            statusFilter === 'all'
+              ? 'bg-white border-[#08B4B5] shadow-sm ring-2 ring-[#08B4B5]/20'
+              : 'bg-white border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <p className="text-xs font-semibold text-slate-500">Semua Event</p>
+          <p className="text-2xl font-bold text-slate-900 mt-1">{events.length}</p>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('pending_approval')}
+          className={`p-4 rounded-xl border transition cursor-pointer ${
+            statusFilter === 'pending_approval'
+              ? 'bg-amber-50/60 border-amber-400 shadow-sm ring-2 ring-amber-400/20'
+              : 'bg-white border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-amber-700">Menunggu Approval</p>
+            <Clock className="w-4 h-4 text-amber-500" />
+          </div>
+          <p className="text-2xl font-bold text-amber-700 mt-1">{pendingCount}</p>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('published')}
+          className={`p-4 rounded-xl border transition cursor-pointer ${
+            statusFilter === 'published'
+              ? 'bg-emerald-50/60 border-emerald-400 shadow-sm ring-2 ring-emerald-400/20'
+              : 'bg-white border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-emerald-700">Tayang / Aktif</p>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          </div>
+          <p className="text-2xl font-bold text-emerald-700 mt-1">{publishedCount}</p>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('draft')}
+          className={`p-4 rounded-xl border transition cursor-pointer ${
+            statusFilter === 'draft'
+              ? 'bg-slate-100 border-slate-400 shadow-sm ring-2 ring-slate-400/20'
+              : 'bg-white border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <p className="text-xs font-semibold text-slate-500">Draft / Selesai</p>
+          <p className="text-2xl font-bold text-slate-700 mt-1">{draftCount}</p>
+        </div>
       </div>
 
       {/* Filters & Search */}
@@ -98,13 +214,13 @@ export default function EventsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-[#08B4B5] focus:bg-white transition-all text-xs cursor-pointer"
+            className="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-[#08B4B5] focus:bg-white transition-all text-xs cursor-pointer font-medium"
           >
             <option value="all">Semua Status</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-            <option value="ended">Selesai</option>
-            <option value="cancelled">Dibatalkan</option>
+            <option value="pending_approval">⏳ Menunggu Approval</option>
+            <option value="published">✅ Tayang (Published)</option>
+            <option value="draft">📝 Draft</option>
+            <option value="cancelled">❌ Dibatalkan / Ditolak</option>
           </select>
         </div>
       </div>
@@ -118,93 +234,116 @@ export default function EventsPage() {
           </div>
         ) : filteredEvents.length === 0 ? (
           <div className="text-center py-16 text-slate-400 text-sm">
-            Tidak ada event yang ditemukan.
+            Tidak ada event yang sesuai dengan filter.
           </div>
         ) : (
-          <div className="overflow-x-auto text-xs">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-bold bg-slate-50 uppercase tracking-wider text-[11px]">
-                  <th className="p-4">Detail Event</th>
-                  <th className="p-4">Penyelenggara</th>
-                  <th className="p-4">Tanggal Pelaksanaan</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Keterisian Kuota</th>
-                  <th className="p-4 text-right">Aksi</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-600">
+              <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th className="py-3.5 px-4">Event & Penyelenggara</th>
+                  <th className="py-3.5 px-4">Lokasi & Waktu</th>
+                  <th className="py-3.5 px-4">Penjualan / Kuota</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right">Aksi Moderasi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredEvents.map((evt) => (
-                  <tr key={evt.id} className="hover:bg-slate-50/70 transition-colors">
-                    {/* Event Detail */}
-                    <td className="p-4">
-                      <div className="font-bold text-slate-900">{evt.title}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">{evt.location}</div>
-                    </td>
-
-                    {/* Organizer */}
-                    <td className="p-4 text-slate-700 font-medium">
-                      {evt.organizerName}
-                    </td>
-
-                    {/* Dates */}
-                    <td className="p-4 text-slate-600 font-mono text-xs">
-                      {formatDate(evt.startDate)}
-                    </td>
-
-                    {/* Status */}
-                    <td className="p-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                          evt.status === 'published'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : evt.status === 'draft'
-                            ? 'bg-slate-100 text-slate-600 border border-slate-200'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200'
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            evt.status === 'published'
-                              ? 'bg-emerald-500'
-                              : evt.status === 'draft'
-                              ? 'bg-slate-400'
-                              : 'bg-rose-500'
-                          }`}
-                        />
-                        {evt.status === 'published'
-                          ? 'Published'
-                          : evt.status === 'draft'
-                          ? 'Draft'
-                          : evt.status === 'ended'
-                          ? 'Selesai'
-                          : 'Dibatalkan'}
-                      </span>
-                    </td>
-
-                    {/* Sales quota */}
-                    <td className="p-4 font-mono text-slate-700">
-                      <div>
-                        {evt.ticketsSold} <span className="text-slate-400 font-normal">/ {evt.quota}</span>
+                  <tr key={evt.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4">
+                      <div className="font-bold text-slate-900 text-sm">{evt.title}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{evt.organizerName}</span>
                       </div>
-                      <div className="w-24 h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden border border-slate-200/50">
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="text-slate-700 font-medium flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>{evt.location}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">{formatDate(evt.startDate)}</div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="font-mono font-bold text-slate-800">
+                        {evt.ticketsSold.toLocaleString()} / {evt.quota.toLocaleString()}
+                      </div>
+                      <div className="w-24 bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
                         <div
-                          className="h-full bg-[#08B4B5] rounded-full"
-                          style={{ width: `${Math.min(100, (evt.ticketsSold / evt.quota) * 100)}%` }}
+                          className="bg-[#08B4B5] h-full"
+                          style={{
+                            width: `${Math.min(100, (evt.ticketsSold / (evt.quota || 1)) * 100)}%`,
+                          }}
                         />
                       </div>
                     </td>
+                    <td className="py-3.5 px-4">
+                      {evt.status === 'pending_approval' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                          <Clock className="w-3 h-3" />
+                          Menunggu Approval
+                        </span>
+                      )}
+                      {evt.status === 'published' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Tayang (Published)
+                        </span>
+                      )}
+                      {evt.status === 'draft' && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                          Draft
+                        </span>
+                      )}
+                      {evt.status === 'cancelled' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                          <XCircle className="w-3 h-3" />
+                          Ditolak / Batal
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => setDetailEvent(evt)}
+                          title="Lihat Detail Event"
+                          className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
 
-                    {/* Actions */}
-                    <td className="p-4 text-right">
-                      <div className="flex justify-end items-center gap-2">
+                        {evt.status === 'pending_approval' && (
+                          <>
+                            <button
+                              onClick={() => approveMutation.mutate(evt.id)}
+                              disabled={approveMutation.isPending}
+                              title="Setujui Event & Publikasikan"
+                              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-xs"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Setujui</span>
+                            </button>
+
+                            <button
+                              onClick={() => setRejectModal(evt)}
+                              title="Tolak Event"
+                              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                              <span>Tolak</span>
+                            </button>
+                          </>
+                        )}
+
                         {evt.status === 'published' && (
                           <button
                             onClick={() => setConfirmUnpublishModal({ id: evt.id, title: evt.title })}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                            title="Force Unpublish"
+                            className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-[11px] font-semibold transition flex items-center gap-1"
                           >
                             <Pause className="w-3.5 h-3.5" />
-                            <span>Force Unpublish</span>
+                            <span>Unpublish</span>
                           </button>
                         )}
                       </div>
@@ -217,34 +356,178 @@ export default function EventsPage() {
         )}
       </div>
 
-      {/* Confirmation Modal */}
-      {confirmUnpublishModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 relative">
-            <div className="flex gap-4">
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl shrink-0">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
+      {/* DETAIL MODAL */}
+      {detailEvent && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-bold text-lg text-slate-900">Batalkan Publikasi Event?</h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  Apakah Anda yakin ingin membatalkan publikasi event <strong>{confirmUnpublishModal.title}</strong>? Event ini akan dikembalikan menjadi status <strong>Draft</strong> sehingga pembeli tidak dapat membeli tiketnya. Tindakan ini akan dicatat ke dalam audit log admin.
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#08B4B5] bg-[#08B4B5]/10 px-2 py-0.5 rounded-md">
+                  {detailEvent.category || 'Event'}
+                </span>
+                <h3 className="text-lg font-bold text-slate-900 mt-1">{detailEvent.title}</h3>
+                <p className="text-xs text-slate-500">Penyelenggara: {detailEvent.organizerName}</p>
+              </div>
+              <button
+                onClick={() => setDetailEvent(null)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg text-lg leading-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-slate-600">
+              <div className="p-3 bg-slate-50 rounded-xl space-y-1.5 border border-slate-200">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-[#08B4B5]" />
+                  <span className="font-semibold text-slate-800">{detailEvent.location}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#08B4B5]" />
+                  <span>{formatDate(detailEvent.startDate)} - {formatDate(detailEvent.endDate)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Ticket className="w-4 h-4 text-[#08B4B5]" />
+                  <span>Kapasitas: {detailEvent.quota.toLocaleString()} Tiket (Terjual: {detailEvent.ticketsSold})</span>
+                </div>
+                {detailEvent.priceRange && (
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-[#08B4B5]" />
+                    <span>Harga Tiket: {detailEvent.priceRange}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-800 mb-1">Deskripsi Event</h4>
+                <p className="text-slate-600 leading-relaxed bg-white border border-slate-100 p-3 rounded-xl">
+                  {detailEvent.description || 'Tidak ada deskripsi rinci untuk event ini.'}
                 </p>
               </div>
             </div>
-            <div className="mt-6 flex justify-end gap-3 text-xs font-bold">
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                onClick={() => setDetailEvent(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Tutup
+              </button>
+
+              {detailEvent.status === 'pending_approval' && (
+                <>
+                  <button
+                    onClick={() => {
+                      setRejectModal(detailEvent);
+                      setDetailEvent(null);
+                    }}
+                    className="px-4 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 rounded-xl text-xs font-bold cursor-pointer"
+                  >
+                    Tolak Event
+                  </button>
+                  <button
+                    onClick={() => approveMutation.mutate(detailEvent.id)}
+                    disabled={approveMutation.isPending}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Setujui & Publikasikan</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REJECT MODAL */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
+            <div className="flex items-center gap-3 text-rose-600">
+              <div className="p-2 bg-rose-50 rounded-xl border border-rose-200">
+                <XCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Tolak Pengajuan Event</h3>
+                <p className="text-xs text-slate-500">{rejectModal.title}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-700 block">
+                Alasan Penolakan (akan dikirimkan ke Penyelenggara)
+              </label>
+              <textarea
+                rows={3}
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Contoh: Dokumen perizinan venue belum lengkap / informasi harga tidak wajar..."
+                className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:border-rose-500 focus:outline-none text-slate-800"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setRejectModal(null);
+                  setRejectReason('');
+                }}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() =>
+                  rejectMutation.mutate({
+                    id: rejectModal.id,
+                    reason: rejectReason || 'Tidak memenuhi kualifikasi persetujuan event platform.',
+                  })
+                }
+                disabled={rejectMutation.isPending}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold cursor-pointer"
+              >
+                {rejectMutation.isPending ? 'Memproses...' : 'Konfirmasi Tolak'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRM FORCE UNPUBLISH MODAL */}
+      {confirmUnpublishModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
+            <div className="flex items-center gap-3 text-amber-600">
+              <div className="p-2 bg-amber-50 rounded-xl border border-amber-200">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Force Unpublish Event</h3>
+                <p className="text-xs text-slate-500">Tindakan Moderasi</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Apakah Anda yakin ingin menarik tayang event{' '}
+              <strong className="text-slate-900">{confirmUnpublishModal.title}</strong>? Event akan
+              dikembalikan ke status <strong className="text-slate-900">Draft</strong> dan tidak
+              dapat diakses/dibeli tiketnya oleh publik.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setConfirmUnpublishModal(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
               >
-                Batalkan
+                Batal
               </button>
               <button
                 onClick={() => unpublishMutation.mutate(confirmUnpublishModal.id)}
                 disabled={unpublishMutation.isPending}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 rounded-xl text-white transition-colors cursor-pointer"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold cursor-pointer"
               >
-                {unpublishMutation.isPending ? 'Memproses...' : 'Ya, Force Unpublish'}
+                {unpublishMutation.isPending ? 'Memproses...' : 'Ya, Tarik Tayang'}
               </button>
             </div>
           </div>

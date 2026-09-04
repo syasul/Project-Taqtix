@@ -14,6 +14,21 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
+import SeoFormSection from '@/components/seo-form-section';
+
+const LocationMapPicker = dynamic(
+  () => import('@/components/location-map-picker'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-72 w-full rounded-2xl bg-slate-100 animate-pulse flex flex-col items-center justify-center text-xs text-slate-400 gap-2 border border-slate-200">
+        <Loader2 className="w-5 h-5 animate-spin text-[#08B4B5]" />
+        <span>Memuat Peta Lokasi Leaflet...</span>
+      </div>
+    ),
+  }
+);
 
 // Validasi Form menggunakan Zod
 const eventSchema = z.object({
@@ -24,6 +39,9 @@ const eventSchema = z.object({
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: 'Format tanggal selesai salah' }),
   bannerUrl: z.string().url({ message: 'URL banner tidak valid' }).or(z.literal('')),
   requireLogin: z.boolean().default(false),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  seoKeywords: z.string().optional(),
 }).refine((data) => {
   return new Date(data.endDate) > new Date(data.startDate);
 }, {
@@ -43,6 +61,11 @@ interface Event {
   startDate: string;
   endDate: string;
   requireLogin?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  adminSeoKeywords?: string;
+  seoPriority?: string;
   status: 'DRAFT' | 'PUBLISHED' | 'ENDED' | 'CANCELLED' | 'draft' | 'published' | 'ended' | 'cancelled';
 }
 
@@ -73,6 +96,9 @@ export default function EditEventPage() {
       endDate: '',
       bannerUrl: '',
       requireLogin: false,
+      seoTitle: '',
+      seoDescription: '',
+      seoKeywords: '',
     },
   });
 
@@ -98,6 +124,9 @@ export default function EditEventPage() {
           endDate: toLocalString(found.endDate),
           bannerUrl: found.bannerUrl || '',
           requireLogin: Boolean(found.requireLogin),
+          seoTitle: found.seoTitle || '',
+          seoDescription: found.seoDescription || '',
+          seoKeywords: found.seoKeywords || '',
         });
       }
     }
@@ -257,11 +286,15 @@ export default function EditEventPage() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Lokasi Penyelenggaraan *</FormLabel>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Lokasi & Titik Peta Penyelenggaraan (Leaflet) *
+                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs"
-                        {...field}
+                      <LocationMapPicker
+                        value={field.value}
+                        onChange={(newAddress) => {
+                          field.onChange(newAddress);
+                        }}
                       />
                     </FormControl>
                     <FormMessage className="text-rose-500 text-xs" />
@@ -365,6 +398,14 @@ export default function EditEventPage() {
                     </div>
                   </FormItem>
                 )}
+              />
+
+              {/* SEO & Double Engagement Section */}
+              <SeoFormSection
+                form={form}
+                currentTitle={form.watch('title')}
+                currentDescription={form.watch('description')}
+                eventSlug={event?.slug || 'event-slug'}
               />
 
               <Button

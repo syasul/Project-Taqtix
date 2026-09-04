@@ -284,6 +284,11 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            seoTitle: string | null;
+            seoDescription: string | null;
+            seoKeywords: string | null;
+            adminSeoKeywords: string | null;
+            seoPriority: string | null;
             organizerId: string;
             status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;
@@ -306,6 +311,11 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            seoTitle: string | null;
+            seoDescription: string | null;
+            seoKeywords: string | null;
+            adminSeoKeywords: string | null;
+            seoPriority: string | null;
             organizerId: string;
             status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;

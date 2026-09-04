@@ -62,6 +62,11 @@ let EventsService = class EventsService {
                 startDate: new Date(dto.startDate),
                 endDate: new Date(dto.endDate),
                 requireLogin: dto.requireLogin ?? false,
+                seoTitle: dto.seoTitle,
+                seoDescription: dto.seoDescription,
+                seoKeywords: dto.seoKeywords,
+                adminSeoKeywords: dto.adminSeoKeywords,
+                seoPriority: dto.seoPriority || 'NORMAL',
                 status: client_1.EventStatus.DRAFT,
             },
         });
@@ -104,6 +109,16 @@ let EventsService = class EventsService {
             updateData.endDate = new Date(dto.endDate);
         if (dto.requireLogin !== undefined)
             updateData.requireLogin = dto.requireLogin;
+        if (dto.seoTitle !== undefined)
+            updateData.seoTitle = dto.seoTitle;
+        if (dto.seoDescription !== undefined)
+            updateData.seoDescription = dto.seoDescription;
+        if (dto.seoKeywords !== undefined)
+            updateData.seoKeywords = dto.seoKeywords;
+        if (dto.adminSeoKeywords !== undefined)
+            updateData.adminSeoKeywords = dto.adminSeoKeywords;
+        if (dto.seoPriority !== undefined)
+            updateData.seoPriority = dto.seoPriority;
         return this.prisma.event.update({
             where: { id },
             data: updateData,

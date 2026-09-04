@@ -20,6 +20,11 @@ class CreateEventDto {
     endDate;
     bannerUrl;
     requireLogin;
+    seoTitle;
+    seoDescription;
+    seoKeywords;
+    adminSeoKeywords;
+    seoPriority;
 }
 exports.CreateEventDto = CreateEventDto;
 __decorate([
@@ -86,4 +91,54 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateEventDto.prototype, "requireLogin", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi',
+        required: false,
+        description: 'Custom SEO Meta Title',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEventDto.prototype, "seoTitle", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026 hanya di Taqtix.',
+        required: false,
+        description: 'Custom SEO Meta Description',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEventDto.prototype, "seoDescription", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'konser musik, taqwa movement, festival islam 2026, tiket jakarta',
+        required: false,
+        description: 'SEO Keywords dari EO (koma terpisah)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEventDto.prototype, "seoKeywords", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Taqtix Official, Tiket Resmi Jakarta, Promo Spesial',
+        required: false,
+        description: 'Platform SEO Booster Keywords dari Main Admin',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEventDto.prototype, "adminSeoKeywords", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'NORMAL',
+        required: false,
+        description: 'Prioritas SEO Platform (NORMAL / HIGH / MAX_BOOST)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEventDto.prototype, "seoPriority", void 0);
 //# sourceMappingURL=create-event.dto.js.map

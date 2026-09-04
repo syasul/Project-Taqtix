@@ -113,6 +113,14 @@ model Event {
   geofenceRadius      Float?
   allowTicketTransfer Boolean           @default(true)
   requireLogin        Boolean           @default(false)
+  
+  // SEO & Double Engagement Fields
+  seoTitle            String?
+  seoDescription      String?           @db.Text
+  seoKeywords         String?           @db.Text
+  adminSeoKeywords    String?           @db.Text
+  seoPriority         String?           @default("NORMAL")
+
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

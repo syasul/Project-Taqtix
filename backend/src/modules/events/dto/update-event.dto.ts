@@ -46,4 +46,29 @@ export class UpdateEventDto {
   @IsBoolean()
   @IsOptional()
   requireLogin?: boolean;
+
+  @ApiProperty({ example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi', required: false })
+  @IsString()
+  @IsOptional()
+  seoTitle?: string;
+
+  @ApiProperty({ example: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026', required: false })
+  @IsString()
+  @IsOptional()
+  seoDescription?: string;
+
+  @ApiProperty({ example: 'konser musik, festival islam 2026', required: false })
+  @IsString()
+  @IsOptional()
+  seoKeywords?: string;
+
+  @ApiProperty({ example: 'Taqtix Official, Tiket Resmi Jakarta', required: false })
+  @IsString()
+  @IsOptional()
+  adminSeoKeywords?: string;
+
+  @ApiProperty({ example: 'NORMAL', required: false })
+  @IsString()
+  @IsOptional()
+  seoPriority?: string;
 }

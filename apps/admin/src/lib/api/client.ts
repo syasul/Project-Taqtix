@@ -202,6 +202,11 @@ let mockEvents = [
     endDate: '2026-09-12T22:00:00Z',
     ticketsSold: 450,
     quota: 650,
+    seoTitle: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi',
+    seoDescription: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026 di JCC Senayan Jakarta hanya di platform TAQtix.',
+    seoKeywords: 'konser musik, taqwa movement, festival islam 2026, tiket konser jakarta',
+    adminSeoKeywords: 'Taqtix Official, Tiket Resmi Jakarta, Trending Pekan Ini, Verified Organizer, Konser Islami',
+    seoPriority: 'MAX_BOOST',
   },
   {
     id: 'evt-2',
@@ -214,6 +219,11 @@ let mockEvents = [
     endDate: '2026-10-04T12:00:00Z',
     ticketsSold: 920,
     quota: 1200,
+    seoTitle: 'Kajian Akbar: Menjemput Hidayah Bersama Asatidz Nasional',
+    seoDescription: 'Pendaftaran dan e-tiket resmi Kajian Akbar Menjemput Hidayah di Masjid Istiqlal.',
+    seoKeywords: 'kajian akbar, hidayah, istiqlal jakarta, tiket kajian gratis',
+    adminSeoKeywords: 'Kajian Trending, Rekomendasi Taqtix, Tiket Masjid Istiqlal',
+    seoPriority: 'HIGH',
   },
   {
     id: 'evt-3',
@@ -229,6 +239,11 @@ let mockEvents = [
     category: 'Bazaar & Culinary',
     description: 'Festival akbar kuliner halal nusantara dan pameran gaya hidup Islami terbesar tahun ini.',
     priceRange: 'Rp 35.000 - Rp 150.000',
+    seoTitle: 'Fest Hijrah & Halal Culinary Expo 2026 di ICE BSD Tangerang',
+    seoDescription: 'Bazaar kuliner halal terbesar se-Indonesia dengan 150+ tenant kuliner dan talkshow inspiratif.',
+    seoKeywords: 'kuliner halal, food fest, ice bsd, hijrah fest 2026',
+    adminSeoKeywords: 'Festival Halal Nasional, Promo Kuliner, Taqtix Top Picks',
+    seoPriority: 'HIGH',
   },
   {
     id: 'evt-4',
@@ -244,6 +259,11 @@ let mockEvents = [
     category: 'Workshop',
     description: 'Workshop interaktif seni kaligrafi modern, desain kreatif, dan fotografi bersama praktisi terkemuka.',
     priceRange: 'Rp 150.000 - Rp 350.000',
+    seoTitle: 'Jakarta Creative Workshop & Kaligrafi Modern Art Expo 2026',
+    seoDescription: 'Ikuti workshop seni dan desain kreatif bersama para mentor ahli di Senayan Park Jakarta.',
+    seoKeywords: 'workshop kaligrafi, creative art, senayan park',
+    adminSeoKeywords: 'Workshop Jakarta, Kelas Kreatif, Taqtix Verified',
+    seoPriority: 'NORMAL',
   },
 ];
 
@@ -871,6 +891,25 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
       });
       return { success: true, data: event };
     }
+  }
+
+  if (url.startsWith('/admin/events/') && url.endsWith('/seo')) {
+    const id = url.split('/')[3];
+    const event = mockEvents.find((e) => e.id === id);
+    if (event) {
+      if (body?.adminSeoKeywords !== undefined) event.adminSeoKeywords = body.adminSeoKeywords;
+      if (body?.seoPriority !== undefined) event.seoPriority = body.seoPriority;
+      if (body?.seoKeywords !== undefined) event.seoKeywords = body.seoKeywords;
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'UPDATE_EVENT_SEO_BOOSTER',
+        target: `${event.title} (${event.id}) - Double Engagement Booster: ${body.seoPriority || 'NORMAL'}`,
+        timestamp: new Date().toISOString(),
+      });
+      return { success: true, data: event };
+    }
+    throw new ApiError('Event tidak ditemukan', 'NOT_FOUND', 404);
   }
 
   // BANNERS CRUD

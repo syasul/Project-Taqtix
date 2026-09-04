@@ -9,10 +9,20 @@ import {
   TicketPercent,
   Banknote,
   Sparkles,
+  LogOut,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('affiliate_auth_token');
+    toast.success('Berhasil logout dari Portal Afiliasi');
+    router.push('/login');
+  };
 
   // On login page, render full screen with NO sidebar
   if (pathname === '/login') {
@@ -94,17 +104,27 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         </div>
 
         {/* User Profile Footer */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/50 m-3 rounded-2xl border">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#08B4B5]/15 text-[#08B4B5] flex items-center justify-center font-bold text-xs">
-              SM
+        <div className="p-4 border-t border-slate-100 bg-slate-50/50 m-3 rounded-2xl border space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-[#08B4B5]/15 text-[#08B4B5] flex items-center justify-center font-bold text-xs shrink-0">
+                SM
+              </div>
+              <div className="truncate">
+                <p className="font-bold text-slate-900 text-xs truncate">Syamsul Ma’arif</p>
+                <p className="text-[10px] text-slate-400 truncate font-mono">syamsul.partner@gmail.com</p>
+              </div>
             </div>
-            <div className="truncate">
-              <p className="font-bold text-slate-900 text-xs truncate">Syamsul Ma’arif</p>
-              <p className="text-[10px] text-slate-400 truncate font-mono">syamsul.partner@gmail.com</p>
-            </div>
+            <button
+              onClick={handleLogout}
+              title="Keluar / Logout"
+              aria-label="Logout"
+              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition shrink-0 cursor-pointer border border-transparent hover:border-rose-200"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+          <div className="pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
             <span className="text-slate-500 font-medium">Saldo Siap Tarik:</span>
             <span className="font-mono font-bold text-emerald-600">Rp 2.733.750</span>
           </div>

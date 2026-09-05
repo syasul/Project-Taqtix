@@ -30,6 +30,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { CountdownTimer } from '@/components/checkout/countdown-timer';
 
 // Schema validasi checkout menggunakan Zod
 const checkoutSchema = z.object({
@@ -213,26 +214,41 @@ function CheckoutContent() {
   // Submit checkout
   const checkoutMutation = useMutation({
     mutationFn: async (values: CheckoutFormValues) => {
-      const storedAff = eventId ? localStorage.getItem(`taqtix_aff_${eventId}`) : null;
+      const storedAff = eventId 
+        ? (localStorage.getItem(`taqtix_aff_${eventId}`) || localStorage.getItem('taqtix_partner_ref'))
+        : (typeof window !== 'undefined' ? localStorage.getItem('taqtix_partner_ref') : null);
 
       const activeFacilities = Object.entries(selectedFacilities)
         .filter(([_, qty]) => qty > 0)
         .map(([facilityId, qty]) => ({ facilityId, qty }));
 
-      const orderRes = await apiClient.post('/orders', {
-        eventId,
-        buyerName: values.buyerName,
-        buyerEmail: values.buyerEmail,
-        buyerPhone: values.buyerPhone,
-        promoCode: appliedPromo || undefined,
-        affiliateCode: storedAff || undefined,
-        customFieldAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
-        facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
-        items: checkoutItems.map((item) => ({
-          ticketCategoryId: item.categoryId,
-          qty: item.qty,
-        })),
-      });
+      const idempotencyKey =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `order-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+      const orderRes = await apiClient.post(
+        '/orders',
+        {
+          eventId,
+          buyerName: values.buyerName,
+          buyerEmail: values.buyerEmail,
+          buyerPhone: values.buyerPhone,
+          promoCode: appliedPromo || undefined,
+          affiliateCode: storedAff || undefined,
+          customFieldAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
+          facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
+          items: checkoutItems.map((item) => ({
+            ticketCategoryId: item.categoryId,
+            qty: item.qty,
+          })),
+        },
+        {
+          headers: {
+            'Idempotency-Key': idempotencyKey,
+          },
+        }
+      );
 
       const orderId = orderRes.data?.data?.id;
       const payRes = await apiClient.post(`/orders/${orderId}/pay`);
@@ -277,6 +293,19 @@ function CheckoutContent() {
                     Selesaikan pembayaran Anda di tab instruksi pembayaran payment gateway yang terbuka.
                   </p>
                 </div>
+
+                {orderDetails?.expiredAt && (
+                  <div className="w-full flex justify-center pt-2">
+                    <CountdownTimer
+                      expiredAt={orderDetails.expiredAt}
+                      onExpire={() => {
+                        setPollingStatus('expired');
+                        toast.error('Batas waktu pembayaran pesanan telah habis (10 menit).');
+                      }}
+                    />
+                  </div>
+                )}
+
                 {orderDetails?.payment?.snapToken && (
                   <Button
                     onClick={() => {

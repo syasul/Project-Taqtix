@@ -20,6 +20,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -32,6 +33,7 @@ export class OrdersController {
 
   @Public()
   @Post()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({
     summary: 'Membuat pesanan baru dan mereservasi kuota tiket (Public/Buyer)',
   })
@@ -61,7 +63,12 @@ export class OrdersController {
         // Token invalid atau expired, tetap lanjut sebagai unauthenticated
       }
     }
-    return this.ordersService.create(dto, authenticatedUserId);
+    const idempotencyKey =
+      (req.headers['idempotency-key'] as string) ||
+      (req.headers['x-idempotency-key'] as string) ||
+      undefined;
+
+    return this.ordersService.create(dto, authenticatedUserId, idempotencyKey);
   }
 
   @Get('my')

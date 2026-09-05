@@ -6,16 +6,34 @@ import {
   Delete,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AdminService } from './admin.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { CreateOrganizerDto } from './dto/create-organizer.dto';
+import { UpdateOrganizerDto } from './dto/update-organizer.dto';
+import { CreatePartnerDto } from './dto/create-partner.dto';
+import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { CreateLeadDto } from './dto/create-lead.dto';
+import { UpdatePlanDto } from './dto/update-plan.dto';
 
 @ApiTags('Admin Panel Console')
 @Controller()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
+
+  @Get('admin/dashboard')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Ringkasan platform & analitik lintas organizer (Admin Only)' })
+  async getDashboard() {
+    const result = await this.adminService.getDashboard();
+    return { success: true, data: result };
+  }
 
   @Get('admin/organizers')
   @Roles('admin')
@@ -26,22 +44,57 @@ export class AdminController {
     return { success: true, data: result };
   }
 
+  @Get('admin/organizers/:id')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan detail organizer beserta list event miliknya (Admin Only)' })
+  async getOrganizerById(@Param('id') id: string) {
+    const result = await this.adminService.getOrganizerById(id);
+    return { success: true, data: result };
+  }
+
+  @Post('admin/organizers/:id/approve')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Menyetujui pendaftaran organizer baru (Admin Only)' })
+  async approveOrganizer(
+    @Param('id') id: string,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.approveOrganizer(id, adminId);
+    return { success: true, data: result };
+  }
+
+  @Post('admin/organizers/:id/suspend')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Menangguhkan akun organizer (Admin Only)' })
+  async suspendOrganizer(
+    @Param('id') id: string,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.suspendOrganizer(id, adminId);
+    return { success: true, data: result };
+  }
+
+  @Patch('admin/organizers/:id/plan')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mengubah paket langganan (plan) organizer (Admin Only)' })
+  async updatePlan(
+    @Param('id') id: string,
+    @Body() dto: UpdatePlanDto,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.updatePlan(id, dto.plan, adminId);
+    return { success: true, data: result };
+  }
+
   @Post('admin/organizers')
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Membuat akun organizer / EO baru (Admin Only)' })
-  async createOrganizer(
-    @Body()
-    dto: {
-      name: string;
-      email: string;
-      password?: string;
-      phone?: string;
-      segment?: string;
-      plan?: string;
-      bankAccount?: string;
-    },
-  ) {
+  async createOrganizer(@Body() dto: CreateOrganizerDto) {
     const result = await this.adminService.createOrganizer(dto);
     return { success: true, data: result };
   }
@@ -61,14 +114,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Mengubah segmen dan plan organizer (Admin Only)' })
   async updateOrganizer(
     @Param('id') id: string,
-    @Body()
-    dto: {
-      segment?: string;
-      plan?: string;
-      planExpiresAt?: string;
-      name?: string;
-      bankAccount?: string;
-    },
+    @Body() dto: UpdateOrganizerDto,
   ) {
     const result = await this.adminService.updateOrganizerSegmentAndPlan(id, dto);
     return { success: true, data: result };
@@ -87,20 +133,7 @@ export class AdminController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Membuat partner afiliasi baru (Admin Only)' })
-  async createPartner(
-    @Body()
-    dto: {
-      name: string;
-      eventId: string;
-      type?: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
-      uniqueCode: string;
-      promoCode?: string;
-      commissionType?: string;
-      commissionValue?: number;
-      email?: string;
-      password?: string;
-    },
-  ) {
+  async createPartner(@Body() dto: CreatePartnerDto) {
     const result = await this.adminService.createPartner(dto);
     return { success: true, data: result };
   }
@@ -111,17 +144,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Memperbarui data partner afiliasi (Admin Only)' })
   async updatePartner(
     @Param('id') id: string,
-    @Body()
-    dto: {
-      name?: string;
-      eventId?: string;
-      type?: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
-      uniqueCode?: string;
-      promoCode?: string;
-      commissionType?: string;
-      commissionValue?: number;
-      email?: string;
-    },
+    @Body() dto: UpdatePartnerDto,
   ) {
     const result = await this.adminService.updatePartner(id, dto);
     return { success: true, data: result };
@@ -138,17 +161,9 @@ export class AdminController {
 
   @Post('leads')
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Mengirimkan lead baru dari landing page (Public)' })
-  async createLead(
-    @Body()
-    dto: {
-      name: string;
-      organizationName: string;
-      email: string;
-      phone: string;
-      message: string;
-    },
-  ) {
+  async createLead(@Body() dto: CreateLeadDto) {
     const result = await this.adminService.createLead(dto);
     return { success: true, data: result };
   }
@@ -222,6 +237,58 @@ export class AdminController {
     @Body('reason') reason?: string,
   ) {
     const result = await this.adminService.rejectEvent(id, reason);
+    return { success: true, data: result };
+  }
+
+  @Post('admin/events/:id/force-unpublish')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Force unpublish event bermasalah (Admin Only)' })
+  async forceUnpublishEvent(
+    @Param('id') id: string,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.forceUnpublishEvent(id, adminId);
+    return { success: true, data: result };
+  }
+
+  @Get('admin/orders')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiQuery({ name: 'q', required: false, description: 'Kata kunci pencarian order (order ID / email buyer / nama attendee)' })
+  @ApiOperation({ summary: 'Pencarian pesanan lintas seluruh organizer (Admin Only)' })
+  async searchOrders(@Query('q') q?: string) {
+    const result = await this.adminService.searchOrders(q);
+    return { success: true, data: result };
+  }
+
+  @Get('admin/settlements')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan daftar settlement yang perlu diproses (Admin Only)' })
+  async getSettlements() {
+    const result = await this.adminService.getSettlements();
+    return { success: true, data: result };
+  }
+
+  @Post('admin/settlements/:id/mark-paid')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Menandai settlement sudah ditransfer manual (Admin Only)' })
+  async markSettlementPaid(
+    @Param('id') id: string,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.markSettlementPaid(id, adminId);
+    return { success: true, data: result };
+  }
+
+  @Get('admin/audit-log')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mendapatkan log audit aktivitas admin (Admin Only)' })
+  async getAuditLogs() {
+    const result = await this.adminService.getAuditLogs();
     return { success: true, data: result };
   }
 }

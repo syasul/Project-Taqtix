@@ -52,7 +52,20 @@ function LoginForm() {
       }
 
       setAuth(accessToken, refreshToken);
+      const userRole = useAuth.getState().user?.role || resData.user?.role;
       toast.success('Login berhasil! Selamat datang di TAQtix.');
+
+      if (userRole === 'organizer' && (!searchParams?.get('redirect') || searchParams.get('redirect') === '/dashboard')) {
+        const eoUrl = process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/dashboard';
+        window.location.href = eoUrl;
+        return;
+      }
+
+      if (userRole === 'admin' && (!searchParams?.get('redirect') || searchParams.get('redirect') === '/dashboard')) {
+        const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3002/admin';
+        window.location.href = adminUrl;
+        return;
+      }
 
       router.push(redirectPath);
       router.refresh();

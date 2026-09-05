@@ -28,6 +28,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
 import { PosModule } from './modules/pos/pos.module';
 import { DoorprizeModule } from './modules/doorprize/doorprize.module';
 import { ExportsModule } from './modules/exports/exports.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PermissionGuard } from './common/guards/permission.guard';
@@ -39,6 +40,27 @@ import { PermissionGuard } from './common/guards/permission.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'short',
+          ttl: 1000, // 1 detik
+          limit: 20, // max 20 request/detik (burst DDoS protection)
+        },
+        {
+          name: 'medium',
+          ttl: 10000, // 10 detik
+          limit: 100, // max 100 request/10 detik
+        },
+        {
+          name: 'long',
+          ttl: 60000, // 1 menit
+          limit: 300, // max 300 request/menit
+        },
+      ],
+      errorMessage:
+        'Terlalu banyak permintaan (Rate limit exceeded). Silakan tunggu beberapa saat.',
     }),
     BullModule.forRootAsync({
       inject: [ConfigService],
@@ -93,6 +115,11 @@ import { PermissionGuard } from './common/guards/permission.guard';
   controllers: [AppController],
   providers: [
     AppService,
+    // Menjadikan ThrottlerGuard aktif secara global untuk proteksi rate limiting & anti-DDoS
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     // Menjadikan JwtAuthGuard aktif secara global di seluruh endpoint aplikasi
     {
       provide: APP_GUARD,

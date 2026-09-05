@@ -37,6 +37,7 @@ const transfers_module_1 = require("./modules/transfers/transfers.module");
 const pos_module_1 = require("./modules/pos/pos.module");
 const doorprize_module_1 = require("./modules/doorprize/doorprize.module");
 const exports_module_1 = require("./modules/exports/exports.module");
+const throttler_1 = require("@nestjs/throttler");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const roles_guard_1 = require("./common/guards/roles.guard");
 const permission_guard_1 = require("./common/guards/permission.guard");
@@ -48,6 +49,26 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+            }),
+            throttler_1.ThrottlerModule.forRoot({
+                throttlers: [
+                    {
+                        name: 'short',
+                        ttl: 1000,
+                        limit: 20,
+                    },
+                    {
+                        name: 'medium',
+                        ttl: 10000,
+                        limit: 100,
+                    },
+                    {
+                        name: 'long',
+                        ttl: 60000,
+                        limit: 300,
+                    },
+                ],
+                errorMessage: 'Terlalu banyak permintaan (Rate limit exceeded). Silakan tunggu beberapa saat.',
             }),
             bull_1.BullModule.forRootAsync({
                 inject: [config_1.ConfigService],
@@ -102,6 +123,10 @@ exports.AppModule = AppModule = __decorate([
         controllers: [app_controller_1.AppController],
         providers: [
             app_service_1.AppService,
+            {
+                provide: core_1.APP_GUARD,
+                useClass: throttler_1.ThrottlerGuard,
+            },
             {
                 provide: core_1.APP_GUARD,
                 useClass: jwt_auth_guard_1.JwtAuthGuard,

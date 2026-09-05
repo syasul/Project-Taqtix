@@ -17,13 +17,15 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const crm_service_1 = require("./crm.service");
 const permissions_decorator_1 = require("../../common/decorators/permissions.decorator");
+const create_segment_dto_1 = require("./dto/create-segment.dto");
+const create_broadcast_dto_1 = require("./dto/create-broadcast.dto");
 let CRMController = class CRMController {
     crmService;
     constructor(crmService) {
         this.crmService = crmService;
     }
-    async createSegment(eventId, name, criteria) {
-        const result = await this.crmService.createSegment(eventId, name, criteria);
+    async createSegment(eventId, dto) {
+        const result = await this.crmService.createSegment(eventId, dto.name, dto.criteria);
         return { success: true, data: result };
     }
     async findSegments(eventId) {
@@ -34,8 +36,8 @@ let CRMController = class CRMController {
         const result = await this.crmService.getSegmentMembers(segmentId);
         return { success: true, data: result };
     }
-    async createBroadcast(segmentId, message, channel, subject) {
-        const result = await this.crmService.createBroadcast(segmentId, message, channel || 'whatsapp', subject);
+    async createBroadcast(segmentId, dto) {
+        const result = await this.crmService.createBroadcast(segmentId, dto.message, dto.channel || 'whatsapp', dto.subject);
         return { success: true, data: result };
     }
     async getBroadcastStatus(jobId) {
@@ -50,10 +52,9 @@ __decorate([
     (0, permissions_decorator_1.Permissions)('manage_audience_segments'),
     (0, swagger_1.ApiOperation)({ summary: 'Membuat segmen pembeli baru' }),
     __param(0, (0, common_1.Param)('eventId')),
-    __param(1, (0, common_1.Body)('name')),
-    __param(2, (0, common_1.Body)('criteria')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:paramtypes", [String, create_segment_dto_1.CreateSegmentDto]),
     __metadata("design:returntype", Promise)
 ], CRMController.prototype, "createSegment", null);
 __decorate([
@@ -82,11 +83,9 @@ __decorate([
     (0, permissions_decorator_1.Permissions)('manage_audience_segments'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' }),
     __param(0, (0, common_1.Param)('segmentId')),
-    __param(1, (0, common_1.Body)('message')),
-    __param(2, (0, common_1.Body)('channel')),
-    __param(3, (0, common_1.Body)('subject')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String]),
+    __metadata("design:paramtypes", [String, create_broadcast_dto_1.CreateBroadcastDto]),
     __metadata("design:returntype", Promise)
 ], CRMController.prototype, "createBroadcast", null);
 __decorate([

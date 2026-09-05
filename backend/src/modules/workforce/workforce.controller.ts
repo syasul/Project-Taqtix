@@ -11,6 +11,7 @@ import { WorkforceService } from './workforce.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { CreateWorkforceDto } from './dto/create-workforce.dto';
 
 @ApiTags('Workforce Management')
 @Controller()
@@ -23,7 +24,7 @@ export class WorkforceController {
   @ApiOperation({ summary: 'Menambahkan crew baru untuk event' })
   async create(
     @Param('eventId') eventId: string,
-    @Body() dto: { name: string; phone: string; division: string; role: string; picUserId?: string },
+    @Body() dto: CreateWorkforceDto,
     @CurrentUser('id') addedByUserId: string,
   ) {
     const result = await this.workforceService.create(eventId, dto, addedByUserId);

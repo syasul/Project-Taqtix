@@ -14,6 +14,8 @@ import { Queue } from 'bullmq';
 
 @Injectable()
 export class OrdersService {
+  private idempotencyStore = new Map<string, { order: any; expiresAt: number }>();
+
   constructor(
     private prisma: PrismaService,
     @InjectQueue('order-expiration') private orderExpirationQueue: Queue,
@@ -22,7 +24,14 @@ export class OrdersService {
   /**
    * Membuat pesanan baru dengan locking kuota tiket pesanan secara transaksional (SELECT FOR UPDATE).
    */
-  async create(dto: CreateOrderDto, authenticatedUserId?: string) {
+  async create(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string) {
+    if (idempotencyKey) {
+      const cached = this.idempotencyStore.get(idempotencyKey);
+      if (cached && cached.expiresAt > Date.now()) {
+        return cached.order;
+      }
+    }
+
     const event = await this.prisma.event.findUnique({
       where: { id: dto.eventId },
       include: {
@@ -299,7 +308,7 @@ export class OrdersService {
       }
 
       const totalAmount = Math.max(0, basePriceTotal - discountAmt);
-      const expiredAt = new Date(Date.now() + 15 * 60 * 1000); // 15 menit
+      const expiredAt = new Date(Date.now() + 10 * 60 * 1000); // 10 menit sesuai API_CONTRACT.md
 
       // 5. Buat Order
       const newOrder = await tx.order.create({
@@ -339,11 +348,26 @@ export class OrdersService {
       return newOrder;
     });
 
-    // 7. Jadwalkan pembatalan otomatis dalam 15 menit menggunakan BullMQ
+    // Simpan ke Idempotency store jika key dikirimkan (berlaku 10 menit)
+    if (idempotencyKey) {
+      this.idempotencyStore.set(idempotencyKey, {
+        order,
+        expiresAt: Date.now() + 10 * 60 * 1000,
+      });
+      // Bersihkan memory cache secara berkala jika melebihi 1000 entri
+      if (this.idempotencyStore.size > 1000) {
+        const now = Date.now();
+        for (const [k, v] of this.idempotencyStore.entries()) {
+          if (v.expiresAt <= now) this.idempotencyStore.delete(k);
+        }
+      }
+    }
+
+    // 7. Jadwalkan pembatalan otomatis dalam 10 menit menggunakan BullMQ
     await this.orderExpirationQueue.add(
       'expire-order',
       { orderId: order.id },
-      { delay: 15 * 60 * 1000 }, // 15 menit
+      { delay: 10 * 60 * 1000 }, // 10 menit
     );
 
     return order;

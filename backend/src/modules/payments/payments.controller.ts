@@ -8,6 +8,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -36,6 +37,7 @@ export class PaymentsController {
   }
 
   @Public()
+  @SkipThrottle()
   @Post('payments/webhook/:provider')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

@@ -14,6 +14,9 @@ import { TeamService } from './team.service';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { InviteTeamMemberDto } from './dto/invite-team-member.dto';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
+import { UpdateTeamRoleDto } from './dto/update-team-role.dto';
 
 @ApiTags('Organizer Team')
 @Controller('organizer/team')
@@ -25,11 +28,10 @@ export class TeamController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mengundang member baru ke organizer (Owner Only)' })
   async invite(
-    @Body('email') email: string,
-    @Body('role') role: string,
+    @Body() dto: InviteTeamMemberDto,
     @CurrentUser('id') invitedById: string,
   ) {
-    const result = await this.teamService.invite(email, role, invitedById);
+    const result = await this.teamService.invite(dto.email, dto.role, invitedById);
     return { success: true, data: result };
   }
 
@@ -38,10 +40,9 @@ export class TeamController {
   @ApiOperation({ summary: 'Menerima undangan tim dan melengkapi data password' })
   async acceptInvite(
     @Param('token') token: string,
-    @Body('name') name: string,
-    @Body('password') passwordHash: string,
+    @Body() dto: AcceptInviteDto,
   ) {
-    const result = await this.teamService.acceptInvite(token, name, passwordHash);
+    const result = await this.teamService.acceptInvite(token, dto.name, dto.password);
     return { success: true, data: result };
   }
 
@@ -60,10 +61,10 @@ export class TeamController {
   @ApiOperation({ summary: 'Mengubah peran member tim (Owner Only)' })
   async updateRole(
     @Param('memberId') memberId: string,
-    @Body('role') role: string,
+    @Body() dto: UpdateTeamRoleDto,
     @CurrentUser('id') ownerUserId: string,
   ) {
-    const result = await this.teamService.updateRole(memberId, role, ownerUserId);
+    const result = await this.teamService.updateRole(memberId, dto.role, ownerUserId);
     return { success: true, data: result };
   }
 

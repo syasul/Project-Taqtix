@@ -1,14 +1,9 @@
 import { WorkforceService } from './workforce.service';
+import { CreateWorkforceDto } from './dto/create-workforce.dto';
 export declare class WorkforceController {
     private readonly workforceService;
     constructor(workforceService: WorkforceService);
-    create(eventId: string, dto: {
-        name: string;
-        phone: string;
-        division: string;
-        role: string;
-        picUserId?: string;
-    }, addedByUserId: string): Promise<{
+    create(eventId: string, dto: CreateWorkforceDto, addedByUserId: string): Promise<{
         success: boolean;
         data: {
             role: string;

@@ -20,18 +20,20 @@ import { RefreshDto } from './dto/refresh.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 /**
  * Controller untuk menangani routing otentikasi user platform TAQtix.
  */
-@ApiTags('Authentication')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
   @Post('register')
-  @ApiOperation({ summary: 'Mendaftarkan pengguna baru' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @ApiOperation({ summary: 'Mendaftarkan akun user/customer baru' })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User berhasil didaftarkan.',
@@ -51,6 +53,7 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Masuk log menggunakan email & password' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -67,6 +70,7 @@ export class AuthController {
   @Public()
   @Post('gate-login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Masuk log khusus gate staff' })
   @ApiResponse({
     status: HttpStatus.OK,

@@ -1,8 +1,10 @@
 import { CRMService } from './crm.service';
+import { CreateSegmentDto } from './dto/create-segment.dto';
+import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 export declare class CRMController {
     private readonly crmService;
     constructor(crmService: CRMService);
-    createSegment(eventId: string, name: string, criteria: any): Promise<{
+    createSegment(eventId: string, dto: CreateSegmentDto): Promise<{
         success: boolean;
         data: {
             id: string;
@@ -35,7 +37,7 @@ export declare class CRMController {
             categories: unknown[];
         }[];
     }>;
-    createBroadcast(segmentId: string, message: string, channel?: 'whatsapp' | 'email', subject?: string): Promise<{
+    createBroadcast(segmentId: string, dto: CreateBroadcastDto): Promise<{
         success: boolean;
         data: {
             jobId: string;

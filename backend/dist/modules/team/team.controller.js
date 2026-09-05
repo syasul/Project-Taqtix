@@ -19,25 +19,28 @@ const team_service_1 = require("./team.service");
 const permissions_decorator_1 = require("../../common/decorators/permissions.decorator");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
+const invite_team_member_dto_1 = require("./dto/invite-team-member.dto");
+const accept_invite_dto_1 = require("./dto/accept-invite.dto");
+const update_team_role_dto_1 = require("./dto/update-team-role.dto");
 let TeamController = class TeamController {
     teamService;
     constructor(teamService) {
         this.teamService = teamService;
     }
-    async invite(email, role, invitedById) {
-        const result = await this.teamService.invite(email, role, invitedById);
+    async invite(dto, invitedById) {
+        const result = await this.teamService.invite(dto.email, dto.role, invitedById);
         return { success: true, data: result };
     }
-    async acceptInvite(token, name, passwordHash) {
-        const result = await this.teamService.acceptInvite(token, name, passwordHash);
+    async acceptInvite(token, dto) {
+        const result = await this.teamService.acceptInvite(token, dto.name, dto.password);
         return { success: true, data: result };
     }
     async getTeam(userId) {
         const result = await this.teamService.getTeam(userId);
         return { success: true, data: result };
     }
-    async updateRole(memberId, role, ownerUserId) {
-        const result = await this.teamService.updateRole(memberId, role, ownerUserId);
+    async updateRole(memberId, dto, ownerUserId) {
+        const result = await this.teamService.updateRole(memberId, dto.role, ownerUserId);
         return { success: true, data: result };
     }
     async removeMember(memberId, ownerUserId) {
@@ -51,11 +54,10 @@ __decorate([
     (0, permissions_decorator_1.Permissions)('manage_team_access'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mengundang member baru ke organizer (Owner Only)' }),
-    __param(0, (0, common_1.Body)('email')),
-    __param(1, (0, common_1.Body)('role')),
-    __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:paramtypes", [invite_team_member_dto_1.InviteTeamMemberDto, String]),
     __metadata("design:returntype", Promise)
 ], TeamController.prototype, "invite", null);
 __decorate([
@@ -63,10 +65,9 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({ summary: 'Menerima undangan tim dan melengkapi data password' }),
     __param(0, (0, common_1.Param)('token')),
-    __param(1, (0, common_1.Body)('name')),
-    __param(2, (0, common_1.Body)('password')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:paramtypes", [String, accept_invite_dto_1.AcceptInviteDto]),
     __metadata("design:returntype", Promise)
 ], TeamController.prototype, "acceptInvite", null);
 __decorate([
@@ -85,10 +86,10 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mengubah peran member tim (Owner Only)' }),
     __param(0, (0, common_1.Param)('memberId')),
-    __param(1, (0, common_1.Body)('role')),
+    __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:paramtypes", [String, update_team_role_dto_1.UpdateTeamRoleDto, String]),
     __metadata("design:returntype", Promise)
 ], TeamController.prototype, "updateRole", null);
 __decorate([

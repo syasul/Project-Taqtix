@@ -43,6 +43,9 @@
 
 **Role:** `buyer` | `organizer` | `gate_staff` | `admin`
 
+- `organizer` = admin milik satu EO, hanya bisa akses event miliknya sendiri (`/organizer/*`)
+- `admin` = **main admin platform TAQtix**, bisa lihat & kelola semua organizer dan semua event (`/admin/*`). Ini bukan role yang bisa didaftarkan sendiri — dibuat manual/seed oleh tim internal.
+
 ---
 
 ## 2. Data Models (bentuk final, dipakai semua project)
@@ -93,7 +96,7 @@
   affiliateCode: string | null;
   items: OrderItem[];
   createdAt: string;
-  expiredAt: string; // batas waktu bayar
+  expiredAt: string; // batas waktu bayar — 10 menit dari createdAt (lihat SPAM_CLICK_AND_MEMORY_BUDGET.md)
 }
 ```
 
@@ -134,6 +137,37 @@
   status: "pending" | "success" | "failed" | "expired";
   amount: number;
   paidAt: string | null;
+}
+```
+
+### Organizer
+```typescript
+{
+  id: string;
+  name: string;              // nama EO/brand
+  email: string;
+  phone: string;
+  status: "pending" | "active" | "suspended";  // pending = baru daftar, nunggu approve admin
+  plan: "starter" | "pro" | "enterprise";
+  createdAt: string;
+  approvedAt: string | null;
+  approvedBy: string | null;  // admin id
+}
+```
+
+### Settlement
+```typescript
+{
+  id: string;
+  organizerId: string;
+  eventId: string;
+  grossRevenue: number;
+  platformFee: number;
+  affiliateCommissionTotal: number;
+  netAmount: number;          // yang harus ditransfer ke organizer
+  status: "pending" | "processing" | "paid";
+  paidAt: string | null;
+  paidBy: string | null;      // admin id yang proses
 }
 ```
 
@@ -218,7 +252,7 @@ Scanner cukup decode & verify signature — tidak perlu hit API dulu untuk valid
 ### Checkout & Orders
 | Method | Path | Role | Deskripsi |
 |---|---|---|---|
-| POST | `/orders` | public/buyer | Create order (reserve quota sementara, expire 15 menit) |
+| POST | `/orders` | public/buyer | Create order (reserve quota sementara, expire 10 menit — wajib kirim header `Idempotency-Key`, lihat SPAM_CLICK_AND_MEMORY_BUDGET.md) |
 | GET | `/orders/:id` | buyer | Detail order + status |
 | POST | `/orders/validate-promo` | public | Validasi promo code |
 
@@ -256,6 +290,22 @@ Scanner cukup decode & verify signature — tidak perlu hit API dulu untuk valid
 | GET | `/organizer/events/:id/dashboard` | organizer | Summary sales, revenue, sold count |
 | GET | `/organizer/events/:id/buyers` | organizer | List buyer database |
 
+### Admin (Main Admin Platform — akses penuh lintas organizer)
+| Method | Path | Role | Deskripsi |
+|---|---|---|---|
+| GET | `/admin/dashboard` | admin | Ringkasan platform: total organizer, total event, total revenue, total fee terkumpul |
+| GET | `/admin/organizers` | admin | List semua organizer + status |
+| GET | `/admin/organizers/:id` | admin | Detail organizer + event miliknya |
+| POST | `/admin/organizers/:id/approve` | admin | Approve organizer baru (status `pending` → `active`) |
+| POST | `/admin/organizers/:id/suspend` | admin | Suspend organizer (mis. penyalahgunaan/dispute) |
+| PATCH | `/admin/organizers/:id/plan` | admin | Ubah plan organizer (starter/pro/enterprise) |
+| GET | `/admin/events` | admin | List SEMUA event lintas organizer (bukan cuma milik sendiri) |
+| POST | `/admin/events/:id/force-unpublish` | admin | Force unpublish event bermasalah |
+| GET | `/admin/orders` | admin | Cari order lintas organizer (untuk keperluan support/dispute) |
+| GET | `/admin/settlements` | admin | List settlement yang perlu diproses (per event/organizer) |
+| POST | `/admin/settlements/:id/mark-paid` | admin | Tandai settlement sudah ditransfer ke organizer |
+| GET | `/admin/audit-log` | admin | Log aktivitas admin (siapa approve/suspend/dsb, untuk akuntabilitas) |
+
 ### Notifications (internal, dipanggil job queue — bukan dipanggil FE/Mobile langsung)
 | Trigger | Aksi |
 |---|---|
@@ -288,3 +338,5 @@ Setiap kali ada perubahan di file ini, catat di sini biar 3 project tahu harus s
 | Tanggal | Perubahan | Project yang perlu update |
 |---|---|---|
 | - | Initial contract | BE, FE, Mobile |
+| - | Tambah role `admin` (main admin platform, terpisah dari `organizer`), model `Organizer` & `Settlement`, endpoint `/admin/*` | BE, FE (Mobile tidak terdampak) |
+| - | Admin panel dipisah jadi project ke-4 tersendiri (`admin/`), bukan bagian dari `fe-web` | BE (tidak berubah), FE (hapus scope admin), Admin (project baru) |

@@ -81,11 +81,15 @@ model Organizer {
   userId         String            @unique
   name           String
   slug           String            @unique
+  phone          String?           // Nomor telepon kontak organizer
+  status         String            @default("pending") // "pending" | "active" | "suspended"
   bankAccount    String?           // Informasi rekening bank organizer untuk pembayaran
   segment        String?           // "event_builder" | "event_ip_owner" | "campus_community" | "enterprise"
   plan           String            @default("starter") // "starter" | "pro" | "enterprise"
   planStartedAt  DateTime?
   planExpiresAt  DateTime?
+  approvedAt     DateTime?         // Waktu persetujuan akun oleh main admin
+  approvedBy     String?           // ID admin yang menyetujui akun
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 
@@ -94,6 +98,7 @@ model Organizer {
   members        OrganizerMember[]
   vouchers       Voucher[]
   apiTokens      ApiToken[]
+  settlements    Settlement[]
 }
 
 /// Representasi dari suatu Event / Acara.
@@ -142,6 +147,7 @@ model Event {
   doorprizeItems      DoorprizeItem[]
   cashTransactions    CashTransaction[]
   posTransactions     PosTransaction[]
+  settlements         Settlement[]
 }
 
 /// Kategori/Tipe Tiket yang tersedia pada suatu event.
@@ -617,5 +623,32 @@ model DoorprizeWinner {
   ticket          Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 }
 
+/// Model Settlement untuk pencairan dana penjualan tiket ke organizer setelah event selesai.
+model Settlement {
+  id                       String    @id @default(uuid())
+  organizerId              String
+  eventId                  String
+  grossRevenue             Float
+  platformFee              Float
+  affiliateCommissionTotal Float
+  netAmount                Float
+  status                   String    @default("pending") // "pending" | "processing" | "paid"
+  paidAt                   DateTime?
+  paidBy                   String?   // Admin ID yang memproses pencairan
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
+  organizer                Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  event                    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
 
+/// Model AuditLog untuk mencatat setiap tindakan kritis admin platform demi akuntabilitas.
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String   // "approve_organizer" | "suspend_organizer" | "change_plan" | "force_unpublish" | "mark_settlement_paid"
+  targetId   String
+  targetType String   // "organizer" | "event" | "settlement"
+  details    Json?
+  timestamp  DateTime @default(now())
+}

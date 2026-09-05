@@ -1,98 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# TAQtix Backend (Core Ticketing Engine & Platform API)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Sistem backend inti TAQtix untuk engine ticketing, transaksi pembayaran anti-double booking, check-in gate QR, manajemen afiliasi / ambassador, serta platform oversight untuk Super Admin dan Organizer.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🛠️ Tech Stack
+- **Runtime:** Node.js 20+ dengan TypeScript
+- **Framework:** NestJS (Modular architecture)
+- **Database:** PostgreSQL (Row-level lock & transaction support)
+- **ORM:** Prisma
+- **Queue/Cache:** Redis + BullMQ (asinkron: notifikasi WA, email confirmation, settlement, auto-expire order)
+- **Auth:** JWT (Access Token & Refresh Token, Scoped Token untuk Gate Staff)
+- **Security:** Helmet, CORS, Throttler Rate Limiter, Global Validation Pipe
+- **API Documentation:** Swagger / OpenAPI auto-generated pada `/docs`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 🚀 Panduan Memulai Cepat (Local Development)
 
+### 1. Prasyarat
+- Node.js 20+
+- Docker & Docker Compose (untuk Postgres & Redis)
+
+### 2. Jalankan PostgreSQL & Redis
+Di root direktori project:
 ```bash
-$ pnpm install
+docker-compose up -d
+```
+Container yang akan berjalan:
+- `taqtix-postgres` di port `5432`
+- `taqtix-redis` di port `6379`
+
+### 3. Setup Environment Variables
+Salin file konfigurasi:
+```bash
+cp .env.example .env
+```
+Pastikan `DATABASE_URL` dan `REDIS_URL` terhubung ke container Docker lokal.
+
+### 4. Install Dependencies, Generate Prisma & Jalankan Migrasi
+```bash
+npm install
+npx prisma generate
+npx prisma migrate dev
 ```
 
-## Compile and run the project
-
+### 5. Seeding Data Awal
+Jalankan script seed untuk mengisi akun admin, organizer, gate staff, serta event contoh:
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+npx prisma db seed
 ```
 
-## Run tests
+#### Akun Hasil Seeding:
+| Peran (Role) | Email | Password | Status | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | `admin@taqtix.id` | `password123` | Active | Akses penuh seluruh platform `/admin/*` |
+| **Organizer (Aktif)** | `organizer@taqtix.id` | `password123` | Active | Mengelola event dan melihat dashboard |
+| **Organizer (Pending)**| `organizer-pending@taqtix.id` | `password123` | Pending | Akun untuk menguji alur approval admin |
+| **Gate Staff** | `staff@taqtix.id` | `password123` | Active | Scoped scan & check-in gate |
 
+### 6. Menjalankan Server
 ```bash
-# unit tests
-$ pnpm run test
+npm run start:dev
+```
+Server akan berjalan di: `http://localhost:3001/v1`  
+Dokumentasi Swagger OpenAPI interaktif: `http://localhost:3001/docs`
 
-# e2e tests
-$ pnpm run test:e2e
+---
 
-# test coverage
-$ pnpm run test:cov
+## 📂 Struktur Modular Backend
+```
+src/
+  modules/
+    auth/                  # Register, login, refresh, gate-login
+    events/                # CRUD Event, publish & katalog publik
+    ticket-categories/     # Manajemen tier / kategori tiket
+    orders/                # Checkout, anti-overselling lock, promo, idempotency
+    payments/              # Payment link, callback/webhook, verification
+    tickets/               # QR signing & verification, manifest tiket
+    gate/                  # Validasi QR, check-in scanner, sync batch offline
+    partners/              # Distribusi tiket, ambassador & affiliate engine
+    notifications/         # Worker BullMQ: WhatsApp gateway & Email
+    dashboard/             # Agregasi metrik penjualan organizer
+    admin/                 # Main platform oversight (approval, suspend, plan, audit)
+    settlements/           # Perhitungan bagi hasil & payout settlement
+  common/
+    decorators/            # @CurrentUser, @Roles, @Public
+    filters/               # HttpExceptionFilter (format error sesuai kontrak)
+    guards/                # JwtAuthGuard, RolesGuard
+    interceptors/          # ResponseInterceptor ({ success: true, data: ... })
+  prisma/
+    schema.prisma          # Skema database & relasi
+    seed.ts                # Seeder data awal
+main.ts                    # Entry point aplikasi
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 🛡️ Anti-Double Booking & Idempotency
+- Pemesanan tiket (`POST /v1/orders`) menerapkan database transaction dengan row-level lock (`SELECT ... FOR UPDATE`) pada `TicketCategory` untuk memastikan kuota tidak pernah terjual melebihi kapasitas (overselling prevention).
+- Mendukung header `Idempotency-Key` untuk mencegah request ganda dari browser atau koneksi jaringan lambat.
+- Order yang belum dibayar dalam 10 menit otomatis kadaluwarsa (`expiredAt`) dan dikembalikan kuotanya melalui scheduler BullMQ.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
 
+## 🧪 Testing & Verifikasi
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Menjalankan unit test
+npm run test
+
+# Menjalankan type-check
+npx tsc --noEmit
 ```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

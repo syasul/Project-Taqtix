@@ -131,13 +131,13 @@ export default function AffiliateEventsPage() {
                 <h3 className="text-lg font-bold text-slate-900">{evt.eventTitle}</h3>
               </div>
 
-              <div className="flex items-center gap-2 self-start md:self-auto">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto self-start md:self-auto">
                 <button
                   onClick={() => {
                     setCustomizingEvent(evt);
                     setCustomCodeInput(evt.promoCode);
                   }}
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  className="w-full min-[420px]:w-auto justify-center px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                   <span>Ubah / Generate Kode</span>
@@ -145,7 +145,7 @@ export default function AffiliateEventsPage() {
 
                 <button
                   onClick={() => handleCopyLink(evt.eventSlug, evt.promoCode, evt.id)}
-                  className="px-3.5 py-1.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="w-full min-[420px]:w-auto justify-center px-3.5 py-1.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   {copiedId === evt.id ? (
                     <>
@@ -163,7 +163,7 @@ export default function AffiliateEventsPage() {
             </div>
 
             {/* Promo Code & Rates Info */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/80 text-xs">
+            <div className="grid grid-cols-1 min-[450px]:grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/80 text-xs">
               <div>
                 <span className="text-[10px] text-slate-400 font-bold uppercase block">
                   Kode Promo Event Ini

@@ -55,6 +55,7 @@ export class AuthService {
             userId: user.id,
             name: 'Penyelenggara Baru',
             slug,
+            status: 'pending',
           },
         });
       }
@@ -137,8 +138,13 @@ export class AuthService {
    */
   async refresh(dto: RefreshDto) {
     try {
+      const refreshSecret =
+        this.configService.get<string>('JWT_REFRESH_SECRET') ||
+        this.configService.get<string>('TAQTIX_JWT_REFRESH_SECRET') ||
+        'super-secret-refresh-token-key-change-me';
+
       const payload = await this.jwtService.verifyAsync(dto.refreshToken, {
-        secret: this.configService.get<string>('TAQTIX_JWT_REFRESH_SECRET'),
+        secret: refreshSecret,
       });
 
       const user = await this.prisma.user.findUnique({
@@ -247,13 +253,23 @@ export class AuthService {
   async generateTokenPair(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
 
+    const accessSecret =
+      this.configService.get<string>('JWT_ACCESS_SECRET') ||
+      this.configService.get<string>('TAQTIX_JWT_ACCESS_SECRET') ||
+      'super-secret-access-token-key-change-me';
+
+    const refreshSecret =
+      this.configService.get<string>('JWT_REFRESH_SECRET') ||
+      this.configService.get<string>('TAQTIX_JWT_REFRESH_SECRET') ||
+      'super-secret-refresh-token-key-change-me';
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('TAQTIX_JWT_ACCESS_SECRET'),
+        secret: accessSecret,
         expiresIn: '15m',
       }),
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('TAQTIX_JWT_REFRESH_SECRET'),
+        secret: refreshSecret,
         expiresIn: '7d',
       }),
     ]);

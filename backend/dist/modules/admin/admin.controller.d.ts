@@ -1,4 +1,9 @@
 import { AdminService } from './admin.service';
+import { CreateOrganizerDto } from './dto/create-organizer.dto';
+import { UpdateOrganizerDto } from './dto/update-organizer.dto';
+import { CreatePartnerDto } from './dto/create-partner.dto';
+import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { CreateLeadDto } from './dto/create-lead.dto';
 export declare class AdminController {
     private readonly adminService;
     constructor(adminService: AdminService);
@@ -20,15 +25,7 @@ export declare class AdminController {
             eventCount: number;
         }[];
     }>;
-    createOrganizer(dto: {
-        name: string;
-        email: string;
-        password?: string;
-        phone?: string;
-        segment?: string;
-        plan?: string;
-        bankAccount?: string;
-    }): Promise<{
+    createOrganizer(dto: CreateOrganizerDto): Promise<{
         success: boolean;
         data: {
             id: string;
@@ -50,13 +47,7 @@ export declare class AdminController {
             message: string;
         };
     }>;
-    updateOrganizer(id: string, dto: {
-        segment?: string;
-        plan?: string;
-        planExpiresAt?: string;
-        name?: string;
-        bankAccount?: string;
-    }): Promise<{
+    updateOrganizer(id: string, dto: UpdateOrganizerDto): Promise<{
         success: boolean;
         data: {
             segment: string | null;
@@ -98,17 +89,7 @@ export declare class AdminController {
             commissionEarned: number;
         })[];
     }>;
-    createPartner(dto: {
-        name: string;
-        eventId: string;
-        type?: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
-        uniqueCode: string;
-        promoCode?: string;
-        commissionType?: string;
-        commissionValue?: number;
-        email?: string;
-        password?: string;
-    }): Promise<{
+    createPartner(dto: CreatePartnerDto): Promise<{
         success: boolean;
         data: {
             event: {
@@ -134,16 +115,7 @@ export declare class AdminController {
             commissionEarned: number;
         };
     }>;
-    updatePartner(id: string, dto: {
-        name?: string;
-        eventId?: string;
-        type?: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
-        uniqueCode?: string;
-        promoCode?: string;
-        commissionType?: string;
-        commissionValue?: number;
-        email?: string;
-    }): Promise<{
+    updatePartner(id: string, dto: UpdatePartnerDto): Promise<{
         success: boolean;
         data: {
             event: {
@@ -176,13 +148,7 @@ export declare class AdminController {
             message: string;
         };
     }>;
-    createLead(dto: {
-        name: string;
-        organizationName: string;
-        email: string;
-        phone: string;
-        message: string;
-    }): Promise<{
+    createLead(dto: CreateLeadDto): Promise<{
         success: boolean;
         data: {
             email: string;

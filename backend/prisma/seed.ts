@@ -8,6 +8,8 @@ async function main() {
 
   // 1. Bersihkan database
   console.log('Membersihkan database...');
+  await prisma.auditLog.deleteMany();
+  await prisma.settlement.deleteMany();
   await prisma.click.deleteMany();
   await prisma.partner.deleteMany();
   await prisma.promoCode.deleteMany();
@@ -17,11 +19,13 @@ async function main() {
   await prisma.order.deleteMany();
   await prisma.ticketCategory.deleteMany();
   await prisma.event.deleteMany();
+  await prisma.organizerMember.deleteMany();
+  await prisma.gateStaff.deleteMany();
   await prisma.organizer.deleteMany();
   await prisma.user.deleteMany();
 
-  // 2. Buat User Organizer
-  console.log('Membuat user organizer...');
+  // 2. Buat User Organizer (Active)
+  console.log('Membuat user organizer (active)...');
   const organizerEmail = 'organizer@taqtix.id';
   const hashedPassword = await bcrypt.hash('password123', 10);
   
@@ -33,16 +37,42 @@ async function main() {
     },
   });
 
-  // 3. Buat Profil Organizer
+  // 3. Buat Profil Organizer (Active)
   console.log('Membuat profil organizer...');
   const organizer = await prisma.organizer.create({
     data: {
       userId: user.id,
       name: 'Taqwa Media Group',
       slug: 'taqwa-media-group',
+      phone: '081234567890',
+      status: 'active',
       bankAccount: 'Bank Syariah Indonesia (BSI) - 7123456789 a.n Taqwa Media',
       segment: 'event_builder',
       plan: 'pro',
+      approvedAt: new Date(),
+      approvedBy: 'system_seed',
+    },
+  });
+
+  // 3-Pending. Buat Organizer Baru (Status Pending untuk ditinjau admin)
+  console.log('Membuat organizer pending...');
+  const pendingUser = await prisma.user.create({
+    data: {
+      email: 'organizer-pending@taqtix.id',
+      passwordHash: hashedPassword,
+      role: 'organizer',
+    },
+  });
+  await prisma.organizer.create({
+    data: {
+      userId: pendingUser.id,
+      name: 'Nusantara Creative Fest EO',
+      slug: 'nusantara-creative-fest',
+      phone: '089876543210',
+      status: 'pending',
+      bankAccount: 'Bank Mandiri - 123000987654 a.n Nusantara Creative',
+      segment: 'community_builder',
+      plan: 'starter',
     },
   });
 
@@ -190,6 +220,33 @@ async function main() {
       }
     });
   }
+
+  // 5. Buat Sampel Settlement & Audit Log
+  console.log('Membuat sample settlement dan audit log...');
+  const firstEvent = await prisma.event.findFirst({ where: { organizerId: organizer.id } });
+  if (firstEvent) {
+    await prisma.settlement.create({
+      data: {
+        organizerId: organizer.id,
+        eventId: firstEvent.id,
+        grossRevenue: 15000000,
+        platformFee: 750000,
+        affiliateCommissionTotal: 500000,
+        netAmount: 13750000,
+        status: 'pending',
+      },
+    });
+  }
+
+  await prisma.auditLog.create({
+    data: {
+      adminId: adminUser.id,
+      action: 'system_init',
+      targetId: organizer.id,
+      targetType: 'organizer',
+      details: { note: 'Initial platform setup and sample data seed' },
+    },
+  });
 
   console.log('Seeding selesai dengan sukses!');
   console.log('Detail Akun Organizer:');

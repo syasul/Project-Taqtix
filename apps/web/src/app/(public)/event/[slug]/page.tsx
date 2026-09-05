@@ -63,8 +63,23 @@ export default function EventDetailPage() {
   const slug = params?.slug as string;
   const { user } = useAuth();
 
-  // Tangkap affiliate partner code (?aff=...) jika di-share
-  const affCode = searchParams?.get('aff') || '';
+  // Tangkap affiliate partner code (?ref=... atau ?aff=...) jika di-share
+  const affCode = searchParams?.get('ref') || searchParams?.get('aff') || '';
+
+  // Trigger tracking klik afiliasi secara asynchronous saat landing page diakses
+  React.useEffect(() => {
+    if (affCode) {
+      // Panggil POST /track/click/:partnerCode
+      apiClient.post(`/track/click/${affCode}`).catch((err) => {
+        console.warn('Gagal mencatat tracking klik afiliasi:', err);
+      });
+      // Simpan ke localStorage global & cookie
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('taqtix_partner_ref', affCode);
+        document.cookie = `taqtix_partner_ref=${affCode}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+    }
+  }, [affCode]);
 
   const { data: eventResponse, isLoading, error } = useQuery({
     queryKey: ['public-event', slug],
@@ -76,6 +91,14 @@ export default function EventDetailPage() {
   });
 
   const event: EventDetail | null = eventResponse?.data || null;
+
+  // Sinkronkan cookie/localStorage spesifik event saat event data termuat
+  React.useEffect(() => {
+    if (event && affCode) {
+      localStorage.setItem(`taqtix_aff_${event.id}`, affCode);
+      document.cookie = `taqtix_aff_${event.id}=${affCode}; path=/; max-age=2592000; SameSite=Lax`;
+    }
+  }, [event, affCode]);
 
   // State untuk menyimpan kuantitas tiket terpilih per kategori: { [categoryId]: qty }
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -101,9 +124,11 @@ export default function EventDetailPage() {
 
     if (!event) return;
 
-    // Simpan affiliate partner code ke localStorage jika ada
-    if (affCode) {
-      localStorage.setItem(`taqtix_aff_${event.id}`, affCode);
+    // Pastikan affiliate partner code tersimpan di localStorage & cookie
+    const activeRef = affCode || (typeof window !== 'undefined' ? localStorage.getItem(`taqtix_aff_${event.id}`) || localStorage.getItem('taqtix_partner_ref') : '');
+    if (activeRef) {
+      localStorage.setItem(`taqtix_aff_${event.id}`, activeRef);
+      document.cookie = `taqtix_aff_${event.id}=${activeRef}; path=/; max-age=2592000; SameSite=Lax`;
     }
 
     // Serialize parameter checkout

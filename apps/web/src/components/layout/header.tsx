@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import { LogOut, LayoutDashboard, Menu } from 'lucide-react';
+import { LogOut, LayoutDashboard, Menu, Building2, ShieldCheck } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -82,8 +82,26 @@ export default function Header() {
                   </div>
                   <DropdownMenuItem onClick={() => router.push('/dashboard')} className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer w-full flex items-center">
                     <LayoutDashboard className="mr-2 h-4 w-4 text-[#08B4B5]" />
-                    <span>Dashboard</span>
+                    <span>Dashboard Tiket Saya</span>
                   </DropdownMenuItem>
+                  {user.role === 'organizer' && (
+                    <DropdownMenuItem
+                      onClick={() => window.open(process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/dashboard', '_blank')}
+                      className="hover:bg-teal-50 focus:bg-teal-50 cursor-pointer w-full flex items-center text-[#08B4B5] font-semibold"
+                    >
+                      <Building2 className="mr-2 h-4 w-4 text-[#08B4B5]" />
+                      <span>Portal Organizer (EO)</span>
+                    </DropdownMenuItem>
+                  )}
+                  {user.role === 'admin' && (
+                    <DropdownMenuItem
+                      onClick={() => window.open(process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3002/admin', '_blank')}
+                      className="hover:bg-purple-50 focus:bg-purple-50 cursor-pointer w-full flex items-center text-purple-600 font-semibold"
+                    >
+                      <ShieldCheck className="mr-2 h-4 w-4 text-purple-600" />
+                      <span>Portal Super Admin</span>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleLogout} className="hover:bg-rose-50 focus:bg-rose-50 text-rose-600 cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Logout</span>

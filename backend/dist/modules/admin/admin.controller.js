@@ -15,9 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const throttler_1 = require("@nestjs/throttler");
 const admin_service_1 = require("./admin.service");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
+const create_organizer_dto_1 = require("./dto/create-organizer.dto");
+const update_organizer_dto_1 = require("./dto/update-organizer.dto");
+const create_partner_dto_1 = require("./dto/create-partner.dto");
+const update_partner_dto_1 = require("./dto/update-partner.dto");
+const create_lead_dto_1 = require("./dto/create-lead.dto");
 let AdminController = class AdminController {
     adminService;
     constructor(adminService) {
@@ -105,7 +111,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Membuat akun organizer / EO baru (Admin Only)' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_organizer_dto_1.CreateOrganizerDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "createOrganizer", null);
 __decorate([
@@ -126,7 +132,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, update_organizer_dto_1.UpdateOrganizerDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "updateOrganizer", null);
 __decorate([
@@ -145,7 +151,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Membuat partner afiliasi baru (Admin Only)' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_partner_dto_1.CreatePartnerDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "createPartner", null);
 __decorate([
@@ -156,7 +162,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, update_partner_dto_1.UpdatePartnerDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "updatePartner", null);
 __decorate([
@@ -172,10 +178,11 @@ __decorate([
 __decorate([
     (0, common_1.Post)('leads'),
     (0, public_decorator_1.Public)(),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
     (0, swagger_1.ApiOperation)({ summary: 'Mengirimkan lead baru dari landing page (Public)' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_lead_dto_1.CreateLeadDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "createLead", null);
 __decorate([

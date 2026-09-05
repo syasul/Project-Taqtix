@@ -140,7 +140,7 @@ export default function AffiliatePayoutsPage() {
         </div>
 
         <div className="overflow-x-auto border border-slate-100 rounded-xl">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 min-w-[640px]">
             <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
               <tr>
                 <th className="py-3.5 px-4">Tanggal Permohonan</th>

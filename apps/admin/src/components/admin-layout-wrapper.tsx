@@ -102,19 +102,41 @@ export default function AdminLayoutWrapper({
             {/* Mobile Sidebar Hamburger Toggle Button */}
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 -ml-2 rounded-lg text-slate-650 hover:bg-slate-100 hover:text-slate-900 md:hidden cursor-pointer"
+              className="p-2 -ml-2 rounded-xl text-slate-700 hover:bg-slate-100 hover:text-slate-900 md:hidden cursor-pointer transition border border-slate-200/80 shadow-2xs"
               aria-label="Open Sidebar"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#08B4B5]/10 border border-[#08B4B5]/30 text-[#08B4B5] uppercase tracking-widest">
+
+            {/* Mobile Branding */}
+            <div className="flex items-center gap-2 md:hidden">
+              <Image
+                src="/logo.png"
+                alt="TAQtix Logo"
+                width={90}
+                height={26}
+                className="h-6 w-auto object-contain"
+                priority
+              />
+              <span className="text-[9px] text-[#08B4B5] font-mono tracking-wider font-bold uppercase bg-[#08B4B5]/10 px-1.5 py-0.5 rounded border border-[#08B4B5]/20">
+                Admin
+              </span>
+            </div>
+
+            <div className="hidden md:inline-flex px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#08B4B5]/10 border border-[#08B4B5]/30 text-[#08B4B5] uppercase tracking-widest">
               Secured Console
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="md:hidden px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 uppercase">
+              Online
             </div>
           </div>
         </header>
 
         {/* Page children */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto min-h-0 bg-slate-50">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto min-h-0 min-w-0 bg-slate-50">
           {children}
         </main>
       </div>

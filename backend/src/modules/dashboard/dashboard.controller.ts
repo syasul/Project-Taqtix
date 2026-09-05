@@ -18,6 +18,7 @@ import { DashboardService } from './dashboard.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { RecordAdSpendDto } from './dto/record-ad-spend.dto';
 import type { Response } from 'express';
 
 @ApiTags('Dashboard & Analytics')
@@ -148,7 +149,7 @@ export class DashboardController {
   @ApiOperation({ summary: 'Mencatat pengeluaran iklan marketing' })
   async recordAdSpend(
     @Param('id') eventId: string,
-    @Body() dto: { channel: string; amount: number; periodStart: string; periodEnd: string },
+    @Body() dto: RecordAdSpendDto,
     @CurrentUser('id') userId: string,
   ) {
     const result = await this.dashboardService.recordAdSpend(eventId, dto, userId);

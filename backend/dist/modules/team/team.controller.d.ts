@@ -1,8 +1,11 @@
 import { TeamService } from './team.service';
+import { InviteTeamMemberDto } from './dto/invite-team-member.dto';
+import { AcceptInviteDto } from './dto/accept-invite.dto';
+import { UpdateTeamRoleDto } from './dto/update-team-role.dto';
 export declare class TeamController {
     private readonly teamService;
     constructor(teamService: TeamService);
-    invite(email: string, role: string, invitedById: string): Promise<{
+    invite(dto: InviteTeamMemberDto, invitedById: string): Promise<{
         success: boolean;
         data: {
             id: string;
@@ -12,7 +15,7 @@ export declare class TeamController {
             inviteToken: string | null;
         };
     }>;
-    acceptInvite(token: string, name: string, passwordHash: string): Promise<{
+    acceptInvite(token: string, dto: AcceptInviteDto): Promise<{
         success: boolean;
         data: {
             accessToken: string;
@@ -41,7 +44,7 @@ export declare class TeamController {
             removedAt: Date | null;
         })[];
     }>;
-    updateRole(memberId: string, role: string, ownerUserId: string): Promise<{
+    updateRole(memberId: string, dto: UpdateTeamRoleDto, ownerUserId: string): Promise<{
         success: boolean;
         data: {
             email: string;

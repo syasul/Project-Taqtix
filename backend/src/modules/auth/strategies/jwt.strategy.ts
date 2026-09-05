@@ -16,7 +16,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.getOrThrow<string>('TAQTIX_JWT_ACCESS_SECRET'),
+      secretOrKey:
+        configService.get<string>('JWT_ACCESS_SECRET') ||
+        configService.get<string>('TAQTIX_JWT_ACCESS_SECRET') ||
+        'super-secret-access-token-key-change-me',
     });
   }
 

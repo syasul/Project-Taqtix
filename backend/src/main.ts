@@ -3,29 +3,41 @@ import { AppModule } from './app.module';
 import { ValidationPipe, HttpStatus } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as express from 'express';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // 1. Terapkan prefix routing global
+  // 1. Keamanan Jaringan: Trust proxy agar Throttler membaca IP asli via X-Forwarded-For
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
+
+  // 2. Terapkan prefix routing global
   app.setGlobalPrefix('v1');
 
-  // 2. Keamanan: Aktifkan Helmet & CORS
+  // 3. Keamanan: Aktifkan Helmet & CORS
   app.use(helmet());
   app.enableCors({
     origin: true, // Menyesuaikan dengan kebutuhan origin di dev/production
     credentials: true,
   });
 
-  // 3. Validasi Global (class-validator)
+  // 4. Batasan Ukuran Payload (Proteksi Payload Bomb DDoS)
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+  // 5. Validasi Global (class-validator & class-transformer)
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 

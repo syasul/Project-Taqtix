@@ -9,6 +9,8 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CRMService } from './crm.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
+import { CreateSegmentDto } from './dto/create-segment.dto';
+import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 
 @ApiTags('Audience CRM & Segments')
 @Controller()
@@ -21,10 +23,9 @@ export class CRMController {
   @ApiOperation({ summary: 'Membuat segmen pembeli baru' })
   async createSegment(
     @Param('eventId') eventId: string,
-    @Body('name') name: string,
-    @Body('criteria') criteria: any,
+    @Body() dto: CreateSegmentDto,
   ) {
-    const result = await this.crmService.createSegment(eventId, name, criteria);
+    const result = await this.crmService.createSegment(eventId, dto.name, dto.criteria);
     return { success: true, data: result };
   }
 
@@ -52,15 +53,13 @@ export class CRMController {
   @ApiOperation({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' })
   async createBroadcast(
     @Param('segmentId') segmentId: string,
-    @Body('message') message: string,
-    @Body('channel') channel?: 'whatsapp' | 'email',
-    @Body('subject') subject?: string,
+    @Body() dto: CreateBroadcastDto,
   ) {
     const result = await this.crmService.createBroadcast(
       segmentId,
-      message,
-      channel || 'whatsapp',
-      subject,
+      dto.message,
+      dto.channel || 'whatsapp',
+      dto.subject,
     );
     return { success: true, data: result };
   }

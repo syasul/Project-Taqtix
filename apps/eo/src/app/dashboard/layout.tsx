@@ -60,14 +60,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Header />
 
       {/* Mobile sub-header for dashboard navigation */}
-      <div className="md:hidden flex items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200 text-slate-800">
+      <div className="md:hidden flex items-center justify-between px-4 sm:px-6 py-3 bg-white border-b border-slate-200 text-slate-800">
         <span className="text-xs font-bold uppercase tracking-wider text-[#08B4B5]">
           Organizer Portal
         </span>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetTrigger className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition cursor-pointer">
+          <SheetTrigger className="flex items-center gap-2 text-xs font-bold px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition cursor-pointer shadow-2xs">
             <Menu className="h-4 w-4 text-[#08B4B5]" />
-            Menu Dashboard
+            <span>Menu Sidebar</span>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 p-0 bg-white border-r border-slate-200 text-slate-800" showCloseButton={true}>
             <div className="pt-8 h-full">
@@ -77,9 +77,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </Sheet>
       </div>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-w-0">
         <Sidebar className="hidden md:flex h-[calc(100vh-4rem)] sticky top-16 bg-white border-r border-slate-200" />
-        <main className="flex-1 p-4 md:p-8 bg-slate-50 min-h-[calc(100vh-4rem)] overflow-y-auto">
+        <main className="flex-1 p-4 md:p-8 bg-slate-50 min-h-[calc(100vh-4rem)] overflow-y-auto min-w-0">
           {children}
         </main>
       </div>

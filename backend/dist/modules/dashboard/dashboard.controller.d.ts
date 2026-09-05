@@ -1,4 +1,5 @@
 import { DashboardService } from './dashboard.service';
+import { RecordAdSpendDto } from './dto/record-ad-spend.dto';
 import type { Response } from 'express';
 export declare class DashboardController {
     private readonly dashboardService;
@@ -97,12 +98,7 @@ export declare class DashboardController {
             refundRate: number;
         };
     }>;
-    recordAdSpend(eventId: string, dto: {
-        channel: string;
-        amount: number;
-        periodStart: string;
-        periodEnd: string;
-    }, userId: string): Promise<{
+    recordAdSpend(eventId: string, dto: RecordAdSpendDto, userId: string): Promise<{
         success: boolean;
         data: {
             id: string;

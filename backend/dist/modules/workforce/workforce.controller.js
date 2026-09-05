@@ -19,6 +19,7 @@ const workforce_service_1 = require("./workforce.service");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const permissions_decorator_1 = require("../../common/decorators/permissions.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
+const create_workforce_dto_1 = require("./dto/create-workforce.dto");
 let WorkforceController = class WorkforceController {
     workforceService;
     constructor(workforceService) {
@@ -63,7 +64,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, String]),
+    __metadata("design:paramtypes", [String, create_workforce_dto_1.CreateWorkforceDto, String]),
     __metadata("design:returntype", Promise)
 ], WorkforceController.prototype, "create", null);
 __decorate([

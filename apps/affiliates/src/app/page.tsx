@@ -57,12 +57,12 @@ export default function AffiliateDashboardOverviewPage() {
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
-      <div className="p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white rounded-3xl shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="p-5 sm:p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white rounded-3xl shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="relative z-10 space-y-2 max-w-xl">
           <span className="px-3 py-1 bg-[#08B4B5]/20 border border-[#08B4B5]/40 text-[#08B4B5] rounded-full text-xs font-bold uppercase tracking-wider inline-block">
             Dashboard Mitra Afiliasi Taqtix
           </span>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
             Selamat Datang, Syamsul Ma’arif!
           </h1>
           <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
@@ -70,7 +70,7 @@ export default function AffiliateDashboardOverviewPage() {
           </p>
         </div>
 
-        <div className="relative z-10 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/10 shrink-0 space-y-3">
+        <div className="relative z-10 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/10 shrink-0 space-y-3 w-full sm:w-auto">
           <div>
             <span className="text-[11px] text-slate-300 uppercase tracking-wider block font-semibold">
               Saldo Komisi Tersedia
@@ -90,7 +90,7 @@ export default function AffiliateDashboardOverviewPage() {
       </div>
 
       {/* KPI METRIC CARDS (Req 1: Keliatan berapa orang yang menggunakan kode promo) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[450px]:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Orang yang Menggunakan Kode Promo */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
           <div className="flex items-center justify-between">
@@ -244,7 +244,7 @@ export default function AffiliateDashboardOverviewPage() {
               </div>
 
               {/* Stats & Actions */}
-              <div className="flex flex-wrap md:flex-nowrap items-center gap-6 justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0">
+              <div className="flex flex-col sm:flex-row md:flex-nowrap items-start sm:items-center gap-4 sm:gap-6 justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 w-full md:w-auto">
                 <div className="text-left md:text-right">
                   <span className="text-[11px] text-slate-400 block font-semibold">Pengguna Kode:</span>
                   <span className="font-mono font-bold text-slate-900 text-sm">
@@ -264,7 +264,7 @@ export default function AffiliateDashboardOverviewPage() {
 
                 <button
                   onClick={() => handleCopyLink(evt.eventSlug, evt.promoCode, evt.id)}
-                  className="px-3.5 py-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs shrink-0"
+                  className="w-full sm:w-auto px-3.5 py-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs shrink-0"
                 >
                   {copiedId === evt.id ? (
                     <>

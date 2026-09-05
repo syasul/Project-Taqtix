@@ -141,6 +141,12 @@ export class EventsService {
   async publish(id: string, userId: string) {
     const organizer = await this.getOrganizerOrThrow(userId);
 
+    if (organizer.status !== 'active') {
+      throw new ForbiddenException(
+        `Akses ditolak: Akun organizer Anda berstatus "${organizer.status}". Hanya organizer berstatus "active" yang dapat mempublikasikan event. Hubungi tim admin TAQtix untuk verifikasi akun.`,
+      );
+    }
+
     const event = await this.prisma.event.findUnique({
       where: { id },
     });

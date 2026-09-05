@@ -22,6 +22,7 @@ const refresh_dto_1 = require("./dto/refresh.dto");
 const change_password_dto_1 = require("./dto/change-password.dto");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
+const throttler_1 = require("@nestjs/throttler");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -53,7 +54,8 @@ exports.AuthController = AuthController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('register'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendaftarkan pengguna baru' }),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendaftarkan akun user/customer baru' }),
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.CREATED,
         description: 'User berhasil didaftarkan.',
@@ -75,6 +77,7 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
     (0, swagger_1.ApiOperation)({ summary: 'Masuk log menggunakan email & password' }),
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.OK,
@@ -93,6 +96,7 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('gate-login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
     (0, swagger_1.ApiOperation)({ summary: 'Masuk log khusus gate staff' }),
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.OK,
@@ -168,7 +172,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "changePassword", null);
 exports.AuthController = AuthController = __decorate([
-    (0, swagger_1.ApiTags)('Authentication'),
+    (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

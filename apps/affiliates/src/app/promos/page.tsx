@@ -75,7 +75,7 @@ export default function AffiliatePromosManagementPage() {
       {/* Table */}
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm p-6 space-y-4">
         <div className="overflow-x-auto border border-slate-100 rounded-xl">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 min-w-[640px]">
             <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
               <tr>
                 <th className="py-3.5 px-4">Kode Promo</th>

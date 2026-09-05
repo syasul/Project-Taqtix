@@ -19,6 +19,7 @@ const dashboard_service_1 = require("./dashboard.service");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const permissions_decorator_1 = require("../../common/decorators/permissions.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
+const record_ad_spend_dto_1 = require("./dto/record-ad-spend.dto");
 let DashboardController = class DashboardController {
     dashboardService;
     constructor(dashboardService) {
@@ -188,7 +189,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, String]),
+    __metadata("design:paramtypes", [String, record_ad_spend_dto_1.RecordAdSpendDto, String]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "recordAdSpend", null);
 __decorate([

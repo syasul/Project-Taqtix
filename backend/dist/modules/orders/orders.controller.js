@@ -21,6 +21,7 @@ const orders_service_1 = require("./orders.service");
 const create_order_dto_1 = require("./dto/create-order.dto");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
+const throttler_1 = require("@nestjs/throttler");
 let OrdersController = class OrdersController {
     ordersService;
     jwtService;
@@ -57,6 +58,7 @@ exports.OrdersController = OrdersController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
+    (0, throttler_1.Throttle)({ default: { limit: 10, ttl: 60000 } }),
     (0, swagger_1.ApiOperation)({
         summary: 'Membuat pesanan baru dan mereservasi kuota tiket (Public/Buyer)',
     }),

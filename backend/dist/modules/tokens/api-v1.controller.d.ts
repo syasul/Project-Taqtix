@@ -30,6 +30,7 @@ export declare class ApiV1Controller {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            status: import("@prisma/client").$Enums.EventStatus;
             location: string;
             startDate: Date;
             endDate: Date;
@@ -41,7 +42,6 @@ export declare class ApiV1Controller {
             adminSeoKeywords: string | null;
             seoPriority: string | null;
             organizerId: string;
-            status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
@@ -96,8 +96,8 @@ export declare class ApiV1Controller {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            eventId: string;
             status: import("@prisma/client").$Enums.OrderStatus;
+            eventId: string;
             promoCodeId: string | null;
             buyerId: string;
             totalAmount: number;

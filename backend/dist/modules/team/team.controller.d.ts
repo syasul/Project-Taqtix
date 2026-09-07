@@ -35,8 +35,8 @@ export declare class TeamController {
             createdAt: Date;
             updatedAt: Date;
             userId: string | null;
-            organizerId: string;
             status: string;
+            organizerId: string;
             inviteToken: string | null;
             invitedBy: string;
             invitedAt: Date;
@@ -53,8 +53,8 @@ export declare class TeamController {
             createdAt: Date;
             updatedAt: Date;
             userId: string | null;
-            organizerId: string;
             status: string;
+            organizerId: string;
             inviteToken: string | null;
             invitedBy: string;
             invitedAt: Date;

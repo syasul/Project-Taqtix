@@ -16,6 +16,7 @@ export declare class GateController {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -27,7 +28,6 @@ export declare class GateController {
         adminSeoKeywords: string | null;
         seoPriority: string | null;
         organizerId: string;
-        status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;

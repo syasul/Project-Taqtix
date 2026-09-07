@@ -8,13 +8,13 @@ export declare class AdminService {
         slug: string;
         email: string;
         phone: string;
-        status: "active";
+        status: string;
         plan: string;
         segment: string | null;
         bankAccount: string | null;
         createdAt: string;
-        approvedAt: string;
-        approvedBy: string;
+        approvedAt: string | null;
+        approvedBy: string | null;
         eventCount: number;
     }[]>;
     createOrganizer(dto: {
@@ -55,10 +55,14 @@ export declare class AdminService {
         name: string;
         userId: string;
         slug: string;
+        phone: string | null;
+        status: string;
         bankAccount: string | null;
         plan: string;
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
+        approvedAt: Date | null;
+        approvedBy: string | null;
     }>;
     createPartner(dto: {
         name: string;
@@ -142,8 +146,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        status: string;
         phone: string;
+        status: string;
         organizationName: string;
         assignedTo: string | null;
     }>;
@@ -154,8 +158,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        status: string;
         phone: string;
+        status: string;
         organizationName: string;
         assignedTo: string | null;
     }[]>;
@@ -166,8 +170,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        status: string;
         phone: string;
+        status: string;
         organizationName: string;
         assignedTo: string | null;
     }>;
@@ -178,8 +182,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        status: string;
         phone: string;
+        status: string;
         organizationName: string;
         assignedTo: string | null;
     }>;
@@ -235,6 +239,7 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -246,7 +251,6 @@ export declare class AdminService {
         adminSeoKeywords: string | null;
         seoPriority: string | null;
         organizerId: string;
-        status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -259,6 +263,7 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        status: import("@prisma/client").$Enums.EventStatus;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -270,10 +275,191 @@ export declare class AdminService {
         adminSeoKeywords: string | null;
         seoPriority: string | null;
         organizerId: string;
-        status: import("@prisma/client").$Enums.EventStatus;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
         allowTicketTransfer: boolean;
     }>;
+    getDashboard(): Promise<{
+        totalOrganizers: number;
+        activeOrganizers: number;
+        totalEvents: number;
+        publishedEvents: number;
+        totalRevenue: number;
+        platformFee: number;
+    }>;
+    getOrganizerById(id: string): Promise<{
+        id: string;
+        name: string;
+        slug: string;
+        email: string;
+        phone: string;
+        status: string;
+        plan: string;
+        segment: string | null;
+        bankAccount: string | null;
+        createdAt: string;
+        approvedAt: string | null;
+        approvedBy: string | null;
+        events: {
+            id: string;
+            title: string;
+            slug: string;
+            status: string;
+            location: string;
+            startDate: string;
+            endDate: string;
+            ticketsSold: number;
+            quota: number;
+        }[];
+    }>;
+    approveOrganizer(id: string, adminId?: string): Promise<{
+        segment: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        userId: string;
+        slug: string;
+        phone: string | null;
+        status: string;
+        bankAccount: string | null;
+        plan: string;
+        planStartedAt: Date | null;
+        planExpiresAt: Date | null;
+        approvedAt: Date | null;
+        approvedBy: string | null;
+    }>;
+    suspendOrganizer(id: string, adminId?: string): Promise<{
+        segment: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        userId: string;
+        slug: string;
+        phone: string | null;
+        status: string;
+        bankAccount: string | null;
+        plan: string;
+        planStartedAt: Date | null;
+        planExpiresAt: Date | null;
+        approvedAt: Date | null;
+        approvedBy: string | null;
+    }>;
+    updatePlan(id: string, plan: string, adminId?: string): Promise<{
+        segment: string | null;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        userId: string;
+        slug: string;
+        phone: string | null;
+        status: string;
+        bankAccount: string | null;
+        plan: string;
+        planStartedAt: Date | null;
+        planExpiresAt: Date | null;
+        approvedAt: Date | null;
+        approvedBy: string | null;
+    }>;
+    forceUnpublishEvent(id: string, adminId?: string): Promise<{
+        description: string | null;
+        title: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        slug: string;
+        status: import("@prisma/client").$Enums.EventStatus;
+        location: string;
+        startDate: Date;
+        endDate: Date;
+        bannerUrl: string;
+        requireLogin: boolean;
+        seoTitle: string | null;
+        seoDescription: string | null;
+        seoKeywords: string | null;
+        adminSeoKeywords: string | null;
+        seoPriority: string | null;
+        organizerId: string;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
+    }>;
+    searchOrders(query?: string): Promise<{
+        id: string;
+        eventId: string;
+        eventTitle: string;
+        organizerName: string;
+        buyerEmail: string;
+        status: string;
+        totalAmount: number;
+        promoCode: string | null;
+        createdAt: string;
+        items: {
+            categoryName: string;
+            qty: number;
+            attendeeName: string;
+            attendeePhone: string;
+        }[];
+    }[]>;
+    getSettlements(): Promise<({
+        organizer: {
+            id: string;
+            name: string;
+            bankAccount: string | null;
+        };
+        event: {
+            title: string;
+            id: string;
+            endDate: Date;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: string;
+        eventId: string;
+        organizerId: string;
+        paidAt: Date | null;
+        grossRevenue: number;
+        platformFee: number;
+        affiliateCommissionTotal: number;
+        netAmount: number;
+        paidBy: string | null;
+    })[]>;
+    markSettlementPaid(id: string, adminId?: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: string;
+        eventId: string;
+        organizerId: string;
+        paidAt: Date | null;
+        grossRevenue: number;
+        platformFee: number;
+        affiliateCommissionTotal: number;
+        netAmount: number;
+        paidBy: string | null;
+    }>;
+    getAuditLogs(): Promise<{
+        id: string;
+        action: string;
+        adminId: string;
+        targetId: string;
+        targetType: string;
+        details: import("@prisma/client/runtime/library").JsonValue | null;
+        timestamp: Date;
+    }[]>;
+    recordAuditLog(adminId: string, action: string, targetId: string, targetType: string, details?: any): Promise<{
+        id: string;
+        action: string;
+        adminId: string;
+        targetId: string;
+        targetType: string;
+        details: import("@prisma/client/runtime/library").JsonValue | null;
+        timestamp: Date;
+    } | undefined>;
 }

@@ -19,18 +19,40 @@ const throttler_1 = require("@nestjs/throttler");
 const admin_service_1 = require("./admin.service");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
+const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const create_organizer_dto_1 = require("./dto/create-organizer.dto");
 const update_organizer_dto_1 = require("./dto/update-organizer.dto");
 const create_partner_dto_1 = require("./dto/create-partner.dto");
 const update_partner_dto_1 = require("./dto/update-partner.dto");
 const create_lead_dto_1 = require("./dto/create-lead.dto");
+const update_plan_dto_1 = require("./dto/update-plan.dto");
 let AdminController = class AdminController {
     adminService;
     constructor(adminService) {
         this.adminService = adminService;
     }
+    async getDashboard() {
+        const result = await this.adminService.getDashboard();
+        return { success: true, data: result };
+    }
     async getOrganizers() {
         const result = await this.adminService.getOrganizers();
+        return { success: true, data: result };
+    }
+    async getOrganizerById(id) {
+        const result = await this.adminService.getOrganizerById(id);
+        return { success: true, data: result };
+    }
+    async approveOrganizer(id, adminId) {
+        const result = await this.adminService.approveOrganizer(id, adminId);
+        return { success: true, data: result };
+    }
+    async suspendOrganizer(id, adminId) {
+        const result = await this.adminService.suspendOrganizer(id, adminId);
+        return { success: true, data: result };
+    }
+    async updatePlan(id, dto, adminId) {
+        const result = await this.adminService.updatePlan(id, dto.plan, adminId);
         return { success: true, data: result };
     }
     async createOrganizer(dto) {
@@ -93,8 +115,37 @@ let AdminController = class AdminController {
         const result = await this.adminService.rejectEvent(id, reason);
         return { success: true, data: result };
     }
+    async forceUnpublishEvent(id, adminId) {
+        const result = await this.adminService.forceUnpublishEvent(id, adminId);
+        return { success: true, data: result };
+    }
+    async searchOrders(q) {
+        const result = await this.adminService.searchOrders(q);
+        return { success: true, data: result };
+    }
+    async getSettlements() {
+        const result = await this.adminService.getSettlements();
+        return { success: true, data: result };
+    }
+    async markSettlementPaid(id, adminId) {
+        const result = await this.adminService.markSettlementPaid(id, adminId);
+        return { success: true, data: result };
+    }
+    async getAuditLogs() {
+        const result = await this.adminService.getAuditLogs();
+        return { success: true, data: result };
+    }
 };
 exports.AdminController = AdminController;
+__decorate([
+    (0, common_1.Get)('admin/dashboard'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Ringkasan platform & analitik lintas organizer (Admin Only)' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getDashboard", null);
 __decorate([
     (0, common_1.Get)('admin/organizers'),
     (0, roles_decorator_1.Roles)('admin'),
@@ -104,6 +155,50 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getOrganizers", null);
+__decorate([
+    (0, common_1.Get)('admin/organizers/:id'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan detail organizer beserta list event miliknya (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getOrganizerById", null);
+__decorate([
+    (0, common_1.Post)('admin/organizers/:id/approve'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menyetujui pendaftaran organizer baru (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "approveOrganizer", null);
+__decorate([
+    (0, common_1.Post)('admin/organizers/:id/suspend'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menangguhkan akun organizer (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "suspendOrganizer", null);
+__decorate([
+    (0, common_1.Patch)('admin/organizers/:id/plan'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mengubah paket langganan (plan) organizer (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_plan_dto_1.UpdatePlanDto, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "updatePlan", null);
 __decorate([
     (0, common_1.Post)('admin/organizers'),
     (0, roles_decorator_1.Roles)('admin'),
@@ -255,6 +350,57 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "rejectEvent", null);
+__decorate([
+    (0, common_1.Post)('admin/events/:id/force-unpublish'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Force unpublish event bermasalah (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "forceUnpublishEvent", null);
+__decorate([
+    (0, common_1.Get)('admin/orders'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiQuery)({ name: 'q', required: false, description: 'Kata kunci pencarian order (order ID / email buyer / nama attendee)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Pencarian pesanan lintas seluruh organizer (Admin Only)' }),
+    __param(0, (0, common_1.Query)('q')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "searchOrders", null);
+__decorate([
+    (0, common_1.Get)('admin/settlements'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar settlement yang perlu diproses (Admin Only)' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getSettlements", null);
+__decorate([
+    (0, common_1.Post)('admin/settlements/:id/mark-paid'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Menandai settlement sudah ditransfer manual (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "markSettlementPaid", null);
+__decorate([
+    (0, common_1.Get)('admin/audit-log'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan log audit aktivitas admin (Admin Only)' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAuditLogs", null);
 exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admin Panel Console'),
     (0, common_1.Controller)(),

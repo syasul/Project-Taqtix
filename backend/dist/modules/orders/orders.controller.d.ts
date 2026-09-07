@@ -8,22 +8,7 @@ export declare class OrdersController {
     private readonly jwtService;
     private readonly configService;
     constructor(ordersService: OrdersService, jwtService: JwtService, configService: ConfigService);
-    createOrder(dto: CreateOrderDto, req: Request): Promise<{
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        eventId: string;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        promoCodeId: string | null;
-        buyerId: string;
-        totalAmount: number;
-        discountAmount: number;
-        partnerId: string | null;
-        utmSource: string | null;
-        utmMedium: string | null;
-        utmCampaign: string | null;
-        expiredAt: Date;
-    }>;
+    createOrder(dto: CreateOrderDto, req: Request): Promise<any>;
     getMyOrders(userId: string): Promise<({
         event: {
             title: string;
@@ -64,8 +49,8 @@ export declare class OrdersController {
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
-                eventId: string;
                 status: import("@prisma/client").$Enums.TicketStatus;
+                eventId: string;
                 qrPayload: string;
                 orderItemId: string;
                 checkedInAt: Date | null;
@@ -97,8 +82,8 @@ export declare class OrdersController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        eventId: string;
         status: import("@prisma/client").$Enums.OrderStatus;
+        eventId: string;
         promoCodeId: string | null;
         buyerId: string;
         totalAmount: number;
@@ -117,6 +102,7 @@ export declare class OrdersController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            status: import("@prisma/client").$Enums.EventStatus;
             location: string;
             startDate: Date;
             endDate: Date;
@@ -128,7 +114,6 @@ export declare class OrdersController {
             adminSeoKeywords: string | null;
             seoPriority: string | null;
             organizerId: string;
-            status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
@@ -189,8 +174,8 @@ export declare class OrdersController {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        eventId: string;
         status: import("@prisma/client").$Enums.OrderStatus;
+        eventId: string;
         promoCodeId: string | null;
         buyerId: string;
         totalAmount: number;

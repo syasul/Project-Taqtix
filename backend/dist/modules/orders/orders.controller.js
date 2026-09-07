@@ -45,7 +45,10 @@ let OrdersController = class OrdersController {
             catch {
             }
         }
-        return this.ordersService.create(dto, authenticatedUserId);
+        const idempotencyKey = req.headers['idempotency-key'] ||
+            req.headers['x-idempotency-key'] ||
+            undefined;
+        return this.ordersService.create(dto, authenticatedUserId, idempotencyKey);
     }
     async getMyOrders(userId) {
         return this.ordersService.findMyOrders(userId);

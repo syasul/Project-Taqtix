@@ -4,23 +4,9 @@ import { Queue } from 'bullmq';
 export declare class OrdersService {
     private prisma;
     private orderExpirationQueue;
+    private idempotencyStore;
     constructor(prisma: PrismaService, orderExpirationQueue: Queue);
-    create(dto: CreateOrderDto, authenticatedUserId?: string): Promise<{
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        eventId: string;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        promoCodeId: string | null;
-        buyerId: string;
-        totalAmount: number;
-        discountAmount: number;
-        partnerId: string | null;
-        utmSource: string | null;
-        utmMedium: string | null;
-        utmCampaign: string | null;
-        expiredAt: Date;
-    }>;
+    create(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string): Promise<any>;
     findOne(id: string): Promise<{
         event: {
             description: string | null;
@@ -29,6 +15,7 @@ export declare class OrdersService {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            status: import("@prisma/client").$Enums.EventStatus;
             location: string;
             startDate: Date;
             endDate: Date;
@@ -40,7 +27,6 @@ export declare class OrdersService {
             adminSeoKeywords: string | null;
             seoPriority: string | null;
             organizerId: string;
-            status: import("@prisma/client").$Enums.EventStatus;
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
@@ -101,8 +87,8 @@ export declare class OrdersService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        eventId: string;
         status: import("@prisma/client").$Enums.OrderStatus;
+        eventId: string;
         promoCodeId: string | null;
         buyerId: string;
         totalAmount: number;
@@ -153,8 +139,8 @@ export declare class OrdersService {
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
-                eventId: string;
                 status: import("@prisma/client").$Enums.TicketStatus;
+                eventId: string;
                 qrPayload: string;
                 orderItemId: string;
                 checkedInAt: Date | null;
@@ -186,8 +172,8 @@ export declare class OrdersService {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        eventId: string;
         status: import("@prisma/client").$Enums.OrderStatus;
+        eventId: string;
         promoCodeId: string | null;
         buyerId: string;
         totalAmount: number;

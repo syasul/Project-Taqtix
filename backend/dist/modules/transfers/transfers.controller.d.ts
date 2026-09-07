@@ -38,8 +38,8 @@ export declare class TransfersController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            eventId: string;
             status: import("@prisma/client").$Enums.TicketStatus;
+            eventId: string;
             qrPayload: string;
             orderItemId: string;
             checkedInAt: Date | null;
@@ -102,8 +102,8 @@ export declare class TransfersController {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            eventId: string;
             status: import("@prisma/client").$Enums.TicketStatus;
+            eventId: string;
             qrPayload: string;
             orderItemId: string;
             checkedInAt: Date | null;

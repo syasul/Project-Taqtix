@@ -72,14 +72,14 @@ let AdminService = class AdminService {
             name: o.name,
             slug: o.slug,
             email: o.user.email,
-            phone: '08123456789',
-            status: 'active',
+            phone: o.phone || '08123456789',
+            status: o.status || 'pending',
             plan: o.plan,
             segment: o.segment,
             bankAccount: o.bankAccount,
             createdAt: o.createdAt.toISOString(),
-            approvedAt: o.createdAt.toISOString(),
-            approvedBy: 'admin@taqtix.id',
+            approvedAt: o.approvedAt ? o.approvedAt.toISOString() : null,
+            approvedBy: o.approvedBy || null,
             eventCount: o._count.events,
         }));
     }
@@ -346,6 +346,212 @@ let AdminService = class AdminService {
             where: { id: eventId },
             data: { status: 'CANCELLED' },
         });
+    }
+    async getDashboard() {
+        const [totalOrganizers, activeOrganizers, totalEvents, publishedEvents, paidOrders] = await Promise.all([
+            this.prisma.organizer.count(),
+            this.prisma.organizer.count({ where: { status: 'active' } }),
+            this.prisma.event.count(),
+            this.prisma.event.count({ where: { status: 'PUBLISHED' } }),
+            this.prisma.order.findMany({
+                where: { status: 'PAID' },
+                select: { totalAmount: true },
+            }),
+        ]);
+        const totalRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+        const platformFee = Math.round(totalRevenue * 0.05);
+        return {
+            totalOrganizers,
+            activeOrganizers,
+            totalEvents,
+            publishedEvents,
+            totalRevenue,
+            platformFee,
+        };
+    }
+    async getOrganizerById(id) {
+        const o = await this.prisma.organizer.findUnique({
+            where: { id },
+            include: {
+                user: {
+                    select: {
+                        email: true,
+                    },
+                },
+                events: {
+                    include: {
+                        ticketCategories: true,
+                    },
+                    orderBy: { createdAt: 'desc' },
+                },
+            },
+        });
+        if (!o)
+            throw new common_1.NotFoundException('Organizer tidak ditemukan');
+        return {
+            id: o.id,
+            name: o.name,
+            slug: o.slug,
+            email: o.user.email,
+            phone: o.phone || '08123456789',
+            status: o.status || 'pending',
+            plan: o.plan,
+            segment: o.segment,
+            bankAccount: o.bankAccount,
+            createdAt: o.createdAt.toISOString(),
+            approvedAt: o.approvedAt ? o.approvedAt.toISOString() : null,
+            approvedBy: o.approvedBy || null,
+            events: o.events.map((e) => ({
+                id: e.id,
+                title: e.title,
+                slug: e.slug,
+                status: e.status.toLowerCase(),
+                location: e.location,
+                startDate: e.startDate.toISOString(),
+                endDate: e.endDate.toISOString(),
+                ticketsSold: e.ticketCategories.reduce((s, tc) => s + tc.sold, 0),
+                quota: e.ticketCategories.reduce((s, tc) => s + tc.quota, 0),
+            })),
+        };
+    }
+    async approveOrganizer(id, adminId) {
+        const organizer = await this.prisma.organizer.findUnique({ where: { id } });
+        if (!organizer)
+            throw new common_1.NotFoundException('Organizer tidak ditemukan');
+        const updated = await this.prisma.organizer.update({
+            where: { id },
+            data: {
+                status: 'active',
+                approvedAt: new Date(),
+                approvedBy: adminId || 'admin',
+            },
+        });
+        await this.recordAuditLog(adminId || 'admin', 'approve_organizer', id, 'organizer', { organizerName: organizer.name, previousStatus: organizer.status });
+        return updated;
+    }
+    async suspendOrganizer(id, adminId) {
+        const organizer = await this.prisma.organizer.findUnique({ where: { id } });
+        if (!organizer)
+            throw new common_1.NotFoundException('Organizer tidak ditemukan');
+        const updated = await this.prisma.organizer.update({
+            where: { id },
+            data: {
+                status: 'suspended',
+            },
+        });
+        await this.recordAuditLog(adminId || 'admin', 'suspend_organizer', id, 'organizer', { organizerName: organizer.name, previousStatus: organizer.status });
+        return updated;
+    }
+    async updatePlan(id, plan, adminId) {
+        const organizer = await this.prisma.organizer.findUnique({ where: { id } });
+        if (!organizer)
+            throw new common_1.NotFoundException('Organizer tidak ditemukan');
+        const updated = await this.prisma.organizer.update({
+            where: { id },
+            data: {
+                plan,
+                planStartedAt: new Date(),
+            },
+        });
+        await this.recordAuditLog(adminId || 'admin', 'change_plan', id, 'organizer', { previousPlan: organizer.plan, newPlan: plan });
+        return updated;
+    }
+    async forceUnpublishEvent(id, adminId) {
+        const event = await this.prisma.event.findUnique({ where: { id } });
+        if (!event)
+            throw new common_1.NotFoundException('Event tidak ditemukan');
+        const updated = await this.prisma.event.update({
+            where: { id },
+            data: {
+                status: 'DRAFT',
+            },
+        });
+        await this.recordAuditLog(adminId || 'admin', 'force_unpublish', id, 'event', { eventTitle: event.title, previousStatus: event.status });
+        return updated;
+    }
+    async searchOrders(query) {
+        const where = {};
+        if (query) {
+            where.OR = [
+                { id: { contains: query, mode: 'insensitive' } },
+                { buyer: { email: { contains: query, mode: 'insensitive' } } },
+                { orderItems: { some: { attendeeName: { contains: query, mode: 'insensitive' } } } },
+            ];
+        }
+        const orders = await this.prisma.order.findMany({
+            where,
+            include: {
+                buyer: { select: { email: true } },
+                event: { select: { id: true, title: true, organizer: { select: { name: true } } } },
+                orderItems: { include: { ticketCategory: true } },
+                payment: true,
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+        });
+        return orders.map((o) => ({
+            id: o.id,
+            eventId: o.eventId,
+            eventTitle: o.event.title,
+            organizerName: o.event.organizer.name,
+            buyerEmail: o.buyer.email,
+            status: o.status.toLowerCase(),
+            totalAmount: o.totalAmount,
+            promoCode: o.promoCodeId,
+            createdAt: o.createdAt.toISOString(),
+            items: o.orderItems.map((it) => ({
+                categoryName: it.ticketCategory.name,
+                qty: it.qty,
+                attendeeName: it.attendeeName,
+                attendeePhone: it.attendeePhone,
+            })),
+        }));
+    }
+    async getSettlements() {
+        return this.prisma.settlement.findMany({
+            include: {
+                organizer: { select: { id: true, name: true, bankAccount: true } },
+                event: { select: { id: true, title: true, endDate: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async markSettlementPaid(id, adminId) {
+        const settlement = await this.prisma.settlement.findUnique({ where: { id } });
+        if (!settlement)
+            throw new common_1.NotFoundException('Settlement tidak ditemukan');
+        const updated = await this.prisma.settlement.update({
+            where: { id },
+            data: {
+                status: 'paid',
+                paidAt: new Date(),
+                paidBy: adminId || 'admin',
+            },
+        });
+        await this.recordAuditLog(adminId || 'admin', 'mark_settlement_paid', id, 'settlement', { netAmount: settlement.netAmount, eventId: settlement.eventId });
+        return updated;
+    }
+    async getAuditLogs() {
+        return this.prisma.auditLog.findMany({
+            orderBy: { timestamp: 'desc' },
+            take: 100,
+        });
+    }
+    async recordAuditLog(adminId, action, targetId, targetType, details) {
+        try {
+            return await this.prisma.auditLog.create({
+                data: {
+                    adminId,
+                    action,
+                    targetId,
+                    targetType,
+                    details: details || null,
+                },
+            });
+        }
+        catch (err) {
+            console.error('Gagal mencatat audit log:', err);
+        }
     }
 };
 exports.AdminService = AdminService;

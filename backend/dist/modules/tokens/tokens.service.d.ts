@@ -43,10 +43,14 @@ export declare class TokensService {
             name: string;
             userId: string;
             slug: string;
+            phone: string | null;
+            status: string;
             bankAccount: string | null;
             plan: string;
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
+            approvedAt: Date | null;
+            approvedBy: string | null;
         };
     } & {
         id: string;

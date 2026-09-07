@@ -21,11 +21,18 @@ const bullmq_1 = require("bullmq");
 let OrdersService = class OrdersService {
     prisma;
     orderExpirationQueue;
+    idempotencyStore = new Map();
     constructor(prisma, orderExpirationQueue) {
         this.prisma = prisma;
         this.orderExpirationQueue = orderExpirationQueue;
     }
-    async create(dto, authenticatedUserId) {
+    async create(dto, authenticatedUserId, idempotencyKey) {
+        if (idempotencyKey) {
+            const cached = this.idempotencyStore.get(idempotencyKey);
+            if (cached && cached.expiresAt > Date.now()) {
+                return cached.order;
+            }
+        }
         const event = await this.prisma.event.findUnique({
             where: { id: dto.eventId },
             include: {
@@ -233,7 +240,7 @@ let OrdersService = class OrdersService {
                 }
             }
             const totalAmount = Math.max(0, basePriceTotal - discountAmt);
-            const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
+            const expiredAt = new Date(Date.now() + 10 * 60 * 1000);
             const newOrder = await tx.order.create({
                 data: {
                     buyerId: buyer.id,
@@ -267,7 +274,20 @@ let OrdersService = class OrdersService {
             }
             return newOrder;
         });
-        await this.orderExpirationQueue.add('expire-order', { orderId: order.id }, { delay: 15 * 60 * 1000 });
+        if (idempotencyKey) {
+            this.idempotencyStore.set(idempotencyKey, {
+                order,
+                expiresAt: Date.now() + 10 * 60 * 1000,
+            });
+            if (this.idempotencyStore.size > 1000) {
+                const now = Date.now();
+                for (const [k, v] of this.idempotencyStore.entries()) {
+                    if (v.expiresAt <= now)
+                        this.idempotencyStore.delete(k);
+                }
+            }
+        }
+        await this.orderExpirationQueue.add('expire-order', { orderId: order.id }, { delay: 10 * 60 * 1000 });
         return order;
     }
     async findOne(id) {

@@ -200,7 +200,10 @@ let EventsService = class EventsService {
         if (!event || event.status !== client_1.EventStatus.PUBLISHED) {
             throw new common_1.NotFoundException('Event tidak ditemukan atau belum dipublikasikan');
         }
-        return event;
+        return {
+            ...event,
+            customFields: event.customFormFields,
+        };
     }
     async findAllOrganizerEvents(userId) {
         const organizer = await this.getOrganizerOrThrow(userId);

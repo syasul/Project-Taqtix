@@ -42,12 +42,24 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const helmet_1 = __importDefault(require("helmet"));
 const express = __importStar(require("express"));
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const http_exception_filter_1 = require("./common/filters/http-exception.filter");
 const response_interceptor_1 = require("./common/interceptors/response.interceptor");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const expressApp = app.getHttpAdapter().getInstance();
     expressApp.set('trust proxy', 1);
+    const uploadPath = process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
+    try {
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        app.use('/uploads', express.static(uploadPath));
+    }
+    catch (err) {
+        console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
+    }
     app.setGlobalPrefix('v1');
     app.use((0, helmet_1.default)());
     app.enableCors({

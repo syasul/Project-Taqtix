@@ -25,6 +25,7 @@ export declare class AuthController {
         refreshToken: string;
     }>;
     me(userId: string): Promise<{
+        organizerRole: string | null;
         organizer: {
             id: string;
             name: string;

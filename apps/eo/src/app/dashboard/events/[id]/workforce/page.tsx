@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import EventTabs from '@/components/layout/event-tabs';
@@ -120,10 +121,19 @@ export default function WorkforcePage() {
     }
   };
 
+  const [selectedDivisionFilter, setSelectedDivisionFilter] = useState('all');
+
   const breadcrumbs = [
     { label: 'Daftar Event', href: '/dashboard/events' },
     { label: 'Workforce & PIC Dashboard' },
   ];
+
+  const uniqueDivisions = Array.from(new Set((dashboard.members || []).map((m: any) => m.division).filter(Boolean)));
+
+  const filteredMembers = (dashboard.members || []).filter((m: any) => {
+    if (selectedDivisionFilter === 'all') return true;
+    return m.division?.toLowerCase() === selectedDivisionFilter.toLowerCase();
+  });
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -142,13 +152,23 @@ export default function WorkforcePage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsInviteOpen(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-sm border-0"
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span>Tambah Crew Baru</span>
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <Link
+            href={`/dashboard/events/${eventId}/workforce/pic-view`}
+            className="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-teal-50 hover:bg-teal-100/70 text-[#08B4B5] border border-teal-200/80 text-xs font-bold rounded-xl transition shadow-2xs"
+          >
+            <Clock className="h-4 w-4" />
+            <span>PIC Real-Time View</span>
+          </Link>
+
+          <button
+            onClick={() => setIsInviteOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-sm border-0"
+          >
+            <PlusCircle className="h-4 w-4" />
+            <span>Tambah Crew</span>
+          </button>
+        </div>
       </div>
 
       {dashboardLoading ? (
@@ -223,61 +243,91 @@ export default function WorkforcePage() {
           </div>
 
           {/* Members list */}
-          <Card className="bg-white border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm">
-            <div>
-              <CardTitle className="text-sm font-bold text-slate-900">Daftar Kehadiran Crew</CardTitle>
-              <CardDescription className="text-xs text-slate-400">Monitor status check-in dan metode pencatatan kehadiran crew</CardDescription>
+          <Card className="bg-white border-slate-200/80 p-6 space-y-4 rounded-2xl shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-sm font-bold text-slate-900">Daftar Kehadiran Crew</CardTitle>
+                <CardDescription className="text-xs text-slate-400">
+                  Monitor status check-in, divisi, dan tautan unik portal kru
+                </CardDescription>
+              </div>
+
+              {/* Division Filter Dropdown */}
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <span className="text-xs font-bold text-slate-500">Filter Divisi:</span>
+                <select
+                  value={selectedDivisionFilter}
+                  onChange={(e) => setSelectedDivisionFilter(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-900 font-medium focus:border-[#08B4B5] focus:outline-hidden"
+                >
+                  <option value="all">Semua Divisi ({dashboard.members?.length || 0})</option>
+                  {uniqueDivisions.map((div: any) => (
+                    <option key={div} value={div}>
+                      {div}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {dashboard.members.length === 0 ? (
+            {filteredMembers.length === 0 ? (
               <div className="py-12 text-center text-slate-400 text-xs">
-                Belum ada crew terdaftar untuk event ini.
+                Tidak ada crew yang ditemukan untuk filter divisi terpilih.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50">
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Nama</th>
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">WhatsApp</th>
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Divisi</th>
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Posisi</th>
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Status</th>
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Jam Hadir</th>
-                      <th className="p-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider text-right">Tautan Portal</th>
+                    <tr className="border-b border-slate-100 bg-slate-50/70 text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                      <th className="p-3.5">Nama Kru</th>
+                      <th className="p-3.5">WhatsApp</th>
+                      <th className="p-3.5">Divisi</th>
+                      <th className="p-3.5">Posisi Role</th>
+                      <th className="p-3.5">Status</th>
+                      <th className="p-3.5">Waktu Check-In</th>
+                      <th className="p-3.5 text-right">Link Crew</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
-                    {dashboard.members.map((m: any) => (
+                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                    {filteredMembers.map((m: any) => (
                       <tr key={m.id} className="hover:bg-slate-50/70 transition">
-                        <td className="p-3 font-bold text-slate-900">{m.name}</td>
-                        <td className="p-3 font-mono text-slate-500">{m.phone}</td>
-                        <td className="p-3 text-slate-600 capitalize">{m.division}</td>
-                        <td className="p-3 text-slate-600">{m.role}</td>
-                        <td className="p-3">
+                        <td className="p-3.5 font-bold text-slate-900">{m.name}</td>
+                        <td className="p-3.5 font-mono text-slate-500">{m.phone}</td>
+                        <td className="p-3.5 text-slate-600 capitalize">
+                          <span className="px-2 py-0.5 bg-slate-100 rounded-md font-medium text-[11px]">
+                            {m.division}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-slate-600">{m.role}</td>
+                        <td className="p-3.5">
                           {m.status === 'present' ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 rounded-full">
-                              Hadir
+                              Present (Hadir)
+                            </span>
+                          ) : m.status === 'checked_out' ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 border border-blue-200 rounded-full">
+                              Checked Out
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 border border-slate-200 rounded-full">
-                              Belum Check-In
+                              Not Checked In
                             </span>
                           )}
                         </td>
-                        <td className="p-3 font-mono text-slate-500">
+                        <td className="p-3.5 font-mono text-slate-500">
                           {m.checkedInAt ? new Date(m.checkedInAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}
                           {m.checkedInMethod && (
-                            <span className="text-[9px] text-slate-400 block font-sans">({m.checkedInMethod.replace('_', ' ')})</span>
+                            <span className="text-[9px] text-slate-400 block font-sans">({m.checkedInMethod.replace(/_/g, ' ')})</span>
                           )}
                         </td>
-                        <td className="p-3 text-right">
+                        <td className="p-3.5 text-right">
                           <button
                             onClick={() => handleCopyLink(m.id)}
-                            className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg transition cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg transition cursor-pointer text-[11px] font-bold"
                             title="Salin Link Onboarding Crew"
                           >
-                            <Copy className="h-3.5 w-3.5" />
+                            <Copy className="h-3 w-3 text-slate-500" />
+                            <span>Salin Link</span>
                           </button>
                         </td>
                       </tr>

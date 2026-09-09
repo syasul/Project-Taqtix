@@ -155,6 +155,17 @@ export class AuthService {
         throw new UnauthorizedException('Pengguna tidak ditemukan');
       }
 
+      // Invalidate refresh token jika diterbitkan sebelum lastLogoutAt / ganti password
+      if (
+        user.lastLogoutAt &&
+        payload.iat &&
+        new Date(payload.iat * 1000) < user.lastLogoutAt
+      ) {
+        throw new UnauthorizedException(
+          'Sesi login telah kedaluwarsa karena perubahan password atau logout. Silakan login kembali.',
+        );
+      }
+
       return this.generateTokenPair(user.id, user.email, user.role);
     } catch {
       throw new UnauthorizedException(
@@ -205,7 +216,29 @@ export class AuthService {
       throw new UnauthorizedException('Pengguna tidak ditemukan');
     }
 
-    return user;
+    // Ambil role spesifik organisasi dari OrganizerMember jika ada
+    const member = await this.prisma.organizerMember.findFirst({
+      where: { userId, status: 'active' },
+      include: {
+        organizer: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            bankAccount: true,
+          },
+        },
+      },
+    });
+
+    const organizerRole = member?.role || (user.organizer ? 'owner' : null);
+    const organizer = user.organizer || member?.organizer || null;
+
+    return {
+      ...user,
+      organizerRole,
+      organizer,
+    };
   }
 
   /**
@@ -238,6 +271,8 @@ export class AuthService {
       where: { id: userId },
       data: {
         passwordHash: newHashed,
+        lastLogoutAt: new Date(),
+        activeDeviceId: null,
       },
     });
 

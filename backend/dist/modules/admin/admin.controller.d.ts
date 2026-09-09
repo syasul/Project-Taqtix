@@ -76,11 +76,17 @@ export declare class AdminController {
             userId: string;
             slug: string;
             phone: string | null;
+            logoUrl: string | null;
+            contactEmail: string | null;
+            bankName: string | null;
+            bankAccountNumber: string | null;
+            bankAccountHolder: string | null;
             status: string;
             bankAccount: string | null;
             plan: string;
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
+            integrations: import("@prisma/client/runtime/library").JsonValue | null;
             approvedAt: Date | null;
             approvedBy: string | null;
         };
@@ -96,11 +102,17 @@ export declare class AdminController {
             userId: string;
             slug: string;
             phone: string | null;
+            logoUrl: string | null;
+            contactEmail: string | null;
+            bankName: string | null;
+            bankAccountNumber: string | null;
+            bankAccountHolder: string | null;
             status: string;
             bankAccount: string | null;
             plan: string;
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
+            integrations: import("@prisma/client/runtime/library").JsonValue | null;
             approvedAt: Date | null;
             approvedBy: string | null;
         };
@@ -116,11 +128,17 @@ export declare class AdminController {
             userId: string;
             slug: string;
             phone: string | null;
+            logoUrl: string | null;
+            contactEmail: string | null;
+            bankName: string | null;
+            bankAccountNumber: string | null;
+            bankAccountHolder: string | null;
             status: string;
             bankAccount: string | null;
             plan: string;
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
+            integrations: import("@prisma/client/runtime/library").JsonValue | null;
             approvedAt: Date | null;
             approvedBy: string | null;
         };
@@ -158,11 +176,17 @@ export declare class AdminController {
             userId: string;
             slug: string;
             phone: string | null;
+            logoUrl: string | null;
+            contactEmail: string | null;
+            bankName: string | null;
+            bankAccountNumber: string | null;
+            bankAccountHolder: string | null;
             status: string;
             bankAccount: string | null;
             plan: string;
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
+            integrations: import("@prisma/client/runtime/library").JsonValue | null;
             approvedAt: Date | null;
             approvedBy: string | null;
         };
@@ -350,6 +374,7 @@ export declare class AdminController {
             updatedAt: Date;
             slug: string;
             status: import("@prisma/client").$Enums.EventStatus;
+            organizerId: string;
             location: string;
             startDate: Date;
             endDate: Date;
@@ -360,7 +385,6 @@ export declare class AdminController {
             seoKeywords: string | null;
             adminSeoKeywords: string | null;
             seoPriority: string | null;
-            organizerId: string;
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
@@ -377,6 +401,7 @@ export declare class AdminController {
             updatedAt: Date;
             slug: string;
             status: import("@prisma/client").$Enums.EventStatus;
+            organizerId: string;
             location: string;
             startDate: Date;
             endDate: Date;
@@ -387,7 +412,6 @@ export declare class AdminController {
             seoKeywords: string | null;
             adminSeoKeywords: string | null;
             seoPriority: string | null;
-            organizerId: string;
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
@@ -404,6 +428,7 @@ export declare class AdminController {
             updatedAt: Date;
             slug: string;
             status: import("@prisma/client").$Enums.EventStatus;
+            organizerId: string;
             location: string;
             startDate: Date;
             endDate: Date;
@@ -414,7 +439,6 @@ export declare class AdminController {
             seoKeywords: string | null;
             adminSeoKeywords: string | null;
             seoPriority: string | null;
-            organizerId: string;
             geofenceLat: number | null;
             geofenceLng: number | null;
             geofenceRadius: number | null;
@@ -445,13 +469,18 @@ export declare class AdminController {
         success: boolean;
         data: ({
             organizer: {
+                user: {
+                    email: string;
+                };
                 id: string;
                 name: string;
+                phone: string | null;
                 bankAccount: string | null;
             };
             event: {
                 title: string;
                 id: string;
+                location: string;
                 endDate: Date;
             };
         } & {
@@ -459,8 +488,8 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             status: string;
-            eventId: string;
             organizerId: string;
+            eventId: string;
             paidAt: Date | null;
             grossRevenue: number;
             platformFee: number;
@@ -469,6 +498,13 @@ export declare class AdminController {
             paidBy: string | null;
         })[];
     }>;
+    calculateSettlements(): Promise<{
+        success: boolean;
+        data: {
+            processed: number;
+            settlements: any[];
+        };
+    }>;
     markSettlementPaid(id: string, adminId: string): Promise<{
         success: boolean;
         data: {
@@ -476,8 +512,8 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             status: string;
-            eventId: string;
             organizerId: string;
+            eventId: string;
             paidAt: Date | null;
             grossRevenue: number;
             platformFee: number;

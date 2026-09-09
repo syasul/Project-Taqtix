@@ -221,6 +221,19 @@ let GateService = class GateService {
                     message: 'Tiket sudah pernah digunakan / check-in sebelumnya',
                 }, common_1.HttpStatus.CONFLICT);
             }
+            if (ticket.status === client_1.TicketStatus.TRANSFER_PENDING) {
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'TRANSFER_PENDING',
+                    },
+                });
+                throw new common_1.HttpException({
+                    code: 'QR_INVALID',
+                    message: 'Tiket sedang dalam proses transfer kepemilikan. QR lama ini tidak dapat digunakan untuk check-in.',
+                }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+            }
             if (ticket.status !== client_1.TicketStatus.VALID) {
                 await tx.scanLog.create({
                     data: {

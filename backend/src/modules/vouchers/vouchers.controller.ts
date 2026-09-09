@@ -15,6 +15,7 @@ import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Permissions } from '../../common/decorators/permissions.decorator';
 
 @ApiTags('Vouchers')
 @ApiBearerAuth()
@@ -24,6 +25,7 @@ export class VouchersController {
   constructor(private readonly vouchersService: VouchersService) {}
 
   @Post()
+  @Permissions('manage_promo_code')
   @ApiOperation({ summary: 'Membuat voucher baru (org-wide atau event-scoped)' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Voucher berhasil dibuat.' })
   async create(
@@ -44,6 +46,7 @@ export class VouchersController {
   }
 
   @Patch(':id')
+  @Permissions('manage_promo_code')
   @ApiOperation({ summary: 'Mengupdate voucher' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Voucher berhasil diupdate.' })
   async update(
@@ -55,6 +58,7 @@ export class VouchersController {
   }
 
   @Post(':id/deactivate')
+  @Permissions('manage_promo_code')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Menonaktifkan voucher' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Voucher berhasil dinonaktifkan.' })

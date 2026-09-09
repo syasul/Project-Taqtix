@@ -23,29 +23,36 @@ let ExportsController = class ExportsController {
     constructor(exportsService) {
         this.exportsService = exportsService;
     }
-    async exportCrossEventSummary(from, to, format, userId, res) {
-        const result = await this.exportsService.exportCrossEventSummary(userId, from, to);
+    sendExportResponse(result, res) {
+        if (result.isAsync) {
+            return res.status(common_1.HttpStatus.OK).json({
+                success: true,
+                data: {
+                    downloadUrl: result.downloadUrl,
+                    expiresAt: result.expiresAt,
+                    filename: result.filename,
+                },
+            });
+        }
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
         return res.status(common_1.HttpStatus.OK).send(result.csv);
+    }
+    async exportCrossEventSummary(from, to, format, userId, res) {
+        const result = await this.exportsService.exportCrossEventSummary(userId, from, to);
+        return this.sendExportResponse(result, res);
     }
     async exportOrders(eventId, format, userId, res) {
         const result = await this.exportsService.exportOrders(eventId, userId);
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-        return res.status(common_1.HttpStatus.OK).send(result.csv);
+        return this.sendExportResponse(result, res);
     }
     async exportAttendance(eventId, format, userId, res) {
         const result = await this.exportsService.exportAttendance(eventId, userId);
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-        return res.status(common_1.HttpStatus.OK).send(result.csv);
+        return this.sendExportResponse(result, res);
     }
     async exportFinancialSummary(eventId, format, userId, res) {
         const result = await this.exportsService.exportFinancialSummary(eventId, userId);
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-        return res.status(common_1.HttpStatus.OK).send(result.csv);
+        return this.sendExportResponse(result, res);
     }
 };
 exports.ExportsController = ExportsController;

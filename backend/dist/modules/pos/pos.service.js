@@ -73,14 +73,48 @@ let PosService = class PosService {
         return organizer;
     }
     async verifyEventOwnership(eventId, userId) {
-        const organizer = await this.getOrganizerOrThrow(userId);
         const event = await this.prisma.event.findUnique({
             where: { id: eventId },
         });
-        if (!event || event.organizerId !== organizer.id) {
-            throw new common_1.NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+        if (!event) {
+            throw new common_1.NotFoundException('Event tidak ditemukan');
         }
-        return { event, organizer };
+        const organizer = await this.prisma.organizer.findUnique({
+            where: { userId },
+        });
+        if (organizer && organizer.id === event.organizerId) {
+            return { event, organizer };
+        }
+        const member = await this.prisma.organizerMember.findFirst({
+            where: {
+                organizerId: event.organizerId,
+                userId,
+                status: 'active',
+            },
+            include: { organizer: true },
+        });
+        if (member) {
+            const allowedRoles = ['owner', 'admin', 'finance', 'cashier'];
+            if (!allowedRoles.includes(member.role)) {
+                throw new common_1.ForbiddenException(`Peran "${member.role}" tidak memiliki izin untuk mengoperasikan kasir POS.`);
+            }
+            return { event, organizer: member.organizer };
+        }
+        const gateStaff = await this.prisma.gateStaff.findUnique({
+            where: {
+                eventId_userId: {
+                    eventId,
+                    userId,
+                },
+            },
+        });
+        if (gateStaff) {
+            const org = await this.prisma.organizer.findUnique({
+                where: { id: event.organizerId },
+            });
+            return { event, organizer: org };
+        }
+        throw new common_1.ForbiddenException('Anda tidak memiliki otorisasi untuk mengoperasikan POS pada event ini.');
     }
     async generateQrPayload(ticketId, eventId) {
         const qrSecret = this.configService.get('QR_SIGNING_SECRET') ||

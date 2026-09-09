@@ -3,11 +3,92 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
+import * as fs from 'fs';
+import * as path from 'path';
+
+export interface ExportResult {
+  isAsync: boolean;
+  filename: string;
+  csv: string;
+  downloadUrl?: string;
+  expiresAt?: Date;
+}
 
 @Injectable()
 export class ExportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  private getExportsDirectory(): string {
+    const baseUploadDir =
+      this.configService.get<string>('UPLOAD_STORAGE_PATH') ||
+      path.join(process.cwd(), 'uploads');
+    const exportsDir = path.join(baseUploadDir, 'exports');
+    if (!fs.existsSync(exportsDir)) {
+      fs.mkdirSync(exportsDir, { recursive: true });
+    }
+    return exportsDir;
+  }
+
+  private handleCsvResult(filename: string, csv: string, rowCount: number): ExportResult {
+    // Jika data lebih dari 1000 baris, simpan sebagai file lokal terisolasi untuk background polling
+    if (rowCount > 1000) {
+      const exportDir = this.getExportsDirectory();
+      const filePath = path.join(exportDir, filename);
+      fs.writeFileSync(filePath, csv, 'utf-8');
+
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 jam expiry
+      return {
+        isAsync: true,
+        filename,
+        csv,
+        downloadUrl: `/uploads/exports/${filename}`,
+        expiresAt,
+      };
+    }
+
+    // Untuk data <= 1000 baris, return langsung sinkron
+    return {
+      isAsync: false,
+      filename,
+      csv,
+    };
+  }
+
+  /**
+   * Scheduled job pembersih (jalan tiap 1 jam)
+   * Menghapus file export yang sudah kedaluwarsa (> 24 jam)
+   */
+  @Cron(CronExpression.EVERY_HOUR)
+  async cleanExpiredExports() {
+    try {
+      const exportDir = this.getExportsDirectory();
+      if (!fs.existsSync(exportDir)) return;
+
+      const files = fs.readdirSync(exportDir);
+      const now = Date.now();
+      const maxAgeMs = 24 * 60 * 60 * 1000; // 24 jam
+
+      for (const file of files) {
+        const filePath = path.join(exportDir, file);
+        try {
+          const stat = fs.statSync(filePath);
+          if (now - stat.mtimeMs > maxAgeMs) {
+            fs.unlinkSync(filePath);
+          }
+        } catch {
+          // Abaikan error file tunggal
+        }
+      }
+    } catch (err) {
+      console.error('[ExportsCleaner] Gagal membersihkan file ekspor lama:', err);
+    }
+  }
 
   private async getOrganizerOrThrow(userId: string) {
     const member = await this.prisma.organizerMember.findFirst({
@@ -39,7 +120,7 @@ export class ExportsService {
   /**
    * Export daftar semua pesanan event dalam CSV.
    */
-  async exportOrders(eventId: string, userId: string) {
+  async exportOrders(eventId: string, userId: string): Promise<ExportResult> {
     await this.verifyEventOwnership(eventId, userId);
 
     const orders = await this.prisma.order.findMany({
@@ -56,6 +137,11 @@ export class ExportsService {
       orderBy: { createdAt: 'desc' },
     });
 
+    const customFields = await this.prisma.customFormField.findMany({
+      where: { eventId },
+      orderBy: { order: 'asc' },
+    });
+
     const headers = [
       'OrderID',
       'BuyerEmail',
@@ -68,12 +154,20 @@ export class ExportsService {
       'AttendeePhone',
       'City',
       'PaymentMethod',
+      ...customFields.map((f) => `"${f.label.replace(/"/g, '""')}"`),
       'CreatedAt',
     ];
 
     const rows: string[] = [];
     for (const ord of orders) {
       for (const item of ord.orderItems) {
+        const customAnswers =
+          (item.customFieldAnswers as Record<string, any>) || {};
+        const customValues = customFields.map((f) => {
+          const val = customAnswers[f.id] ?? customAnswers[f.label] ?? '';
+          return `"${String(val).replace(/"/g, '""')}"`;
+        });
+
         rows.push(
           [
             `"${ord.id}"`,
@@ -87,6 +181,7 @@ export class ExportsService {
             `"${(item.attendeePhone || '').replace(/"/g, '""')}"`,
             `"${(item.city || '').replace(/"/g, '""')}"`,
             `"${ord.payment?.provider || ''}"`,
+            ...customValues,
             `"${ord.createdAt.toISOString()}"`,
           ].join(','),
         );
@@ -94,16 +189,17 @@ export class ExportsService {
     }
 
     const csv = [headers.join(','), ...rows].join('\n');
-    return {
-      filename: `orders-export-${eventId}.csv`,
+    return this.handleCsvResult(
+      `orders-export-${eventId}-${Date.now()}.csv`,
       csv,
-    };
+      rows.length,
+    );
   }
 
   /**
    * Export data kehadiran / attendance tiket event dalam CSV.
    */
-  async exportAttendance(eventId: string, userId: string) {
+  async exportAttendance(eventId: string, userId: string): Promise<ExportResult> {
     await this.verifyEventOwnership(eventId, userId);
 
     const tickets = await this.prisma.ticket.findMany({
@@ -146,16 +242,17 @@ export class ExportsService {
     ]);
 
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    return {
-      filename: `attendance-export-${eventId}.csv`,
+    return this.handleCsvResult(
+      `attendance-export-${eventId}-${Date.now()}.csv`,
       csv,
-    };
+      rows.length,
+    );
   }
 
   /**
    * Export ringkasan keuangan event (revenue, fees, net) dalam CSV.
    */
-  async exportFinancialSummary(eventId: string, userId: string) {
+  async exportFinancialSummary(eventId: string, userId: string): Promise<ExportResult> {
     const { event } = await this.verifyEventOwnership(eventId, userId);
 
     const orders = await this.prisma.order.findMany({
@@ -170,7 +267,14 @@ export class ExportsService {
     });
     const totalCashIn = cashTxs.reduce((acc, c) => acc + c.amount, 0);
 
-    const headers = ['EventTitle', 'TotalOrdersPaid', 'OnlineRevenue', 'TotalDiscount', 'CashInTotal', 'GrossSales'];
+    const headers = [
+      'EventTitle',
+      'TotalOrdersPaid',
+      'OnlineRevenue',
+      'TotalDiscount',
+      'CashInTotal',
+      'GrossSales',
+    ];
     const row = [
       `"${event.title.replace(/"/g, '""')}"`,
       orders.length,
@@ -181,10 +285,11 @@ export class ExportsService {
     ];
 
     const csv = [headers.join(','), row.join(',')].join('\n');
-    return {
-      filename: `financial-summary-${eventId}.csv`,
+    return this.handleCsvResult(
+      `financial-summary-${eventId}-${Date.now()}.csv`,
       csv,
-    };
+      1,
+    );
   }
 
   /**
@@ -194,7 +299,7 @@ export class ExportsService {
     userId: string,
     from?: string,
     to?: string,
-  ) {
+  ): Promise<ExportResult> {
     const organizer = await this.getOrganizerOrThrow(userId);
 
     const where: any = { organizerId: organizer.id };
@@ -247,9 +352,10 @@ export class ExportsService {
     });
 
     const csv = [headers.join(','), ...rows].join('\n');
-    return {
-      filename: `cross-event-summary-${organizer.id}.csv`,
+    return this.handleCsvResult(
+      `cross-event-summary-${organizer.id}-${Date.now()}.csv`,
       csv,
-    };
+      rows.length,
+    );
   }
 }

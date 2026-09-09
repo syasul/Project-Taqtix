@@ -4,20 +4,19 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import EventTabs from '@/components/layout/event-tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { 
-  BarChart, 
-  Bar, 
-  Cell, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
-import { Loader2, Kanban, Zap, Eye, ShoppingCart, CheckCircle, RefreshCcw } from 'lucide-react';
+  Loader2, 
+  Kanban, 
+  Zap, 
+  Eye, 
+  ShoppingCart, 
+  CheckCircle, 
+  RefreshCcw, 
+  Clock,
+  ArrowRight
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function PerformanceAnalyticsPage() {
   const params = useParams();
@@ -41,138 +40,178 @@ export default function PerformanceAnalyticsPage() {
     refundRate: 0,
   };
 
-  const funnelData = [
-    { stage: 'Landing Page Views', count: perf.landingPageViews, fill: '#08B4B5' },
-    { stage: 'Checkout Started', count: perf.checkoutStarted, fill: '#0d9488' },
-    { stage: 'Purchase Completed', count: perf.checkoutCompleted, fill: '#10b981' },
-  ];
+  const views = perf.landingPageViews || 0;
+  const started = perf.checkoutStarted || 0;
+  const completed = perf.checkoutCompleted || 0;
 
-  const breadcrumbs = [
-    { label: 'Daftar Event', href: '/dashboard/events' },
-    { label: 'Kinerja Konversi Funnel' },
-  ];
+  // Conversion dropoff percentages
+  const startedPct = views > 0 ? Math.round((started / views) * 100) : 0;
+  const completedPct = views > 0 ? Math.round((completed / views) * 100) : 0;
+  const checkoutConversionPct = started > 0 ? Math.round((completed / started) * 100) : 0;
+
+  const formatSeconds = (seconds: number) => {
+    if (!seconds) return '0 dtk';
+    if (seconds < 60) return `${Math.round(seconds)} dtk`;
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.round(seconds % 60);
+    return `${mins}m ${secs}s`;
+  };
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
-
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Kanban className="h-5 w-5 text-[#08B4B5]" />
-          Kinerja Konversi (Funnel)
+          Kinerja Konversi Funnel Tiket
         </h2>
         <p className="text-xs text-slate-500 mt-1">
-          Pantau rasio konversi corong checkout dan rata-rata durasi pembelian tiket.
+          Pantau rasio konversi pengunjung dari halaman detail tiket, memulai checkout, hingga pembayaran lunas.
         </p>
       </div>
 
       {isLoading ? (
         <div className="py-24 flex flex-col items-center justify-center space-y-3">
           <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
-          <span className="text-xs text-slate-400">Memuat analisis performa...</span>
+          <span className="text-xs font-semibold text-slate-400">Menghitung konversi funnel...</span>
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Funnel Graph */}
-          <Card className="bg-white border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm">
-            <div>
-              <CardTitle className="text-sm font-bold text-slate-900">Grafik Corong Konversi (Funnel)</CardTitle>
-              <CardDescription className="text-xs text-slate-400">Jumlah traffic pengunjung pada setiap tahapan checkout</CardDescription>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Landing Page Views Card */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3.5">
-                <div className="h-10 w-10 bg-teal-50 border border-[#08B4B5]/30 text-[#08B4B5] rounded-xl flex items-center justify-center shrink-0">
-                  <Eye className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Landing Views</span>
-                  <span className="text-lg font-extrabold text-slate-900 font-mono">{perf.landingPageViews}</span>
+          {/* Top Metrics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <Card className="bg-white border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tingkat Konversi Total</span>
+                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                  <Zap className="h-4 w-4" />
                 </div>
               </div>
-
-              {/* Checkout Started Card */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3.5">
-                <div className="flex items-center gap-3.5">
-                  <div className="h-10 w-10 bg-teal-50 border border-[#08B4B5]/30 text-[#08B4B5] rounded-xl flex items-center justify-center shrink-0">
-                    <ShoppingCart className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Checkout Started</span>
-                    <span className="text-lg font-extrabold text-slate-900 font-mono">{perf.checkoutStarted}</span>
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-[#08B4B5] font-mono bg-teal-50 px-2 py-0.5 border border-[#08B4B5]/30 rounded-lg">
-                  {perf.landingPageViews > 0 ? ((perf.checkoutStarted / perf.landingPageViews) * 100).toFixed(0) : 0}%
-                </span>
+              <div className="text-2xl font-black text-slate-900 font-mono">
+                {perf.conversionRate || completedPct}%
               </div>
-
-              {/* Purchase Completed Card */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3.5">
-                <div className="flex items-center gap-3.5">
-                  <div className="h-10 w-10 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
-                    <CheckCircle className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Completed</span>
-                    <span className="text-lg font-extrabold text-slate-900 font-mono">{perf.checkoutCompleted}</span>
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 border border-emerald-200 rounded-lg">
-                  {perf.checkoutStarted > 0 ? ((perf.checkoutCompleted / perf.checkoutStarted) * 100).toFixed(0) : 0}%
-                </span>
-              </div>
-            </div>
-
-            {/* Funnel chart container */}
-            <div className="h-64 w-full text-xs font-mono mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={funnelData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis type="number" stroke="#94a3b8" />
-                  <YAxis dataKey="stage" type="category" stroke="#94a3b8" width={140} />
-                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#0f172a' }} />
-                  <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-                    {funnelData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          {/* Checkout Speed & Refund Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="bg-white border-slate-200 p-6 flex items-center gap-4 rounded-2xl shadow-sm">
-              <div className="h-12 w-12 bg-teal-50 border border-[#08B4B5]/30 text-[#08B4B5] rounded-2xl flex items-center justify-center shrink-0">
-                <Zap className="h-6 w-6" />
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-xs font-bold text-slate-400">Durasi Transaksi Rata-Rata</span>
-                <h4 className="text-2xl font-bold text-slate-900 font-mono">
-                  {perf.avgCheckoutTimeSeconds} Detik
-                </h4>
-                <p className="text-[10px] text-slate-400">Waktu yang dibutuhkan buyer dari klik checkout hingga lunas</p>
-              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Pengunjung yang sukses menyelesaikan pembelian
+              </p>
             </Card>
 
-            <Card className="bg-white border-slate-200 p-6 flex items-center gap-4 rounded-2xl shadow-sm">
-              <div className="h-12 w-12 bg-rose-50 border border-rose-200 text-rose-500 rounded-2xl flex items-center justify-center shrink-0">
-                <RefreshCcw className="h-6 w-6 animate-pulse" />
+            <Card className="bg-white border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Rata-Rata Waktu Checkout</span>
+                <div className="p-2 bg-teal-50 text-[#08B4B5] rounded-xl">
+                  <Clock className="h-4 w-4" />
+                </div>
               </div>
-              <div className="space-y-0.5">
-                <span className="text-xs font-bold text-slate-400">Rasio Refund / Pembatalan</span>
-                <h4 className="text-2xl font-bold text-slate-900 font-mono">
-                  {(perf.refundRate * 100).toFixed(1)}%
-                </h4>
-                <p className="text-[10px] text-slate-400">Persentase tiket refund dibandingkan total pembelian sukses</p>
+              <div className="text-2xl font-black text-slate-900 font-mono">
+                {formatSeconds(perf.avgCheckoutTimeSeconds)}
               </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Waktu dari mulai isi data sampai transaksi sukses
+              </p>
+            </Card>
+
+            <Card className="bg-white border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tingkat Refund / Batal</span>
+                <div className="p-2 bg-slate-100 text-slate-600 rounded-xl">
+                  <RefreshCcw className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="text-2xl font-black text-slate-900 font-mono">
+                {perf.refundRate || 0}%
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Tiket yang dibatalkan atau direfund resmi
+              </p>
             </Card>
           </div>
+
+          {/* Funnel Visual: Horizontal Step Bar */}
+          <Card className="bg-white border-slate-200/80 p-6 rounded-2xl shadow-xs space-y-6">
+            <div>
+              <CardTitle className="text-sm font-bold text-slate-900">Alur Funnel Konversi Pengunjung</CardTitle>
+              <CardDescription className="text-xs text-slate-400">
+                Visualisasi titik drop-off dari landing page pengunjung hingga transaksi checkout lunas
+              </CardDescription>
+            </div>
+
+            <div className="space-y-4 max-w-3xl">
+              {/* Step 1: Landing Page Views */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-slate-100 rounded-lg text-slate-700">
+                      <Eye className="h-3.5 w-3.5" />
+                    </div>
+                    <span>1. Landing Page Views</span>
+                  </div>
+                  <span className="font-mono text-slate-900">{views.toLocaleString('id-ID')} views (100%)</span>
+                </div>
+                <div className="h-8 bg-slate-100 rounded-xl overflow-hidden p-1 flex">
+                  <div 
+                    className="h-full bg-[#08B4B5] rounded-lg transition-all duration-500 flex items-center px-3 text-[11px] font-bold text-white"
+                    style={{ width: '100%' }}
+                  >
+                    100%
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: Checkout Started */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-teal-50 rounded-lg text-[#08B4B5]">
+                      <ShoppingCart className="h-3.5 w-3.5" />
+                    </div>
+                    <span>2. Checkout Started (Mulai Isi Form)</span>
+                  </div>
+                  <span className="font-mono text-slate-900">{started.toLocaleString('id-ID')} user ({startedPct}%)</span>
+                </div>
+                <div className="h-8 bg-slate-100 rounded-xl overflow-hidden p-1 flex">
+                  <div 
+                    className="h-full bg-[#079b9c] rounded-lg transition-all duration-500 flex items-center px-3 text-[11px] font-bold text-white min-w-[3rem]"
+                    style={{ width: `${Math.max(startedPct, 4)}%` }}
+                  >
+                    {startedPct}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: Checkout Completed */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600">
+                      <CheckCircle className="h-3.5 w-3.5" />
+                    </div>
+                    <span>3. Checkout Completed (Pembayaran Lunas)</span>
+                  </div>
+                  <span className="font-mono text-slate-900">{completed.toLocaleString('id-ID')} order ({completedPct}%)</span>
+                </div>
+                <div className="h-8 bg-slate-100 rounded-xl overflow-hidden p-1 flex">
+                  <div 
+                    className="h-full bg-emerald-500 rounded-lg transition-all duration-500 flex items-center px-3 text-[11px] font-bold text-white min-w-[3rem]"
+                    style={{ width: `${Math.max(completedPct, 4)}%` }}
+                  >
+                    {completedPct}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Funnel Dropoff Insight */}
+            <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="space-y-0.5">
+                <span className="font-bold text-slate-900">Rasio Penyelesaian Checkout</span>
+                <p className="text-slate-500 text-[11px]">
+                  Dari mereka yang mulai mengisi form checkout, {checkoutConversionPct}% berhasil menyelesaikan pembayaran.
+                </p>
+              </div>
+              <div className="font-mono text-base font-black text-[#08B4B5] self-start sm:self-auto">
+                {checkoutConversionPct}% Selesai
+              </div>
+            </div>
+          </Card>
         </div>
       )}
     </div>

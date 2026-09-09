@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { useIdempotency } from '@/hooks/use-idempotency';
 
 interface TicketCat {
   id: string;
@@ -67,6 +68,9 @@ export default function PosTerminalPage() {
     posTransaction: any;
     tickets: any[];
   } | null>(null);
+
+  const { idempotencyKey, refreshKey } = useIdempotency();
+  const lastCheckoutTimeRef = React.useRef(0);
 
   const fetchCatalog = async () => {
     try {
@@ -128,24 +132,43 @@ export default function PosTerminalPage() {
   const totalAmount = cart.reduce((acc, item) => acc + item.unitPrice * item.qty, 0);
 
   const handleCheckout = async () => {
-    if (cart.length === 0) return;
+    // 500ms debounce & immediate submission lock (anti spam-click)
+    const now = Date.now();
+    if (now - lastCheckoutTimeRef.current < 500) return;
+    if (cart.length === 0 || submitting) return;
+
+    lastCheckoutTimeRef.current = now;
+    setSubmitting(true);
     setErrorMsg('');
+
     try {
-      setSubmitting(true);
-      const res = await apiClient.post(`/organizer/events/${eventId}/pos/transaction`, {
-        items: cart,
-        paymentMethod,
-        buyerName: buyerName.trim() || undefined,
-        buyerPhone: buyerPhone.trim() || undefined,
-      });
+      const res = await apiClient.post(
+        `/organizer/events/${eventId}/pos/transaction`,
+        {
+          items: cart,
+          paymentMethod,
+          buyerName: buyerName.trim() || undefined,
+          buyerPhone: buyerPhone.trim() || undefined,
+        },
+        {
+          headers: {
+            'Idempotency-Key': idempotencyKey,
+          },
+        },
+      );
 
       setSuccessData(res.data?.data || res.data);
       clearCart();
       setBuyerName('');
       setBuyerPhone('');
+      refreshKey(); // Generate key baru untuk sesi transaksi kasir berikutnya
       fetchCatalog();
     } catch (err: any) {
-      setErrorMsg(err?.response?.data?.message || 'Gagal memproses transaksi POS');
+      setErrorMsg(
+        err?.response?.data?.error?.message ||
+        err?.response?.data?.message ||
+        'Gagal memproses transaksi POS',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -386,11 +409,16 @@ export default function PosTerminalPage() {
               className="w-full py-3 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-40 cursor-pointer border-0"
             >
               {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Memproses Transaksi...</span>
+                </>
               ) : (
-                <Receipt className="h-4 w-4" />
+                <>
+                  <Receipt className="h-4 w-4" />
+                  <span>Selesaikan Transaksi (Rp {totalAmount.toLocaleString('id-ID')})</span>
+                </>
               )}
-              <span>Selesaikan Transaksi (Rp {totalAmount.toLocaleString('id-ID')})</span>
             </button>
           </div>
         </div>

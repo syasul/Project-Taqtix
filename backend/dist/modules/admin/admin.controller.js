@@ -127,6 +127,10 @@ let AdminController = class AdminController {
         const result = await this.adminService.getSettlements();
         return { success: true, data: result };
     }
+    async calculateSettlements() {
+        const result = await this.adminService.calculateSettlements();
+        return { success: true, data: result };
+    }
     async markSettlementPaid(id, adminId) {
         const result = await this.adminService.markSettlementPaid(id, adminId);
         return { success: true, data: result };
@@ -381,6 +385,15 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getSettlements", null);
+__decorate([
+    (0, common_1.Post)('admin/settlements/calculate'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Memicu kalkulasi otomatis settlement event yang telah berakhir (Admin Only)' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "calculateSettlements", null);
 __decorate([
     (0, common_1.Post)('admin/settlements/:id/mark-paid'),
     (0, roles_decorator_1.Roles)('admin'),

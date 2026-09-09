@@ -20,6 +20,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { RequireIdempotency } from '../../common/decorators/idempotency.decorator';
 import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Orders')
@@ -33,6 +34,7 @@ export class OrdersController {
 
   @Public()
   @Post()
+  @RequireIdempotency()
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({
     summary: 'Membuat pesanan baru dan mereservasi kuota tiket (Public/Buyer)',

@@ -53,16 +53,16 @@ export default function EventTabs({ eventId }: EventTabsProps) {
       active: pathname === `/dashboard/events/${eventId}/partners`
     },
     {
-      label: 'Analitik Sales',
+      label: 'Analitik & Pelaporan',
       href: `/dashboard/events/${eventId}/analytics/sales`,
       icon: TrendingUp,
-      active: pathname === `/dashboard/events/${eventId}/analytics/sales`
+      active: pathname.includes(`/dashboard/events/${eventId}/analytics`)
     },
     {
       label: 'CRM Segmen',
-      href: `/dashboard/events/${eventId}/segments`,
+      href: `/dashboard/events/${eventId}/audience/segments`,
       icon: Users,
-      active: pathname.startsWith(`/dashboard/events/${eventId}/segments`)
+      active: pathname.includes('/segments')
     },
     {
       label: 'Workforce',

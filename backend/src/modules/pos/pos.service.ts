@@ -35,14 +35,59 @@ export class PosService {
   }
 
   private async verifyEventOwnership(eventId: string, userId: string) {
-    const organizer = await this.getOrganizerOrThrow(userId);
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
     });
-    if (!event || event.organizerId !== organizer.id) {
-      throw new NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+    if (!event) {
+      throw new NotFoundException('Event tidak ditemukan');
     }
-    return { event, organizer };
+
+    // 1. Cek apakah pengguna adalah owner langsung profil organizer
+    const organizer = await this.prisma.organizer.findUnique({
+      where: { userId },
+    });
+    if (organizer && organizer.id === event.organizerId) {
+      return { event, organizer };
+    }
+
+    // 2. Cek apakah anggota tim organizer (owner, admin, finance, cashier)
+    const member = await this.prisma.organizerMember.findFirst({
+      where: {
+        organizerId: event.organizerId,
+        userId,
+        status: 'active',
+      },
+      include: { organizer: true },
+    });
+    if (member) {
+      const allowedRoles = ['owner', 'admin', 'finance', 'cashier'];
+      if (!allowedRoles.includes(member.role)) {
+        throw new ForbiddenException(
+          `Peran "${member.role}" tidak memiliki izin untuk mengoperasikan kasir POS.`,
+        );
+      }
+      return { event, organizer: member.organizer };
+    }
+
+    // 3. Cek apakah staf gerbang / staf lapangan yang di-assign untuk event ini
+    const gateStaff = await this.prisma.gateStaff.findUnique({
+      where: {
+        eventId_userId: {
+          eventId,
+          userId,
+        },
+      },
+    });
+    if (gateStaff) {
+      const org = await this.prisma.organizer.findUnique({
+        where: { id: event.organizerId },
+      });
+      return { event, organizer: org };
+    }
+
+    throw new ForbiddenException(
+      'Anda tidak memiliki otorisasi untuk mengoperasikan POS pada event ini.',
+    );
   }
 
   private async generateQrPayload(ticketId: string, eventId: string) {

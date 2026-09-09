@@ -100,6 +100,13 @@ export default function EventDetailPage() {
     }
   }, [event, affCode]);
 
+  // Track page view event sekali saat event berhasil dimuat
+  React.useEffect(() => {
+    if (event?.id) {
+      apiClient.post('/track/page-view', { eventId: event.id }).catch(() => {});
+    }
+  }, [event?.id]);
+
   // State untuk menyimpan kuantitas tiket terpilih per kategori: { [categoryId]: qty }
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 

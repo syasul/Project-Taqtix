@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const core_1 = require("@nestjs/core");
 const bull_1 = require("@nestjs/bull");
+const schedule_1 = require("@nestjs/schedule");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const prisma_module_1 = require("./modules/prisma/prisma.module");
@@ -37,10 +38,14 @@ const transfers_module_1 = require("./modules/transfers/transfers.module");
 const pos_module_1 = require("./modules/pos/pos.module");
 const doorprize_module_1 = require("./modules/doorprize/doorprize.module");
 const exports_module_1 = require("./modules/exports/exports.module");
+const upload_module_1 = require("./modules/upload/upload.module");
+const settlements_module_1 = require("./modules/settlements/settlements.module");
+const settings_module_1 = require("./modules/settings/settings.module");
 const throttler_1 = require("@nestjs/throttler");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const roles_guard_1 = require("./common/guards/roles.guard");
 const permission_guard_1 = require("./common/guards/permission.guard");
+const idempotency_interceptor_1 = require("./common/interceptors/idempotency.interceptor");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -50,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
+            schedule_1.ScheduleModule.forRoot(),
             throttler_1.ThrottlerModule.forRoot({
                 throttlers: [
                     {
@@ -119,6 +125,9 @@ exports.AppModule = AppModule = __decorate([
             pos_module_1.PosModule,
             doorprize_module_1.DoorprizeModule,
             exports_module_1.ExportsModule,
+            upload_module_1.UploadModule,
+            settlements_module_1.SettlementsModule,
+            settings_module_1.SettingsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -138,6 +147,10 @@ exports.AppModule = AppModule = __decorate([
             {
                 provide: core_1.APP_GUARD,
                 useClass: permission_guard_1.PermissionGuard,
+            },
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useClass: idempotency_interceptor_1.IdempotencyInterceptor,
             },
         ],
     })

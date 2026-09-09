@@ -26,8 +26,8 @@ let PaymentsController = class PaymentsController {
     async payOrder(orderId) {
         return this.paymentsService.pay(orderId);
     }
-    async handleWebhook(provider, body) {
-        return this.paymentsService.handleWebhook(body);
+    async handleWebhook(provider, body, headers) {
+        return this.paymentsService.handleWebhook(body, provider, headers);
     }
     async getPaymentStatus(orderId) {
         return this.paymentsService.getPaymentStatus(orderId);
@@ -60,13 +60,14 @@ __decorate([
     (0, common_1.Post)('payments/webhook/:provider'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({
-        summary: 'Menerima notifikasi callback webhook dari payment gateway (Public/Webhook)',
+        summary: 'Menerima notifikasi callback webhook dari payment gateway (DOKU / Midtrans)',
     }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Webhook diproses.' }),
     __param(0, (0, common_1.Param)('provider')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Headers)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PaymentsController.prototype, "handleWebhook", null);
 __decorate([

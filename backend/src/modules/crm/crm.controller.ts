@@ -9,6 +9,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CRMService } from './crm.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
+import { RequireIdempotency } from '../../common/decorators/idempotency.decorator';
 import { CreateSegmentDto } from './dto/create-segment.dto';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 
@@ -50,6 +51,7 @@ export class CRMController {
   @Post('organizer/segments/:segmentId/broadcast')
   @ApiBearerAuth()
   @Permissions('manage_audience_segments')
+  @RequireIdempotency()
   @ApiOperation({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' })
   async createBroadcast(
     @Param('segmentId') segmentId: string,

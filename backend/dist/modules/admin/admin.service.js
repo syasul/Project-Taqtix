@@ -45,11 +45,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const settlements_service_1 = require("../settlements/settlements.service");
 const bcrypt = __importStar(require("bcrypt"));
 let AdminService = class AdminService {
     prisma;
-    constructor(prisma) {
+    settlementsService;
+    constructor(prisma, settlementsService) {
         this.prisma = prisma;
+        this.settlementsService = settlementsService;
     }
     async getOrganizers() {
         const orgs = await this.prisma.organizer.findMany({
@@ -507,29 +510,14 @@ let AdminService = class AdminService {
             })),
         }));
     }
+    async calculateSettlements() {
+        return this.settlementsService.calculatePendingSettlements();
+    }
     async getSettlements() {
-        return this.prisma.settlement.findMany({
-            include: {
-                organizer: { select: { id: true, name: true, bankAccount: true } },
-                event: { select: { id: true, title: true, endDate: true } },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+        return this.settlementsService.getSettlements();
     }
     async markSettlementPaid(id, adminId) {
-        const settlement = await this.prisma.settlement.findUnique({ where: { id } });
-        if (!settlement)
-            throw new common_1.NotFoundException('Settlement tidak ditemukan');
-        const updated = await this.prisma.settlement.update({
-            where: { id },
-            data: {
-                status: 'paid',
-                paidAt: new Date(),
-                paidBy: adminId || 'admin',
-            },
-        });
-        await this.recordAuditLog(adminId || 'admin', 'mark_settlement_paid', id, 'settlement', { netAmount: settlement.netAmount, eventId: settlement.eventId });
-        return updated;
+        return this.settlementsService.markSettlementPaid(id, adminId || 'admin');
     }
     async getAuditLogs() {
         return this.prisma.auditLog.findMany({
@@ -557,6 +545,7 @@ let AdminService = class AdminService {
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        settlements_service_1.SettlementsService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

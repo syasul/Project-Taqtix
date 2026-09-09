@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/use-auth';
+import { useOrganizerRole } from '../../hooks/use-organizer-role';
 import { cn } from '@/lib/utils';
 import {
   Calendar,
@@ -31,6 +32,9 @@ import {
   Download,
   BarChart3,
   UserCheck,
+  Building2,
+  CreditCard,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -41,6 +45,7 @@ interface SidebarProps {
 export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const pathname = usePathname() || '';
   const { user } = useAuth();
+  const { role, can, isOwner } = useOrganizerRole();
 
   const isOrganizer = user?.role === 'organizer' || user?.role === 'organizer_member';
   const isPartner = user?.role === 'partner';
@@ -50,40 +55,45 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const eventId = eventMatch && eventMatch[1] !== 'new' ? eventMatch[1] : null;
   const isEventScope = Boolean(eventId);
 
-  // Menu Organisasi
+  // Menu Organisasi (Section 0)
   const organizationLinks = [
-    { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { href: '/dashboard/events', label: 'Daftar Event', icon: Calendar },
-    { href: '/dashboard/settings/team', label: 'Staff (Team)', icon: Users },
-    { href: '/dashboard/vouchers', label: 'Voucher', icon: TicketPercent },
-    { href: '/dashboard/cash', label: 'Cash (Rekonsiliasi)', icon: Banknote },
-    { href: '/dashboard/recap', label: 'Rekap Data', icon: FileSpreadsheet },
-    { href: '/dashboard/settings/password', label: 'Ubah Password', icon: KeyRound },
-    { href: '/dashboard/settings/tokens', label: 'Token Generator (API)', icon: Code2 },
-    { href: '/dashboard/guide', label: 'Panduan Penggunaan', icon: BookOpen },
+    { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, resource: 'view_sales_revenue' },
+    { href: '/dashboard/events', label: 'Daftar Event', icon: Calendar, resource: 'view_sales_revenue' },
+    { href: '/dashboard/settings/team', label: 'Staff (Team Access)', icon: Users, resource: 'manage_team_access' },
+    { href: '/dashboard/vouchers', label: 'Voucher', icon: TicketPercent, resource: 'manage_promo_code' },
+    { href: '/dashboard/cash', label: 'Cash (Kas Organisasi)', icon: Banknote, resource: 'view_sales_revenue' },
+    { href: '/dashboard/recap', label: 'Rekap Data', icon: FileSpreadsheet, resource: 'view_sales_revenue' },
+    { href: '/dashboard/settings/password', label: 'Ubah Password', icon: KeyRound, resource: '' },
+    { href: '/dashboard/settings/tokens', label: 'Token Generator (API)', icon: Code2, resource: 'manage_team_access' },
+    { href: '/dashboard/guide', label: 'Panduan Penggunaan', icon: BookOpen, resource: '' },
+    { href: '/dashboard/settings/organization', label: 'Profil Organisasi', icon: Building2, resource: 'view_sales_revenue' },
+    { href: '/dashboard/settings/payment', label: 'Rekening Settlement', icon: CreditCard, resource: 'manage_payment_settings' },
+    { href: '/dashboard/settings/integrations', label: 'Integrasi Pixel', icon: SlidersHorizontal, resource: 'edit_organization_settings' },
   ];
 
-  // Menu Event-Scoped
+  // Menu Event-Scoped (Section 0)
   const eventLinks = eventId
     ? [
-        { href: `/dashboard/events/${eventId}/sales`, label: 'Statistik Ringkasan', icon: BarChart3 },
-        { href: `/dashboard/events/${eventId}/edit`, label: 'Detail Event', icon: Edit3 },
-        { href: `/dashboard/events/${eventId}/custom-fields`, label: 'Formulir Tambahan', icon: ClipboardList },
-        { href: `/dashboard/events/${eventId}/ticket-categories`, label: 'Kategori Tiket', icon: Ticket },
-        { href: `/dashboard/events/${eventId}/facilities`, label: 'Fasilitas Event', icon: Sparkles },
-        { href: `/dashboard/events/${eventId}/staff`, label: 'Staff Penugasan', icon: UserCheck },
-        { href: `/dashboard/events/${eventId}/lineup`, label: 'Line Up Performer', icon: Mic2 },
-        { href: `/dashboard/events/${eventId}/vouchers`, label: 'Voucher Event', icon: TicketPercent },
-        { href: `/dashboard/events/${eventId}/cash`, label: 'Cash Event', icon: Banknote },
-        { href: `/dashboard/events/${eventId}/transfers`, label: 'Transfer Tiket', icon: ArrowLeftRight },
-        { href: `/dashboard/events/${eventId}/pos`, label: 'Point of Sales (POS)', icon: Store },
-        { href: `/dashboard/events/${eventId}/doorprize`, label: 'Doorprize', icon: Gift },
-        { href: `/dashboard/events/${eventId}/live`, label: 'Validasi / Check-in', icon: QrCode },
-        { href: `/dashboard/events/${eventId}/segments`, label: 'Marketing (Broadcast)', icon: Megaphone },
-        { href: `/dashboard/events/${eventId}/growth`, label: 'Sales Insight', icon: TrendingUp },
-        { href: `/dashboard/events/${eventId}/buyers`, label: 'Daftar Pengunjung', icon: Users },
-        { href: `/dashboard/events/${eventId}/blocked-visitors`, label: 'Pengunjung Nonaktif', icon: UserX },
-        { href: `/dashboard/events/${eventId}/export`, label: 'Laporan (Rekap Data)', icon: Download },
+        { href: `/dashboard/events/${eventId}/sales`, label: 'Statistik Ringkasan', icon: BarChart3, resource: 'view_sales_revenue' },
+        { href: `/dashboard/events/${eventId}/analytics/sales`, label: 'Analitik Mendalam', icon: TrendingUp, resource: 'view_analytics_growth' },
+        { href: `/dashboard/events/${eventId}/edit`, label: 'Detail Event', icon: Edit3, resource: 'create_edit_event' },
+        { href: `/dashboard/events/${eventId}/custom-fields`, label: 'Formulir Tambahan', icon: ClipboardList, resource: 'create_edit_event' },
+        { href: `/dashboard/events/${eventId}/ticket-categories`, label: 'Kategori Tiket', icon: Ticket, resource: 'manage_ticket_category' },
+        { href: `/dashboard/events/${eventId}/facilities`, label: 'Fasilitas Event', icon: Sparkles, resource: 'create_edit_event' },
+        { href: `/dashboard/events/${eventId}/staff`, label: 'Staff (Penugasan)', icon: UserCheck, resource: 'manage_workforce_crew' },
+        { href: `/dashboard/events/${eventId}/workforce`, label: 'Workforce (Kru)', icon: Users, resource: 'manage_workforce_crew' },
+        { href: `/dashboard/events/${eventId}/lineup`, label: 'Line Up', icon: Mic2, resource: 'create_edit_event' },
+        { href: `/dashboard/events/${eventId}/vouchers`, label: 'Voucher', icon: TicketPercent, resource: 'manage_promo_code' },
+        { href: `/dashboard/events/${eventId}/cash`, label: 'Cash', icon: Banknote, resource: 'view_sales_revenue' },
+        { href: `/dashboard/events/${eventId}/transfers`, label: 'Transfer Tiket', icon: ArrowLeftRight, resource: 'view_sales_revenue' },
+        { href: `/dashboard/events/${eventId}/buyers`, label: 'Pengunjung', icon: Users, resource: 'view_sales_revenue' },
+        { href: `/dashboard/events/${eventId}/blocked-visitors`, label: 'Pengunjung Nonaktif', icon: UserX, resource: 'view_sales_revenue' },
+        { href: `/dashboard/events/${eventId}/pos`, label: 'Point Of Sales (POS)', icon: Store, resource: 'pos_cashier' },
+        { href: `/dashboard/events/${eventId}/doorprize`, label: 'Doorprize', icon: Gift, resource: 'view_sales_revenue' },
+        { href: `/dashboard/events/${eventId}/live`, label: 'Validasi Tiket (Check-In)', icon: QrCode, resource: 'pos_cashier' },
+        { href: `/dashboard/events/${eventId}/audience/segments`, label: 'Marketing (Broadcast)', icon: Megaphone, resource: 'manage_audience_segments' },
+        { href: `/dashboard/events/${eventId}/growth`, label: 'Penjualan (Sales Insight)', icon: TrendingUp, resource: 'view_analytics_growth' },
+        { href: `/dashboard/events/${eventId}/export`, label: 'Laporan (Rekap Data)', icon: Download, resource: 'view_sales_revenue' },
       ]
     : [];
 
@@ -126,7 +136,7 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
                 {user?.email?.split('@')[0] || 'Organizer'}
               </h4>
               <span className="text-[10px] font-bold text-[#08B4B5] uppercase tracking-wider bg-[#08B4B5]/10 px-2 py-0.5 rounded-full border border-[#08B4B5]/20 mt-1 inline-block">
-                {user?.role || 'ORGANIZER'}
+                {role.toUpperCase()}
               </span>
             </div>
           </div>
@@ -141,45 +151,49 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
 
         {/* Level Event */}
         {isEventScope &&
-          eventLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={onItemClick}
-                className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
-                  isActive ? activeLinkClass : inactiveLinkClass
-                }`}
-              >
-                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
-                <span className="truncate">{link.label}</span>
-              </Link>
-            );
-          })}
+          eventLinks
+            .filter((link) => !link.resource || can(link.resource))
+            .map((link) => {
+              const Icon = link.icon;
+              const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={onItemClick}
+                  className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
+                    isActive ? activeLinkClass : inactiveLinkClass
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
+                  <span className="truncate">{link.label}</span>
+                </Link>
+              );
+            })}
 
         {/* Level Organisasi */}
         {!isEventScope &&
           isOrganizer &&
-          organizationLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive =
-              pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={onItemClick}
-                className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
-                  isActive ? activeLinkClass : inactiveLinkClass
-                }`}
-              >
-                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
-                <span className="truncate">{link.label}</span>
-              </Link>
-            );
-          })}
+          organizationLinks
+            .filter((link) => !link.resource || can(link.resource))
+            .map((link) => {
+              const Icon = link.icon;
+              const isActive =
+                pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={onItemClick}
+                  className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
+                    isActive ? activeLinkClass : inactiveLinkClass
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
+                  <span className="truncate">{link.label}</span>
+                </Link>
+              );
+            })}
 
         {/* Level Partner */}
         {isPartner &&

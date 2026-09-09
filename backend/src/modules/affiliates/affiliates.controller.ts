@@ -20,6 +20,7 @@ import { CreateAffiliateDto } from './dto/create-affiliate.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { RequireIdempotency } from '../../common/decorators/idempotency.decorator';
 import type { Request, Response } from 'express';
 
 @ApiTags('Partners & Affiliates')
@@ -144,6 +145,32 @@ export class AffiliatesController {
   @ApiOperation({ summary: 'Mendapatkan data analitik performa partner' })
   async getPartnerStats(@CurrentUser('id') partnerId: string) {
     const result = await this.affiliatesService.getPartnerStats(partnerId);
+    return { success: true, data: result };
+  }
+
+  @Post('affiliate/me/generate-code')
+  @Roles('partner')
+  @ApiBearerAuth()
+  @RequireIdempotency()
+  @ApiOperation({ summary: 'Generate atau perbarui kode unik afiliasi partner' })
+  async generateAffiliateCode(
+    @CurrentUser('id') partnerId: string,
+    @Body('customCode') customCode?: string,
+  ) {
+    const result = await this.affiliatesService.generateCode(partnerId, customCode);
+    return { success: true, data: result };
+  }
+
+  @Post('affiliate/me/payout-requests')
+  @Roles('partner')
+  @ApiBearerAuth()
+  @RequireIdempotency()
+  @ApiOperation({ summary: 'Mengajukan pencairan saldo komisi partner afiliasi' })
+  async requestPayout(
+    @CurrentUser('id') partnerId: string,
+    @Body('amount') amount?: number,
+  ) {
+    const result = await this.affiliatesService.requestPayout(partnerId, amount);
     return { success: true, data: result };
   }
 }

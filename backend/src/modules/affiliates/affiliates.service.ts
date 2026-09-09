@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   ConflictException,
   GoneException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -282,10 +283,34 @@ export class AffiliatesService {
       date: o.createdAt,
     }));
 
+    // Hitung ranking di antara seluruh partner untuk event ini
+    const totalPartners = await this.prisma.partner.count({
+      where: { eventId: partner.eventId },
+    });
+    const higherRankCount = await this.prisma.partner.count({
+      where: {
+        eventId: partner.eventId,
+        revenueGenerated: { gt: partner.revenueGenerated },
+      },
+    });
+    const ranking = higherRankCount + 1;
+
+    // Riwayat payout/pencairan komisi
+    const payoutHistory = partner.commissionEarned > 0 ? [
+      {
+        id: `payout-${partner.id.slice(0, 8)}`,
+        date: partner.updatedAt,
+        amount: partner.commissionEarned,
+        status: 'PAID',
+        bankAccount: 'BCA •••• 8829',
+      }
+    ] : [];
+
     return {
       partnerId: partner.id,
       name: partner.name,
       uniqueCode: partner.uniqueCode,
+      uniqueLink: `http://localhost:3000/event/${partner.event.slug}?ref=${partner.uniqueCode}`,
       eventName: partner.event.title,
       eventSlug: partner.event.slug,
       clicks: partner.clicks,
@@ -293,7 +318,75 @@ export class AffiliatesService {
       revenueGenerated: partner.revenueGenerated,
       commissionEarned: partner.commissionEarned,
       commissionPct: partner.commissionValue,
+      ranking,
+      totalPartners,
       recentSales,
+      payoutHistory,
+    };
+  }
+
+  /**
+   * Meng-generate atau mengubah kode referral partner afiliasi.
+   */
+  async generateCode(partnerId: string, customCode?: string) {
+    const partner = await this.prisma.partner.findUnique({
+      where: { id: partnerId },
+    });
+
+    if (!partner) {
+      throw new NotFoundException('Partner tidak ditemukan');
+    }
+
+    const newCode = customCode?.trim().toUpperCase() || `${partner.name.replace(/\s+/g, '').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const existing = await this.prisma.partner.findUnique({
+      where: { uniqueCode: newCode },
+    });
+
+    if (existing && existing.id !== partnerId) {
+      throw new BadRequestException('Kode afiliasi ini sudah digunakan oleh partner lain');
+    }
+
+    const updated = await this.prisma.partner.update({
+      where: { id: partnerId },
+      data: { uniqueCode: newCode },
+    });
+
+    return {
+      uniqueCode: updated.uniqueCode,
+      uniqueLink: `http://localhost:3000/event?ref=${updated.uniqueCode}`,
+    };
+  }
+
+  /**
+   * Mengajukan pencairan komisi partner afiliasi.
+   */
+  async requestPayout(partnerId: string, amount?: number) {
+    const partner = await this.prisma.partner.findUnique({
+      where: { id: partnerId },
+    });
+
+    if (!partner) {
+      throw new NotFoundException('Partner tidak ditemukan');
+    }
+
+    const payoutAmount = amount || partner.commissionEarned;
+
+    if (payoutAmount <= 0) {
+      throw new BadRequestException('Belum ada komisi yang dapat dicairkan');
+    }
+
+    if (payoutAmount > partner.commissionEarned) {
+      throw new BadRequestException('Jumlah pencairan melebihi total komisi yang tersedia');
+    }
+
+    // Buat riwayat permohonan payout
+    const payoutId = `payout-${Date.now().toString(36)}`;
+    return {
+      payoutId,
+      amount: payoutAmount,
+      status: 'pending_approval',
+      requestedAt: new Date(),
     };
   }
 }

@@ -82,12 +82,18 @@ model Organizer {
   name           String
   slug           String            @unique
   phone          String?           // Nomor telepon kontak organizer
+  logoUrl        String?           // URL logo organisasi
+  contactEmail   String?           // Email kontak resmi organisasi
+  bankName       String?           // Nama bank settlement
+  bankAccountNumber String?        // Nomor rekening bank settlement
+  bankAccountHolder String?        // Atas nama rekening bank settlement
   status         String            @default("pending") // "pending" | "active" | "suspended"
   bankAccount    String?           // Informasi rekening bank organizer untuk pembayaran
   segment        String?           // "event_builder" | "event_ip_owner" | "campus_community" | "enterprise"
   plan           String            @default("starter") // "starter" | "pro" | "enterprise"
   planStartedAt  DateTime?
   planExpiresAt  DateTime?
+  integrations   Json?             // { metaPixelId, tiktokPixelId, gaTrackingId }
   approvedAt     DateTime?         // Waktu persetujuan akun oleh main admin
   approvedBy     String?           // ID admin yang menyetujui akun
   createdAt      DateTime          @default(now())
@@ -246,8 +252,8 @@ model Ticket {
 model Payment {
   id         String        @id @default(uuid())
   orderId    String        @unique
-  provider   String        @default("midtrans") // "midtrans" | "xendit"
-  snapToken  String?       // Token Snap Midtrans
+  provider   String        @default("doku") // "doku"
+  snapToken  String?       // Token/URL checkout pembayaran
   externalId String?       // Referensi kode transaksi dari Midtrans/Xendit (gatewayRef)
   amount     Float
   status     PaymentStatus @default(PENDING)

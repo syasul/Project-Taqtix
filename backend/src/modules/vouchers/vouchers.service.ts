@@ -34,6 +34,29 @@ export class VouchersService {
   async create(dto: CreateVoucherDto, userId: string) {
     const organizer = await this.getOrganizerOrThrow(userId);
 
+    // Validasi event ownership jika eventId ditentukan
+    if (dto.eventId) {
+      const event = await this.prisma.event.findUnique({
+        where: { id: dto.eventId },
+      });
+      if (!event || event.organizerId !== organizer.id) {
+        throw new BadRequestException('Event tidak valid atau bukan milik organisasi Anda');
+      }
+    }
+
+    // Validasi applicableEventIds jika ditentukan
+    if (dto.applicableEventIds && dto.applicableEventIds.length > 0) {
+      const events = await this.prisma.event.findMany({
+        where: {
+          id: { in: dto.applicableEventIds },
+          organizerId: organizer.id,
+        },
+      });
+      if (events.length !== dto.applicableEventIds.length) {
+        throw new BadRequestException('Satu atau lebih event di applicableEventIds tidak valid atau bukan milik organisasi Anda');
+      }
+    }
+
     const existing = await this.prisma.voucher.findUnique({
       where: {
         organizerId_code: {
@@ -106,6 +129,27 @@ export class VouchersService {
 
     if (!voucher || voucher.organizerId !== organizer.id) {
       throw new NotFoundException('Voucher tidak ditemukan');
+    }
+
+    if (dto.eventId) {
+      const event = await this.prisma.event.findUnique({
+        where: { id: dto.eventId },
+      });
+      if (!event || event.organizerId !== organizer.id) {
+        throw new BadRequestException('Event tidak valid atau bukan milik organisasi Anda');
+      }
+    }
+
+    if (dto.applicableEventIds && dto.applicableEventIds.length > 0) {
+      const events = await this.prisma.event.findMany({
+        where: {
+          id: { in: dto.applicableEventIds },
+          organizerId: organizer.id,
+        },
+      });
+      if (events.length !== dto.applicableEventIds.length) {
+        throw new BadRequestException('Satu atau lebih event di applicableEventIds tidak valid atau bukan milik organisasi Anda');
+      }
     }
 
     const data: any = {};

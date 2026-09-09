@@ -44,11 +44,17 @@ export declare class TokensService {
             userId: string;
             slug: string;
             phone: string | null;
+            logoUrl: string | null;
+            contactEmail: string | null;
+            bankName: string | null;
+            bankAccountNumber: string | null;
+            bankAccountHolder: string | null;
             status: string;
             bankAccount: string | null;
             plan: string;
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
+            integrations: import("@prisma/client/runtime/library").JsonValue | null;
             approvedAt: Date | null;
             approvedBy: string | null;
         };

@@ -11,10 +11,25 @@ export declare class PaymentsService {
     pay(orderId: string): Promise<{
         token: any;
         redirectUrl: any;
+        provider: string;
+    } | {
+        token: string;
+        redirectUrl: string;
+        provider: string;
+        message: string;
     }>;
-    handleWebhook(body: any): Promise<{
+    private createDokuPayment;
+    private createMidtransPayment;
+    handleWebhook(body: any, provider?: string, headers?: Record<string, string>): Promise<{
         received: boolean;
+    } | {
+        received: boolean;
+        status: string;
     }>;
+    private handleDokuWebhook;
+    private handleMidtransWebhook;
+    processPaymentSuccess(orderId: string, transactionId?: string): Promise<void>;
+    processPaymentFailed(orderId: string): Promise<void>;
     getTicket(ticketId: string): Promise<{
         ticketId: string;
         ticketStatus: import("@prisma/client").$Enums.TicketStatus;

@@ -291,6 +291,24 @@ export class GateService {
         );
       }
 
+      if (ticket.status === TicketStatus.TRANSFER_PENDING) {
+        await tx.scanLog.create({
+          data: {
+            ticketId: ticket.id,
+            scannedById: staffUserId,
+            result: 'TRANSFER_PENDING',
+          },
+        });
+        throw new HttpException(
+          {
+            code: 'QR_INVALID',
+            message:
+              'Tiket sedang dalam proses transfer kepemilikan. QR lama ini tidak dapat digunakan untuk check-in.',
+          },
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+
       if (ticket.status !== TicketStatus.VALID) {
         // Catat ScanLog gagal (INVALID)
         await tx.scanLog.create({

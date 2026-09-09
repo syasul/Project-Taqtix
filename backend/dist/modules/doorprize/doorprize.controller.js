@@ -20,6 +20,7 @@ const create_doorprize_dto_1 = require("./dto/create-doorprize.dto");
 const draw_doorprize_dto_1 = require("./dto/draw-doorprize.dto");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const idempotency_decorator_1 = require("../../common/decorators/idempotency.decorator");
 let DoorprizeController = class DoorprizeController {
     doorprizeService;
     constructor(doorprizeService) {
@@ -62,6 +63,7 @@ __decorate([
 ], DoorprizeController.prototype, "listItems", null);
 __decorate([
     (0, common_1.Post)(':itemId/draw'),
+    (0, idempotency_decorator_1.RequireIdempotency)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mengundi pemenang doorprize dari pengunjung yang sudah Check-In' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Pengundian pemenang berhasil.' }),
     __param(0, (0, common_1.Param)('id')),

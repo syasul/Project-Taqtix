@@ -12,6 +12,7 @@ export declare class OrganizerEventsController {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -22,7 +23,6 @@ export declare class OrganizerEventsController {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -36,6 +36,7 @@ export declare class OrganizerEventsController {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -46,7 +47,6 @@ export declare class OrganizerEventsController {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -60,6 +60,7 @@ export declare class OrganizerEventsController {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -70,7 +71,6 @@ export declare class OrganizerEventsController {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -84,6 +84,7 @@ export declare class OrganizerEventsController {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -94,7 +95,6 @@ export declare class OrganizerEventsController {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;

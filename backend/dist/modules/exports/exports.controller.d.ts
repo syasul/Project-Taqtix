@@ -3,6 +3,7 @@ import { ExportsService } from './exports.service';
 export declare class ExportsController {
     private readonly exportsService;
     constructor(exportsService: ExportsService);
+    private sendExportResponse;
     exportCrossEventSummary(from: string, to: string, format: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     exportOrders(eventId: string, format: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;
     exportAttendance(eventId: string, format: string, userId: string, res: Response): Promise<Response<any, Record<string, any>>>;

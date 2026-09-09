@@ -88,13 +88,18 @@ export default function TeamSettingsPage() {
     }
   };
 
-  const handleRoleChange = async (memberId: string, newRole: string) => {
+  const handleRoleChange = async (memberId: string, memberEmail: string, newRole: string) => {
+    if (!confirm(`Yakin ingin mengubah peran akses tim untuk ${memberEmail} menjadi ${newRole.toUpperCase()}?`)) {
+      fetchTeam(); // Reset selection to previous state
+      return;
+    }
+
     try {
       const res = await apiClient.patch(`/organizer/team/${memberId}/role`, {
         role: newRole,
       });
       if (res.data.success) {
-        toast.success('Peran berhasil diperbarui');
+        toast.success(`Peran ${memberEmail} berhasil diperbarui`);
         fetchTeam();
       }
     } catch (err: any) {
@@ -103,16 +108,17 @@ export default function TeamSettingsPage() {
       } else {
         toast.error('Gagal memperbarui peran');
       }
+      fetchTeam();
     }
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus anggota ini dari tim?')) return;
+  const handleRemoveMember = async (memberId: string, memberEmail: string) => {
+    if (!confirm(`Yakin hapus akses tim untuk ${memberEmail}?`)) return;
 
     try {
       const res = await apiClient.delete(`/organizer/team/${memberId}`);
       if (res.data.success) {
-        toast.success('Anggota tim berhasil dihapus');
+        toast.success(`Akses tim untuk ${memberEmail} berhasil dihapus`);
         fetchTeam();
       }
     } catch (err: any) {
@@ -189,7 +195,7 @@ export default function TeamSettingsPage() {
                       {isOwner && member.role !== 'owner' ? (
                         <select
                           value={member.role}
-                          onChange={(e) => handleRoleChange(member.id, e.target.value)}
+                          onChange={(e) => handleRoleChange(member.id, member.email, e.target.value)}
                           className="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#08B4B5] cursor-pointer"
                         >
                           <option value="admin">Admin</option>
@@ -231,7 +237,7 @@ export default function TeamSettingsPage() {
                       <td className="p-4 text-right">
                         {member.role !== 'owner' && member.status !== 'removed' && (
                           <button
-                            onClick={() => handleRemoveMember(member.id)}
+                            onClick={() => handleRemoveMember(member.id, member.email)}
                             className="p-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-xl transition cursor-pointer"
                             title="Hapus Anggota"
                           >

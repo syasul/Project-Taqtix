@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const crm_service_1 = require("./crm.service");
 const permissions_decorator_1 = require("../../common/decorators/permissions.decorator");
+const idempotency_decorator_1 = require("../../common/decorators/idempotency.decorator");
 const create_segment_dto_1 = require("./dto/create-segment.dto");
 const create_broadcast_dto_1 = require("./dto/create-broadcast.dto");
 let CRMController = class CRMController {
@@ -81,6 +82,7 @@ __decorate([
     (0, common_1.Post)('organizer/segments/:segmentId/broadcast'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, permissions_decorator_1.Permissions)('manage_audience_segments'),
+    (0, idempotency_decorator_1.RequireIdempotency)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' }),
     __param(0, (0, common_1.Param)('segmentId')),
     __param(1, (0, common_1.Body)()),

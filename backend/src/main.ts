@@ -4,6 +4,8 @@ import { ValidationPipe, HttpStatus } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
@@ -13,6 +15,18 @@ async function bootstrap() {
   // 1. Keamanan Jaringan: Trust proxy agar Throttler membaca IP asli via X-Forwarded-For
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('trust proxy', 1);
+
+  // 1.1 Sajikan file statis upload untuk akses lokal server
+  const uploadPath =
+    process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
+  try {
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    app.use('/uploads', express.static(uploadPath));
+  } catch (err) {
+    console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
+  }
 
   // 2. Terapkan prefix routing global
   app.setGlobalPrefix('v1');

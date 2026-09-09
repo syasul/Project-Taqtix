@@ -1,7 +1,9 @@
 import { PrismaService } from '../prisma/prisma.service';
+import { SettlementsService } from '../settlements/settlements.service';
 export declare class AdminService {
     private readonly prisma;
-    constructor(prisma: PrismaService);
+    private readonly settlementsService;
+    constructor(prisma: PrismaService, settlementsService: SettlementsService);
     getOrganizers(): Promise<{
         id: string;
         name: string;
@@ -56,11 +58,17 @@ export declare class AdminService {
         userId: string;
         slug: string;
         phone: string | null;
+        logoUrl: string | null;
+        contactEmail: string | null;
+        bankName: string | null;
+        bankAccountNumber: string | null;
+        bankAccountHolder: string | null;
         status: string;
         bankAccount: string | null;
         plan: string;
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
+        integrations: import("@prisma/client/runtime/library").JsonValue | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -240,6 +248,7 @@ export declare class AdminService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -250,7 +259,6 @@ export declare class AdminService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -264,6 +272,7 @@ export declare class AdminService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -274,7 +283,6 @@ export declare class AdminService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -322,11 +330,17 @@ export declare class AdminService {
         userId: string;
         slug: string;
         phone: string | null;
+        logoUrl: string | null;
+        contactEmail: string | null;
+        bankName: string | null;
+        bankAccountNumber: string | null;
+        bankAccountHolder: string | null;
         status: string;
         bankAccount: string | null;
         plan: string;
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
+        integrations: import("@prisma/client/runtime/library").JsonValue | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -339,11 +353,17 @@ export declare class AdminService {
         userId: string;
         slug: string;
         phone: string | null;
+        logoUrl: string | null;
+        contactEmail: string | null;
+        bankName: string | null;
+        bankAccountNumber: string | null;
+        bankAccountHolder: string | null;
         status: string;
         bankAccount: string | null;
         plan: string;
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
+        integrations: import("@prisma/client/runtime/library").JsonValue | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -356,11 +376,17 @@ export declare class AdminService {
         userId: string;
         slug: string;
         phone: string | null;
+        logoUrl: string | null;
+        contactEmail: string | null;
+        bankName: string | null;
+        bankAccountNumber: string | null;
+        bankAccountHolder: string | null;
         status: string;
         bankAccount: string | null;
         plan: string;
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
+        integrations: import("@prisma/client/runtime/library").JsonValue | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -372,6 +398,7 @@ export declare class AdminService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -382,7 +409,6 @@ export declare class AdminService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -405,15 +431,24 @@ export declare class AdminService {
             attendeePhone: string;
         }[];
     }[]>;
+    calculateSettlements(): Promise<{
+        processed: number;
+        settlements: any[];
+    }>;
     getSettlements(): Promise<({
         organizer: {
+            user: {
+                email: string;
+            };
             id: string;
             name: string;
+            phone: string | null;
             bankAccount: string | null;
         };
         event: {
             title: string;
             id: string;
+            location: string;
             endDate: Date;
         };
     } & {
@@ -421,8 +456,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string;
         organizerId: string;
+        eventId: string;
         paidAt: Date | null;
         grossRevenue: number;
         platformFee: number;
@@ -435,8 +470,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string;
         organizerId: string;
+        eventId: string;
         paidAt: Date | null;
         grossRevenue: number;
         platformFee: number;

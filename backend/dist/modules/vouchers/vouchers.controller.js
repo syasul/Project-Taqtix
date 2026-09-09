@@ -20,6 +20,7 @@ const create_voucher_dto_1 = require("./dto/create-voucher.dto");
 const update_voucher_dto_1 = require("./dto/update-voucher.dto");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const permissions_decorator_1 = require("../../common/decorators/permissions.decorator");
 let VouchersController = class VouchersController {
     vouchersService;
     constructor(vouchersService) {
@@ -41,6 +42,7 @@ let VouchersController = class VouchersController {
 exports.VouchersController = VouchersController;
 __decorate([
     (0, common_1.Post)(),
+    (0, permissions_decorator_1.Permissions)('manage_promo_code'),
     (0, swagger_1.ApiOperation)({ summary: 'Membuat voucher baru (org-wide atau event-scoped)' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Voucher berhasil dibuat.' }),
     __param(0, (0, common_1.Body)()),
@@ -61,6 +63,7 @@ __decorate([
 ], VouchersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, permissions_decorator_1.Permissions)('manage_promo_code'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengupdate voucher' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Voucher berhasil diupdate.' }),
     __param(0, (0, common_1.Param)('id')),
@@ -72,6 +75,7 @@ __decorate([
 ], VouchersController.prototype, "update", null);
 __decorate([
     (0, common_1.Post)(':id/deactivate'),
+    (0, permissions_decorator_1.Permissions)('manage_promo_code'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Menonaktifkan voucher' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Voucher berhasil dinonaktifkan.' }),

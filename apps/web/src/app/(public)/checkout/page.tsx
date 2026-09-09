@@ -23,6 +23,7 @@ import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
+import { useIdempotency } from '@/hooks/use-idempotency';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -149,6 +150,20 @@ function CheckoutContent() {
     }
   }, [user, form]);
 
+  // Track checkout started event saat user mulai mengisi field form pertama kali
+  const hasFiredCheckoutStarted = React.useRef(false);
+  const watchedName = form.watch('buyerName');
+  const watchedPhone = form.watch('buyerPhone');
+
+  useEffect(() => {
+    if (!hasFiredCheckoutStarted.current && eventId) {
+      if ((watchedName && watchedName.trim().length > 0) || (watchedPhone && watchedPhone.trim().length > 1)) {
+        hasFiredCheckoutStarted.current = true;
+        apiClient.post('/track/checkout-started', { eventId }).catch(() => {});
+      }
+    }
+  }, [watchedName, watchedPhone, eventId]);
+
   // State untuk custom fields answers & facilities add-ons
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
   const [selectedFacilities, setSelectedFacilities] = useState<Record<string, number>>({});
@@ -211,6 +226,11 @@ function CheckoutContent() {
     }
   };
 
+  // Stable Idempotency Key & Immediate submission lock
+  const { idempotencyKey } = useIdempotency();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const lastSubmitTimeRef = React.useRef(0);
+
   // Submit checkout
   const checkoutMutation = useMutation({
     mutationFn: async (values: CheckoutFormValues) => {
@@ -221,11 +241,6 @@ function CheckoutContent() {
       const activeFacilities = Object.entries(selectedFacilities)
         .filter(([_, qty]) => qty > 0)
         .map(([facilityId, qty]) => ({ facilityId, qty }));
-
-      const idempotencyKey =
-        typeof crypto !== 'undefined' && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `order-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
       const orderRes = await apiClient.post(
         '/orders',
@@ -255,6 +270,7 @@ function CheckoutContent() {
       return { orderId, payment: payRes.data?.data };
     },
     onSuccess: (data) => {
+      setIsSubmitting(false);
       toast.success('Pemesanan tiket berhasil dibuat!');
       if (data.payment?.redirectUrl) {
         window.open(data.payment.redirectUrl, '_blank');
@@ -262,11 +278,19 @@ function CheckoutContent() {
       router.push(`/checkout?orderId=${data.orderId}`);
     },
     onError: (error: any) => {
+      setIsSubmitting(false);
       toast.error(error.response?.data?.error?.message || 'Gagal melakukan pemesanan tiket.');
     },
   });
 
   const onSubmit = (values: CheckoutFormValues) => {
+    // 500ms debounce guard & immediate disable
+    const now = Date.now();
+    if (now - lastSubmitTimeRef.current < 500) return;
+    if (isSubmitting || checkoutMutation.isPending) return;
+
+    lastSubmitTimeRef.current = now;
+    setIsSubmitting(true);
     checkoutMutation.mutate(values);
   };
 
@@ -754,10 +778,10 @@ function CheckoutContent() {
                   ) : (
                     <Button
                       type="submit"
-                      disabled={checkoutMutation.isPending}
+                      disabled={isSubmitting || checkoutMutation.isPending}
                       className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0"
                     >
-                      {checkoutMutation.isPending ? (
+                      {isSubmitting || checkoutMutation.isPending ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
                           <span>Sedang Memproses...</span>

@@ -235,7 +235,10 @@ export class EventsService {
       );
     }
 
-    return event;
+    return {
+      ...event,
+      customFields: event.customFormFields,
+    };
   }
 
   /**

@@ -13,6 +13,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -23,7 +24,6 @@ export declare class EventsService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -37,6 +37,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -47,7 +48,6 @@ export declare class EventsService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -61,6 +61,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -71,7 +72,6 @@ export declare class EventsService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -90,6 +90,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -100,13 +101,23 @@ export declare class EventsService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
         allowTicketTransfer: boolean;
     })[]>;
     findOnePublicBySlug(slugOrId: string): Promise<{
+        customFields: {
+            order: number;
+            required: boolean;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            eventId: string;
+            label: string;
+            fieldType: string;
+            options: import("@prisma/client/runtime/library").JsonValue | null;
+        }[];
         organizer: {
             name: string;
             slug: string;
@@ -158,7 +169,6 @@ export declare class EventsService {
             performTime: string | null;
             stage: string | null;
         }[];
-    } & {
         description: string | null;
         title: string;
         id: string;
@@ -166,6 +176,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -176,7 +187,6 @@ export declare class EventsService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;
@@ -190,6 +200,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        organizerId: string;
         location: string;
         startDate: Date;
         endDate: Date;
@@ -200,7 +211,6 @@ export declare class EventsService {
         seoKeywords: string | null;
         adminSeoKeywords: string | null;
         seoPriority: string | null;
-        organizerId: string;
         geofenceLat: number | null;
         geofenceLng: number | null;
         geofenceRadius: number | null;

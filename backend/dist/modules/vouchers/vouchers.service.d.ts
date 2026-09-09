@@ -11,8 +11,8 @@ export declare class VouchersService {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;
@@ -33,8 +33,8 @@ export declare class VouchersService {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;
@@ -50,8 +50,8 @@ export declare class VouchersService {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;
@@ -67,8 +67,8 @@ export declare class VouchersService {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;

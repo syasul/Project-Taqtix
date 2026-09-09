@@ -4,6 +4,7 @@ import {
   Post,
   Param,
   Body,
+  Headers,
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
@@ -42,12 +43,15 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
-      'Menerima notifikasi callback webhook dari payment gateway (Public/Webhook)',
+      'Menerima notifikasi callback webhook dari payment gateway (DOKU / Midtrans)',
   })
   @ApiResponse({ status: HttpStatus.OK, description: 'Webhook diproses.' })
-  async handleWebhook(@Param('provider') provider: string, @Body() body: any) {
-    // Di masa depan bisa dispatch berdasarkan provider, saat ini default ke Midtrans
-    return this.paymentsService.handleWebhook(body);
+  async handleWebhook(
+    @Param('provider') provider: string,
+    @Body() body: any,
+    @Headers() headers: Record<string, string>,
+  ) {
+    return this.paymentsService.handleWebhook(body, provider, headers);
   }
 
   @Public()

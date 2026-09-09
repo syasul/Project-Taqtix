@@ -20,6 +20,7 @@ const create_affiliate_dto_1 = require("./dto/create-affiliate.dto");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
+const idempotency_decorator_1 = require("../../common/decorators/idempotency.decorator");
 let AffiliatesController = class AffiliatesController {
     affiliatesService;
     constructor(affiliatesService) {
@@ -56,6 +57,14 @@ let AffiliatesController = class AffiliatesController {
     }
     async getPartnerStats(partnerId) {
         const result = await this.affiliatesService.getPartnerStats(partnerId);
+        return { success: true, data: result };
+    }
+    async generateAffiliateCode(partnerId, customCode) {
+        const result = await this.affiliatesService.generateCode(partnerId, customCode);
+        return { success: true, data: result };
+    }
+    async requestPayout(partnerId, amount) {
+        const result = await this.affiliatesService.requestPayout(partnerId, amount);
         return { success: true, data: result };
     }
 };
@@ -166,6 +175,30 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AffiliatesController.prototype, "getPartnerStats", null);
+__decorate([
+    (0, common_1.Post)('affiliate/me/generate-code'),
+    (0, roles_decorator_1.Roles)('partner'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, idempotency_decorator_1.RequireIdempotency)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Generate atau perbarui kode unik afiliasi partner' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Body)('customCode')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AffiliatesController.prototype, "generateAffiliateCode", null);
+__decorate([
+    (0, common_1.Post)('affiliate/me/payout-requests'),
+    (0, roles_decorator_1.Roles)('partner'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, idempotency_decorator_1.RequireIdempotency)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Mengajukan pencairan saldo komisi partner afiliasi' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Body)('amount')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:returntype", Promise)
+], AffiliatesController.prototype, "requestPayout", null);
 exports.AffiliatesController = AffiliatesController = __decorate([
     (0, swagger_1.ApiTags)('Partners & Affiliates'),
     (0, common_1.Controller)(),

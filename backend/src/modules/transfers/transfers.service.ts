@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -224,6 +225,7 @@ export class TransfersService {
   /**
    * Cron/Scheduled job: auto-expire transfer request > 24 jam.
    */
+  @Cron(CronExpression.EVERY_HOUR)
   async handleExpiredTransfers() {
     const expiredTransfers = await this.prisma.ticketTransfer.findMany({
       where: {

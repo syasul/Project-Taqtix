@@ -132,7 +132,7 @@
 {
   id: string;
   orderId: string;
-  provider: "midtrans" | "xendit";
+  provider: "doku";
   externalId: string;
   status: "pending" | "success" | "failed" | "expired";
   amount: number;
@@ -340,3 +340,4 @@ Setiap kali ada perubahan di file ini, catat di sini biar 3 project tahu harus s
 | - | Initial contract | BE, FE, Mobile |
 | - | Tambah role `admin` (main admin platform, terpisah dari `organizer`), model `Organizer` & `Settlement`, endpoint `/admin/*` | BE, FE (Mobile tidak terdampak) |
 | - | Admin panel dipisah jadi project ke-4 tersendiri (`admin/`), bukan bagian dari `fe-web` | BE (tidak berubah), FE (hapus scope admin), Admin (project baru) |
+| 2026-09-09 | Ganti payment gateway ke DOKU (`provider: "doku"`), bukan Midtrans/Xendit | BE, FE, Mobile |

@@ -19,6 +19,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { useIdempotency } from '@/hooks/use-idempotency';
 
 interface DoorprizeWinner {
   id: string;
@@ -50,6 +51,9 @@ export default function DoorprizePage() {
   const [drawnWinner, setDrawnWinner] = useState<any | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  const { idempotencyKey, refreshKey } = useIdempotency();
+  const lastDrawTimeRef = React.useRef(0);
 
   const [form, setForm] = useState({
     name: '',
@@ -96,6 +100,12 @@ export default function DoorprizePage() {
   };
 
   const handleDraw = async (prizeId: string) => {
+    // 500ms debounce & immediate lock
+    const now = Date.now();
+    if (now - lastDrawTimeRef.current < 500) return;
+    if (isDrawingAnimation || drawingId) return;
+
+    lastDrawTimeRef.current = now;
     setErrorMsg('');
     setDrawnWinner(null);
     setDrawingId(prizeId);
@@ -104,15 +114,28 @@ export default function DoorprizePage() {
     try {
       await new Promise((r) => setTimeout(r, 2000));
 
-      const res = await apiClient.post(`/organizer/events/${eventId}/doorprize/${prizeId}/draw`, {
-        excludeWinnersFromPreviousDraws: true,
-      });
+      const res = await apiClient.post(
+        `/organizer/events/${eventId}/doorprize/${prizeId}/draw`,
+        {
+          excludeWinnersFromPreviousDraws: true,
+        },
+        {
+          headers: {
+            'Idempotency-Key': idempotencyKey,
+          },
+        },
+      );
 
       const winnerData = res.data?.winner || res.data?.data?.winner;
       setDrawnWinner(winnerData);
+      refreshKey(); // Generate key baru untuk undian doorprize berikutnya
       fetchPrizes();
     } catch (err: any) {
-      setErrorMsg(err?.response?.data?.message || 'Gagal melakukan pengundian (Pastikan ada penonton check-in)');
+      setErrorMsg(
+        err?.response?.data?.error?.message ||
+        err?.response?.data?.message ||
+        'Gagal melakukan pengundian (Pastikan ada penonton check-in)',
+      );
     } finally {
       setIsDrawingAnimation(false);
       setDrawingId(null);

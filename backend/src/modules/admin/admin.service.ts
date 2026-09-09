@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SettlementsService } from '../settlements/settlements.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly settlementsService: SettlementsService,
+  ) {}
 
   /**
    * Mendapatkan semua data organizer
@@ -647,43 +651,24 @@ export class AdminService {
   }
 
   /**
+   * Menghitung dan membuat record settlement otomatis untuk event yang telah selesai
+   */
+  async calculateSettlements() {
+    return this.settlementsService.calculatePendingSettlements();
+  }
+
+  /**
    * Mendapatkan daftar settlement yang perlu diproses
    */
   async getSettlements() {
-    return this.prisma.settlement.findMany({
-      include: {
-        organizer: { select: { id: true, name: true, bankAccount: true } },
-        event: { select: { id: true, title: true, endDate: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    return this.settlementsService.getSettlements();
   }
 
   /**
    * Menandai settlement sudah ditransfer ke rekening organizer
    */
   async markSettlementPaid(id: string, adminId?: string) {
-    const settlement = await this.prisma.settlement.findUnique({ where: { id } });
-    if (!settlement) throw new NotFoundException('Settlement tidak ditemukan');
-
-    const updated = await this.prisma.settlement.update({
-      where: { id },
-      data: {
-        status: 'paid',
-        paidAt: new Date(),
-        paidBy: adminId || 'admin',
-      },
-    });
-
-    await this.recordAuditLog(
-      adminId || 'admin',
-      'mark_settlement_paid',
-      id,
-      'settlement',
-      { netAmount: settlement.netAmount, eventId: settlement.eventId },
-    );
-
-    return updated;
+    return this.settlementsService.markSettlementPaid(id, adminId || 'admin');
   }
 
   /**

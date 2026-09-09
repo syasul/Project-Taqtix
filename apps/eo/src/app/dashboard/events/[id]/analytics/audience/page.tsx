@@ -4,19 +4,27 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import EventTabs from '@/components/layout/event-tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { 
-  PieChart, 
-  Pie, 
-  Cell, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { Loader2, Users, MapPin, Award, Activity } from 'lucide-react';
-
-const COLORS = ['#08B4B5', '#64748b'];
+import { 
+  Loader2, 
+  Users, 
+  UserPlus, 
+  UserCheck, 
+  MapPin, 
+  TrendingUp, 
+  TrendingDown, 
+  Percent 
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function AudienceAnalyticsPage() {
   const params = useParams();
@@ -37,171 +45,152 @@ export default function AudienceAnalyticsPage() {
     returningBuyers: 0,
     topCities: [],
     repeatPurchaseRate: 0,
+    repeatRateTrend: '+4.2%', // Indicator versus previous event if available
   };
 
-  const chartData = [
-    { name: 'Buyer Baru', value: audience.newBuyers },
-    { name: 'Buyer Lama (Returning)', value: audience.returningBuyers },
-  ];
+  const citiesData = (audience.topCities || []).map((c: any) => ({
+    city: c.city || 'Kota Lainnya',
+    buyers: c.count || c.buyers || 0,
+  }));
 
-  const breadcrumbs = [
-    { label: 'Daftar Event', href: '/dashboard/events' },
-    { label: 'Analisis Profil Audiens' },
-  ];
+  const newBuyersPct = audience.totalBuyers > 0 
+    ? Math.round((audience.newBuyers / audience.totalBuyers) * 100) 
+    : 0;
+
+  const returningBuyersPct = audience.totalBuyers > 0 
+    ? Math.round((audience.returningBuyers / audience.totalBuyers) * 100) 
+    : 0;
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
-
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Users className="h-5 w-5 text-[#08B4B5]" />
-          Analisis Profil Audiens
+          Laporan Demografi & Loyalitas Audiens
         </h2>
         <p className="text-xs text-slate-500 mt-1">
-          Dapatkan gambaran retensi pembeli berulang dan peta sebaran kota asal pembeli.
+          Analisis perbandingan pembeli baru versus pelanggan setia, sebaran geografis kota, dan tingkat pembelian ulang.
         </p>
       </div>
 
       {isLoading ? (
         <div className="py-24 flex flex-col items-center justify-center space-y-3">
           <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
-          <span className="text-xs text-slate-400">Memuat analisis audiens...</span>
+          <span className="text-xs font-semibold text-slate-400">Menganalisis audiens event...</span>
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Key Retention Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-white border-slate-200 rounded-2xl shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Total Buyer Unik
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-extrabold text-slate-900 font-mono">
-                  {audience.totalBuyers} Orang
+          {/* Key Metrics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {/* Card 1: New Buyers */}
+            <Card className="bg-white border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pembeli Baru (New)</span>
+                <div className="p-2 bg-teal-50 text-[#08B4B5] rounded-xl">
+                  <UserPlus className="h-4 w-4" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1">Jumlah email/kontak unik terdaftar</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-slate-200 rounded-2xl shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Loyalty (Repeat Buyer)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-extrabold text-[#08B4B5] font-mono">
-                  {audience.returningBuyers} Orang
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1">Pembeli yang sudah beli event Anda sebelumnya</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-slate-200 rounded-2xl shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Repeat Purchase Rate
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-extrabold text-emerald-600 font-mono">
-                  {(audience.repeatPurchaseRate * 100).toFixed(0)}%
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1">Rasio loyalitas audiens organizer Anda</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Retention Donut */}
-            <Card className="bg-white border-slate-200 p-6 flex flex-col justify-between rounded-2xl shadow-sm">
-              <div>
-                <CardTitle className="text-sm font-bold text-slate-900">Rasio Buyer Baru vs Lama</CardTitle>
-                <CardDescription className="text-xs text-slate-400">Rasio retensi basis audiens acara</CardDescription>
               </div>
-
-              {audience.totalBuyers === 0 ? (
-                <div className="h-56 flex items-center justify-center text-slate-400 text-xs">
-                  Belum ada data retensi.
-                </div>
-              ) : (
-                <div className="flex flex-col md:flex-row items-center gap-6 mt-6">
-                  <div className="h-44 w-44 shrink-0 font-mono text-xs">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={chartData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={45}
-                          outerRadius={65}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#0f172a' }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-
-                  <div className="space-y-3 flex-1 w-full">
-                    {chartData.map((item, idx) => (
-                      <div key={item.name} className="flex justify-between items-center p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[idx] }} />
-                          <span className="text-xs text-slate-700 font-semibold">{item.name}</span>
-                        </div>
-                        <span className="text-xs font-bold text-slate-900 font-mono">
-                          {item.value} ({((item.value / audience.totalBuyers) * 100).toFixed(0)}%)
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div className="text-2xl font-black text-slate-900 font-mono">
+                {audience.newBuyers.toLocaleString('id-ID')}
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                {newBuyersPct}% dari total {audience.totalBuyers} pembeli
+              </p>
             </Card>
 
-            {/* Top Cities */}
-            <Card className="bg-white border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm">
-              <div>
-                <CardTitle className="text-sm font-bold text-slate-900">5 Kota Teratas Pembeli</CardTitle>
-                <CardDescription className="text-xs text-slate-400">Sebaran wilayah pembeli tiket terbanyak</CardDescription>
+            {/* Card 2: Returning Buyers */}
+            <Card className="bg-white border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Returning Buyers</span>
+                <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
+                  <UserCheck className="h-4 w-4" />
+                </div>
               </div>
+              <div className="text-2xl font-black text-slate-900 font-mono">
+                {audience.returningBuyers.toLocaleString('id-ID')}
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                {returningBuyersPct}% pernah beli event sebelumnya
+              </p>
+            </Card>
 
-              <div className="space-y-3">
-                {audience.topCities.length === 0 ? (
-                  <div className="py-10 text-center text-slate-400 text-xs">
-                    Belum ada data geografi terisi dari checkout pembeli.
-                  </div>
+            {/* Card 3: Repeat Purchase Rate with Trend Indicator */}
+            <Card className="bg-white border-slate-200/80 p-5 rounded-2xl shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Repeat Purchase Rate</span>
+                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                  <Percent className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="text-2xl font-black text-slate-900 font-mono flex items-center gap-2">
+                <span>{audience.repeatPurchaseRate}%</span>
+                {audience.repeatPurchaseRate >= 15 ? (
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-0.5 font-sans">
+                    <TrendingUp className="h-3 w-3" />
+                    Tinggi
+                  </span>
                 ) : (
-                  audience.topCities.map((cityData: any, idx: number) => (
-                    <div key={cityData.city} className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
-                      <div className="flex items-center gap-2.5">
-                        <span className="h-5 w-5 bg-teal-50 border border-[#08B4B5]/30 text-[#08B4B5] font-bold rounded-lg flex items-center justify-center text-xs">
-                          {idx + 1}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                          <span className="text-xs text-slate-900 font-bold capitalize">{cityData.city}</span>
-                        </div>
-                      </div>
-                      <span className="text-xs text-slate-500 font-mono font-bold">
-                        {cityData.count} Pembeli
-                      </span>
-                    </div>
-                  ))
+                  <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-0.5 font-sans">
+                    Normal
+                  </span>
                 )}
               </div>
+              <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+                <TrendingUp className="h-3 w-3 text-emerald-600 inline" />
+                Loyalitas audiens ekosistem Anda
+              </p>
             </Card>
           </div>
+
+          {/* Top Cities Horizontal Bar Chart */}
+          <Card className="bg-white border-slate-200/80 p-6 rounded-2xl shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-slate-100 rounded-xl text-slate-700">
+                  <MapPin className="h-4 w-4 text-[#08B4B5]" />
+                </div>
+                <div>
+                  <CardTitle className="text-sm font-bold text-slate-900">Sebaran Asal Kota Terbanyak (Top Cities)</CardTitle>
+                  <CardDescription className="text-xs text-slate-400">
+                    Kota asal pembeli tiket terverifikasi berdasarkan invoice & checkout data
+                  </CardDescription>
+                </div>
+              </div>
+            </div>
+
+            {citiesData.length === 0 ? (
+              <div className="h-56 flex items-center justify-center text-slate-400 text-xs">
+                Belum ada data domisili kota pembeli tiket yang terekam.
+              </div>
+            ) : (
+              <div className="h-64 w-full text-xs font-mono pt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={citiesData} 
+                    layout="vertical"
+                    margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                    <XAxis type="number" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis 
+                      type="category" 
+                      dataKey="city" 
+                      stroke="#475569" 
+                      fontSize={11} 
+                      tickLine={false} 
+                      width={100}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px' }}
+                      formatter={(value: any) => [`${value} Pembeli`, 'Total']}
+                    />
+                    <Bar dataKey="buyers" fill="#08B4B5" radius={[0, 6, 6, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </Card>
         </div>
       )}
     </div>

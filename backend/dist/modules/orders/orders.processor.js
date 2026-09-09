@@ -41,7 +41,7 @@ let OrdersProcessor = class OrdersProcessor {
                 await tx.order.update({
                     where: { id: orderId },
                     data: {
-                        status: client_1.OrderStatus.CANCELLED,
+                        status: client_1.OrderStatus.EXPIRED,
                     },
                 });
                 for (const item of order.orderItems) {

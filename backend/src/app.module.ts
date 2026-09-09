@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { BullModule } from '@nestjs/bull';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './modules/prisma/prisma.module';
@@ -28,10 +29,14 @@ import { TransfersModule } from './modules/transfers/transfers.module';
 import { PosModule } from './modules/pos/pos.module';
 import { DoorprizeModule } from './modules/doorprize/doorprize.module';
 import { ExportsModule } from './modules/exports/exports.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { SettlementsModule } from './modules/settlements/settlements.module';
+import { SettingsModule } from './modules/settings/settings.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PermissionGuard } from './common/guards/permission.guard';
+import { IdempotencyInterceptor } from './common/interceptors/idempotency.interceptor';
 
 /**
  * Modul utama / akar (root) aplikasi NestJS.
@@ -41,6 +46,7 @@ import { PermissionGuard } from './common/guards/permission.guard';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -111,6 +117,9 @@ import { PermissionGuard } from './common/guards/permission.guard';
     PosModule,
     DoorprizeModule,
     ExportsModule,
+    UploadModule,
+    SettlementsModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -134,6 +143,11 @@ import { PermissionGuard } from './common/guards/permission.guard';
     {
       provide: APP_GUARD,
       useClass: PermissionGuard,
+    },
+    // Menjadikan IdempotencyInterceptor aktif secara global untuk proteksi anti spam-click & duplicate mutations
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: IdempotencyInterceptor,
     },
   ],
 })

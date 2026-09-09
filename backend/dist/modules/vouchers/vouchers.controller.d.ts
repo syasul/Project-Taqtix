@@ -10,8 +10,8 @@ export declare class VouchersController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;
@@ -32,8 +32,8 @@ export declare class VouchersController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;
@@ -49,8 +49,8 @@ export declare class VouchersController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;
@@ -66,8 +66,8 @@ export declare class VouchersController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
-        eventId: string | null;
         organizerId: string;
+        eventId: string | null;
         code: string;
         value: number;
         usageLimit: number | null;

@@ -34,11 +34,11 @@ export class OrdersProcessor {
           return;
         }
 
-        // Update status order menjadi CANCELLED
+        // Update status order menjadi EXPIRED sesuai API Contract
         await tx.order.update({
           where: { id: orderId },
           data: {
-            status: OrderStatus.CANCELLED,
+            status: OrderStatus.EXPIRED,
           },
         });
 

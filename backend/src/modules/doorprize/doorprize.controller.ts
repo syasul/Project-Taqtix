@@ -12,6 +12,7 @@ import { CreateDoorprizeDto } from './dto/create-doorprize.dto';
 import { DrawDoorprizeDto } from './dto/draw-doorprize.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { RequireIdempotency } from '../../common/decorators/idempotency.decorator';
 
 @ApiTags('Doorprize')
 @ApiBearerAuth()
@@ -42,6 +43,7 @@ export class DoorprizeController {
   }
 
   @Post(':itemId/draw')
+  @RequireIdempotency()
   @ApiOperation({ summary: 'Mengundi pemenang doorprize dari pengunjung yang sudah Check-In' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Pengundian pemenang berhasil.' })
   async drawWinner(

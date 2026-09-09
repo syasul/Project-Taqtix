@@ -7,4 +7,10 @@ export declare class CRMProcessor {
         recipientId: string;
         message: string;
     }>): Promise<void>;
+    handleSendEmail(job: Job<{
+        recipientId: string;
+        message: string;
+        subject?: string;
+    }>): Promise<void>;
+    private updateMasterJobCounter;
 }

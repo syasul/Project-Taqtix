@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { ExportsService } from './exports.service';
+import { ExportsService, ExportResult } from './exports.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 
@@ -18,6 +18,26 @@ import { Roles } from '../../common/decorators/roles.decorator';
 @Controller('organizer')
 export class ExportsController {
   constructor(private readonly exportsService: ExportsService) {}
+
+  private sendExportResponse(result: ExportResult, res: Response) {
+    if (result.isAsync) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: {
+          downloadUrl: result.downloadUrl,
+          expiresAt: result.expiresAt,
+          filename: result.filename,
+        },
+      });
+    }
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${result.filename}"`,
+    );
+    return res.status(HttpStatus.OK).send(result.csv);
+  }
 
   @Get('export/cross-event-summary')
   @ApiOperation({ summary: 'Export ringkasan lintas event (org-level) dalam CSV' })
@@ -30,9 +50,7 @@ export class ExportsController {
     @Res() res: Response,
   ) {
     const result = await this.exportsService.exportCrossEventSummary(userId, from, to);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-    return res.status(HttpStatus.OK).send(result.csv);
+    return this.sendExportResponse(result, res);
   }
 
   @Get('events/:id/export/orders')
@@ -45,9 +63,7 @@ export class ExportsController {
     @Res() res: Response,
   ) {
     const result = await this.exportsService.exportOrders(eventId, userId);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-    return res.status(HttpStatus.OK).send(result.csv);
+    return this.sendExportResponse(result, res);
   }
 
   @Get('events/:id/export/attendance')
@@ -60,9 +76,7 @@ export class ExportsController {
     @Res() res: Response,
   ) {
     const result = await this.exportsService.exportAttendance(eventId, userId);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-    return res.status(HttpStatus.OK).send(result.csv);
+    return this.sendExportResponse(result, res);
   }
 
   @Get('events/:id/export/financial-summary')
@@ -75,8 +89,6 @@ export class ExportsController {
     @Res() res: Response,
   ) {
     const result = await this.exportsService.exportFinancialSummary(eventId, userId);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-    return res.status(HttpStatus.OK).send(result.csv);
+    return this.sendExportResponse(result, res);
   }
 }

@@ -271,6 +271,15 @@ export class AdminController {
     return { success: true, data: result };
   }
 
+  @Post('admin/settlements/calculate')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Memicu kalkulasi otomatis settlement event yang telah berakhir (Admin Only)' })
+  async calculateSettlements() {
+    const result = await this.adminService.calculateSettlements();
+    return { success: true, data: result };
+  }
+
   @Post('admin/settlements/:id/mark-paid')
   @Roles('admin')
   @ApiBearerAuth()

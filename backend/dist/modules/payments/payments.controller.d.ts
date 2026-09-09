@@ -5,9 +5,18 @@ export declare class PaymentsController {
     payOrder(orderId: string): Promise<{
         token: any;
         redirectUrl: any;
+        provider: string;
+    } | {
+        token: string;
+        redirectUrl: string;
+        provider: string;
+        message: string;
     }>;
-    handleWebhook(provider: string, body: any): Promise<{
+    handleWebhook(provider: string, body: any, headers: Record<string, string>): Promise<{
         received: boolean;
+    } | {
+        received: boolean;
+        status: string;
     }>;
     getPaymentStatus(orderId: string): Promise<{
         status: string;

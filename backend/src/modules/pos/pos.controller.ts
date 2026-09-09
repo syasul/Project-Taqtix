@@ -11,6 +11,7 @@ import { PosService } from './pos.service';
 import { CreatePosTransactionDto } from './dto/create-pos-transaction.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { RequireIdempotency } from '../../common/decorators/idempotency.decorator';
 
 @ApiTags('Point of Sales (POS)')
 @ApiBearerAuth()
@@ -20,6 +21,7 @@ export class PosController {
   constructor(private readonly posService: PosService) {}
 
   @Post('transaction')
+  @RequireIdempotency()
   @ApiOperation({ summary: 'Membuat transaksi pembelian langsung di POS (on-site)' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Transaksi POS berhasil diproses.' })
   async createTransaction(

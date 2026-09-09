@@ -145,6 +145,11 @@ let AuthService = class AuthService {
             if (!user) {
                 throw new common_1.UnauthorizedException('Pengguna tidak ditemukan');
             }
+            if (user.lastLogoutAt &&
+                payload.iat &&
+                new Date(payload.iat * 1000) < user.lastLogoutAt) {
+                throw new common_1.UnauthorizedException('Sesi login telah kedaluwarsa karena perubahan password atau logout. Silakan login kembali.');
+            }
             return this.generateTokenPair(user.id, user.email, user.role);
         }
         catch {
@@ -184,7 +189,26 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException('Pengguna tidak ditemukan');
         }
-        return user;
+        const member = await this.prisma.organizerMember.findFirst({
+            where: { userId, status: 'active' },
+            include: {
+                organizer: {
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        bankAccount: true,
+                    },
+                },
+            },
+        });
+        const organizerRole = member?.role || (user.organizer ? 'owner' : null);
+        const organizer = user.organizer || member?.organizer || null;
+        return {
+            ...user,
+            organizerRole,
+            organizer,
+        };
     }
     async changePassword(userId, currentPassword, newPassword) {
         const user = await this.prisma.user.findUnique({
@@ -204,6 +228,8 @@ let AuthService = class AuthService {
             where: { id: userId },
             data: {
                 passwordHash: newHashed,
+                lastLogoutAt: new Date(),
+                activeDeviceId: null,
             },
         });
         return {

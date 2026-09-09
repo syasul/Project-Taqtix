@@ -82,6 +82,7 @@ export declare class AffiliatesController {
             partnerId: string;
             name: string;
             uniqueCode: string;
+            uniqueLink: string;
             eventName: string;
             eventSlug: string;
             clicks: number;
@@ -89,11 +90,36 @@ export declare class AffiliatesController {
             revenueGenerated: number;
             commissionEarned: number;
             commissionPct: number;
+            ranking: number;
+            totalPartners: number;
             recentSales: {
                 orderId: string;
                 amount: number;
                 date: Date;
             }[];
+            payoutHistory: {
+                id: string;
+                date: Date;
+                amount: number;
+                status: string;
+                bankAccount: string;
+            }[];
+        };
+    }>;
+    generateAffiliateCode(partnerId: string, customCode?: string): Promise<{
+        success: boolean;
+        data: {
+            uniqueCode: string;
+            uniqueLink: string;
+        };
+    }>;
+    requestPayout(partnerId: string, amount?: number): Promise<{
+        success: boolean;
+        data: {
+            payoutId: string;
+            amount: number;
+            status: string;
+            requestedAt: Date;
         };
     }>;
 }

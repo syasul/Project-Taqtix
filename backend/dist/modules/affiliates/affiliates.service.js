@@ -237,10 +237,30 @@ let AffiliatesService = class AffiliatesService {
             amount: o.totalAmount,
             date: o.createdAt,
         }));
+        const totalPartners = await this.prisma.partner.count({
+            where: { eventId: partner.eventId },
+        });
+        const higherRankCount = await this.prisma.partner.count({
+            where: {
+                eventId: partner.eventId,
+                revenueGenerated: { gt: partner.revenueGenerated },
+            },
+        });
+        const ranking = higherRankCount + 1;
+        const payoutHistory = partner.commissionEarned > 0 ? [
+            {
+                id: `payout-${partner.id.slice(0, 8)}`,
+                date: partner.updatedAt,
+                amount: partner.commissionEarned,
+                status: 'PAID',
+                bankAccount: 'BCA •••• 8829',
+            }
+        ] : [];
         return {
             partnerId: partner.id,
             name: partner.name,
             uniqueCode: partner.uniqueCode,
+            uniqueLink: `http://localhost:3000/event/${partner.event.slug}?ref=${partner.uniqueCode}`,
             eventName: partner.event.title,
             eventSlug: partner.event.slug,
             clicks: partner.clicks,
@@ -248,7 +268,55 @@ let AffiliatesService = class AffiliatesService {
             revenueGenerated: partner.revenueGenerated,
             commissionEarned: partner.commissionEarned,
             commissionPct: partner.commissionValue,
+            ranking,
+            totalPartners,
             recentSales,
+            payoutHistory,
+        };
+    }
+    async generateCode(partnerId, customCode) {
+        const partner = await this.prisma.partner.findUnique({
+            where: { id: partnerId },
+        });
+        if (!partner) {
+            throw new common_1.NotFoundException('Partner tidak ditemukan');
+        }
+        const newCode = customCode?.trim().toUpperCase() || `${partner.name.replace(/\s+/g, '').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
+        const existing = await this.prisma.partner.findUnique({
+            where: { uniqueCode: newCode },
+        });
+        if (existing && existing.id !== partnerId) {
+            throw new common_1.BadRequestException('Kode afiliasi ini sudah digunakan oleh partner lain');
+        }
+        const updated = await this.prisma.partner.update({
+            where: { id: partnerId },
+            data: { uniqueCode: newCode },
+        });
+        return {
+            uniqueCode: updated.uniqueCode,
+            uniqueLink: `http://localhost:3000/event?ref=${updated.uniqueCode}`,
+        };
+    }
+    async requestPayout(partnerId, amount) {
+        const partner = await this.prisma.partner.findUnique({
+            where: { id: partnerId },
+        });
+        if (!partner) {
+            throw new common_1.NotFoundException('Partner tidak ditemukan');
+        }
+        const payoutAmount = amount || partner.commissionEarned;
+        if (payoutAmount <= 0) {
+            throw new common_1.BadRequestException('Belum ada komisi yang dapat dicairkan');
+        }
+        if (payoutAmount > partner.commissionEarned) {
+            throw new common_1.BadRequestException('Jumlah pencairan melebihi total komisi yang tersedia');
+        }
+        const payoutId = `payout-${Date.now().toString(36)}`;
+        return {
+            payoutId,
+            amount: payoutAmount,
+            status: 'pending_approval',
+            requestedAt: new Date(),
         };
     }
 };

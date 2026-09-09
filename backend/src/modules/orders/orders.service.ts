@@ -50,19 +50,46 @@ export class OrdersService {
       );
     }
 
-    // Validasi Custom Form Fields yang required
+    // Validasi Custom Form Fields
     if (event.customFormFields && event.customFormFields.length > 0) {
-      const requiredFields = event.customFormFields.filter((f) => f.required);
-      for (const reqField of requiredFields) {
-        // Cek apakah ada di level order atau di level items
-        const inOrder = dto.customFieldAnswers && dto.customFieldAnswers[reqField.id];
-        const inItems = dto.items.some(
-          (it) => it.customFieldAnswers && it.customFieldAnswers[reqField.id],
-        );
-        if (!inOrder && !inItems) {
-          throw new BadRequestException(
-            `Formulir "${reqField.label}" wajib diisi.`,
+      for (const field of event.customFormFields) {
+        const orderAns = dto.customFieldAnswers?.[field.id];
+        const itemAnswers = dto.items
+          .map((it) => it.customFieldAnswers?.[field.id])
+          .filter((a) => a !== undefined && a !== null && a !== '');
+
+        // Validasi Required
+        if (field.required) {
+          const hasOrderAns = orderAns !== undefined && orderAns !== null && orderAns !== '';
+          const hasItemAns = itemAnswers.length > 0;
+          if (!hasOrderAns && !hasItemAns) {
+            throw new BadRequestException({
+              code: 'VALIDATION_ERROR',
+              message: `Formulir "${field.label}" wajib diisi.`,
+              field: field.label,
+            });
+          }
+        }
+
+        // Validasi Dropdown options
+        if (
+          field.fieldType === 'dropdown' &&
+          Array.isArray(field.options) &&
+          field.options.length > 0
+        ) {
+          const validOptions = (field.options as string[]).map((o) => String(o));
+          const allAnswers: string[] = [orderAns, ...itemAnswers].filter(
+            (a): a is string => typeof a === 'string' && a.trim() !== '',
           );
+          for (const ans of allAnswers) {
+            if (!validOptions.includes(ans)) {
+              throw new BadRequestException({
+                code: 'VALIDATION_ERROR',
+                message: `Jawaban "${ans}" untuk field "${field.label}" tidak valid. Pilihan yang tersedia: ${validOptions.join(', ')}`,
+                field: field.label,
+              });
+            }
+          }
         }
       }
     }
@@ -237,26 +264,64 @@ export class OrdersService {
         const verifiedItemFacilities: any[] = [];
         if (item.facilities && item.facilities.length > 0) {
           for (const fac of item.facilities) {
-            const facility = await tx.eventFacility.findUnique({
-              where: { id: fac.facilityId },
-            });
-            if (facility && facility.eventId === dto.eventId) {
-              if (facility.quota !== null && facility.quota - facility.sold < fac.qty) {
-                throw new BadRequestException(`Fasilitas "${facility.name}" sudah habis.`);
+            // Pessimistic row locking pada EventFacility untuk anti-overselling
+            const facilitiesLocked = await tx.$queryRaw<any[]>`
+              SELECT id, quota, sold, name, price, "applicableTicketCategoryIds" FROM "EventFacility"
+              WHERE id = ${fac.facilityId} AND "eventId" = ${dto.eventId}
+              FOR UPDATE
+            `;
+
+            if (!facilitiesLocked || facilitiesLocked.length === 0) {
+              throw new BadRequestException(`Fasilitas dengan ID "${fac.facilityId}" tidak ditemukan pada event ini.`);
+            }
+
+            const facility = facilitiesLocked[0];
+
+            // Validasi applicableTicketCategoryIds
+            let applicableCategories = facility.applicableTicketCategoryIds;
+            if (typeof applicableCategories === 'string') {
+              try {
+                applicableCategories = JSON.parse(applicableCategories);
+              } catch {
+                applicableCategories = [];
               }
-              await tx.eventFacility.update({
-                where: { id: facility.id },
-                data: { sold: { increment: fac.qty } },
-              });
-              const cost = facility.price * fac.qty;
-              itemFacilityCost += cost;
-              verifiedItemFacilities.push({
-                facilityId: facility.id,
-                name: facility.name,
-                qty: fac.qty,
-                price: facility.price,
+            }
+
+            if (
+              Array.isArray(applicableCategories) &&
+              applicableCategories.length > 0 &&
+              !applicableCategories.includes(item.ticketCategoryId)
+            ) {
+              throw new BadRequestException({
+                code: 'FACILITY_NOT_APPLICABLE',
+                message: `Fasilitas "${facility.name}" tidak berlaku untuk kategori tiket "${ticketCategory.name}".`,
               });
             }
+
+            // Validasi kuota fasilitas
+            if (facility.quota !== null && facility.quota - facility.sold < fac.qty) {
+              throw new HttpException(
+                {
+                  code: 'FACILITY_SOLD_OUT',
+                  message: `Kuota fasilitas "${facility.name}" tidak mencukupi (sisa ${facility.quota - facility.sold}, diminta: ${fac.qty}).`,
+                },
+                HttpStatus.CONFLICT,
+              );
+            }
+
+            await tx.eventFacility.update({
+              where: { id: facility.id },
+              data: { sold: { increment: fac.qty } },
+            });
+
+            const cost = Number(facility.price) * fac.qty;
+            itemFacilityCost += cost;
+            verifiedItemFacilities.push({
+              facilityId: facility.id,
+              name: facility.name,
+              qty: fac.qty,
+              price: Number(facility.price),
+            });
           }
         }
 

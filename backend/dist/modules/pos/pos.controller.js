@@ -19,6 +19,7 @@ const pos_service_1 = require("./pos.service");
 const create_pos_transaction_dto_1 = require("./dto/create-pos-transaction.dto");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const idempotency_decorator_1 = require("../../common/decorators/idempotency.decorator");
 let PosController = class PosController {
     posService;
     constructor(posService) {
@@ -37,6 +38,7 @@ let PosController = class PosController {
 exports.PosController = PosController;
 __decorate([
     (0, common_1.Post)('transaction'),
+    (0, idempotency_decorator_1.RequireIdempotency)(),
     (0, swagger_1.ApiOperation)({ summary: 'Membuat transaksi pembelian langsung di POS (on-site)' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Transaksi POS berhasil diproses.' }),
     __param(0, (0, common_1.Param)('id')),

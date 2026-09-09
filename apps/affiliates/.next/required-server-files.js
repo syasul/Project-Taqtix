@@ -325,6 +325,7 @@ self.__SERVER_FILES_MANIFEST={
       "root": "/Users/syamsul/Documents/Coding/Project/Project-Taqtix"
     },
     "distDirRoot": ".next",
+    "supportsImmutableAssets": false,
     "_originalRedirects": [
       {
         "source": "/dashboard",
@@ -344,6 +345,8 @@ self.__SERVER_FILES_MANIFEST={
     ".next/server/functions-config-manifest.json",
     ".next/server/middleware-manifest.json",
     ".next/server/middleware-build-manifest.js",
+    ".next/server/middleware-react-loadable-manifest.js",
+    ".next/react-loadable-manifest.json",
     ".next/server/app-paths-manifest.json",
     ".next/app-path-routes-manifest.json",
     ".next/server/server-reference-manifest.js",

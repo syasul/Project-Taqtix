@@ -1,21 +1,21 @@
 1:"$Sreact.fragment"
-2:I[38252,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"ClientPageRoot"]
-3:I[60125,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js","/_next/static/chunks/0yqy0hhlyt2ok.js"],"default"]
-6:I[44101,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"OutletBoundary"]
+2:I[32463,[],"ClientPageRoot"]
+3:I[72211,["351","static/chunks/351-ee925e9094f33b0d.js","634","static/chunks/app/events/page-369b5cf82c7714bf.js"],"default"]
+6:I[26007,[],"OutletBoundary"]
 7:"$Sreact.suspense"
-b:I[44101,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"ViewportBoundary"]
-c:I[44101,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"MetadataBoundary"]
-d:I[89236,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"IconMark"]
-f:I[81869,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"default"]
-10:I[57830,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"default"]
-13:I[5423,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"default"]
-14:I[27302,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js","/_next/static/chunks/1u-izakue-iy6.js"],"default"]
-15:I[27940,["/_next/static/chunks/01jg4tp3-3fb_.js","/_next/static/chunks/1cm1jss1glol1.js"],"Toaster"]
-:HL["/_next/static/chunks/1p4t05dvabmyv.css","style"]
+b:I[26007,[],"ViewportBoundary"]
+c:I[26007,[],"MetadataBoundary"]
+d:I[10182,[],"IconMark"]
+f:I[15582,[],""]
+10:I[21748,[],""]
+13:I[54812,["351","static/chunks/351-ee925e9094f33b0d.js","419","static/chunks/419-209e8f5823efd7ea.js","574","static/chunks/574-391a0d2ddf9b015b.js","177","static/chunks/app/layout-b341356a52a0c0b8.js"],"default"]
+14:I[24258,["419","static/chunks/419-209e8f5823efd7ea.js","574","static/chunks/574-391a0d2ddf9b015b.js","345","static/chunks/app/not-found-d550494feaada5c9.js"],"default"]
+15:I[7415,["351","static/chunks/351-ee925e9094f33b0d.js","419","static/chunks/419-209e8f5823efd7ea.js","574","static/chunks/574-391a0d2ddf9b015b.js","177","static/chunks/app/layout-b341356a52a0c0b8.js"],"Toaster"]
+:HL["/_next/static/css/92e79ac8c0e29c83.css","style"]
 a:X
 12:X
 12:C
-0:{"buildId":"Fbwnv3Y6ezFjG4SH7c37m","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/_next/static/chunks/0yqy0hhlyt2ok.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":"$@9","staleTime":"$a","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$Lb",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$Lc",null,{"children":["$","$7",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"TAQtix Affiliates - Portal Mitra Afiliasi"}],["$","meta","1",{"name":"description","content":"Dashboard kemitraan affiliator penjualan tiket event TAQtix"}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","link","3",{"rel":"icon","href":"/favicon.ico"}],["$","link","4",{"rel":"icon","href":"/favicon.png","type":"image/png"}],["$","link","5",{"rel":"apple-touch-icon","href":"/apple-icon.png"}],["$","$Ld","6",{}]]}]}]}],null]}],"isPartial":"$@e","staleTime":"$a","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}]}]]}],"isPartial":"$@11","staleTime":"$a","varyParams":"$12"},{"rsc":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/1p4t05dvabmyv.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/01jg4tp3-3fb_.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/1cm1jss1glol1.js","async":true}]],["$","html",null,{"lang":"id","children":["$","body",null,{"className":"bg-slate-50 text-slate-900 min-h-screen antialiased","children":[["$","$L13",null,{"children":["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}],"notFound":[["$","$L14",null,{}],[]]}]}],["$","$L15",null,{"richColors":true,"position":"top-right"}]]}]}]]}],"isPartial":"$@16","staleTime":"$a","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@17","rootVaryParams":null,"needsRuntimeRequest":"$@18"}
+0:{"buildId":"BYyVZwGgbfkNRe--TwfGb","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],null,["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":"$@9","staleTime":"$a","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$Lb",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$Lc",null,{"children":["$","$7",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"TAQtix Affiliates - Portal Mitra Afiliasi"}],["$","meta","1",{"name":"description","content":"Dashboard kemitraan affiliator penjualan tiket event TAQtix"}],["$","link","2",{"rel":"icon","href":"/favicon.ico?603d046c9a6fdfbb","type":"image/x-icon","sizes":"16x16"}],["$","link","3",{"rel":"icon","href":"/favicon.ico"}],["$","link","4",{"rel":"icon","href":"/favicon.png","type":"image/png"}],["$","link","5",{"rel":"apple-touch-icon","href":"/apple-icon.png"}],["$","$Ld","6",{}]]}]}]}],null]}],"isPartial":"$@e","staleTime":"$a","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}]}]]}],"isPartial":"$@11","staleTime":"$a","varyParams":"$12"},{"rsc":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/92e79ac8c0e29c83.css","precedence":"next"}]],["$","html",null,{"lang":"id","children":["$","body",null,{"className":"bg-slate-50 text-slate-900 min-h-screen antialiased","children":[["$","$L13",null,{"children":["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}],"notFound":[["$","$L14",null,{}],[]]}]}],["$","$L15",null,{"richColors":true,"position":"top-right"}]]}]}]]}],"isPartial":"$@16","staleTime":"$a","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@17","rootVaryParams":null,"needsRuntimeRequest":"$@18"}
 4:{}
 5:"$0:data:0:rsc:props:children:0:props:serverProvidedParams:params"
 8:null

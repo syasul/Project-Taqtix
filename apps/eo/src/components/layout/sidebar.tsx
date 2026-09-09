@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/use-auth';
 import { useOrganizerRole } from '../../hooks/use-organizer-role';
 import { cn } from '@/lib/utils';
@@ -35,6 +36,8 @@ import {
   Building2,
   CreditCard,
   SlidersHorizontal,
+  LogOut,
+  X,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,8 +47,15 @@ interface SidebarProps {
 
 export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const pathname = usePathname() || '';
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, logout } = useAuth();
   const { role, can, isOwner } = useOrganizerRole();
+
+  const handleLogout = () => {
+    if (onItemClick) onItemClick();
+    logout();
+    router.push('/login');
+  };
 
   const isOrganizer = user?.role === 'organizer' || user?.role === 'organizer_member';
   const isPartner = user?.role === 'partner';
@@ -106,119 +116,164 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const inactiveLinkClass = 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium';
 
   return (
-    <aside className={cn('w-64 border-r border-slate-200 bg-white flex flex-col shrink-0', className)}>
-      {/* Header Sidebar / Context Header */}
-      {isEventScope ? (
-        <div className="p-4 border-b border-slate-100 bg-slate-50/70">
-          <Link
-            href="/dashboard/events"
-            onClick={onItemClick}
-            className="flex items-center gap-2 text-xs font-bold text-[#08B4B5] hover:text-[#079b9c] transition py-2 px-3 rounded-xl bg-white border border-slate-200 shadow-xs w-full mb-2.5"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Kembali ke Daftar Event</span>
-          </Link>
-          <div className="flex items-center gap-2 px-1">
-            <div className="h-2 w-2 rounded-full bg-[#08B4B5]" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
-              Event Workspace
+    <aside className={cn('w-64 border-r border-slate-200 bg-white flex flex-col justify-between shrink-0 h-full', className)}>
+      <div className="flex flex-col flex-1 min-h-0">
+        {/* 1. Logo & Portal Title (Centered, consistent with Admin & Affiliates) */}
+        <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between relative shrink-0">
+          <div className="w-full flex flex-col items-center justify-center text-center gap-1">
+            <Link
+              href="/dashboard"
+              onClick={onItemClick}
+              className="inline-flex justify-center items-center"
+            >
+              <Image
+                src="/logo.png"
+                alt="TAQtix Logo"
+                width={120}
+                height={34}
+                className="h-7 w-auto object-contain mx-auto"
+                priority
+              />
+            </Link>
+            <span className="text-[9px] text-[#08B4B5] font-mono tracking-widest font-bold uppercase text-center">
+              Organizer Platform
             </span>
           </div>
+          {onItemClick && (
+            <button
+              onClick={onItemClick}
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer md:hidden absolute right-4 top-6"
+              aria-label="Tutup Menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
-      ) : (
-        <div className="p-5 border-b border-slate-100">
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-[#08B4B5]/10 border border-[#08B4B5]/20 flex items-center justify-center shrink-0">
-              <Users className="h-5 w-5 text-[#08B4B5]" />
-            </div>
-            <div className="overflow-hidden">
-              <h4 className="text-sm font-bold text-slate-900 truncate">
-                {user?.email?.split('@')[0] || 'Organizer'}
-              </h4>
-              <span className="text-[10px] font-bold text-[#08B4B5] uppercase tracking-wider bg-[#08B4B5]/10 px-2 py-0.5 rounded-full border border-[#08B4B5]/20 mt-1 inline-block">
-                {role.toUpperCase()}
+
+        {/* 2. Event Context Header (if in specific event scope) */}
+        {isEventScope && (
+          <div className="p-3.5 border-b border-slate-100 bg-slate-50/70 shrink-0">
+            <Link
+              href="/dashboard/events"
+              onClick={onItemClick}
+              className="flex items-center gap-2 text-xs font-bold text-[#08B4B5] hover:text-[#079b9c] transition py-2 px-3 rounded-xl bg-white border border-slate-200 shadow-2xs w-full mb-2"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Kembali ke Daftar Event</span>
+            </Link>
+            <div className="flex items-center gap-2 px-1">
+              <div className="h-2 w-2 rounded-full bg-[#08B4B5] animate-pulse" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                Event Workspace
               </span>
             </div>
           </div>
+        )}
+
+        {/* 3. Navigation Links */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto min-h-0">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
+            {isEventScope ? 'Fitur Event' : 'Menu Organisasi'}
+          </span>
+
+          {/* Level Event */}
+          {isEventScope &&
+            eventLinks
+              .filter((link) => !link.resource || can(link.resource))
+              .map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={onItemClick}
+                    className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
+                      isActive ? activeLinkClass : inactiveLinkClass
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
+                    <span className="truncate">{link.label}</span>
+                  </Link>
+                );
+              })}
+
+          {/* Level Organisasi */}
+          {!isEventScope &&
+            isOrganizer &&
+            organizationLinks
+              .filter((link) => !link.resource || can(link.resource))
+              .map((link) => {
+                const Icon = link.icon;
+                const isActive =
+                  pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={onItemClick}
+                    className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
+                      isActive ? activeLinkClass : inactiveLinkClass
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
+                    <span className="truncate">{link.label}</span>
+                  </Link>
+                );
+              })}
+
+          {/* Level Partner */}
+          {isPartner &&
+            partnerLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={onItemClick}
+                  className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
+                    isActive ? activeLinkClass : inactiveLinkClass
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
+                  <span className="truncate">{link.label}</span>
+                </Link>
+              );
+            })}
+        </nav>
+      </div>
+
+      {/* 4. User Profile Footer & Logout (Consistent with Affiliates & Admin) */}
+      <div className="p-3 border-t border-slate-100 bg-slate-50/60 shrink-0 space-y-2">
+        <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-xl border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-[#08B4B5]/10 text-[#08B4B5] border border-[#08B4B5]/20 flex items-center justify-center font-bold text-xs shrink-0 uppercase">
+              {user?.email ? user.email[0] : 'O'}
+            </div>
+            <div className="truncate">
+              <p className="font-bold text-slate-900 text-xs truncate">
+                {user?.email?.split('@')[0] || 'Organizer'}
+              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[9px] font-bold text-[#08B4B5] uppercase font-mono tracking-wider bg-[#08B4B5]/10 px-1.5 py-0.2 rounded border border-[#08B4B5]/20">
+                  {role || 'OWNER'}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            title="Keluar / Logout"
+            aria-label="Logout"
+            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition shrink-0 cursor-pointer border border-transparent hover:border-rose-200"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
-      )}
-
-      {/* Tautan Navigasi */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
-          {isEventScope ? 'Fitur Event' : 'Menu Organisasi'}
-        </span>
-
-        {/* Level Event */}
-        {isEventScope &&
-          eventLinks
-            .filter((link) => !link.resource || can(link.resource))
-            .map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={onItemClick}
-                  className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
-                    isActive ? activeLinkClass : inactiveLinkClass
-                  }`}
-                >
-                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
-                  <span className="truncate">{link.label}</span>
-                </Link>
-              );
-            })}
-
-        {/* Level Organisasi */}
-        {!isEventScope &&
-          isOrganizer &&
-          organizationLinks
-            .filter((link) => !link.resource || can(link.resource))
-            .map((link) => {
-              const Icon = link.icon;
-              const isActive =
-                pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={onItemClick}
-                  className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
-                    isActive ? activeLinkClass : inactiveLinkClass
-                  }`}
-                >
-                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
-                  <span className="truncate">{link.label}</span>
-                </Link>
-              );
-            })}
-
-        {/* Level Partner */}
-        {isPartner &&
-          partnerLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={onItemClick}
-                className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
-                  isActive ? activeLinkClass : inactiveLinkClass
-                }`}
-              >
-                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
-                <span className="truncate">{link.label}</span>
-              </Link>
-            );
-          })}
-      </nav>
-
-      {/* Footer Sidebar */}
-      <div className="p-4 border-t border-slate-100 text-center">
-        <p className="text-[10px] text-slate-400 font-mono font-medium">TAQtix v2.0 • Professional EO</p>
+        <p className="text-[10px] text-slate-400 font-mono font-medium text-center">
+          TAQtix v2.0 • Professional EO
+        </p>
       </div>
     </aside>
   );

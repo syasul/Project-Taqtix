@@ -1,13 +1,13 @@
 var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/events/page.js")
-R.c("server/chunks/ssr/[root-of-the-server]__1bk51yz._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__1v6geft._.js")
 R.c("server/chunks/ssr/111d_next_dist_1s2lbqb._.js")
 R.c("server/chunks/ssr/[root-of-the-server]__0is6d1l._.js")
 R.c("server/chunks/ssr/[root-of-the-server]__0avsl9m._.js")
 R.c("server/chunks/ssr/_0y_33ta._.js")
-R.c("server/chunks/ssr/111d_next_dist_client_components_12vi7fn._.js")
-R.c("server/chunks/ssr/111d_next_dist_client_components_builtin_forbidden_00cr5qx.js")
+R.c("server/chunks/ssr/apps_affiliates_src_app_not-found_tsx_0xjzs82._.js")
+R.c("server/chunks/ssr/111d_next_dist_client_components_20iaksd._.js")
 R.c("server/chunks/ssr/111d_next_dist_client_components_builtin_unauthorized_0o1hvu7.js")
 R.c("server/chunks/ssr/111d_next_dist_client_components_builtin_global-error_0dbyhg6.js")
 R.c("server/chunks/ssr/apps_affiliates__next-internal_server_app_events_page_actions_066u0fd.js")
-R.m(75172)
-module.exports=R.m(75172).exports
+R.m(55723)
+module.exports=R.m(55723).exports

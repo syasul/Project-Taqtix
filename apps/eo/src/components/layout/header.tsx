@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import { LogOut, LayoutDashboard, Menu } from 'lucide-react';
+import { LogOut, LayoutDashboard } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -14,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export default function Header() {
   const router = useRouter();
@@ -26,56 +25,38 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+          {/* Logo & Portal Branding */}
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="flex items-center space-x-2">
               <Image
                 src="/logo.png"
                 alt="TAQtix Logo"
                 width={120}
                 height={34}
-                className="h-8 w-auto object-contain"
+                className="h-7 w-auto object-contain"
                 priority
               />
             </Link>
+            <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest text-[#08B4B5] font-mono bg-[#08B4B5]/10 px-2 py-0.5 rounded border border-[#08B4B5]/20">
+              Organizer Portal
+            </span>
           </div>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-xs font-bold text-slate-600 hover:text-[#08B4B5] transition">
-              Discovery
-            </Link>
-            <Link href="/about" className="text-xs font-bold text-slate-600 hover:text-[#08B4B5] transition">
-              About
-            </Link>
-            <Link href="/help" className="text-xs font-bold text-slate-600 hover:text-[#08B4B5] transition">
-              Help Center
-            </Link>
-            <Link href="/contact" className="text-xs font-bold text-slate-600 hover:text-[#08B4B5] transition">
-              Contact
-            </Link>
-            {user && (
-              <Link href="/dashboard" className="text-xs font-bold text-slate-600 hover:text-[#08B4B5] transition">
-                Dashboard
-              </Link>
-            )}
-          </nav>
-
           {/* User Account & Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="flex items-center space-x-4">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger
                   className={cn(
                     buttonVariants({ variant: 'ghost' }),
-                    'relative h-10 w-10 rounded-full border border-slate-200 hover:bg-slate-50 bg-slate-50 p-0 overflow-hidden cursor-pointer'
+                    'relative h-9 w-9 rounded-full border border-slate-200 hover:bg-slate-50 bg-slate-50 p-0 overflow-hidden cursor-pointer'
                   )}
                 >
                   <span className="text-xs font-bold text-[#08B4B5] uppercase">
-                    {user.email[0]}
+                    {user.email ? user.email[0] : 'O'}
                   </span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 bg-white border-slate-200 text-slate-800" align="end">
@@ -112,100 +93,8 @@ export default function Header() {
                 >
                   Masuk
                 </Link>
-                <Link
-                  href="/register"
-                  className={cn(
-                    buttonVariants({ variant: 'default' }),
-                    'bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold cursor-pointer rounded-xl text-xs shadow-sm border-0'
-                  )}
-                >
-                  Daftar
-                </Link>
               </div>
             )}
-          </div>
-
-          {/* Mobile Hamburger Menu */}
-          <div className="flex md:hidden">
-            <Sheet>
-              <SheetTrigger
-                className={cn(buttonVariants({ variant: 'ghost' }), 'p-2 text-slate-600 hover:text-slate-900')}
-              >
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Buka Menu</span>
-              </SheetTrigger>
-              <SheetContent side="right" className="bg-white border-slate-200">
-                <SheetHeader>
-                  <SheetTitle className="text-left font-bold text-slate-900 text-sm">Navigasi</SheetTitle>
-                </SheetHeader>
-                <div className="mt-6 flex flex-col space-y-4">
-                  <Link href="/" className="text-sm font-semibold text-slate-700 hover:text-[#08B4B5] transition">
-                    Discovery
-                  </Link>
-                  <Link href="/about" className="text-sm font-semibold text-slate-700 hover:text-[#08B4B5] transition">
-                    About
-                  </Link>
-                  <Link href="/help" className="text-sm font-semibold text-slate-700 hover:text-[#08B4B5] transition">
-                    Help Center
-                  </Link>
-                  <Link href="/contact" className="text-sm font-semibold text-slate-700 hover:text-[#08B4B5] transition">
-                    Contact
-                  </Link>
-
-                  <div className="border-t border-slate-100 pt-4 mt-2">
-                    {user ? (
-                      <div className="space-y-3">
-                        <div className="px-2">
-                          <p className="text-xs font-bold text-slate-900">{user.email}</p>
-                          <p className="text-[10px] text-slate-400 capitalize">{user.role}</p>
-                        </div>
-                        <Link
-                          href="/dashboard"
-                          className={cn(
-                            buttonVariants({ variant: 'outline' }),
-                            'w-full justify-start text-slate-700 text-xs font-semibold'
-                          )}
-                        >
-                          <LayoutDashboard className="mr-2 h-4 w-4 text-[#08B4B5]" />
-                          Dashboard
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className={cn(
-                            buttonVariants({ variant: 'ghost' }),
-                            'w-full justify-start text-rose-600 hover:bg-rose-50 text-xs font-semibold cursor-pointer'
-                          )}
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Logout
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col space-y-2">
-                        <Link
-                          href="/login"
-                          className={cn(
-                            buttonVariants({ variant: 'outline' }),
-                            'w-full justify-center text-slate-700 text-xs font-bold'
-                          )}
-                        >
-                          Masuk
-                        </Link>
-                        <Link
-                          href="/register"
-                          className={cn(
-                            buttonVariants({ variant: 'default' }),
-                            'w-full justify-center bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold text-xs rounded-xl shadow-sm border-0'
-                          )}
-                        >
-                          Daftar
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </div>

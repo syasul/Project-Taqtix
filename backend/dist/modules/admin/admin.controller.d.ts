@@ -207,6 +207,8 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            bankName: string | null;
+            bankAccountNumber: string | null;
             uniqueCode: string;
             eventId: string;
             commissionType: string;
@@ -215,6 +217,8 @@ export declare class AdminController {
             conversions: number;
             revenueGenerated: number;
             commissionEarned: number;
+            idCardNumber: string | null;
+            bankAccountName: string | null;
         })[];
     }>;
     createPartner(dto: CreatePartnerDto): Promise<{
@@ -233,6 +237,8 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            bankName: string | null;
+            bankAccountNumber: string | null;
             uniqueCode: string;
             eventId: string;
             commissionType: string;
@@ -241,6 +247,8 @@ export declare class AdminController {
             conversions: number;
             revenueGenerated: number;
             commissionEarned: number;
+            idCardNumber: string | null;
+            bankAccountName: string | null;
         };
     }>;
     updatePartner(id: string, dto: UpdatePartnerDto): Promise<{
@@ -259,6 +267,8 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            bankName: string | null;
+            bankAccountNumber: string | null;
             uniqueCode: string;
             eventId: string;
             commissionType: string;
@@ -267,6 +277,8 @@ export declare class AdminController {
             conversions: number;
             revenueGenerated: number;
             commissionEarned: number;
+            idCardNumber: string | null;
+            bankAccountName: string | null;
         };
     }>;
     deletePartner(id: string): Promise<{

@@ -82,6 +82,10 @@ export declare class AdminService {
         commissionValue?: number;
         email?: string;
         password?: string;
+        idCardNumber?: string;
+        bankName?: string;
+        bankAccountNumber?: string;
+        bankAccountName?: string;
     }): Promise<{
         event: {
             title: string;
@@ -96,6 +100,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -104,6 +110,8 @@ export declare class AdminService {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }>;
     updatePartner(partnerId: string, dto: {
         name?: string;
@@ -114,6 +122,10 @@ export declare class AdminService {
         commissionType?: string;
         commissionValue?: number;
         email?: string;
+        idCardNumber?: string;
+        bankName?: string;
+        bankAccountNumber?: string;
+        bankAccountName?: string;
     }): Promise<{
         event: {
             title: string;
@@ -128,6 +140,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -136,6 +150,8 @@ export declare class AdminService {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }>;
     deletePartner(id: string): Promise<{
         id: string;
@@ -219,6 +235,8 @@ export declare class AdminService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -227,6 +245,8 @@ export declare class AdminService {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     })[]>;
     getEvents(): Promise<{
         id: string;

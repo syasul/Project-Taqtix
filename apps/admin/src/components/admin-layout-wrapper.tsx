@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { ShieldCheck, LogOut, Menu, X } from 'lucide-react';
 import SidebarNav from './sidebar-nav';
 
@@ -15,6 +16,24 @@ export default function AdminLayoutWrapper({
   email,
 }: AdminLayoutWrapperProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const pageTitles: Record<string, string> = {
+        '/': 'Dashboard — TAQtix Admin',
+        '/events': 'Manajemen Event — TAQtix Admin',
+        '/orders': 'Manajemen Pesanan — TAQtix Admin',
+        '/banners': 'Banner Promo — TAQtix Admin',
+        '/organizers': 'Daftar Organizer — TAQtix Admin',
+        '/partners': 'Mitra Afiliasi — TAQtix Admin',
+        '/settlements': 'Settlement Dana — TAQtix Admin',
+        '/billing': 'Billing & Invoice — TAQtix Admin',
+        '/audit-log': 'Audit Log — TAQtix Admin',
+      };
+      document.title = pageTitles[pathname] || 'TAQtix Admin Console';
+    }
+  }, [pathname]);
 
   const sidebarContent = (isMobile: boolean) => (
     <>

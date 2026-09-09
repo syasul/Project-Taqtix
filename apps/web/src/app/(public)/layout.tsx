@@ -128,7 +128,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <Link href="/help" className="hover:text-[#08ADAE] transition">Syarat & Ketentuan</Link>
               <Link href="/help" className="hover:text-[#08ADAE] transition">Kebijakan Privasi</Link>
               <span className="text-slate-300">•</span>
-              <span className="text-[#08ADAE] font-semibold">Taqtix Ticketing Suite</span>
+              <span className="text-[#08ADAE] font-semibold">TAQtix Ticketing Suite</span>
             </div>
           </div>
         </div>

@@ -170,6 +170,10 @@ export class AdminService {
     commissionValue?: number;
     email?: string;
     password?: string;
+    idCardNumber?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+    bankAccountName?: string;
   }) {
     let passwordHash = undefined;
     if (dto.password) {
@@ -187,6 +191,10 @@ export class AdminService {
         commissionValue: dto.commissionValue ?? 10.0,
         email: dto.email || null,
         passwordHash,
+        idCardNumber: dto.idCardNumber || null,
+        bankName: dto.bankName || null,
+        bankAccountNumber: dto.bankAccountNumber || null,
+        bankAccountName: dto.bankAccountName || null,
       },
       include: {
         event: {
@@ -212,6 +220,10 @@ export class AdminService {
       commissionType?: string;
       commissionValue?: number;
       email?: string;
+      idCardNumber?: string;
+      bankName?: string;
+      bankAccountNumber?: string;
+      bankAccountName?: string;
     },
   ) {
     const partner = await this.prisma.partner.findUnique({
@@ -232,6 +244,10 @@ export class AdminService {
         commissionType: dto.commissionType ?? partner.commissionType,
         commissionValue: dto.commissionValue ?? partner.commissionValue,
         email: dto.email ?? partner.email,
+        idCardNumber: dto.idCardNumber !== undefined ? dto.idCardNumber : partner.idCardNumber,
+        bankName: dto.bankName !== undefined ? dto.bankName : partner.bankName,
+        bankAccountNumber: dto.bankAccountNumber !== undefined ? dto.bankAccountNumber : partner.bankAccountNumber,
+        bankAccountName: dto.bankAccountName !== undefined ? dto.bankAccountName : partner.bankAccountName,
       },
       include: {
         event: {

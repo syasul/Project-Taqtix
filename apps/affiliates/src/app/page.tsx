@@ -60,7 +60,7 @@ export default function AffiliateDashboardOverviewPage() {
       <div className="p-5 sm:p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white rounded-3xl shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="relative z-10 space-y-2 max-w-xl">
           <span className="px-3 py-1 bg-[#08B4B5]/20 border border-[#08B4B5]/40 text-[#08B4B5] rounded-full text-xs font-bold uppercase tracking-wider inline-block">
-            Dashboard Mitra Afiliasi Taqtix
+            Dashboard Mitra Afiliasi TAQtix
           </span>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
             Selamat Datang, Syamsul Ma’arif!

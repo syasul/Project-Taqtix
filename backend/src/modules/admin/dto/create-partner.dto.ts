@@ -63,4 +63,24 @@ export class CreatePartnerDto {
   @MinLength(6, { message: 'Password minimal 6 karakter' })
   @IsOptional()
   password?: string;
+
+  @ApiPropertyOptional({ example: '3201234567890001', description: 'Nomor KTP / NIK partner' })
+  @IsString()
+  @IsOptional()
+  idCardNumber?: string;
+
+  @ApiPropertyOptional({ example: 'BCA', description: 'Nama Bank pencairan komisi' })
+  @IsString()
+  @IsOptional()
+  bankName?: string;
+
+  @ApiPropertyOptional({ example: '8820192831', description: 'Nomor Rekening bank' })
+  @IsString()
+  @IsOptional()
+  bankAccountNumber?: string;
+
+  @ApiPropertyOptional({ example: 'Budi Santoso', description: 'Nama pemilik rekening bank' })
+  @IsString()
+  @IsOptional()
+  bankAccountName?: string;
 }

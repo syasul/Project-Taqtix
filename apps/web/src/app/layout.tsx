@@ -10,7 +10,10 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "TAQtix — Event Growth Infrastructure",
+  title: {
+    default: "TAQtix — Event Growth Infrastructure",
+    template: "%s | TAQtix",
+  },
   description: "Sell Tickets. Build Audience. Grow Events.",
   icons: {
     icon: [

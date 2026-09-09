@@ -179,6 +179,10 @@ let AdminService = class AdminService {
                 commissionValue: dto.commissionValue ?? 10.0,
                 email: dto.email || null,
                 passwordHash,
+                idCardNumber: dto.idCardNumber || null,
+                bankName: dto.bankName || null,
+                bankAccountNumber: dto.bankAccountNumber || null,
+                bankAccountName: dto.bankAccountName || null,
             },
             include: {
                 event: {
@@ -207,6 +211,10 @@ let AdminService = class AdminService {
                 commissionType: dto.commissionType ?? partner.commissionType,
                 commissionValue: dto.commissionValue ?? partner.commissionValue,
                 email: dto.email ?? partner.email,
+                idCardNumber: dto.idCardNumber !== undefined ? dto.idCardNumber : partner.idCardNumber,
+                bankName: dto.bankName !== undefined ? dto.bankName : partner.bankName,
+                bankAccountNumber: dto.bankAccountNumber !== undefined ? dto.bankAccountNumber : partner.bankAccountNumber,
+                bankAccountName: dto.bankAccountName !== undefined ? dto.bankAccountName : partner.bankAccountName,
             },
             include: {
                 event: {

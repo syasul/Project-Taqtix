@@ -45,7 +45,7 @@ export default function AffiliatePromosManagementPage() {
             Manajemen Kode Promo Afiliasi
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm mt-1">
-            Lihat semua kode promo yang Anda miliki di platform Taqtix beserta data penjualan tiket dan komisi yang dihasilkan.
+            Lihat semua kode promo yang Anda miliki di platform TAQtix beserta data penjualan tiket dan komisi yang dihasilkan.
           </p>
         </div>
 

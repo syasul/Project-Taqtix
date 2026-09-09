@@ -10,7 +10,10 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "TAQtix Event Partner Portal",
+  title: {
+    default: "TAQtix Event Partner Portal",
+    template: "%s | TAQtix Partner",
+  },
   description: "Manage events, tickets, audiences, and growth for TAQtix organizers.",
   icons: {
     icon: [

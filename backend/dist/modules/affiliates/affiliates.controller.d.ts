@@ -18,6 +18,8 @@ export declare class AffiliatesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -26,6 +28,8 @@ export declare class AffiliatesController {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }>;
     getAffiliates(eventId: string, userId: string): Promise<{
         promoCode: string | null;
@@ -37,6 +41,8 @@ export declare class AffiliatesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -45,6 +51,8 @@ export declare class AffiliatesController {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }[]>;
     getLeaderboard(eventId: string, userId: string): Promise<{
         promoCode: string | null;
@@ -56,6 +64,8 @@ export declare class AffiliatesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -64,6 +74,8 @@ export declare class AffiliatesController {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }[]>;
     requestMagicLink(email: string): Promise<{
         success: boolean;

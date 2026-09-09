@@ -29,7 +29,7 @@ import {
   AtSign,
   HeartPulse,
 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import EventTabs from '@/components/layout/event-tabs';
@@ -299,8 +299,11 @@ export default function CustomFieldsPage() {
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Plus className="w-5 h-5 text-[#08B4B5]" />
-                Buat Formulir Baru
+                Buat Formulir Kustom Baru
               </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500">
+                Formulir ini akan ditampilkan kepada calon peserta saat memesan tiket di halaman checkout.
+              </DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleCreateManual} className="space-y-4 pt-2 text-xs">
@@ -474,19 +477,63 @@ export default function CustomFieldsPage() {
               </div>
             );
           })}
+
+          {/* 10. Kartu Tombol + Tambah Form Kustom Sendiri */}
+          <div
+            onClick={() => setIsOpen(true)}
+            className="p-3.5 rounded-xl border-2 border-dashed border-teal-300 hover:border-[#08B4B5] bg-gradient-to-br from-teal-50/50 via-white to-teal-50/30 hover:from-teal-50 hover:to-teal-100/40 cursor-pointer transition-all duration-200 flex flex-col justify-between group shadow-xs hover:shadow-sm"
+          >
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-[#08B4B5] text-white shadow-xs group-hover:scale-105 group-hover:bg-[#079b9c] transition-all">
+                    <Plus className="w-4 h-4 stroke-[3]" />
+                  </div>
+                  <span className="font-bold text-slate-900 text-xs group-hover:text-[#08B4B5] transition-colors">
+                    + Tambah Form Kustom
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-teal-100 text-teal-800 border border-teal-200">
+                  Custom
+                </span>
+              </div>
+
+              <p className="text-[11px] text-slate-500 mt-2 leading-snug">
+                Butuh data spesifik? Klik tombol ini untuk membuat pertanyaan atau formulir kustom Anda sendiri.
+              </p>
+            </div>
+
+            <div className="mt-3 pt-2 border-t border-teal-100 flex items-center justify-between text-[10px]">
+              <span className="font-semibold text-teal-700 group-hover:underline">
+                Buat pertanyaan baru
+              </span>
+              <span className="font-bold text-[#08B4B5] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                <Plus className="w-3.5 h-3.5" /> Buka Form
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* 2. DAFTAR FORMULIR YANG SEDANG AKTIF */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <ClipboardList className="w-5 h-5 text-[#08B4B5]" />
             <h2 className="text-base font-bold text-slate-900">Formulir Aktif pada Tiket ({fields.length})</h2>
           </div>
-          <span className="text-xs text-slate-400 font-semibold">
-            Urutan pertanyaan saat checkout
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsOpen(true)}
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#08B4B5] hover:text-[#079b9c] bg-teal-50 hover:bg-teal-100 border border-teal-200 px-2.5 py-1 rounded-lg cursor-pointer transition shadow-2xs"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Tambah Form Kustom</span>
+            </button>
+            <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
+              • Urutan checkout
+            </span>
+          </div>
         </div>
 
         {loading ? (
@@ -494,9 +541,16 @@ export default function CustomFieldsPage() {
             <Loader2 className="h-6 w-6 text-[#08B4B5] animate-spin" />
           </div>
         ) : fields.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 text-xs bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-2">
+          <div className="text-center py-12 text-slate-400 text-xs bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-3">
             <p className="font-semibold text-slate-600">Belum ada formulir tambahan yang aktif.</p>
-            <p>Aktifkan preset di atas atau klik "Tambah Pertanyaan Kustom".</p>
+            <p>Aktifkan template preset di atas atau buat formulir kustom baru.</p>
+            <Button
+              onClick={() => setIsOpen(true)}
+              className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-sm mx-auto"
+            >
+              <Plus className="h-4 w-4" />
+              <span>+ Tambah Formulir Kustom</span>
+            </Button>
           </div>
         ) : (
           <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">

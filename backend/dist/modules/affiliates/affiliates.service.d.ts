@@ -18,6 +18,8 @@ export declare class AffiliatesService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -26,6 +28,8 @@ export declare class AffiliatesService {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }>;
     registerClickAndGetUrl(code: string, ipAddress?: string, userAgent?: string): Promise<string>;
     findAll(eventId: string, organizerUserId: string): Promise<{
@@ -38,6 +42,8 @@ export declare class AffiliatesService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -46,6 +52,8 @@ export declare class AffiliatesService {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }[]>;
     getLeaderboard(eventId: string, organizerUserId: string): Promise<{
         promoCode: string | null;
@@ -57,6 +65,8 @@ export declare class AffiliatesService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        bankName: string | null;
+        bankAccountNumber: string | null;
         uniqueCode: string;
         eventId: string;
         commissionType: string;
@@ -65,6 +75,8 @@ export declare class AffiliatesService {
         conversions: number;
         revenueGenerated: number;
         commissionEarned: number;
+        idCardNumber: string | null;
+        bankAccountName: string | null;
     }[]>;
     requestMagicLink(email: string): Promise<{
         success: boolean;

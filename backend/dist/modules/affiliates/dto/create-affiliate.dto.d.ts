@@ -5,4 +5,8 @@ export declare class CreateAffiliateDto {
     type: PartnerType;
     commissionPct?: number;
     promoCode?: string;
+    idCardNumber?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+    bankAccountName?: string;
 }

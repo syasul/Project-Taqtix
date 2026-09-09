@@ -296,6 +296,10 @@ model Partner {
   email            String?     @unique
   passwordHash     String?
   lastLoginAt      DateTime?
+  idCardNumber     String?     // Nomor KTP / NIK
+  bankName         String?     // Nama Bank (BCA, Mandiri, BRI, BNI, dll)
+  bankAccountNumber String?    // Nomor Rekening (Norek)
+  bankAccountName  String?     // Nama Pemilik Rekening
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 

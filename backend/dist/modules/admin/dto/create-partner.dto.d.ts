@@ -8,4 +8,8 @@ export declare class CreatePartnerDto {
     commissionValue?: number;
     email?: string;
     password?: string;
+    idCardNumber?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+    bankAccountName?: string;
 }

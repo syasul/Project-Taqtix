@@ -55,4 +55,40 @@ export class CreateAffiliateDto {
   @IsString()
   @IsOptional()
   promoCode?: string;
+
+  @ApiProperty({
+    example: '3201234567890001',
+    required: false,
+    description: 'Nomor KTP / NIK identitas partner',
+  })
+  @IsString()
+  @IsOptional()
+  idCardNumber?: string;
+
+  @ApiProperty({
+    example: 'BCA',
+    required: false,
+    description: 'Nama Bank pencairan komisi',
+  })
+  @IsString()
+  @IsOptional()
+  bankName?: string;
+
+  @ApiProperty({
+    example: '8820192831',
+    required: false,
+    description: 'Nomor Rekening bank pencairan komisi',
+  })
+  @IsString()
+  @IsOptional()
+  bankAccountNumber?: string;
+
+  @ApiProperty({
+    example: 'Budi Santoso',
+    required: false,
+    description: 'Nama pemilik rekening bank pencairan komisi',
+  })
+  @IsString()
+  @IsOptional()
+  bankAccountName?: string;
 }

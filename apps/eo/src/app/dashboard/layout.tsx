@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import Sidebar from '@/components/layout/sidebar';
 import { Loader2, ShieldAlert, Menu, LogOut } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname() || '';
   const { user, accessToken, logout } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -16,6 +17,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const pageTitles: Record<string, string> = {
+        '/dashboard': 'Ringkasan Eksekutif — TAQtix Partner',
+        '/dashboard/events': 'Daftar Event — TAQtix Partner',
+        '/dashboard/events/new': 'Buat Event Baru — TAQtix Partner',
+        '/dashboard/settings/team': 'Staff (Team Access) — TAQtix Partner',
+        '/dashboard/vouchers': 'Voucher & Promo — TAQtix Partner',
+        '/dashboard/cash': 'Kas Organisasi — TAQtix Partner',
+        '/dashboard/recap': 'Rekap Data — TAQtix Partner',
+        '/dashboard/settings/password': 'Ubah Password — TAQtix Partner',
+        '/dashboard/settings/tokens': 'Token Generator — TAQtix Partner',
+        '/dashboard/guide': 'Panduan Penggunaan — TAQtix Partner',
+        '/dashboard/settings/organization': 'Profil Organisasi — TAQtix Partner',
+        '/dashboard/settings/payment': 'Rekening Settlement — TAQtix Partner',
+        '/dashboard/settings/integrations': 'Integrasi Pixel — TAQtix Partner',
+      };
+
+      if (pageTitles[pathname]) {
+        document.title = pageTitles[pathname];
+      } else if (pathname.startsWith('/dashboard/events/')) {
+        document.title = 'Event Workspace — TAQtix Partner';
+      } else {
+        document.title = 'TAQtix Event Partner Portal';
+      }
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (isClient && !accessToken) {

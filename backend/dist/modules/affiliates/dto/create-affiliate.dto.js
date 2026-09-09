@@ -19,6 +19,10 @@ class CreateAffiliateDto {
     type;
     commissionPct;
     promoCode;
+    idCardNumber;
+    bankName;
+    bankAccountNumber;
+    bankAccountName;
 }
 exports.CreateAffiliateDto = CreateAffiliateDto;
 __decorate([
@@ -71,4 +75,44 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateAffiliateDto.prototype, "promoCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '3201234567890001',
+        required: false,
+        description: 'Nomor KTP / NIK identitas partner',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAffiliateDto.prototype, "idCardNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'BCA',
+        required: false,
+        description: 'Nama Bank pencairan komisi',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAffiliateDto.prototype, "bankName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '8820192831',
+        required: false,
+        description: 'Nomor Rekening bank pencairan komisi',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAffiliateDto.prototype, "bankAccountNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Budi Santoso',
+        required: false,
+        description: 'Nama pemilik rekening bank pencairan komisi',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAffiliateDto.prototype, "bankAccountName", void 0);
 //# sourceMappingURL=create-affiliate.dto.js.map

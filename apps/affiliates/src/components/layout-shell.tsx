@@ -21,6 +21,19 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const pageTitles: Record<string, string> = {
+        '/': 'Dashboard Overview — TAQtix Affiliates',
+        '/events': 'Event & Kode Promo — TAQtix Affiliates',
+        '/payouts': 'Pencairan Komisi — TAQtix Affiliates',
+        '/promos': 'Manajemen Promo — TAQtix Affiliates',
+        '/login': 'Login Mitra — TAQtix Affiliates',
+      };
+      document.title = pageTitles[pathname] || 'TAQtix Affiliates - Portal Mitra Afiliasi';
+    }
+  }, [pathname]);
+
   const handleLogout = () => {
     setIsSidebarOpen(false);
     localStorage.removeItem('affiliate_auth_token');

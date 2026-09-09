@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Loader2, Plus, Copy, Link as LinkIcon, HeartHandshake, Percent, TrendingUp, Trophy } from 'lucide-react';
+import { ArrowLeft, Loader2, Plus, Copy, Link as LinkIcon, HeartHandshake, Percent, TrendingUp, Trophy, IdCard, CreditCard } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +26,10 @@ const partnerSchema = z.object({
   }),
   commissionPct: z.number().min(0).max(100, { message: 'Komisi berkisar antara 0 - 100%' }),
   promoCode: z.string().optional(),
+  idCardNumber: z.string().optional(),
+  bankName: z.string().optional(),
+  bankAccountNumber: z.string().optional(),
+  bankAccountName: z.string().optional(),
 });
 
 type PartnerFormValues = z.infer<typeof partnerSchema>;
@@ -42,6 +46,10 @@ interface Partner {
   conversions: number;
   revenueGenerated: number;
   commissionEarned: number;
+  idCardNumber?: string | null;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  bankAccountName?: string | null;
   createdAt: string;
 }
 
@@ -84,6 +92,10 @@ export default function AffiliatePartnersPage() {
       type: 'INFLUENCER',
       commissionPct: 10,
       promoCode: '',
+      idCardNumber: '',
+      bankName: 'BCA',
+      bankAccountNumber: '',
+      bankAccountName: '',
     },
   });
 
@@ -212,9 +224,32 @@ export default function AffiliatePartnersPage() {
                     return (
                       <TableRow key={partner.id} className="border-b border-slate-100 hover:bg-slate-50/70 transition">
                         <TableCell className="py-4 px-6">
-                          <div className="flex flex-col space-y-0.5">
-                            <span className="font-bold text-slate-900 text-xs">{partner.name}</span>
-                            <span className="text-[10px] text-slate-400 font-mono">CODE: {partner.uniqueCode}</span>
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900 text-xs">{partner.name}</span>
+                              {partner.idCardNumber && (
+                                <span
+                                  className="inline-flex items-center gap-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200"
+                                  title="Nomor KTP / NIK"
+                                >
+                                  <IdCard className="w-2.5 h-2.5 text-slate-500" />
+                                  KTP: {partner.idCardNumber}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[10px] text-slate-400 font-mono">CODE: {partner.uniqueCode}</span>
+                              {partner.bankAccountNumber && (
+                                <span
+                                  className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60"
+                                  title="Rekening Pencairan Komisi"
+                                >
+                                  <CreditCard className="w-2.5 h-2.5 text-emerald-600" />
+                                  {partner.bankName || 'Bank'}: {partner.bankAccountNumber}
+                                  {partner.bankAccountName ? ` (a.n ${partner.bankAccountName})` : ''}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="py-4 px-4">
@@ -273,71 +308,103 @@ export default function AffiliatePartnersPage() {
 
       {/* Add Partner Dialog Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-white border-slate-200 text-slate-900 rounded-2xl shadow-xl max-w-md">
+        <DialogContent className="bg-white border-slate-200 text-slate-900 rounded-2xl shadow-xl max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">Daftarkan Partner Baru</DialogTitle>
+            <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <HeartHandshake className="w-5 h-5 text-[#08B4B5]" />
+              Daftarkan Partner Afiliasi Baru
+            </DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              Buat link pelacakan unik dan atur persentase komisi per tiket terjual.
+              Buat link pelacakan unik, atur persentase komisi, serta masukkan identitas KTP dan nomor rekening bank partner.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit((v) => addMutation.mutate(v))} className="space-y-4 mt-2">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Partner / Afiliasi *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Contoh: Influencer Dakwah, Budi Santoso"
-                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs py-2"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-rose-500 text-[10px]" />
-                  </FormItem>
-                )}
-              />
+              {/* SECTION 1: INFORMASI DASAR AFILIASI */}
+              <div className="space-y-3">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  1. Informasi Partner & Komisi
+                </h4>
 
-              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
-                  name="type"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tipe Partner</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-900 text-xs rounded-xl focus:border-[#08B4B5] focus:bg-white">
-                            <SelectValue placeholder="Pilih tipe" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white border-slate-200 text-slate-800 text-xs">
-                          <SelectItem value="AMBASSADOR">Ambassador</SelectItem>
-                          <SelectItem value="COMMUNITY">Community</SelectItem>
-                          <SelectItem value="INFLUENCER">Influencer</SelectItem>
-                          <SelectItem value="CORPORATE">Corporate</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Nama Lengkap Partner / Afiliasi *
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Contoh: Influencer Dakwah, Budi Santoso"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs py-2"
+                          {...field}
+                        />
+                      </FormControl>
                       <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}
                 />
 
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Tipe Partner</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-900 text-xs rounded-xl focus:border-[#08B4B5] focus:bg-white">
+                              <SelectValue placeholder="Pilih tipe" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-white border-slate-200 text-slate-800 text-xs">
+                            <SelectItem value="AMBASSADOR">Ambassador</SelectItem>
+                            <SelectItem value="COMMUNITY">Community</SelectItem>
+                            <SelectItem value="INFLUENCER">Influencer</SelectItem>
+                            <SelectItem value="CORPORATE">Corporate</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-rose-500 text-[10px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="commissionPct"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Komisi Penjualan (%) *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-rose-500 text-[10px]" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
-                  name="commissionPct"
+                  name="promoCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Komisi Penjualan (%) *</FormLabel>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kode Promo Terkait (Opsional)</FormLabel>
                       <FormControl>
                         <Input
-                          type="number"
-                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
+                          placeholder="Contoh: BUDIS10"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs uppercase py-2 font-mono"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
                       <FormMessage className="text-rose-500 text-[10px]" />
@@ -346,23 +413,106 @@ export default function AffiliatePartnersPage() {
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="promoCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kode Promo Terkait (Opsional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Contoh: BUDIS10"
-                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs uppercase py-2"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-rose-500 text-[10px]" />
-                  </FormItem>
-                )}
-              />
+              {/* SECTION 2: IDENTITAS KTP & REKENING PENCAIRAN */}
+              <div className="pt-3 border-t border-slate-100 space-y-3">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <IdCard className="w-3.5 h-3.5 text-[#08B4B5]" />
+                  <span>2. Data KTP & Rekening Pencairan (Norek)</span>
+                </h4>
+
+                <FormField
+                  control={form.control}
+                  name="idCardNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Nomor KTP / NIK (Opsional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Contoh: 3201234567890001 (16 Digit)"
+                          maxLength={20}
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-500 text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="bankName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Bank Pencairan</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || 'BCA'}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-900 text-xs rounded-xl focus:border-[#08B4B5] focus:bg-white">
+                              <SelectValue placeholder="Pilih Bank" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-white border-slate-200 text-slate-800 text-xs">
+                            <SelectItem value="BCA">BCA (Bank Central Asia)</SelectItem>
+                            <SelectItem value="Mandiri">Bank Mandiri</SelectItem>
+                            <SelectItem value="BNI">BNI (Bank Negara Indonesia)</SelectItem>
+                            <SelectItem value="BRI">BRI (Bank Rakyat Indonesia)</SelectItem>
+                            <SelectItem value="BSI">BSI (Bank Syariah Indonesia)</SelectItem>
+                            <SelectItem value="Bank Jago">Bank Jago</SelectItem>
+                            <SelectItem value="CIMB Niaga">CIMB Niaga</SelectItem>
+                            <SelectItem value="Permata">Bank Permata</SelectItem>
+                            <SelectItem value="SeaBank">SeaBank</SelectItem>
+                            <SelectItem value="Lainnya">Bank Lainnya</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-rose-500 text-[10px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="bankAccountNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          Nomor Rekening (Norek)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Contoh: 1234567890"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-rose-500 text-[10px]" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="bankAccountName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Nama Pemilik Rekening (Atas Nama)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Nama sesuai buku tabungan / m-banking"
+                          className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs py-2"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-rose-500 text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="pt-4 flex gap-3 justify-end border-t border-slate-100">
                 <Button
@@ -379,7 +529,7 @@ export default function AffiliatePartnersPage() {
                   className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1.5 px-4 shadow-sm border-0"
                 >
                   {addMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  <span>Daftarkan</span>
+                  <span>Daftarkan Partner</span>
                 </Button>
               </div>
             </form>

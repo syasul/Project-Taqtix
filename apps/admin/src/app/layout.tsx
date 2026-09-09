@@ -14,7 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TAQtix Admin Console",
+  title: {
+    default: "TAQtix Admin Console",
+    template: "%s | TAQtix Admin",
+  },
   description: "Internal operations dashboard for TAQtix administration.",
   icons: {
     icon: [

@@ -4,8 +4,11 @@ import { Toaster } from 'sonner';
 import LayoutShell from '@/components/layout-shell';
 
 export const metadata: Metadata = {
-  title: 'Taqtix Affiliates - Portal Mitra Afiliasi',
-  description: 'Dashboard kemitraan affiliator penjualan tiket event Taqtix',
+  title: {
+    default: 'TAQtix Affiliates - Portal Mitra Afiliasi',
+    template: '%s | TAQtix Affiliates',
+  },
+  description: 'Dashboard kemitraan affiliator penjualan tiket event TAQtix',
   icons: {
     icon: [
       { url: '/favicon.ico' },

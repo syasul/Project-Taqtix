@@ -22,6 +22,10 @@ class CreatePartnerDto {
     commissionValue;
     email;
     password;
+    idCardNumber;
+    bankName;
+    bankAccountNumber;
+    bankAccountName;
 }
 exports.CreatePartnerDto = CreatePartnerDto;
 __decorate([
@@ -86,4 +90,28 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '3201234567890001', description: 'Nomor KTP / NIK partner' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "idCardNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'BCA', description: 'Nama Bank pencairan komisi' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "bankName", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '8820192831', description: 'Nomor Rekening bank' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "bankAccountNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Budi Santoso', description: 'Nama pemilik rekening bank' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreatePartnerDto.prototype, "bankAccountName", void 0);
 //# sourceMappingURL=create-partner.dto.js.map

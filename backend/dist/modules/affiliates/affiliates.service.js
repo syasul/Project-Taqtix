@@ -107,6 +107,10 @@ let AffiliatesService = class AffiliatesService {
                 commissionType: 'percentage',
                 commissionValue: dto.commissionPct ?? 10,
                 email: dto.email || null,
+                idCardNumber: dto.idCardNumber || null,
+                bankName: dto.bankName || null,
+                bankAccountNumber: dto.bankAccountNumber || null,
+                bankAccountName: dto.bankAccountName || null,
             },
         });
     }

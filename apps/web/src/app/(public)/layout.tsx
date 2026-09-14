@@ -30,6 +30,23 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <p className="text-sm text-slate-500 leading-relaxed max-w-sm">
                 Infrastruktur ticketing modern anti double-booking dengan pengiriman e-ticket WhatsApp otomatis dan verifikasi QR kilat untuk seluruh acara di Indonesia.
               </p>
+              <div className="text-xs text-slate-500 space-y-1.5 pt-1">
+                <p>
+                  <span className="font-semibold text-slate-700">Email:</span>{' '}
+                  <a href="mailto:taqtix.id@gmail.com" className="hover:text-[#08ADAE] transition-colors">
+                    taqtix.id@gmail.com
+                  </a>
+                </p>
+                <p>
+                  <span className="font-semibold text-slate-700">WhatsApp:</span>{' '}
+                  <a href="https://wa.me/6281244442474" target="_blank" rel="noopener noreferrer" className="hover:text-[#08ADAE] transition-colors">
+                    +62 81244442474
+                  </a>
+                </p>
+                <p className="text-[11px] text-slate-400 leading-relaxed pt-0.5">
+                  JL.DR CIPTO VII/34, RT/RW: 006/010, Bedali, Lawang, Kab. Malang, Jawa Timur
+                </p>
+              </div>
               <div className="flex items-center gap-2 pt-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />

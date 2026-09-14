@@ -45,8 +45,8 @@ export default function ContactPage() {
                 <Mail className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">Email Support</p>
-                  <a href="mailto:support@taqtix.id" className="hover:underline text-[#08B4B5]">
-                    support@taqtix.id
+                  <a href="mailto:taqtix.id@gmail.com" className="hover:underline text-[#08B4B5]">
+                    taqtix.id@gmail.com
                   </a>
                 </div>
               </div>
@@ -55,8 +55,8 @@ export default function ContactPage() {
                 <Phone className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">WhatsApp Hotline</p>
-                  <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="hover:underline text-[#08B4B5]">
-                    +62 812-3456-7890
+                  <a href="https://wa.me/6281244442474" target="_blank" rel="noreferrer" className="hover:underline text-[#08B4B5]">
+                    +62 81244442474
                   </a>
                 </div>
               </div>
@@ -66,8 +66,9 @@ export default function ContactPage() {
                 <div>
                   <p className="font-semibold text-slate-800">Kantor Pusat</p>
                   <p className="text-slate-500 text-xs leading-relaxed">
-                    Taqwa Space Coworking, Tebet Raya No. 42,<br />
-                    Jakarta Selatan, DKI Jakarta 12810
+                    JL.DR CIPTO VII/34, RT/RW: 006/010,<br />
+                    Desa/Kelurahan Bedali, Kecamatan Lawang,<br />
+                    Kabupaten Malang, Provinsi Jawa Timur
                   </p>
                 </div>
               </div>

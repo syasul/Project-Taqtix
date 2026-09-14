@@ -116,7 +116,7 @@ export default function AboutPage() {
         </p>
         <div>
           <a
-            href="mailto:support@taqtix.id"
+            href="mailto:taqtix.id@gmail.com"
             className="inline-flex items-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm text-sm border-0"
           >
             Hubungi Kemitraan TAQtix

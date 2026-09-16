@@ -9,7 +9,12 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { LineupService } from './lineup.service';
 import { CreateLineupDto } from './dto/create-lineup.dto';
 import { UpdateLineupDto } from './dto/update-lineup.dto';
@@ -26,7 +31,10 @@ export class LineupController {
 
   @Post()
   @ApiOperation({ summary: 'Menambahkan pengisi acara / lineup baru' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Lineup berhasil ditambahkan.' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Lineup berhasil ditambahkan.',
+  })
   async create(
     @Param('id') eventId: string,
     @Body() dto: CreateLineupDto,
@@ -37,14 +45,20 @@ export class LineupController {
 
   @Get()
   @ApiOperation({ summary: 'Mendapatkan daftar lineup terurut untuk event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar lineup berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar lineup berhasil diambil.',
+  })
   async findAll(@Param('id') eventId: string) {
     return this.lineupService.findAll(eventId);
   }
 
   @Patch('reorder')
   @ApiOperation({ summary: 'Mengubah urutan tampil lineup' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Urutan lineup berhasil diperbarui.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Urutan lineup berhasil diperbarui.',
+  })
   async reorder(
     @Param('id') eventId: string,
     @Body() dto: ReorderLineupDto,
@@ -55,7 +69,10 @@ export class LineupController {
 
   @Patch(':itemId')
   @ApiOperation({ summary: 'Mengupdate data lineup' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Data lineup berhasil diupdate.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Data lineup berhasil diupdate.',
+  })
   async update(
     @Param('id') eventId: string,
     @Param('itemId') itemId: string,
@@ -68,7 +85,10 @@ export class LineupController {
   @Delete(':itemId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Menghapus lineup' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Lineup berhasil dihapus.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Lineup berhasil dihapus.',
+  })
   async delete(
     @Param('id') eventId: string,
     @Param('itemId') itemId: string,

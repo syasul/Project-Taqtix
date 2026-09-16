@@ -82,7 +82,10 @@ describe('TokensService', () => {
   describe('validateApiKey', () => {
     it('should validate apiKey by comparing sha256 hash', async () => {
       const plainKey = 'taq_live_abc1234567890abcdef1234567890';
-      const expectedHash = crypto.createHash('sha256').update(plainKey).digest('hex');
+      const expectedHash = crypto
+        .createHash('sha256')
+        .update(plainKey)
+        .digest('hex');
 
       mockPrisma.apiToken.findFirst.mockResolvedValue({
         id: 'tok-1',

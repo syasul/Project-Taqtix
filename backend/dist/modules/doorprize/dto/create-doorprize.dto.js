@@ -19,7 +19,10 @@ class CreateDoorprizeDto {
 }
 exports.CreateDoorprizeDto = CreateDoorprizeDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'iPhone 15 Pro Max', description: 'Nama hadiah doorprize' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'iPhone 15 Pro Max',
+        description: 'Nama hadiah doorprize',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -31,7 +34,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateDoorprizeDto.prototype, "imageUrl", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 1, description: 'Jumlah kuantitas hadiah yang diundi' }),
+    (0, swagger_1.ApiProperty)({
+        example: 1,
+        description: 'Jumlah kuantitas hadiah yang diundi',
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)

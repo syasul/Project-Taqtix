@@ -17,7 +17,9 @@ async function bootstrapWorker() {
   logger.log('====================================================');
 
   const shutdown = async (signal: string) => {
-    logger.log(`Menerima sinyal ${signal}. Menghentikan worker secara aman (graceful shutdown)...`);
+    logger.log(
+      `Menerima sinyal ${signal}. Menghentikan worker secara aman (graceful shutdown)...`,
+    );
     await app.close();
     process.exit(0);
   };

@@ -124,9 +124,11 @@ export class EventsService {
     if (dto.requireLogin !== undefined)
       updateData.requireLogin = dto.requireLogin;
     if (dto.seoTitle !== undefined) updateData.seoTitle = dto.seoTitle;
-    if (dto.seoDescription !== undefined) updateData.seoDescription = dto.seoDescription;
+    if (dto.seoDescription !== undefined)
+      updateData.seoDescription = dto.seoDescription;
     if (dto.seoKeywords !== undefined) updateData.seoKeywords = dto.seoKeywords;
-    if (dto.adminSeoKeywords !== undefined) updateData.adminSeoKeywords = dto.adminSeoKeywords;
+    if (dto.adminSeoKeywords !== undefined)
+      updateData.adminSeoKeywords = dto.adminSeoKeywords;
     if (dto.seoPriority !== undefined) updateData.seoPriority = dto.seoPriority;
 
     return this.prisma.event.update({

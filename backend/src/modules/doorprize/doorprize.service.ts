@@ -34,7 +34,9 @@ export class DoorprizeService {
       where: { id: eventId },
     });
     if (!event || event.organizerId !== organizer.id) {
-      throw new NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+      throw new NotFoundException(
+        'Event tidak ditemukan atau bukan milik Anda',
+      );
     }
     return { event, organizer };
   }
@@ -92,7 +94,9 @@ export class DoorprizeService {
     }
 
     if (item.remainingQuantity <= 0) {
-      throw new BadRequestException('Kuantitas hadiah ini sudah habis terundi.');
+      throw new BadRequestException(
+        'Kuantitas hadiah ini sudah habis terundi.',
+      );
     }
 
     // Ambil tiket yang sudah CHECKED_IN

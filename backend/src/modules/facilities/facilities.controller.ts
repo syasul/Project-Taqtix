@@ -9,7 +9,12 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { FacilitiesService } from './facilities.service';
 import { CreateFacilityDto } from './dto/create-facility.dto';
 import { UpdateFacilityDto } from './dto/update-facility.dto';
@@ -25,7 +30,10 @@ export class FacilitiesController {
 
   @Post()
   @ApiOperation({ summary: 'Menambahkan fasilitas/addon baru untuk event' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Fasilitas berhasil ditambahkan.' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Fasilitas berhasil ditambahkan.',
+  })
   async create(
     @Param('id') eventId: string,
     @Body() dto: CreateFacilityDto,
@@ -36,14 +44,20 @@ export class FacilitiesController {
 
   @Get()
   @ApiOperation({ summary: 'Mendapatkan daftar fasilitas/addon untuk event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar fasilitas berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar fasilitas berhasil diambil.',
+  })
   async findAll(@Param('id') eventId: string) {
     return this.facilitiesService.findAll(eventId);
   }
 
   @Patch(':facilityId')
   @ApiOperation({ summary: 'Mengupdate data fasilitas/addon' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Fasilitas berhasil diupdate.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Fasilitas berhasil diupdate.',
+  })
   async update(
     @Param('id') eventId: string,
     @Param('facilityId') facilityId: string,
@@ -56,7 +70,10 @@ export class FacilitiesController {
   @Delete(':facilityId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Menghapus fasilitas/addon' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Fasilitas berhasil dihapus.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Fasilitas berhasil dihapus.',
+  })
   async delete(
     @Param('id') eventId: string,
     @Param('facilityId') facilityId: string,

@@ -21,7 +21,10 @@ class CreateFacilityDto {
 }
 exports.CreateFacilityDto = CreateFacilityDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Merchandise Bundle', description: 'Nama fasilitas / addon' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Merchandise Bundle',
+        description: 'Nama fasilitas / addon',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -33,14 +36,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreateFacilityDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ default: 0, description: 'Harga fasilitas dalam Rupiah (0 = gratis)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        default: 0,
+        description: 'Harga fasilitas dalam Rupiah (0 = gratis)',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(0),
     __metadata("design:type", Number)
 ], CreateFacilityDto.prototype, "price", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Batas kuota stok fasilitas (null = unlimited)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Batas kuota stok fasilitas (null = unlimited)',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),

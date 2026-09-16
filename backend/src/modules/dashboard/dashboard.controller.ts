@@ -29,7 +29,9 @@ export class DashboardController {
   @Get('organizer/overview')
   @ApiBearerAuth()
   @Permissions('view_sales_revenue')
-  @ApiOperation({ summary: 'Mendapatkan rangkuman eksekutif multi-event organizer (Cached)' })
+  @ApiOperation({
+    summary: 'Mendapatkan rangkuman eksekutif multi-event organizer (Cached)',
+  })
   async getOverview(@CurrentUser('id') userId: string) {
     const result = await this.dashboardService.getOverview(userId);
     return { success: true, data: result };
@@ -38,7 +40,9 @@ export class DashboardController {
   @Get('organizer/events/:id/dashboard')
   @ApiBearerAuth()
   @Permissions('view_sales_revenue')
-  @ApiOperation({ summary: 'Mendapatkan rangkuman metrik utama dashboard event' })
+  @ApiOperation({
+    summary: 'Mendapatkan rangkuman metrik utama dashboard event',
+  })
   async getEventDashboard(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
@@ -66,7 +70,10 @@ export class DashboardController {
     @CurrentUser('id') userId: string,
     @Res() res: Response,
   ) {
-    const csvContent = await this.dashboardService.getBuyersCsv(eventId, userId);
+    const csvContent = await this.dashboardService.getBuyersCsv(
+      eventId,
+      userId,
+    );
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader(
       'Content-Disposition',
@@ -78,7 +85,9 @@ export class DashboardController {
   @Get('organizer/events/:id/channel-performance')
   @ApiBearerAuth()
   @Permissions('view_analytics_growth')
-  @ApiOperation({ summary: 'Mendapatkan data atribusi performa marketing channel' })
+  @ApiOperation({
+    summary: 'Mendapatkan data atribusi performa marketing channel',
+  })
   async getChannelPerformance(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
@@ -96,19 +105,27 @@ export class DashboardController {
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
   ) {
-    const result = await this.dashboardService.getSalesAnalytics(eventId, userId);
+    const result = await this.dashboardService.getSalesAnalytics(
+      eventId,
+      userId,
+    );
     return { success: true, data: result };
   }
 
   @Get('organizer/events/:id/analytics/distribution')
   @ApiBearerAuth()
   @Permissions('view_sales_revenue')
-  @ApiOperation({ summary: 'Mendapatkan laporan analitik distribusi marketing' })
+  @ApiOperation({
+    summary: 'Mendapatkan laporan analitik distribusi marketing',
+  })
   async getDistributionAnalytics(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
   ) {
-    const result = await this.dashboardService.getDistributionAnalytics(eventId, userId);
+    const result = await this.dashboardService.getDistributionAnalytics(
+      eventId,
+      userId,
+    );
     return { success: true, data: result };
   }
 
@@ -137,7 +154,10 @@ export class DashboardController {
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
   ) {
-    const result = await this.dashboardService.getPerformanceAnalytics(eventId, userId);
+    const result = await this.dashboardService.getPerformanceAnalytics(
+      eventId,
+      userId,
+    );
     return { success: true, data: result };
   }
 
@@ -152,19 +172,28 @@ export class DashboardController {
     @Body() dto: RecordAdSpendDto,
     @CurrentUser('id') userId: string,
   ) {
-    const result = await this.dashboardService.recordAdSpend(eventId, dto, userId);
+    const result = await this.dashboardService.recordAdSpend(
+      eventId,
+      dto,
+      userId,
+    );
     return { success: true, data: result };
   }
 
   @Get('organizer/events/:id/growth-dashboard')
   @ApiBearerAuth()
   @Permissions('view_analytics_growth')
-  @ApiOperation({ summary: 'Mendapatkan data dashboard performa ROAS & afiliasi' })
+  @ApiOperation({
+    summary: 'Mendapatkan data dashboard performa ROAS & afiliasi',
+  })
   async getGrowthDashboard(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
   ) {
-    const result = await this.dashboardService.getGrowthDashboard(eventId, userId);
+    const result = await this.dashboardService.getGrowthDashboard(
+      eventId,
+      userId,
+    );
     return { success: true, data: result };
   }
 

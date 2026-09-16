@@ -78,8 +78,8 @@ export class UploadController {
       },
       fileFilter: (req, file, cb) => {
         // Simpan referensi service untuk diakses di diskStorage destination
-        (req as any).uploadServiceRef = (req as any).res?.req?.app?.get
-          ? (req as any).res.req.app.get(UploadService)
+        req.uploadServiceRef = req.res?.req?.app?.get
+          ? req.res.req.app.get(UploadService)
           : null;
 
         const allowedMimes = [

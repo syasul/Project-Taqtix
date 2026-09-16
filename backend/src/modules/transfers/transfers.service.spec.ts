@@ -9,7 +9,7 @@ describe('TransfersService', () => {
   let service: TransfersService;
   let prisma: any;
 
-  const mockPrisma = {
+  const mockPrisma: any = {
     ticket: {
       findUnique: jest.fn(),
       update: jest.fn(),
@@ -24,7 +24,7 @@ describe('TransfersService', () => {
     orderItem: {
       update: jest.fn(),
     },
-    $transaction: jest.fn((callback) => callback(mockPrisma)),
+    $transaction: jest.fn((callback: (tx: any) => any) => callback(mockPrisma)),
   };
 
   const mockConfig = {
@@ -100,6 +100,7 @@ describe('TransfersService', () => {
         service.requestTransfer('ticket-1', {
           toName: 'New Person',
           toEmail: 'new@test.com',
+          toPhone: '081234567890',
         }),
       ).rejects.toThrow(ForbiddenException);
     });

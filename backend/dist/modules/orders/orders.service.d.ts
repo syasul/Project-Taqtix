@@ -1,12 +1,18 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Queue } from 'bullmq';
+import { DokuService } from '../payments/doku/doku.service';
+import { ConfigService } from '@nestjs/config';
 export declare class OrdersService {
     private prisma;
     private orderExpirationQueue;
+    private readonly dokuService;
+    private readonly configService;
+    private readonly logger;
     private idempotencyStore;
-    constructor(prisma: PrismaService, orderExpirationQueue: Queue);
+    constructor(prisma: PrismaService, orderExpirationQueue: Queue, dokuService: DokuService, configService: ConfigService);
     create(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string): Promise<any>;
+    private rollbackOrder;
     findOne(id: string): Promise<{
         event: {
             description: string | null;

@@ -45,7 +45,10 @@ __decorate([
     __metadata("design:type", Array)
 ], CreateCustomFieldDto.prototype, "options", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ default: false, description: 'Wajib diisi atau opsional' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        default: false,
+        description: 'Wajib diisi atau opsional',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)

@@ -7,7 +7,7 @@ describe('DoorprizeService', () => {
   let service: DoorprizeService;
   let prisma: any;
 
-  const mockPrisma = {
+  const mockPrisma: any = {
     organizerMember: { findFirst: jest.fn() },
     organizer: { findUnique: jest.fn() },
     event: { findUnique: jest.fn() },
@@ -24,7 +24,7 @@ describe('DoorprizeService', () => {
     ticket: {
       findMany: jest.fn(),
     },
-    $transaction: jest.fn((callback) => callback(mockPrisma)),
+    $transaction: jest.fn((callback: (tx: any) => any) => callback(mockPrisma)),
   };
 
   beforeEach(async () => {

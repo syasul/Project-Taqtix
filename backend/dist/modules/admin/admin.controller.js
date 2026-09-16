@@ -145,7 +145,9 @@ __decorate([
     (0, common_1.Get)('admin/dashboard'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Ringkasan platform & analitik lintas organizer (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Ringkasan platform & analitik lintas organizer (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -163,7 +165,9 @@ __decorate([
     (0, common_1.Get)('admin/organizers/:id'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan detail organizer beserta list event miliknya (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan detail organizer beserta list event miliknya (Admin Only)',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -173,7 +177,9 @@ __decorate([
     (0, common_1.Post)('admin/organizers/:id/approve'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Menyetujui pendaftaran organizer baru (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Menyetujui pendaftaran organizer baru (Admin Only)',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -195,7 +201,9 @@ __decorate([
     (0, common_1.Patch)('admin/organizers/:id/plan'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mengubah paket langganan (plan) organizer (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengubah paket langganan (plan) organizer (Admin Only)',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -238,7 +246,9 @@ __decorate([
     (0, common_1.Get)('admin/partners'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data audit/rekap partner afiliasi (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan data audit/rekap partner afiliasi (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -319,7 +329,9 @@ __decorate([
     (0, common_1.Get)('admin/billing'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan rekap billing subscription (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan rekap billing subscription (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -328,7 +340,9 @@ __decorate([
     (0, common_1.Get)('admin/events'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan seluruh event untuk moderasi (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan seluruh event untuk moderasi (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -337,7 +351,9 @@ __decorate([
     (0, common_1.Post)('admin/events/:id/approve'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Menyetujui event untuk dipublikasikan (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Menyetujui event untuk dipublikasikan (Admin Only)',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -369,8 +385,14 @@ __decorate([
     (0, common_1.Get)('admin/orders'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiQuery)({ name: 'q', required: false, description: 'Kata kunci pencarian order (order ID / email buyer / nama attendee)' }),
-    (0, swagger_1.ApiOperation)({ summary: 'Pencarian pesanan lintas seluruh organizer (Admin Only)' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'q',
+        required: false,
+        description: 'Kata kunci pencarian order (order ID / email buyer / nama attendee)',
+    }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Pencarian pesanan lintas seluruh organizer (Admin Only)',
+    }),
     __param(0, (0, common_1.Query)('q')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -380,7 +402,9 @@ __decorate([
     (0, common_1.Get)('admin/settlements'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar settlement yang perlu diproses (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar settlement yang perlu diproses (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -389,7 +413,9 @@ __decorate([
     (0, common_1.Post)('admin/settlements/calculate'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Memicu kalkulasi otomatis settlement event yang telah berakhir (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Memicu kalkulasi otomatis settlement event yang telah berakhir (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -398,7 +424,9 @@ __decorate([
     (0, common_1.Post)('admin/settlements/:id/mark-paid'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Menandai settlement sudah ditransfer manual (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Menandai settlement sudah ditransfer manual (Admin Only)',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -409,7 +437,9 @@ __decorate([
     (0, common_1.Get)('admin/audit-log'),
     (0, roles_decorator_1.Roles)('admin'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan log audit aktivitas admin (Admin Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan log audit aktivitas admin (Admin Only)',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

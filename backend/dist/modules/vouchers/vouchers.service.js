@@ -88,10 +88,7 @@ let VouchersService = class VouchersService {
             organizerId: organizer.id,
         };
         if (eventId) {
-            where.OR = [
-                { eventId },
-                { eventId: null },
-            ];
+            where.OR = [{ eventId }, { eventId: null }];
         }
         return this.prisma.voucher.findMany({
             where,

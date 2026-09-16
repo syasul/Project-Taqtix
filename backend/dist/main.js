@@ -47,7 +47,7 @@ const path = __importStar(require("path"));
 const http_exception_filter_1 = require("./common/filters/http-exception.filter");
 const response_interceptor_1 = require("./common/interceptors/response.interceptor");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, { rawBody: true });
     const expressApp = app.getHttpAdapter().getInstance();
     expressApp.set('trust proxy', 1);
     const uploadPath = process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
@@ -60,13 +60,20 @@ async function bootstrap() {
     catch (err) {
         console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
     }
-    app.setGlobalPrefix('v1');
+    app.setGlobalPrefix('v1', {
+        exclude: ['payments/webhook/(.*)', 'payments/webhook'],
+    });
     app.use((0, helmet_1.default)());
     app.enableCors({
         origin: true,
         credentials: true,
     });
-    app.use(express.json({ limit: '10mb' }));
+    app.use(express.json({
+        limit: '10mb',
+        verify: (req, _res, buf) => {
+            req.rawBody = buf;
+        },
+    }));
     app.use(express.urlencoded({ limit: '10mb', extended: true }));
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,

@@ -58,7 +58,10 @@ class CreatePosTransactionDto {
 }
 exports.CreatePosTransactionDto = CreatePosTransactionDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [PosItemDto], description: 'Daftar item belanja di POS' }),
+    (0, swagger_1.ApiProperty)({
+        type: [PosItemDto],
+        description: 'Daftar item belanja di POS',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => PosItemDto),
@@ -79,7 +82,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePosTransactionDto.prototype, "buyerName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Nomor WhatsApp / HP pembeli (opsional)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Nomor WhatsApp / HP pembeli (opsional)',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

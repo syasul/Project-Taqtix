@@ -18,13 +18,19 @@ class CreateSegmentDto {
 }
 exports.CreateSegmentDto = CreateSegmentDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'VIP Repeat Buyers', description: 'Nama segmen audiens' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'VIP Repeat Buyers',
+        description: 'Nama segmen audiens',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama segmen tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateSegmentDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: { minSpend: 500000 }, description: 'Kriteria filter dinamis segmen' }),
+    (0, swagger_1.ApiProperty)({
+        example: { minSpend: 500000 },
+        description: 'Kriteria filter dinamis segmen',
+    }),
     (0, class_validator_1.IsObject)({ message: 'Kriteria segmen harus berupa objek' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Kriteria segmen tidak boleh kosong' }),
     __metadata("design:type", Object)

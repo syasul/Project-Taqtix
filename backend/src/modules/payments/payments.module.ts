@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { BullModule } from '@nestjs/bull';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
+import { DokuService } from './doku/doku.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { PaymentsController } from './payments.controller';
     }),
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService],
-  exports: [PaymentsService],
+  providers: [PaymentsService, DokuService],
+  exports: [PaymentsService, DokuService],
 })
 export class PaymentsModule {}

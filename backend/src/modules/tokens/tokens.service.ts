@@ -20,7 +20,9 @@ export class TokensService {
 
     if (member) {
       if (member.role !== 'owner') {
-        throw new ForbiddenException('Hanya peran Owner yang berhak mengelola API token.');
+        throw new ForbiddenException(
+          'Hanya peran Owner yang berhak mengelola API token.',
+        );
       }
       return member.organizer;
     }
@@ -44,12 +46,16 @@ export class TokensService {
 
     const rawSecret = crypto.randomBytes(24).toString('hex');
     const fullToken = `taq_live_${rawSecret}`;
-    const tokenHash = crypto.createHash('sha256').update(fullToken).digest('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(fullToken)
+      .digest('hex');
     const tokenPreview = `...${fullToken.slice(-8)}`;
 
-    const scopes = dto.scopes && dto.scopes.length > 0
-      ? dto.scopes
-      : ['read:events', 'read:orders', 'read:attendance'];
+    const scopes =
+      dto.scopes && dto.scopes.length > 0
+        ? dto.scopes
+        : ['read:events', 'read:orders', 'read:attendance'];
 
     const record = await this.prisma.apiToken.create({
       data: {
@@ -137,10 +143,12 @@ export class TokensService {
     }
 
     // Update lastUsedAt secara asynchronous tanpa blocking
-    this.prisma.apiToken.update({
-      where: { id: tokenRecord.id },
-      data: { lastUsedAt: new Date() },
-    }).catch(() => {});
+    this.prisma.apiToken
+      .update({
+        where: { id: tokenRecord.id },
+        data: { lastUsedAt: new Date() },
+      })
+      .catch(() => {});
 
     return tokenRecord;
   }

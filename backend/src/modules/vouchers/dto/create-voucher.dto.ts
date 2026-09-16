@@ -11,7 +11,9 @@ import {
 } from 'class-validator';
 
 export class CreateVoucherDto {
-  @ApiPropertyOptional({ description: 'ID event jika voucher scoped ke 1 event tertentu' })
+  @ApiPropertyOptional({
+    description: 'ID event jika voucher scoped ke 1 event tertentu',
+  })
   @IsOptional()
   @IsString()
   eventId?: string;
@@ -21,7 +23,10 @@ export class CreateVoucherDto {
   @IsNotEmpty()
   code: string;
 
-  @ApiProperty({ enum: ['percentage', 'fixed'], description: 'Tipe potongan diskon' })
+  @ApiProperty({
+    enum: ['percentage', 'fixed'],
+    description: 'Tipe potongan diskon',
+  })
   @IsEnum(['percentage', 'fixed'])
   type: 'percentage' | 'fixed';
 
@@ -30,13 +35,17 @@ export class CreateVoucherDto {
   @Min(0)
   value: number;
 
-  @ApiPropertyOptional({ description: 'Batas kuota penggunaan (null = unlimited)' })
+  @ApiPropertyOptional({
+    description: 'Batas kuota penggunaan (null = unlimited)',
+  })
   @IsOptional()
   @IsNumber()
   @Min(1)
   usageLimit?: number;
 
-  @ApiPropertyOptional({ description: 'Maksimum nominal potongan untuk diskon percentage' })
+  @ApiPropertyOptional({
+    description: 'Maksimum nominal potongan untuk diskon percentage',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -50,7 +59,9 @@ export class CreateVoucherDto {
   @IsDateString()
   validUntil: string;
 
-  @ApiPropertyOptional({ description: 'Daftar ID event yang berlaku jika eventId null' })
+  @ApiPropertyOptional({
+    description: 'Daftar ID event yang berlaku jika eventId null',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

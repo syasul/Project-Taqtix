@@ -53,15 +53,21 @@ export class TransfersService {
     }
 
     if (!ticket.event.allowTicketTransfer) {
-      throw new ForbiddenException('Fitur transfer tiket dinonaktifkan oleh penyelenggara untuk event ini.');
+      throw new ForbiddenException(
+        'Fitur transfer tiket dinonaktifkan oleh penyelenggara untuk event ini.',
+      );
     }
 
     if (ticket.status !== 'VALID') {
-      throw new BadRequestException('Hanya tiket dengan status VALID yang dapat ditransfer.');
+      throw new BadRequestException(
+        'Hanya tiket dengan status VALID yang dapat ditransfer.',
+      );
     }
 
     if (ticket.isBlocked) {
-      throw new ForbiddenException('Tiket telah diblokir dan tidak dapat ditransfer.');
+      throw new ForbiddenException(
+        'Tiket telah diblokir dan tidak dapat ditransfer.',
+      );
     }
 
     // Periksa apakah ada transfer pending yang masih aktif
@@ -74,7 +80,9 @@ export class TransfersService {
     });
 
     if (existingPending) {
-      throw new BadRequestException('Tiket ini sedang dalam proses transfer yang belum selesai.');
+      throw new BadRequestException(
+        'Tiket ini sedang dalam proses transfer yang belum selesai.',
+      );
     }
 
     const requestToken = crypto.randomBytes(24).toString('hex');
@@ -128,7 +136,9 @@ export class TransfersService {
     }
 
     if (transfer.status !== 'pending') {
-      throw new BadRequestException(`Transfer sudah berstatus ${transfer.status}`);
+      throw new BadRequestException(
+        `Transfer sudah berstatus ${transfer.status}`,
+      );
     }
 
     if (new Date() > transfer.expiresAt) {
@@ -197,7 +207,9 @@ export class TransfersService {
     }
 
     if (transfer.status !== 'pending') {
-      throw new BadRequestException(`Transfer sudah berstatus ${transfer.status}`);
+      throw new BadRequestException(
+        `Transfer sudah berstatus ${transfer.status}`,
+      );
     }
 
     // Restore QR untuk pemilik asal
@@ -236,7 +248,10 @@ export class TransfersService {
     });
 
     for (const t of expiredTransfers) {
-      const restoredQr = await this.generateQrPayload(t.ticket.id, t.ticket.eventId);
+      const restoredQr = await this.generateQrPayload(
+        t.ticket.id,
+        t.ticket.eventId,
+      );
       await this.prisma.$transaction([
         this.prisma.ticket.update({
           where: { id: t.ticketId },

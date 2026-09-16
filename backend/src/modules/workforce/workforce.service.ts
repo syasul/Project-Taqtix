@@ -22,7 +22,13 @@ export class WorkforceService {
    */
   async create(
     eventId: string,
-    dto: { name: string; phone: string; division: string; role: string; picUserId?: string },
+    dto: {
+      name: string;
+      phone: string;
+      division: string;
+      role: string;
+      picUserId?: string;
+    },
     addedByUserId: string,
   ) {
     const event = await this.prisma.event.findUnique({
@@ -33,7 +39,9 @@ export class WorkforceService {
     }
 
     const memberId = crypto.randomUUID();
-    const qrSecret = this.configService.get<string>('TAQTIX_QR_SECRET') || 'super-secret-qr-key-change-me';
+    const qrSecret =
+      this.configService.get<string>('TAQTIX_QR_SECRET') ||
+      'super-secret-qr-key-change-me';
 
     // Generate signed QR payload
     const qrPayload = await this.jwtService.signAsync(
@@ -84,7 +92,11 @@ export class WorkforceService {
   /**
    * Dashboard PIC divisi untuk memantau absensi crew.
    */
-  async getPicDashboard(eventId: string, userId: string, divisionFilter?: string) {
+  async getPicDashboard(
+    eventId: string,
+    userId: string,
+    divisionFilter?: string,
+  ) {
     // Cek apakah user adalah OrganizerMember dan PIC divisi tertentu
     const member = await this.prisma.organizerMember.findFirst({
       where: { userId, status: 'active' },
@@ -123,14 +135,14 @@ export class WorkforceService {
     // Hitung late: shift default dimulai jam event startDate (atau config event)
     const lateThresholdMinutes = 15; // default 15 menit
     const shiftStartTime = event.startDate;
-    const lateTime = new Date(shiftStartTime.getTime() + lateThresholdMinutes * 60000);
+    const lateTime = new Date(
+      shiftStartTime.getTime() + lateThresholdMinutes * 60000,
+    );
     const now = new Date();
 
     const late = allMembers.filter(
       (m) =>
-        m.status === 'present' &&
-        m.checkedInAt &&
-        m.checkedInAt > lateTime,
+        m.status === 'present' && m.checkedInAt && m.checkedInAt > lateTime,
     ).length;
 
     const absent = allMembers.filter(
@@ -178,7 +190,9 @@ export class WorkforceService {
     let payload;
     try {
       payload = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.getOrThrow<string>('TAQTIX_JWT_ACCESS_SECRET'),
+        secret: this.configService.getOrThrow<string>(
+          'TAQTIX_JWT_ACCESS_SECRET',
+        ),
       });
     } catch {
       throw new ForbiddenException('SESSION_EXPIRED');
@@ -209,7 +223,9 @@ export class WorkforceService {
     let payload;
     try {
       payload = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.getOrThrow<string>('TAQTIX_JWT_ACCESS_SECRET'),
+        secret: this.configService.getOrThrow<string>(
+          'TAQTIX_JWT_ACCESS_SECRET',
+        ),
       });
     } catch {
       throw new ForbiddenException('SESSION_EXPIRED');
@@ -229,7 +245,11 @@ export class WorkforceService {
     }
 
     // Geofencing verification
-    if (member.event.geofenceLat !== null && member.event.geofenceLng !== null && member.event.geofenceRadius !== null) {
+    if (
+      member.event.geofenceLat !== null &&
+      member.event.geofenceLng !== null &&
+      member.event.geofenceRadius !== null
+    ) {
       const distance = this.calculateDistance(
         latitude,
         longitude,
@@ -256,7 +276,9 @@ export class WorkforceService {
    * Scan crew dari gate/alat pemindai staff pintu.
    */
   async scanCrew(qrPayload: string) {
-    const qrSecret = this.configService.get<string>('TAQTIX_QR_SECRET') || 'super-secret-qr-key-change-me';
+    const qrSecret =
+      this.configService.get<string>('TAQTIX_QR_SECRET') ||
+      'super-secret-qr-key-change-me';
     let decoded;
     try {
       decoded = await this.jwtService.verifyAsync(qrPayload, {
@@ -301,7 +323,12 @@ export class WorkforceService {
     };
   }
 
-  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  private calculateDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
     const R = 6371e3; // Earth radius in meters
     const phi1 = (lat1 * Math.PI) / 180;
     const phi2 = (lat2 * Math.PI) / 180;

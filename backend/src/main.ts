@@ -10,7 +10,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // 1. Keamanan Jaringan: Trust proxy agar Throttler membaca IP asli via X-Forwarded-For
   const expressApp = app.getHttpAdapter().getInstance();
@@ -28,8 +28,10 @@ async function bootstrap() {
     console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
   }
 
-  // 2. Terapkan prefix routing global
-  app.setGlobalPrefix('v1');
+  // 2. Terapkan prefix routing global (kecualikan webhook payments agar dapat diakses langsung)
+  app.setGlobalPrefix('v1', {
+    exclude: ['payments/webhook/(.*)', 'payments/webhook'],
+  });
 
   // 3. Keamanan: Aktifkan Helmet & CORS
   app.use(helmet());
@@ -38,8 +40,15 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // 4. Batasan Ukuran Payload (Proteksi Payload Bomb DDoS)
-  app.use(express.json({ limit: '10mb' }));
+  // 4. Batasan Ukuran Payload & capture raw body buffer untuk verifikasi HMAC signature payment gateway (DOKU)
+  app.use(
+    express.json({
+      limit: '10mb',
+      verify: (req: any, _res: any, buf: Buffer) => {
+        req.rawBody = buf;
+      },
+    }),
+  );
   app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   // 5. Validasi Global (class-validator & class-transformer)

@@ -9,7 +9,12 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { TeamService } from './team.service';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -31,18 +36,28 @@ export class TeamController {
     @Body() dto: InviteTeamMemberDto,
     @CurrentUser('id') invitedById: string,
   ) {
-    const result = await this.teamService.invite(dto.email, dto.role, invitedById);
+    const result = await this.teamService.invite(
+      dto.email,
+      dto.role,
+      invitedById,
+    );
     return { success: true, data: result };
   }
 
   @Post('accept-invite/:token')
   @Public()
-  @ApiOperation({ summary: 'Menerima undangan tim dan melengkapi data password' })
+  @ApiOperation({
+    summary: 'Menerima undangan tim dan melengkapi data password',
+  })
   async acceptInvite(
     @Param('token') token: string,
     @Body() dto: AcceptInviteDto,
   ) {
-    const result = await this.teamService.acceptInvite(token, dto.name, dto.password);
+    const result = await this.teamService.acceptInvite(
+      token,
+      dto.name,
+      dto.password,
+    );
     return { success: true, data: result };
   }
 
@@ -64,7 +79,11 @@ export class TeamController {
     @Body() dto: UpdateTeamRoleDto,
     @CurrentUser('id') ownerUserId: string,
   ) {
-    const result = await this.teamService.updateRole(memberId, dto.role, ownerUserId);
+    const result = await this.teamService.updateRole(
+      memberId,
+      dto.role,
+      ownerUserId,
+    );
     return { success: true, data: result };
   }
 

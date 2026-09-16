@@ -1,5 +1,10 @@
 import { Reflector } from '@nestjs/core';
-import { BadRequestException, ConflictException, ExecutionContext, CallHandler } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ExecutionContext,
+  CallHandler,
+} from '@nestjs/common';
 import { of } from 'rxjs';
 import { IdempotencyInterceptor } from './idempotency.interceptor';
 import { REQUIRE_IDEMPOTENCY_KEY } from '../decorators/idempotency.decorator';
@@ -17,7 +22,10 @@ describe('IdempotencyInterceptor', () => {
     await interceptor.onModuleDestroy();
   });
 
-  const createMockContext = (headers: Record<string, string> = {}, user: any = { id: 'user-123' }) => {
+  const createMockContext = (
+    headers: Record<string, string> = {},
+    user: any = { id: 'user-123' },
+  ) => {
     const req = {
       headers,
       user,
@@ -38,7 +46,9 @@ describe('IdempotencyInterceptor', () => {
     } as unknown as ExecutionContext;
   };
 
-  const createMockHandler = (result: any = { success: true, data: { id: 'order-1' } }): CallHandler => {
+  const createMockHandler = (
+    result: any = { success: true, data: { id: 'order-1' } },
+  ): CallHandler => {
     return {
       handle: jest.fn(() => of(result)),
     };
@@ -61,7 +71,9 @@ describe('IdempotencyInterceptor', () => {
     const context = createMockContext({});
     const handler = createMockHandler();
 
-    await expect(interceptor.intercept(context, handler)).rejects.toThrow(BadRequestException);
+    await expect(interceptor.intercept(context, handler)).rejects.toThrow(
+      BadRequestException,
+    );
     try {
       await interceptor.intercept(context, handler);
     } catch (err: any) {
@@ -74,10 +86,14 @@ describe('IdempotencyInterceptor', () => {
 
   it('harus melempar BadRequestException jika format Idempotency-Key bukan UUID valid', async () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(true);
-    const context = createMockContext({ 'idempotency-key': 'not-a-valid-uuid' });
+    const context = createMockContext({
+      'idempotency-key': 'not-a-valid-uuid',
+    });
     const handler = createMockHandler();
 
-    await expect(interceptor.intercept(context, handler)).rejects.toThrow(BadRequestException);
+    await expect(interceptor.intercept(context, handler)).rejects.toThrow(
+      BadRequestException,
+    );
     try {
       await interceptor.intercept(context, handler);
     } catch (err: any) {
@@ -115,16 +131,22 @@ describe('IdempotencyInterceptor', () => {
     await interceptor.intercept(context, longRunningHandler);
 
     // Kunci manual untuk simulasi in-progress sebelum release
-    (interceptor as any).inMemoryLocks.set(`idempotency:lock:user-123:${uuid}`, Date.now() + 10000);
+    (interceptor as any).inMemoryLocks.set(
+      `idempotency:lock:user-123:${uuid}`,
+      Date.now() + 10000,
+    );
 
     // Request kedua dengan key yang sama saat lock masih aktif
-    await expect(interceptor.intercept(context, createMockHandler())).rejects.toThrow(ConflictException);
+    await expect(
+      interceptor.intercept(context, createMockHandler()),
+    ).rejects.toThrow(ConflictException);
     try {
       await interceptor.intercept(context, createMockHandler());
     } catch (err: any) {
       expect(err.getResponse()).toEqual({
         code: 'REQUEST_IN_PROGRESS',
-        message: 'Permintaan dengan Idempotency-Key ini sedang diproses. Mohon tunggu.',
+        message:
+          'Permintaan dengan Idempotency-Key ini sedang diproses. Mohon tunggu.',
       });
     }
   });
@@ -133,7 +155,10 @@ describe('IdempotencyInterceptor', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(true);
     const uuid = 'c0000000-0000-4000-8000-000000000003';
     const context = createMockContext({ 'idempotency-key': uuid });
-    const handler = createMockHandler({ transactionId: 'tx-999', status: 'paid' });
+    const handler = createMockHandler({
+      transactionId: 'tx-999',
+      status: 'paid',
+    });
 
     // Request 1
     const result1$ = await interceptor.intercept(context, handler);

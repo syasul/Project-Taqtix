@@ -17,16 +17,25 @@ export class SettlementsService implements OnModuleInit {
     // Jalankan pengecekan kalkulasi 10 detik setelah aplikasi start
     setTimeout(() => {
       this.calculatePendingSettlements().catch((err) =>
-        console.error('[SettlementsService] Error running initial calculation:', err),
+        console.error(
+          '[SettlementsService] Error running initial calculation:',
+          err,
+        ),
       );
     }, 10000);
 
     // Jalankan scheduler berkala setiap 15 menit
-    this.timer = setInterval(() => {
-      this.calculatePendingSettlements().catch((err) =>
-        console.error('[SettlementsService] Error running scheduled calculation:', err),
-      );
-    }, 15 * 60 * 1000);
+    this.timer = setInterval(
+      () => {
+        this.calculatePendingSettlements().catch((err) =>
+          console.error(
+            '[SettlementsService] Error running scheduled calculation:',
+            err,
+          ),
+        );
+      },
+      15 * 60 * 1000,
+    );
   }
 
   /**
@@ -39,10 +48,7 @@ export class SettlementsService implements OnModuleInit {
     // Cari event yang sudah ENDED atau endDate sudah lewat, dan belum memiliki record Settlement
     const endedEvents = await this.prisma.event.findMany({
       where: {
-        OR: [
-          { status: EventStatus.ENDED },
-          { endDate: { lte: now } },
-        ],
+        OR: [{ status: EventStatus.ENDED }, { endDate: { lte: now } }],
         settlements: {
           none: {},
         },

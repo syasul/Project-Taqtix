@@ -538,12 +538,12 @@ export declare class AdminController {
         success: boolean;
         data: {
             id: string;
+            timestamp: Date;
             action: string;
             adminId: string;
             targetId: string;
             targetType: string;
             details: import("@prisma/client/runtime/library").JsonValue | null;
-            timestamp: Date;
         }[];
     }>;
 }

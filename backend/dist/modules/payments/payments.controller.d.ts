@@ -1,4 +1,5 @@
 import { PaymentsService } from './payments.service';
+import type { Request } from 'express';
 export declare class PaymentsController {
     private readonly paymentsService;
     constructor(paymentsService: PaymentsService);
@@ -12,13 +13,18 @@ export declare class PaymentsController {
         provider: string;
         message: string;
     }>;
-    handleWebhook(provider: string, body: any, headers: Record<string, string>): Promise<{
+    handleWebhook(provider: string, body: any, headers: Record<string, string>, req: Request & {
+        rawBody?: Buffer;
+    }): Promise<{
         received: boolean;
-    } | {
-        received: boolean;
-        status: string;
     }>;
     getPaymentStatus(orderId: string): Promise<{
         status: string;
+        expiredAt: Date;
+    }>;
+    checkGatewayStatus(invoiceNumber: string): Promise<import("./doku/doku.service").DokuCheckStatusResult | {
+        success: boolean;
+        transactionStatus: string;
+        data: any;
     }>;
 }

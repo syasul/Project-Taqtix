@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SettlementsService } from '../settlements/settlements.service';
 import * as bcrypt from 'bcrypt';
@@ -78,10 +82,11 @@ export class AdminService {
       },
     });
 
-    const slug = dto.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') + `-${Date.now().toString().slice(-4)}`;
+    const slug =
+      dto.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') + `-${Date.now().toString().slice(-4)}`;
 
     const organizer = await this.prisma.organizer.create({
       data: {
@@ -123,9 +128,11 @@ export class AdminService {
       where: { id },
     });
 
-    await this.prisma.user.delete({
-      where: { id: org.userId },
-    }).catch(() => {});
+    await this.prisma.user
+      .delete({
+        where: { id: org.userId },
+      })
+      .catch(() => {});
 
     return { id, message: 'Organizer berhasil dihapus' };
   }
@@ -135,7 +142,13 @@ export class AdminService {
    */
   async updateOrganizerSegmentAndPlan(
     organizerId: string,
-    dto: { segment?: string; plan?: string; planExpiresAt?: string; name?: string; bankAccount?: string },
+    dto: {
+      segment?: string;
+      plan?: string;
+      planExpiresAt?: string;
+      name?: string;
+      bankAccount?: string;
+    },
   ) {
     const organizer = await this.prisma.organizer.findUnique({
       where: { id: organizerId },
@@ -152,7 +165,9 @@ export class AdminService {
         plan: dto.plan ?? organizer.plan,
         bankAccount: dto.bankAccount ?? organizer.bankAccount,
         planStartedAt: dto.plan ? new Date() : organizer.planStartedAt,
-        planExpiresAt: dto.planExpiresAt ? new Date(dto.planExpiresAt) : organizer.planExpiresAt,
+        planExpiresAt: dto.planExpiresAt
+          ? new Date(dto.planExpiresAt)
+          : organizer.planExpiresAt,
       },
     });
   }
@@ -239,15 +254,29 @@ export class AdminService {
         name: dto.name ?? partner.name,
         eventId: dto.eventId ?? partner.eventId,
         type: dto.type ?? partner.type,
-        uniqueCode: dto.uniqueCode ? dto.uniqueCode.toUpperCase() : partner.uniqueCode,
-        promoCode: dto.promoCode !== undefined ? dto.promoCode?.toUpperCase() : partner.promoCode,
+        uniqueCode: dto.uniqueCode
+          ? dto.uniqueCode.toUpperCase()
+          : partner.uniqueCode,
+        promoCode:
+          dto.promoCode !== undefined
+            ? dto.promoCode?.toUpperCase()
+            : partner.promoCode,
         commissionType: dto.commissionType ?? partner.commissionType,
         commissionValue: dto.commissionValue ?? partner.commissionValue,
         email: dto.email ?? partner.email,
-        idCardNumber: dto.idCardNumber !== undefined ? dto.idCardNumber : partner.idCardNumber,
+        idCardNumber:
+          dto.idCardNumber !== undefined
+            ? dto.idCardNumber
+            : partner.idCardNumber,
         bankName: dto.bankName !== undefined ? dto.bankName : partner.bankName,
-        bankAccountNumber: dto.bankAccountNumber !== undefined ? dto.bankAccountNumber : partner.bankAccountNumber,
-        bankAccountName: dto.bankAccountName !== undefined ? dto.bankAccountName : partner.bankAccountName,
+        bankAccountNumber:
+          dto.bankAccountNumber !== undefined
+            ? dto.bankAccountNumber
+            : partner.bankAccountNumber,
+        bankAccountName:
+          dto.bankAccountName !== undefined
+            ? dto.bankAccountName
+            : partner.bankAccountName,
       },
       include: {
         event: {
@@ -420,7 +449,9 @@ export class AdminService {
    * Menyetujui event untuk tayang di platform
    */
   async approveEvent(eventId: string) {
-    const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) throw new NotFoundException('Event tidak ditemukan');
     return this.prisma.event.update({
       where: { id: eventId },
@@ -432,7 +463,9 @@ export class AdminService {
    * Menolak event
    */
   async rejectEvent(eventId: string, reason?: string) {
-    const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) throw new NotFoundException('Event tidak ditemukan');
     return this.prisma.event.update({
       where: { id: eventId },
@@ -444,17 +477,22 @@ export class AdminService {
    * Ringkasan platform: total organizer, total event, total revenue, total fee terkumpul
    */
   async getDashboard() {
-    const [totalOrganizers, activeOrganizers, totalEvents, publishedEvents, paidOrders] =
-      await Promise.all([
-        this.prisma.organizer.count(),
-        this.prisma.organizer.count({ where: { status: 'active' } }),
-        this.prisma.event.count(),
-        this.prisma.event.count({ where: { status: 'PUBLISHED' } }),
-        this.prisma.order.findMany({
-          where: { status: 'PAID' },
-          select: { totalAmount: true },
-        }),
-      ]);
+    const [
+      totalOrganizers,
+      activeOrganizers,
+      totalEvents,
+      publishedEvents,
+      paidOrders,
+    ] = await Promise.all([
+      this.prisma.organizer.count(),
+      this.prisma.organizer.count({ where: { status: 'active' } }),
+      this.prisma.event.count(),
+      this.prisma.event.count({ where: { status: 'PUBLISHED' } }),
+      this.prisma.order.findMany({
+        where: { status: 'PAID' },
+        select: { totalAmount: true },
+      }),
+    ]);
 
     const totalRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
     const platformFee = Math.round(totalRevenue * 0.05); // 5% platform fee standar
@@ -631,7 +669,11 @@ export class AdminService {
       where.OR = [
         { id: { contains: query, mode: 'insensitive' } },
         { buyer: { email: { contains: query, mode: 'insensitive' } } },
-        { orderItems: { some: { attendeeName: { contains: query, mode: 'insensitive' } } } },
+        {
+          orderItems: {
+            some: { attendeeName: { contains: query, mode: 'insensitive' } },
+          },
+        },
       ];
     }
 
@@ -639,7 +681,13 @@ export class AdminService {
       where,
       include: {
         buyer: { select: { email: true } },
-        event: { select: { id: true, title: true, organizer: { select: { name: true } } } },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            organizer: { select: { name: true } },
+          },
+        },
         orderItems: { include: { ticketCategory: true } },
         payment: true,
       },
@@ -722,4 +770,3 @@ export class AdminService {
     }
   }
 }
-

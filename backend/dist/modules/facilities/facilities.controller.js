@@ -42,7 +42,10 @@ exports.FacilitiesController = FacilitiesController;
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Menambahkan fasilitas/addon baru untuk event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Fasilitas berhasil ditambahkan.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Fasilitas berhasil ditambahkan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -53,7 +56,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar fasilitas/addon untuk event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar fasilitas berhasil diambil.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar fasilitas berhasil diambil.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -62,7 +68,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':facilityId'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengupdate data fasilitas/addon' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Fasilitas berhasil diupdate.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Fasilitas berhasil diupdate.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('facilityId')),
     __param(2, (0, common_1.Body)()),
@@ -75,7 +84,10 @@ __decorate([
     (0, common_1.Delete)(':facilityId'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Menghapus fasilitas/addon' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Fasilitas berhasil dihapus.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Fasilitas berhasil dihapus.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('facilityId')),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),

@@ -41,8 +41,13 @@ exports.TransfersController = TransfersController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('tickets/:id/transfer'),
-    (0, swagger_1.ApiOperation)({ summary: 'Pemilik tiket mengajukan permintaan transfer kepemilikan' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Permintaan transfer berhasil dibuat.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Pemilik tiket mengajukan permintaan transfer kepemilikan',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Permintaan transfer berhasil dibuat.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -53,8 +58,13 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('tickets/transfer/:requestToken/confirm'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Penerima mengonfirmasi dan menerima transfer tiket' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Transfer tiket berhasil dikonfirmasi.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Penerima mengonfirmasi dan menerima transfer tiket',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Transfer tiket berhasil dikonfirmasi.',
+    }),
     __param(0, (0, common_1.Param)('requestToken')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -64,8 +74,13 @@ __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('tickets/transfer/:requestToken/decline'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Menolak atau membatalkan permintaan transfer tiket' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Transfer tiket dibatalkan.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Menolak atau membatalkan permintaan transfer tiket',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Transfer tiket dibatalkan.',
+    }),
     __param(0, (0, common_1.Param)('requestToken')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -75,8 +90,13 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, roles_decorator_1.Roles)('organizer', 'organizer_member'),
     (0, common_1.Get)('organizer/events/:id/transfers'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar histori transfer tiket pada event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Histori transfer tiket berhasil diambil.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar histori transfer tiket pada event',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Histori transfer tiket berhasil diambil.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

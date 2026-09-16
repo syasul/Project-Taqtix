@@ -29,13 +29,19 @@ class CreatePartnerDto {
 }
 exports.CreatePartnerDto = CreatePartnerDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Raffi Ahmad Ambassador', description: 'Nama partner afiliasi' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Raffi Ahmad Ambassador',
+        description: 'Nama partner afiliasi',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama partner tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'event-uuid-1234', description: 'ID Event yang dipromosikan' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'event-uuid-1234',
+        description: 'ID Event yang dipromosikan',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Event ID tidak boleh kosong' }),
     __metadata("design:type", String)
@@ -59,13 +65,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "uniqueCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'PROMORAF', description: 'Kode voucher diskon' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'PROMORAF',
+        description: 'Kode voucher diskon',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "promoCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'percentage', description: 'Tipe komisi (percentage / fixed)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'percentage',
+        description: 'Tipe komisi (percentage / fixed)',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -78,38 +90,56 @@ __decorate([
     __metadata("design:type", Number)
 ], CreatePartnerDto.prototype, "commissionValue", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'raffi@partner.com', description: 'Email partner' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'raffi@partner.com',
+        description: 'Email partner',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'PartnerSecret123', description: 'Password akun portal partner' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'PartnerSecret123',
+        description: 'Password akun portal partner',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6, { message: 'Password minimal 6 karakter' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: '3201234567890001', description: 'Nomor KTP / NIK partner' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '3201234567890001',
+        description: 'Nomor KTP / NIK partner',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "idCardNumber", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'BCA', description: 'Nama Bank pencairan komisi' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'BCA',
+        description: 'Nama Bank pencairan komisi',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "bankName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: '8820192831', description: 'Nomor Rekening bank' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '8820192831',
+        description: 'Nomor Rekening bank',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePartnerDto.prototype, "bankAccountNumber", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Budi Santoso', description: 'Nama pemilik rekening bank' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Budi Santoso',
+        description: 'Nama pemilik rekening bank',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

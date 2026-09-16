@@ -180,7 +180,9 @@ __decorate([
     (0, roles_decorator_1.Roles)('partner'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, idempotency_decorator_1.RequireIdempotency)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Generate atau perbarui kode unik afiliasi partner' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Generate atau perbarui kode unik afiliasi partner',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __param(1, (0, common_1.Body)('customCode')),
     __metadata("design:type", Function),
@@ -192,7 +194,9 @@ __decorate([
     (0, roles_decorator_1.Roles)('partner'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, idempotency_decorator_1.RequireIdempotency)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mengajukan pencairan saldo komisi partner afiliasi' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengajukan pencairan saldo komisi partner afiliasi',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __param(1, (0, common_1.Body)('amount')),
     __metadata("design:type", Function),

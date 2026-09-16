@@ -181,7 +181,9 @@ export class GateService {
         throw new HttpException(
           {
             code: 'TICKET_BLOCKED',
-            message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+            message:
+              ticket.blockedReason ||
+              'Tiket telah dinonaktifkan / diblokir oleh panitia',
           },
           HttpStatus.FORBIDDEN,
         );
@@ -253,7 +255,8 @@ export class GateService {
 
         return {
           success: true,
-          message: 'Check-out berhasil! Tiket dinonaktifkan sementara (bisa masuk kembali).',
+          message:
+            'Check-out berhasil! Tiket dinonaktifkan sementara (bisa masuk kembali).',
           ticketId: ticket.id,
           buyerName: ticket.orderItem.attendeeName,
           ticketCategory: ticket.orderItem.ticketCategory.name,
@@ -403,7 +406,9 @@ export class GateService {
         throw new HttpException(
           {
             code: 'TICKET_BLOCKED',
-            message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+            message:
+              ticket.blockedReason ||
+              'Tiket telah dinonaktifkan / diblokir oleh panitia',
           },
           HttpStatus.FORBIDDEN,
         );

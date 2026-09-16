@@ -109,8 +109,13 @@ let ApiV1Controller = class ApiV1Controller {
 exports.ApiV1Controller = ApiV1Controller;
 __decorate([
     (0, common_1.Get)('events'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar event milik organizer (Public API v1)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar event berhasil diambil.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar event milik organizer (Public API v1)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar event berhasil diambil.',
+    }),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -119,7 +124,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)('orders'),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar pesanan tiket (Public API v1)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar pesanan berhasil diambil.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar pesanan berhasil diambil.',
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('eventId')),
     __metadata("design:type", Function),
@@ -128,8 +136,13 @@ __decorate([
 ], ApiV1Controller.prototype, "getOrders", null);
 __decorate([
     (0, common_1.Get)('attendance'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar kehadiran / scan log (Public API v1)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar kehadiran berhasil diambil.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar kehadiran / scan log (Public API v1)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar kehadiran berhasil diambil.',
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('eventId')),
     __metadata("design:type", Function),

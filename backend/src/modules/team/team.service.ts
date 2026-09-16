@@ -25,7 +25,7 @@ export class TeamService {
     const inviterMember = await this.prisma.organizerMember.findFirst({
       where: { userId: invitedByUserId, status: 'active' },
     });
-    
+
     let organizerId = inviterMember?.organizerId;
 
     if (!organizerId) {
@@ -81,7 +81,9 @@ export class TeamService {
     }
 
     // Simulasi pengiriman email / WhatsApp dengan log ke konsol
-    console.log(`[INVITE MAIL] Link: https://app.taqtix.id/team/accept/${inviteToken}`);
+    console.log(
+      `[INVITE MAIL] Link: https://app.taqtix.id/team/accept/${inviteToken}`,
+    );
 
     return {
       id: member.id,
@@ -175,7 +177,9 @@ export class TeamService {
         where: { userId },
       });
       if (!org) {
-        throw new ForbiddenException('Pengguna tidak memiliki profil organizer');
+        throw new ForbiddenException(
+          'Pengguna tidak memiliki profil organizer',
+        );
       }
       organizerId = org.id;
     }

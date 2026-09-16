@@ -21,31 +21,46 @@ class UpdateOrganizerDto {
 }
 exports.UpdateOrganizerDto = UpdateOrganizerDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Nusantara Creative EO Baru', description: 'Nama penyelenggara' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Nusantara Creative EO Baru',
+        description: 'Nama penyelenggara',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateOrganizerDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'ENTERPRISE', description: 'Segmentasi bisnis organizer' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'ENTERPRISE',
+        description: 'Segmentasi bisnis organizer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateOrganizerDto.prototype, "segment", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'ENTERPRISE_CUSTOM', description: 'Paket langganan/plan' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'ENTERPRISE_CUSTOM',
+        description: 'Paket langganan/plan',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateOrganizerDto.prototype, "plan", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: '2027-12-31T23:59:59Z', description: 'Tanggal kedaluwarsa plan' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '2027-12-31T23:59:59Z',
+        description: 'Tanggal kedaluwarsa plan',
+    }),
     (0, class_validator_1.IsDateString)({}, { message: 'Format tanggal planExpiresAt tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateOrganizerDto.prototype, "planExpiresAt", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Mandiri - 987654321 a.n PT Nusantara', description: 'Rekening bank' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Mandiri - 987654321 a.n PT Nusantara',
+        description: 'Rekening bank',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

@@ -31,7 +31,10 @@ export class CreateCustomFieldDto {
   @IsString({ each: true })
   options?: string[];
 
-  @ApiPropertyOptional({ default: false, description: 'Wajib diisi atau opsional' })
+  @ApiPropertyOptional({
+    default: false,
+    description: 'Wajib diisi atau opsional',
+  })
   @IsOptional()
   @IsBoolean()
   required?: boolean;

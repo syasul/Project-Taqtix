@@ -34,7 +34,9 @@ export class LineupService {
       where: { id: eventId },
     });
     if (!event || event.organizerId !== organizer.id) {
-      throw new NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+      throw new NotFoundException(
+        'Event tidak ditemukan atau bukan milik Anda',
+      );
     }
     return { event, organizer };
   }

@@ -31,7 +31,8 @@ let WorkforceService = class WorkforceService {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
         const memberId = crypto.randomUUID();
-        const qrSecret = this.configService.get('TAQTIX_QR_SECRET') || 'super-secret-qr-key-change-me';
+        const qrSecret = this.configService.get('TAQTIX_QR_SECRET') ||
+            'super-secret-qr-key-change-me';
         const qrPayload = await this.jwtService.signAsync({
             ticketId: memberId,
             eventId,
@@ -100,9 +101,7 @@ let WorkforceService = class WorkforceService {
         const shiftStartTime = event.startDate;
         const lateTime = new Date(shiftStartTime.getTime() + lateThresholdMinutes * 60000);
         const now = new Date();
-        const late = allMembers.filter((m) => m.status === 'present' &&
-            m.checkedInAt &&
-            m.checkedInAt > lateTime).length;
+        const late = allMembers.filter((m) => m.status === 'present' && m.checkedInAt && m.checkedInAt > lateTime).length;
         const absent = allMembers.filter((m) => m.status === 'not_checked_in' && now > lateTime).length;
         return {
             division: activeDivision || 'All Divisions',
@@ -175,7 +174,9 @@ let WorkforceService = class WorkforceService {
         if (member.status === 'present') {
             throw new common_1.ConflictException('ALREADY_CHECKED_IN');
         }
-        if (member.event.geofenceLat !== null && member.event.geofenceLng !== null && member.event.geofenceRadius !== null) {
+        if (member.event.geofenceLat !== null &&
+            member.event.geofenceLng !== null &&
+            member.event.geofenceRadius !== null) {
             const distance = this.calculateDistance(latitude, longitude, member.event.geofenceLat, member.event.geofenceLng);
             if (distance > member.event.geofenceRadius) {
                 throw new common_1.BadRequestException('OUTSIDE_VENUE_RADIUS');
@@ -191,7 +192,8 @@ let WorkforceService = class WorkforceService {
         });
     }
     async scanCrew(qrPayload) {
-        const qrSecret = this.configService.get('TAQTIX_QR_SECRET') || 'super-secret-qr-key-change-me';
+        const qrSecret = this.configService.get('TAQTIX_QR_SECRET') ||
+            'super-secret-qr-key-change-me';
         let decoded;
         try {
             decoded = await this.jwtService.verifyAsync(qrPayload, {

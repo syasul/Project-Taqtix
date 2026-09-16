@@ -34,7 +34,9 @@ export class CustomFieldsService {
       where: { id: eventId },
     });
     if (!event || event.organizerId !== organizer.id) {
-      throw new NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+      throw new NotFoundException(
+        'Event tidak ditemukan atau bukan milik Anda',
+      );
     }
     return { event, organizer };
   }
@@ -45,7 +47,9 @@ export class CustomFieldsService {
     // Hitung order berikutnya jika order tidak ditentukan
     let orderIndex = dto.order;
     if (orderIndex === undefined) {
-      const count = await this.prisma.customFormField.count({ where: { eventId } });
+      const count = await this.prisma.customFormField.count({
+        where: { eventId },
+      });
       orderIndex = count;
     }
 

@@ -1,8 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateDoorprizeDto {
-  @ApiProperty({ example: 'iPhone 15 Pro Max', description: 'Nama hadiah doorprize' })
+  @ApiProperty({
+    example: 'iPhone 15 Pro Max',
+    description: 'Nama hadiah doorprize',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -12,7 +21,10 @@ export class CreateDoorprizeDto {
   @IsString()
   imageUrl?: string;
 
-  @ApiProperty({ example: 1, description: 'Jumlah kuantitas hadiah yang diundi' })
+  @ApiProperty({
+    example: 1,
+    description: 'Jumlah kuantitas hadiah yang diundi',
+  })
   @IsNumber()
   @Min(1)
   quantity: number;

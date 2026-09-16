@@ -75,7 +75,8 @@ export class CreateEventDto {
   seoTitle?: string;
 
   @ApiProperty({
-    example: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026 hanya di Taqtix.',
+    example:
+      'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026 hanya di Taqtix.',
     required: false,
     description: 'Custom SEO Meta Description',
   })

@@ -9,7 +9,12 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { VouchersService } from './vouchers.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
@@ -26,8 +31,13 @@ export class VouchersController {
 
   @Post()
   @Permissions('manage_promo_code')
-  @ApiOperation({ summary: 'Membuat voucher baru (org-wide atau event-scoped)' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Voucher berhasil dibuat.' })
+  @ApiOperation({
+    summary: 'Membuat voucher baru (org-wide atau event-scoped)',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Voucher berhasil dibuat.',
+  })
   async create(
     @Body() dto: CreateVoucherDto,
     @CurrentUser('id') userId: string,
@@ -37,7 +47,10 @@ export class VouchersController {
 
   @Get()
   @ApiOperation({ summary: 'Mendapatkan daftar semua voucher organisasi' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar voucher berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar voucher berhasil diambil.',
+  })
   async findAll(
     @Query('eventId') eventId: string,
     @CurrentUser('id') userId: string,
@@ -48,7 +61,10 @@ export class VouchersController {
   @Patch(':id')
   @Permissions('manage_promo_code')
   @ApiOperation({ summary: 'Mengupdate voucher' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Voucher berhasil diupdate.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Voucher berhasil diupdate.',
+  })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateVoucherDto,
@@ -61,11 +77,11 @@ export class VouchersController {
   @Permissions('manage_promo_code')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Menonaktifkan voucher' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Voucher berhasil dinonaktifkan.' })
-  async deactivate(
-    @Param('id') id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Voucher berhasil dinonaktifkan.',
+  })
+  async deactivate(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.vouchersService.deactivate(id, userId);
   }
 }

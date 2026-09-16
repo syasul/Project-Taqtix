@@ -46,7 +46,10 @@ exports.CustomFieldsController = CustomFieldsController;
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Menambahkan field formulir baru untuk event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Field formulir berhasil ditambahkan.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Field formulir berhasil ditambahkan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -57,7 +60,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar field formulir untuk event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar field formulir berhasil diambil.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar field formulir berhasil diambil.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -66,7 +72,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)('reorder'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengubah urutan tampilan field formulir' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Urutan field formulir berhasil diperbarui.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Urutan field formulir berhasil diperbarui.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -77,7 +86,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':fieldId'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengupdate field formulir' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Field formulir berhasil diupdate.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Field formulir berhasil diupdate.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('fieldId')),
     __param(2, (0, common_1.Body)()),
@@ -90,7 +102,10 @@ __decorate([
     (0, common_1.Delete)(':fieldId'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Menghapus field formulir' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Field formulir berhasil dihapus.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Field formulir berhasil dihapus.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('fieldId')),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),

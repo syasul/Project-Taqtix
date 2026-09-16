@@ -9,7 +9,10 @@ import {
 } from 'class-validator';
 
 export class CreateFacilityDto {
-  @ApiProperty({ example: 'Merchandise Bundle', description: 'Nama fasilitas / addon' })
+  @ApiProperty({
+    example: 'Merchandise Bundle',
+    description: 'Nama fasilitas / addon',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -19,13 +22,18 @@ export class CreateFacilityDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ default: 0, description: 'Harga fasilitas dalam Rupiah (0 = gratis)' })
+  @ApiPropertyOptional({
+    default: 0,
+    description: 'Harga fasilitas dalam Rupiah (0 = gratis)',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
   price?: number;
 
-  @ApiPropertyOptional({ description: 'Batas kuota stok fasilitas (null = unlimited)' })
+  @ApiPropertyOptional({
+    description: 'Batas kuota stok fasilitas (null = unlimited)',
+  })
   @IsOptional()
   @IsNumber()
   @Min(1)
@@ -33,7 +41,8 @@ export class CreateFacilityDto {
 
   @ApiPropertyOptional({
     type: [String],
-    description: 'ID kategori tiket yang boleh membeli fasilitas ini (null = semua kategori)',
+    description:
+      'ID kategori tiket yang boleh membeli fasilitas ini (null = semua kategori)',
   })
   @IsOptional()
   @IsArray()

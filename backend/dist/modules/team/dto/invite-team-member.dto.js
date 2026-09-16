@@ -18,13 +18,19 @@ class InviteTeamMemberDto {
 }
 exports.InviteTeamMemberDto = InviteTeamMemberDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'colleague@organizer.id', description: 'Email anggota tim yang diundang' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'colleague@organizer.id',
+        description: 'Email anggota tim yang diundang',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Email tidak boleh kosong' }),
     __metadata("design:type", String)
 ], InviteTeamMemberDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'finance', description: 'Peran / hak akses di organizer' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'finance',
+        description: 'Peran / hak akses di organizer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Peran (role) tidak boleh kosong' }),
     __metadata("design:type", String)

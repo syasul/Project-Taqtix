@@ -19,19 +19,31 @@ class CreateBroadcastDto {
 }
 exports.CreateBroadcastDto = CreateBroadcastDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Halo! Dapatkan potongan 20% khusus untuk Anda...', description: 'Pesan broadcast' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Halo! Dapatkan potongan 20% khusus untuk Anda...',
+        description: 'Pesan broadcast',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Pesan broadcast tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateBroadcastDto.prototype, "message", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'whatsapp', enum: ['whatsapp', 'email'], description: 'Kanal pengiriman' }),
-    (0, class_validator_1.IsIn)(['whatsapp', 'email'], { message: 'Kanal harus berupa whatsapp atau email' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'whatsapp',
+        enum: ['whatsapp', 'email'],
+        description: 'Kanal pengiriman',
+    }),
+    (0, class_validator_1.IsIn)(['whatsapp', 'email'], {
+        message: 'Kanal harus berupa whatsapp atau email',
+    }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateBroadcastDto.prototype, "channel", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Penawaran Eksklusif Tiket TAQtix', description: 'Subjek email jika kanal email' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Penawaran Eksklusif Tiket TAQtix',
+        description: 'Subjek email jika kanal email',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

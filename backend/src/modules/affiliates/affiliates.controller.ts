@@ -31,7 +31,8 @@ export class AffiliatesController {
   @Public()
   @Get('r/:code')
   @ApiOperation({
-    summary: 'Mencatat klik afiliasi dan redirect ke landing page event (Public)',
+    summary:
+      'Mencatat klik afiliasi dan redirect ke landing page event (Public)',
   })
   async redirectAffiliate(
     @Param('code') code: string,
@@ -106,7 +107,8 @@ export class AffiliatesController {
   @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
+    summary:
+      'Mendapatkan leaderboard penjualan partner afiliasi (Organizer Only)',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -152,12 +154,17 @@ export class AffiliatesController {
   @Roles('partner')
   @ApiBearerAuth()
   @RequireIdempotency()
-  @ApiOperation({ summary: 'Generate atau perbarui kode unik afiliasi partner' })
+  @ApiOperation({
+    summary: 'Generate atau perbarui kode unik afiliasi partner',
+  })
   async generateAffiliateCode(
     @CurrentUser('id') partnerId: string,
     @Body('customCode') customCode?: string,
   ) {
-    const result = await this.affiliatesService.generateCode(partnerId, customCode);
+    const result = await this.affiliatesService.generateCode(
+      partnerId,
+      customCode,
+    );
     return { success: true, data: result };
   }
 
@@ -165,12 +172,17 @@ export class AffiliatesController {
   @Roles('partner')
   @ApiBearerAuth()
   @RequireIdempotency()
-  @ApiOperation({ summary: 'Mengajukan pencairan saldo komisi partner afiliasi' })
+  @ApiOperation({
+    summary: 'Mengajukan pencairan saldo komisi partner afiliasi',
+  })
   async requestPayout(
     @CurrentUser('id') partnerId: string,
     @Body('amount') amount?: number,
   ) {
-    const result = await this.affiliatesService.requestPayout(partnerId, amount);
+    const result = await this.affiliatesService.requestPayout(
+      partnerId,
+      amount,
+    );
     return { success: true, data: result };
   }
 }

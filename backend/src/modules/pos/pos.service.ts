@@ -118,7 +118,9 @@ export class PosService {
     await this.verifyEventOwnership(eventId, cashierUserId);
 
     if (!dto.items || dto.items.length === 0) {
-      throw new BadRequestException('Daftar item belanja POS tidak boleh kosong.');
+      throw new BadRequestException(
+        'Daftar item belanja POS tidak boleh kosong.',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -148,7 +150,9 @@ export class PosService {
           });
 
           if (!cat || cat.eventId !== eventId) {
-            throw new BadRequestException(`Kategori tiket "${item.name}" tidak ditemukan`);
+            throw new BadRequestException(
+              `Kategori tiket "${item.name}" tidak ditemukan`,
+            );
           }
 
           if (cat.quota - cat.sold < item.qty) {
@@ -174,7 +178,9 @@ export class PosService {
           });
 
           if (!fac || fac.eventId !== eventId) {
-            throw new BadRequestException(`Fasilitas "${item.name}" tidak ditemukan`);
+            throw new BadRequestException(
+              `Fasilitas "${item.name}" tidak ditemukan`,
+            );
           }
 
           if (fac.quota !== null && fac.quota - fac.sold < item.qty) {
@@ -321,7 +327,10 @@ export class PosService {
       where: { eventId },
     });
 
-    const totalRevenue = transactions.reduce((acc, t) => acc + t.totalAmount, 0);
+    const totalRevenue = transactions.reduce(
+      (acc, t) => acc + t.totalAmount,
+      0,
+    );
 
     const byMethod = {
       cash: transactions

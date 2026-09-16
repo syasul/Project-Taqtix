@@ -85,7 +85,9 @@ export class CRMService {
         },
         select: { attendeeEmail: true },
       });
-      const prevEmails = Array.from(new Set(prevItems.map((item) => item.attendeeEmail)));
+      const prevEmails = Array.from(
+        new Set(prevItems.map((item) => item.attendeeEmail)),
+      );
       where.attendeeEmail = { in: prevEmails };
     }
 

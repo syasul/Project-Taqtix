@@ -139,9 +139,11 @@ let AdminService = class AdminService {
         await this.prisma.organizer.delete({
             where: { id },
         });
-        await this.prisma.user.delete({
+        await this.prisma.user
+            .delete({
             where: { id: org.userId },
-        }).catch(() => { });
+        })
+            .catch(() => { });
         return { id, message: 'Organizer berhasil dihapus' };
     }
     async updateOrganizerSegmentAndPlan(organizerId, dto) {
@@ -159,7 +161,9 @@ let AdminService = class AdminService {
                 plan: dto.plan ?? organizer.plan,
                 bankAccount: dto.bankAccount ?? organizer.bankAccount,
                 planStartedAt: dto.plan ? new Date() : organizer.planStartedAt,
-                planExpiresAt: dto.planExpiresAt ? new Date(dto.planExpiresAt) : organizer.planExpiresAt,
+                planExpiresAt: dto.planExpiresAt
+                    ? new Date(dto.planExpiresAt)
+                    : organizer.planExpiresAt,
             },
         });
     }
@@ -206,15 +210,25 @@ let AdminService = class AdminService {
                 name: dto.name ?? partner.name,
                 eventId: dto.eventId ?? partner.eventId,
                 type: dto.type ?? partner.type,
-                uniqueCode: dto.uniqueCode ? dto.uniqueCode.toUpperCase() : partner.uniqueCode,
-                promoCode: dto.promoCode !== undefined ? dto.promoCode?.toUpperCase() : partner.promoCode,
+                uniqueCode: dto.uniqueCode
+                    ? dto.uniqueCode.toUpperCase()
+                    : partner.uniqueCode,
+                promoCode: dto.promoCode !== undefined
+                    ? dto.promoCode?.toUpperCase()
+                    : partner.promoCode,
                 commissionType: dto.commissionType ?? partner.commissionType,
                 commissionValue: dto.commissionValue ?? partner.commissionValue,
                 email: dto.email ?? partner.email,
-                idCardNumber: dto.idCardNumber !== undefined ? dto.idCardNumber : partner.idCardNumber,
+                idCardNumber: dto.idCardNumber !== undefined
+                    ? dto.idCardNumber
+                    : partner.idCardNumber,
                 bankName: dto.bankName !== undefined ? dto.bankName : partner.bankName,
-                bankAccountNumber: dto.bankAccountNumber !== undefined ? dto.bankAccountNumber : partner.bankAccountNumber,
-                bankAccountName: dto.bankAccountName !== undefined ? dto.bankAccountName : partner.bankAccountName,
+                bankAccountNumber: dto.bankAccountNumber !== undefined
+                    ? dto.bankAccountNumber
+                    : partner.bankAccountNumber,
+                bankAccountName: dto.bankAccountName !== undefined
+                    ? dto.bankAccountName
+                    : partner.bankAccountName,
             },
             include: {
                 event: {
@@ -341,7 +355,9 @@ let AdminService = class AdminService {
         }));
     }
     async approveEvent(eventId) {
-        const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+        const event = await this.prisma.event.findUnique({
+            where: { id: eventId },
+        });
         if (!event)
             throw new common_1.NotFoundException('Event tidak ditemukan');
         return this.prisma.event.update({
@@ -350,7 +366,9 @@ let AdminService = class AdminService {
         });
     }
     async rejectEvent(eventId, reason) {
-        const event = await this.prisma.event.findUnique({ where: { id: eventId } });
+        const event = await this.prisma.event.findUnique({
+            where: { id: eventId },
+        });
         if (!event)
             throw new common_1.NotFoundException('Event tidak ditemukan');
         return this.prisma.event.update({
@@ -359,7 +377,7 @@ let AdminService = class AdminService {
         });
     }
     async getDashboard() {
-        const [totalOrganizers, activeOrganizers, totalEvents, publishedEvents, paidOrders] = await Promise.all([
+        const [totalOrganizers, activeOrganizers, totalEvents, publishedEvents, paidOrders,] = await Promise.all([
             this.prisma.organizer.count(),
             this.prisma.organizer.count({ where: { status: 'active' } }),
             this.prisma.event.count(),
@@ -486,14 +504,24 @@ let AdminService = class AdminService {
             where.OR = [
                 { id: { contains: query, mode: 'insensitive' } },
                 { buyer: { email: { contains: query, mode: 'insensitive' } } },
-                { orderItems: { some: { attendeeName: { contains: query, mode: 'insensitive' } } } },
+                {
+                    orderItems: {
+                        some: { attendeeName: { contains: query, mode: 'insensitive' } },
+                    },
+                },
             ];
         }
         const orders = await this.prisma.order.findMany({
             where,
             include: {
                 buyer: { select: { email: true } },
-                event: { select: { id: true, title: true, organizer: { select: { name: true } } } },
+                event: {
+                    select: {
+                        id: true,
+                        title: true,
+                        organizer: { select: { name: true } },
+                    },
+                },
                 orderItems: { include: { ticketCategory: true } },
                 payment: true,
             },

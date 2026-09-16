@@ -12,6 +12,7 @@ const jwt_1 = require("@nestjs/jwt");
 const bull_1 = require("@nestjs/bull");
 const payments_service_1 = require("./payments.service");
 const payments_controller_1 = require("./payments.controller");
+const doku_service_1 = require("./doku/doku.service");
 let PaymentsModule = class PaymentsModule {
 };
 exports.PaymentsModule = PaymentsModule;
@@ -24,8 +25,8 @@ exports.PaymentsModule = PaymentsModule = __decorate([
             }),
         ],
         controllers: [payments_controller_1.PaymentsController],
-        providers: [payments_service_1.PaymentsService],
-        exports: [payments_service_1.PaymentsService],
+        providers: [payments_service_1.PaymentsService, doku_service_1.DokuService],
+        exports: [payments_service_1.PaymentsService, doku_service_1.DokuService],
     })
 ], PaymentsModule);
 //# sourceMappingURL=payments.module.js.map

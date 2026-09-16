@@ -25,7 +25,9 @@ const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 @Injectable()
-export class IdempotencyInterceptor implements NestInterceptor, OnModuleDestroy {
+export class IdempotencyInterceptor
+  implements NestInterceptor, OnModuleDestroy
+{
   private readonly logger = new Logger(IdempotencyInterceptor.name);
   private redis: Redis | null = null;
 
@@ -158,7 +160,9 @@ export class IdempotencyInterceptor implements NestInterceptor, OnModuleDestroy 
             86400,
           );
         } catch (err: any) {
-          this.logger.error(`Gagal menyimpan cache idempotency: ${err.message}`);
+          this.logger.error(
+            `Gagal menyimpan cache idempotency: ${err.message}`,
+          );
         } finally {
           // Lepaskan penanda lock
           await this.releaseLock(lockKey);
@@ -216,10 +220,7 @@ export class IdempotencyInterceptor implements NestInterceptor, OnModuleDestroy 
     });
   }
 
-  private async acquireLock(
-    key: string,
-    ttlMillis: number,
-  ): Promise<boolean> {
+  private async acquireLock(key: string, ttlMillis: number): Promise<boolean> {
     if (this.redis && this.redis.status === 'ready') {
       try {
         const result = await this.redis.set(

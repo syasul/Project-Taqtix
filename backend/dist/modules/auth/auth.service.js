@@ -119,7 +119,9 @@ let AuthService = class AuthService {
         if (user.role !== 'gate_staff') {
             throw new common_1.UnauthorizedException('Akses ditolak: Hanya untuk gate_staff');
         }
-        if (dto.deviceId && user.activeDeviceId && user.activeDeviceId !== dto.deviceId) {
+        if (dto.deviceId &&
+            user.activeDeviceId &&
+            user.activeDeviceId !== dto.deviceId) {
             throw new common_1.UnauthorizedException('Akun ini sedang aktif di perangkat lain');
         }
         await this.prisma.user.update({

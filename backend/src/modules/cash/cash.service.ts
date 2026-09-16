@@ -32,7 +32,9 @@ export class CashService {
       where: { id: eventId },
     });
     if (!event || event.organizerId !== organizer.id) {
-      throw new NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+      throw new NotFoundException(
+        'Event tidak ditemukan atau bukan milik Anda',
+      );
     }
     return { event, organizer };
   }
@@ -40,7 +42,11 @@ export class CashService {
   /**
    * Catat transaksi cash manual untuk event tertentu.
    */
-  async recordCash(eventId: string, dto: CreateCashTransactionDto, userId: string) {
+  async recordCash(
+    eventId: string,
+    dto: CreateCashTransactionDto,
+    userId: string,
+  ) {
     await this.verifyEventOwnership(eventId, userId);
 
     return this.prisma.cashTransaction.create({
@@ -67,7 +73,10 @@ export class CashService {
       orderBy: { createdAt: 'desc' },
     });
 
-    const totalCashIn = transactions.reduce((acc, curr) => acc + curr.amount, 0);
+    const totalCashIn = transactions.reduce(
+      (acc, curr) => acc + curr.amount,
+      0,
+    );
 
     const breakdown = {
       ticket_sale: transactions
@@ -113,7 +122,10 @@ export class CashService {
 
     let grandTotalCash = 0;
     const eventSummaries = events.map((ev) => {
-      const totalCash = ev.cashTransactions.reduce((acc, t) => acc + t.amount, 0);
+      const totalCash = ev.cashTransactions.reduce(
+        (acc, t) => acc + t.amount,
+        0,
+      );
       grandTotalCash += totalCash;
       return {
         eventId: ev.id,

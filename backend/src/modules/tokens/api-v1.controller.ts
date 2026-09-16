@@ -24,8 +24,13 @@ export class ApiV1Controller {
   constructor(private readonly prisma: PrismaService) {}
 
   @Get('events')
-  @ApiOperation({ summary: 'Mendapatkan daftar event milik organizer (Public API v1)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar event berhasil diambil.' })
+  @ApiOperation({
+    summary: 'Mendapatkan daftar event milik organizer (Public API v1)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar event berhasil diambil.',
+  })
   async getEvents(@Req() req: any) {
     const organizer = req.organizer;
 
@@ -47,11 +52,11 @@ export class ApiV1Controller {
 
   @Get('orders')
   @ApiOperation({ summary: 'Mendapatkan daftar pesanan tiket (Public API v1)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar pesanan berhasil diambil.' })
-  async getOrders(
-    @Req() req: any,
-    @Query('eventId') eventId?: string,
-  ) {
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar pesanan berhasil diambil.',
+  })
+  async getOrders(@Req() req: any, @Query('eventId') eventId?: string) {
     const organizer = req.organizer;
 
     const where: any = {
@@ -85,12 +90,14 @@ export class ApiV1Controller {
   }
 
   @Get('attendance')
-  @ApiOperation({ summary: 'Mendapatkan daftar kehadiran / scan log (Public API v1)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar kehadiran berhasil diambil.' })
-  async getAttendance(
-    @Req() req: any,
-    @Query('eventId') eventId?: string,
-  ) {
+  @ApiOperation({
+    summary: 'Mendapatkan daftar kehadiran / scan log (Public API v1)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar kehadiran berhasil diambil.',
+  })
+  async getAttendance(@Req() req: any, @Query('eventId') eventId?: string) {
     const organizer = req.organizer;
 
     const where: any = {

@@ -5,26 +5,39 @@ import {
   UnauthorizedException,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentStatus } from '@prisma/client';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bullmq';
+import { DokuService } from '../payments/doku/doku.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
-  private idempotencyStore = new Map<string, { order: any; expiresAt: number }>();
+  private readonly logger = new Logger(OrdersService.name);
+  private idempotencyStore = new Map<
+    string,
+    { order: any; expiresAt: number }
+  >();
 
   constructor(
     private prisma: PrismaService,
     @InjectQueue('order-expiration') private orderExpirationQueue: Queue,
+    private readonly dokuService: DokuService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
    * Membuat pesanan baru dengan locking kuota tiket pesanan secara transaksional (SELECT FOR UPDATE).
    */
-  async create(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string) {
+  async create(
+    dto: CreateOrderDto,
+    authenticatedUserId?: string,
+    idempotencyKey?: string,
+  ) {
     if (idempotencyKey) {
       const cached = this.idempotencyStore.get(idempotencyKey);
       if (cached && cached.expiresAt > Date.now()) {
@@ -60,7 +73,8 @@ export class OrdersService {
 
         // Validasi Required
         if (field.required) {
-          const hasOrderAns = orderAns !== undefined && orderAns !== null && orderAns !== '';
+          const hasOrderAns =
+            orderAns !== undefined && orderAns !== null && orderAns !== '';
           const hasItemAns = itemAnswers.length > 0;
           if (!hasOrderAns && !hasItemAns) {
             throw new BadRequestException({
@@ -77,7 +91,9 @@ export class OrdersService {
           Array.isArray(field.options) &&
           field.options.length > 0
         ) {
-          const validOptions = (field.options as string[]).map((o) => String(o));
+          const validOptions = (field.options as string[]).map((o) =>
+            String(o),
+          );
           const allAnswers: string[] = [orderAns, ...itemAnswers].filter(
             (a): a is string => typeof a === 'string' && a.trim() !== '',
           );
@@ -272,7 +288,9 @@ export class OrdersService {
             `;
 
             if (!facilitiesLocked || facilitiesLocked.length === 0) {
-              throw new BadRequestException(`Fasilitas dengan ID "${fac.facilityId}" tidak ditemukan pada event ini.`);
+              throw new BadRequestException(
+                `Fasilitas dengan ID "${fac.facilityId}" tidak ditemukan pada event ini.`,
+              );
             }
 
             const facility = facilitiesLocked[0];
@@ -299,7 +317,10 @@ export class OrdersService {
             }
 
             // Validasi kuota fasilitas
-            if (facility.quota !== null && facility.quota - facility.sold < fac.qty) {
+            if (
+              facility.quota !== null &&
+              facility.quota - facility.sold < fac.qty
+            ) {
               throw new HttpException(
                 {
                   code: 'FACILITY_SOLD_OUT',
@@ -331,18 +352,25 @@ export class OrdersService {
           ticketCategoryId: ticketCategory.id,
           qty: item.qty,
           price: ticketCategory.price,
-          customFieldAnswers: item.customFieldAnswers || dto.customFieldAnswers || null,
-          facilities: verifiedItemFacilities.length > 0 ? verifiedItemFacilities : null,
+          customFieldAnswers:
+            item.customFieldAnswers || dto.customFieldAnswers || null,
+          facilities:
+            verifiedItemFacilities.length > 0 ? verifiedItemFacilities : null,
         });
       }
 
       // 4. Kalkulasi diskon voucher / promo code
       if (voucherId) {
-        const voucher = await tx.voucher.findUnique({ where: { id: voucherId } });
+        const voucher = await tx.voucher.findUnique({
+          where: { id: voucherId },
+        });
         if (voucher) {
           if (voucher.type === 'percentage') {
             discountAmt = (basePriceTotal * voucher.value) / 100;
-            if (voucher.maxDiscountAmount && discountAmt > voucher.maxDiscountAmount) {
+            if (
+              voucher.maxDiscountAmount &&
+              discountAmt > voucher.maxDiscountAmount
+            ) {
               discountAmt = voucher.maxDiscountAmount;
             }
           } else {
@@ -356,7 +384,9 @@ export class OrdersService {
           });
         }
       } else if (promoCodeId) {
-        const promo = await tx.promoCode.findUnique({ where: { id: promoCodeId } });
+        const promo = await tx.promoCode.findUnique({
+          where: { id: promoCodeId },
+        });
         if (promo) {
           if (promo.discount <= 100) {
             discountAmt = basePriceTotal * (promo.discount / 100);
@@ -413,6 +443,98 @@ export class OrdersService {
       return newOrder;
     });
 
+    // Query order lengkap beserta buyer dan items untuk pembuatan payment
+    const fullOrder = await this.prisma.order.findUnique({
+      where: { id: order.id },
+      include: {
+        buyer: true,
+        orderItems: {
+          include: {
+            ticketCategory: true,
+          },
+        },
+        payment: true,
+      },
+    });
+
+    let payment = fullOrder?.payment;
+    if (!payment) {
+      payment = await this.prisma.payment.create({
+        data: {
+          orderId: order.id,
+          amount: order.totalAmount,
+          status: PaymentStatus.PENDING,
+          provider: 'doku',
+        },
+      });
+    }
+
+    const dokuConfig = this.dokuService.getConfig();
+    let paymentUrl: string | undefined = undefined;
+    let expirationDelay = 10 * 60 * 1000;
+
+    if (dokuConfig.clientId && dokuConfig.secretKey) {
+      try {
+        const result = await this.dokuService.createPayment(fullOrder, payment);
+        paymentUrl = result.paymentUrl;
+
+        // Simpan response.payment.token_id ke Payment.externalId (dan snapToken = paymentUrl)
+        await this.prisma.payment.update({
+          where: { id: payment.id },
+          data: {
+            externalId: result.tokenId || result.invoiceNumber,
+            snapToken: result.paymentUrl,
+            provider: 'doku',
+          },
+        });
+
+        // Update Order.expiredAt pakai response.payment.expired_date dari Doku (parse format yyyyMMddHHmmss UTC+7),
+        // BUKAN hitung now + 10 menit secara terpisah di kode TAQtix — supaya expiry di 2 sistem selalu sinkron persis
+        if (result.expiredDate) {
+          await this.prisma.order.update({
+            where: { id: order.id },
+            data: { expiredAt: result.expiredDate },
+          });
+          order.expiredAt = result.expiredDate;
+          expirationDelay = Math.max(
+            1000,
+            result.expiredDate.getTime() - Date.now(),
+          );
+        }
+      } catch (dokuError: any) {
+        this.logger.error(
+          `Gagal memanggil DokuService.createPayment untuk order ${order.id}:`,
+          dokuError,
+        );
+        // Error handling: kalau request ke Doku gagal (network error, response 4xx/5xx), rollback —
+        // kembalikan quota yang sudah di-lock, set Order.status jadi cancelled,
+        // JANGAN biarkan Order menggantung pending tanpa paymentUrl yang valid
+        await this.rollbackOrder(order.id, dto);
+        throw new BadRequestException(
+          dokuError?.message ||
+            'Gagal memproses pembuatan pembayaran dengan DOKU Checkout',
+        );
+      }
+    } else {
+      // Fallback mode development / testing lokal
+      const frontendUrl =
+        this.configService.get<string>('TAQTIX_FRONTEND_URL') ||
+        this.configService.get<string>('TAQTIX_WEB_URL') ||
+        'http://localhost:3000';
+      paymentUrl = `${frontendUrl}/checkout?orderId=${order.id}&simulation=true`;
+      await this.prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+          externalId: 'DEV_MOCK_' + order.id,
+          snapToken: paymentUrl,
+          provider: 'doku_sandbox_mock',
+        },
+      });
+    }
+
+    // Return response.payment.url ke FE sebagai bagian dari response POST /orders
+    (order as any).paymentUrl = paymentUrl;
+
     // Simpan ke Idempotency store jika key dikirimkan (berlaku 10 menit)
     if (idempotencyKey) {
       this.idempotencyStore.set(idempotencyKey, {
@@ -428,14 +550,93 @@ export class OrdersService {
       }
     }
 
-    // 7. Jadwalkan pembatalan otomatis dalam 10 menit menggunakan BullMQ
+    // 7. Jadwalkan pembatalan otomatis disinkronkan dengan expired_date
     await this.orderExpirationQueue.add(
       'expire-order',
       { orderId: order.id },
-      { delay: 10 * 60 * 1000 }, // 10 menit
+      { delay: expirationDelay },
     );
 
     return order;
+  }
+
+  /**
+   * Melakukan rollback transaksional jika integrasi payment gateway DOKU gagal:
+   * 1. Mengubah Order.status menjadi CANCELLED
+   * 2. Mengubah Payment.status menjadi FAILED jika ada
+   * 3. Mengembalikan kuota tiket yang telah di-reserve
+   * 4. Mengembalikan kuota fasilitas add-ons jika ada
+   * 5. Mengembalikan limit pemakaian voucher / promo code
+   */
+  private async rollbackOrder(orderId: string, dto: CreateOrderDto) {
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        // 1. Update Order status
+        await tx.order.update({
+          where: { id: orderId },
+          data: { status: OrderStatus.CANCELLED },
+        });
+
+        // 2. Update Payment status
+        const payment = await tx.payment.findUnique({
+          where: { orderId },
+        });
+        if (payment) {
+          await tx.payment.update({
+            where: { id: payment.id },
+            data: { status: PaymentStatus.FAILED },
+          });
+        }
+
+        // 3. Kembalikan kuota tiket
+        for (const item of dto.items) {
+          await tx.ticketCategory.update({
+            where: { id: item.ticketCategoryId },
+            data: { sold: { decrement: item.qty } },
+          });
+
+          // Kembalikan fasilitas jika ada
+          if (item.facilities && item.facilities.length > 0) {
+            for (const fac of item.facilities) {
+              await tx.eventFacility.update({
+                where: { id: fac.facilityId },
+                data: { sold: { decrement: fac.qty } },
+              });
+            }
+          }
+        }
+
+        // 4. Kembalikan promo/voucher jika ada
+        const order = await tx.order.findUnique({
+          where: { id: orderId },
+        });
+        if (order?.promoCodeId) {
+          await tx.promoCode.update({
+            where: { id: order.promoCodeId },
+            data: { usedCount: { decrement: 1 } },
+          });
+        }
+        if (dto.promoCode) {
+          const voucher = await tx.voucher.findFirst({
+            where: { code: dto.promoCode.toUpperCase() },
+          });
+          if (voucher) {
+            await tx.voucher.update({
+              where: { id: voucher.id },
+              data: { usageCount: { decrement: 1 } },
+            });
+          }
+        }
+      });
+      this.logger.warn(
+        `[OrdersService] Rollback order ${orderId} berhasil dieksekusi.`,
+      );
+    } catch (rollbackErr) {
+      this.logger.error(
+        `[OrdersService] Gagal melakukan rollback order ${orderId}:`,
+        rollbackErr,
+      );
+    }
   }
 
   /**

@@ -156,7 +156,10 @@ let DashboardService = class DashboardService {
         for (let i = 5; i >= 0; i--) {
             const d = new Date();
             d.setMonth(d.getMonth() - i);
-            const label = d.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
+            const label = d.toLocaleString('id-ID', {
+                month: 'short',
+                year: '2-digit',
+            });
             months.push(label);
             monthlyTrends[label] = 0;
         }
@@ -288,7 +291,11 @@ let DashboardService = class DashboardService {
         for (const item of paidOrderItems) {
             const catName = item.ticketCategory.name;
             if (!categoryMap.has(catName)) {
-                categoryMap.set(catName, { categoryName: catName, sold: 0, revenue: 0 });
+                categoryMap.set(catName, {
+                    categoryName: catName,
+                    sold: 0,
+                    revenue: 0,
+                });
             }
             const data = categoryMap.get(catName);
             data.sold += item.qty;
@@ -399,7 +406,9 @@ let DashboardService = class DashboardService {
             city: c.city || 'Lainnya',
             count: c._count.city,
         }));
-        const repeatPurchaseRate = totalBuyers > 0 ? parseFloat((returningBuyersCount / totalBuyers).toFixed(2)) : 0.0;
+        const repeatPurchaseRate = totalBuyers > 0
+            ? parseFloat((returningBuyersCount / totalBuyers).toFixed(2))
+            : 0.0;
         return {
             totalBuyers,
             newBuyers: newBuyersCount,
@@ -438,8 +447,12 @@ let DashboardService = class DashboardService {
         const avgCheckoutTimeSeconds = validPaymentCount > 0 ? Math.round(totalSeconds / validPaymentCount) : 0;
         const totalOrdersCount = allOrders.length;
         const refundedOrdersCount = allOrders.filter((o) => o.status === client_1.OrderStatus.REFUNDED).length;
-        const refundRate = totalOrdersCount > 0 ? parseFloat((refundedOrdersCount / totalOrdersCount).toFixed(3)) : 0.0;
-        const conversionRate = landingPageViews > 0 ? parseFloat((checkoutCompleted / landingPageViews).toFixed(3)) : 0.0;
+        const refundRate = totalOrdersCount > 0
+            ? parseFloat((refundedOrdersCount / totalOrdersCount).toFixed(3))
+            : 0.0;
+        const conversionRate = landingPageViews > 0
+            ? parseFloat((checkoutCompleted / landingPageViews).toFixed(3))
+            : 0.0;
         return {
             landingPageViews,
             checkoutStarted,

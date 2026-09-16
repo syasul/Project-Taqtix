@@ -501,20 +501,20 @@ export declare class AdminService {
     }>;
     getAuditLogs(): Promise<{
         id: string;
+        timestamp: Date;
         action: string;
         adminId: string;
         targetId: string;
         targetType: string;
         details: import("@prisma/client/runtime/library").JsonValue | null;
-        timestamp: Date;
     }[]>;
     recordAuditLog(adminId: string, action: string, targetId: string, targetType: string, details?: any): Promise<{
         id: string;
+        timestamp: Date;
         action: string;
         adminId: string;
         targetId: string;
         targetType: string;
         details: import("@prisma/client/runtime/library").JsonValue | null;
-        timestamp: Date;
     } | undefined>;
 }

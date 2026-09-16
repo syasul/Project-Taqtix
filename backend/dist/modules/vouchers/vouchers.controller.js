@@ -43,8 +43,13 @@ exports.VouchersController = VouchersController;
 __decorate([
     (0, common_1.Post)(),
     (0, permissions_decorator_1.Permissions)('manage_promo_code'),
-    (0, swagger_1.ApiOperation)({ summary: 'Membuat voucher baru (org-wide atau event-scoped)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Voucher berhasil dibuat.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Membuat voucher baru (org-wide atau event-scoped)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Voucher berhasil dibuat.',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -54,7 +59,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar semua voucher organisasi' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar voucher berhasil diambil.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar voucher berhasil diambil.',
+    }),
     __param(0, (0, common_1.Query)('eventId')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -65,7 +73,10 @@ __decorate([
     (0, common_1.Patch)(':id'),
     (0, permissions_decorator_1.Permissions)('manage_promo_code'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengupdate voucher' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Voucher berhasil diupdate.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Voucher berhasil diupdate.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -78,7 +89,10 @@ __decorate([
     (0, permissions_decorator_1.Permissions)('manage_promo_code'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Menonaktifkan voucher' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Voucher berhasil dinonaktifkan.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Voucher berhasil dinonaktifkan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),

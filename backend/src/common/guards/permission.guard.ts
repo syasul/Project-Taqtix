@@ -57,7 +57,8 @@ export class PermissionGuard implements CanActivate {
 
     // Resolve organizerId or eventId from route params or body
     let organizerId = request.params.organizerId || request.body.organizerId;
-    const eventId = request.params.eventId || request.params.id || request.body.eventId;
+    const eventId =
+      request.params.eventId || request.params.id || request.body.eventId;
 
     if (!organizerId && eventId) {
       const event = await this.prisma.event.findUnique({
@@ -104,7 +105,9 @@ export class PermissionGuard implements CanActivate {
     }
 
     if (!role) {
-      throw new ForbiddenException('Akses ditolak: Anda bukan bagian dari organizer ini');
+      throw new ForbiddenException(
+        'Akses ditolak: Anda bukan bagian dari organizer ini',
+      );
     }
 
     const allowedRoles = PERMISSION_MATRIX[requiredPermission];

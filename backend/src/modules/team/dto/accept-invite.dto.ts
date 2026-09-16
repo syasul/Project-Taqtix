@@ -7,7 +7,10 @@ export class AcceptInviteDto {
   @IsNotEmpty({ message: 'Nama tidak boleh kosong' })
   name!: string;
 
-  @ApiProperty({ example: 'StrongPassword123!', description: 'Kata sandi baru' })
+  @ApiProperty({
+    example: 'StrongPassword123!',
+    description: 'Kata sandi baru',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Password tidak boleh kosong' })
   @MinLength(6, { message: 'Password minimal 6 karakter' })

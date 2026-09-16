@@ -9,7 +9,12 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CustomFieldsService } from './custom-fields.service';
 import { CreateCustomFieldDto } from './dto/create-custom-field.dto';
 import { UpdateCustomFieldDto } from './dto/update-custom-field.dto';
@@ -26,7 +31,10 @@ export class CustomFieldsController {
 
   @Post()
   @ApiOperation({ summary: 'Menambahkan field formulir baru untuk event' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Field formulir berhasil ditambahkan.' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Field formulir berhasil ditambahkan.',
+  })
   async create(
     @Param('id') eventId: string,
     @Body() dto: CreateCustomFieldDto,
@@ -37,14 +45,20 @@ export class CustomFieldsController {
 
   @Get()
   @ApiOperation({ summary: 'Mendapatkan daftar field formulir untuk event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar field formulir berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar field formulir berhasil diambil.',
+  })
   async findAll(@Param('id') eventId: string) {
     return this.customFieldsService.findAll(eventId);
   }
 
   @Patch('reorder')
   @ApiOperation({ summary: 'Mengubah urutan tampilan field formulir' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Urutan field formulir berhasil diperbarui.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Urutan field formulir berhasil diperbarui.',
+  })
   async reorder(
     @Param('id') eventId: string,
     @Body() dto: ReorderCustomFieldsDto,
@@ -55,7 +69,10 @@ export class CustomFieldsController {
 
   @Patch(':fieldId')
   @ApiOperation({ summary: 'Mengupdate field formulir' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Field formulir berhasil diupdate.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Field formulir berhasil diupdate.',
+  })
   async update(
     @Param('id') eventId: string,
     @Param('fieldId') fieldId: string,
@@ -68,7 +85,10 @@ export class CustomFieldsController {
   @Delete(':fieldId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Menghapus field formulir' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Field formulir berhasil dihapus.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Field formulir berhasil dihapus.',
+  })
   async delete(
     @Param('id') eventId: string,
     @Param('fieldId') fieldId: string,

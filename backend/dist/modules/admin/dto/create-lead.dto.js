@@ -21,33 +21,48 @@ class CreateLeadDto {
 }
 exports.CreateLeadDto = CreateLeadDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Syamsul Ma’arif', description: 'Nama calon klien / organizer' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Syamsul Ma’arif',
+        description: 'Nama calon klien / organizer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama tidak boleh kosong' }),
     (0, class_validator_1.MaxLength)(100, { message: 'Nama maksimal 100 karakter' }),
     __metadata("design:type", String)
 ], CreateLeadDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'PT Kreasi Festival Nusantara', description: 'Nama organisasi / perusahaan' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'PT Kreasi Festival Nusantara',
+        description: 'Nama organisasi / perusahaan',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama organisasi tidak boleh kosong' }),
     (0, class_validator_1.MaxLength)(150, { message: 'Nama organisasi maksimal 150 karakter' }),
     __metadata("design:type", String)
 ], CreateLeadDto.prototype, "organizationName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'syamsul@kreasifestival.id', description: 'Email narahubung' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'syamsul@kreasifestival.id',
+        description: 'Email narahubung',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     __metadata("design:type", String)
 ], CreateLeadDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '081234567890', description: 'Nomor telepon / WhatsApp' }),
+    (0, swagger_1.ApiProperty)({
+        example: '081234567890',
+        description: 'Nomor telepon / WhatsApp',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nomor telepon tidak boleh kosong' }),
     (0, class_validator_1.MaxLength)(30, { message: 'Nomor telepon maksimal 30 karakter' }),
     __metadata("design:type", String)
 ], CreateLeadDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Kami ingin konsultasi tiket konser musik kapasitas 5000 orang.', description: 'Pesan kebutuhan' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Kami ingin konsultasi tiket konser musik kapasitas 5000 orang.',
+        description: 'Pesan kebutuhan',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Pesan tidak boleh kosong' }),
     (0, class_validator_1.MaxLength)(2000, { message: 'Pesan maksimal 2000 karakter' }),

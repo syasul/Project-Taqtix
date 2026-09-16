@@ -74,7 +74,10 @@ let TokensService = class TokensService {
         const organizer = await this.getOrganizerAndVerifyOwner(userId);
         const rawSecret = crypto.randomBytes(24).toString('hex');
         const fullToken = `taq_live_${rawSecret}`;
-        const tokenHash = crypto.createHash('sha256').update(fullToken).digest('hex');
+        const tokenHash = crypto
+            .createHash('sha256')
+            .update(fullToken)
+            .digest('hex');
         const tokenPreview = `...${fullToken.slice(-8)}`;
         const scopes = dto.scopes && dto.scopes.length > 0
             ? dto.scopes
@@ -144,10 +147,12 @@ let TokensService = class TokensService {
         if (!tokenRecord) {
             return null;
         }
-        this.prisma.apiToken.update({
+        this.prisma.apiToken
+            .update({
             where: { id: tokenRecord.id },
             data: { lastUsedAt: new Date() },
-        }).catch(() => { });
+        })
+            .catch(() => { });
         return tokenRecord;
     }
 };

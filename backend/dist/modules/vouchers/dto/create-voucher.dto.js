@@ -25,7 +25,9 @@ class CreateVoucherDto {
 }
 exports.CreateVoucherDto = CreateVoucherDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'ID event jika voucher scoped ke 1 event tertentu' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'ID event jika voucher scoped ke 1 event tertentu',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -37,7 +39,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateVoucherDto.prototype, "code", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: ['percentage', 'fixed'], description: 'Tipe potongan diskon' }),
+    (0, swagger_1.ApiProperty)({
+        enum: ['percentage', 'fixed'],
+        description: 'Tipe potongan diskon',
+    }),
     (0, class_validator_1.IsEnum)(['percentage', 'fixed']),
     __metadata("design:type", String)
 ], CreateVoucherDto.prototype, "type", void 0);
@@ -48,14 +53,18 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateVoucherDto.prototype, "value", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Batas kuota penggunaan (null = unlimited)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Batas kuota penggunaan (null = unlimited)',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateVoucherDto.prototype, "usageLimit", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Maksimum nominal potongan untuk diskon percentage' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Maksimum nominal potongan untuk diskon percentage',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(0),
@@ -72,7 +81,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateVoucherDto.prototype, "validUntil", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Daftar ID event yang berlaku jika eventId null' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Daftar ID event yang berlaku jika eventId null',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),

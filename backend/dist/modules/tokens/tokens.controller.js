@@ -37,8 +37,13 @@ let TokensController = class TokensController {
 exports.TokensController = TokensController;
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Generate token API baru (Secret token hanya ditampilkan satu kali)' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Token berhasil di-generate.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Generate token API baru (Secret token hanya ditampilkan satu kali)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Token berhasil di-generate.',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
@@ -48,7 +53,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar token API milik organizer' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar API token berhasil diambil.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar API token berhasil diambil.',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -58,7 +66,10 @@ __decorate([
     (0, common_1.Post)(':id/revoke'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Mencabut / me-revoke token API' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Token berhasil dicabut.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Token berhasil dicabut.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),

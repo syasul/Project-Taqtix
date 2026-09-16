@@ -5,6 +5,7 @@ import {
   Param,
   Body,
   Headers,
+  Req,
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import { Public } from '../../common/decorators/public.decorator';
+
+import type { Request } from 'express';
 
 @ApiTags('Payments & Tickets')
 @Controller()
@@ -23,11 +26,11 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
-      'Mendapatkan link/token pembayaran Snap Midtrans untuk order (Public/Buyer)',
+      'Mendapatkan link/token pembayaran DOKU Checkout / Snap untuk order (Public/Buyer)',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Token Snap berhasil dibuat.',
+    description: 'Link checkout berhasil dibuat.',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -39,7 +42,7 @@ export class PaymentsController {
 
   @Public()
   @SkipThrottle()
-  @Post('payments/webhook/:provider')
+  @Post(['payments/webhook/:provider', 'v1/payments/webhook/:provider'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
@@ -50,8 +53,17 @@ export class PaymentsController {
     @Param('provider') provider: string,
     @Body() body: any,
     @Headers() headers: Record<string, string>,
+    @Req() req: Request & { rawBody?: Buffer },
   ) {
-    return this.paymentsService.handleWebhook(body, provider, headers);
+    const rawBody: Buffer | undefined = req.rawBody;
+    const requestPath: string = req.originalUrl || req.url || '';
+    return this.paymentsService.handleWebhook(
+      body,
+      provider,
+      headers,
+      rawBody,
+      requestPath,
+    );
   }
 
   @Public()
@@ -70,5 +82,19 @@ export class PaymentsController {
   })
   async getPaymentStatus(@Param('orderId') orderId: string) {
     return this.paymentsService.getPaymentStatus(orderId);
+  }
+
+  @Public()
+  @Get('payments/status-check/:invoiceNumber')
+  @ApiOperation({
+    summary:
+      'Fallback Check Status API ke payment gateway DOKU (Public/Scheduled)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Status transaksi berhasil dicek ke gateway.',
+  })
+  async checkGatewayStatus(@Param('invoiceNumber') invoiceNumber: string) {
+    return this.paymentsService.checkDokuOrderStatus(invoiceNumber);
   }
 }

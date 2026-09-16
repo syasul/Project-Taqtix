@@ -9,12 +9,18 @@ import {
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdatePartnerDto {
-  @ApiPropertyOptional({ example: 'Raffi Ahmad Official', description: 'Nama partner afiliasi' })
+  @ApiPropertyOptional({
+    example: 'Raffi Ahmad Official',
+    description: 'Nama partner afiliasi',
+  })
   @IsString()
   @IsOptional()
   name?: string;
 
-  @ApiPropertyOptional({ example: 'event-uuid-5678', description: 'ID Event yang dipromosikan' })
+  @ApiPropertyOptional({
+    example: 'event-uuid-5678',
+    description: 'ID Event yang dipromosikan',
+  })
   @IsString()
   @IsOptional()
   eventId?: string;
@@ -25,22 +31,32 @@ export class UpdatePartnerDto {
     description: 'Tipe kategori partner',
   })
   @IsIn(['AMBASSADOR', 'COMMUNITY', 'INFLUENCER', 'CORPORATE'], {
-    message: 'Tipe partner harus salah satu dari: AMBASSADOR, COMMUNITY, INFLUENCER, CORPORATE',
+    message:
+      'Tipe partner harus salah satu dari: AMBASSADOR, COMMUNITY, INFLUENCER, CORPORATE',
   })
   @IsOptional()
   type?: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
 
-  @ApiPropertyOptional({ example: 'RAFFI2026', description: 'Kode unik referral' })
+  @ApiPropertyOptional({
+    example: 'RAFFI2026',
+    description: 'Kode unik referral',
+  })
   @IsString()
   @IsOptional()
   uniqueCode?: string;
 
-  @ApiPropertyOptional({ example: 'DISKONRAF', description: 'Kode voucher diskon' })
+  @ApiPropertyOptional({
+    example: 'DISKONRAF',
+    description: 'Kode voucher diskon',
+  })
   @IsString()
   @IsOptional()
   promoCode?: string;
 
-  @ApiPropertyOptional({ example: 'fixed', description: 'Tipe komisi (percentage / fixed)' })
+  @ApiPropertyOptional({
+    example: 'fixed',
+    description: 'Tipe komisi (percentage / fixed)',
+  })
   @IsString()
   @IsOptional()
   commissionType?: string;
@@ -51,7 +67,10 @@ export class UpdatePartnerDto {
   @IsOptional()
   commissionValue?: number;
 
-  @ApiPropertyOptional({ example: 'raffi.new@partner.com', description: 'Email partner' })
+  @ApiPropertyOptional({
+    example: 'raffi.new@partner.com',
+    description: 'Email partner',
+  })
   @IsEmail({}, { message: 'Format email tidak valid' })
   @IsOptional()
   email?: string;

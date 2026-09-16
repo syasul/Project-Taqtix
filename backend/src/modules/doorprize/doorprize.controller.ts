@@ -1,12 +1,10 @@
+import { Controller, Get, Post, Param, Body, HttpStatus } from '@nestjs/common';
 import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Body,
-  HttpStatus,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { DoorprizeService } from './doorprize.service';
 import { CreateDoorprizeDto } from './dto/create-doorprize.dto';
 import { DrawDoorprizeDto } from './dto/draw-doorprize.dto';
@@ -23,7 +21,10 @@ export class DoorprizeController {
 
   @Post()
   @ApiOperation({ summary: 'Menambahkan item hadiah doorprize baru' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Hadiah doorprize berhasil ditambahkan.' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Hadiah doorprize berhasil ditambahkan.',
+  })
   async createItem(
     @Param('id') eventId: string,
     @Body() dto: CreateDoorprizeDto,
@@ -34,7 +35,10 @@ export class DoorprizeController {
 
   @Get()
   @ApiOperation({ summary: 'Mendapatkan daftar hadiah doorprize' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar hadiah berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar hadiah berhasil diambil.',
+  })
   async listItems(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
@@ -44,8 +48,13 @@ export class DoorprizeController {
 
   @Post(':itemId/draw')
   @RequireIdempotency()
-  @ApiOperation({ summary: 'Mengundi pemenang doorprize dari pengunjung yang sudah Check-In' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Pengundian pemenang berhasil.' })
+  @ApiOperation({
+    summary: 'Mengundi pemenang doorprize dari pengunjung yang sudah Check-In',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Pengundian pemenang berhasil.',
+  })
   async drawWinner(
     @Param('id') eventId: string,
     @Param('itemId') itemId: string,
@@ -57,7 +66,10 @@ export class DoorprizeController {
 
   @Get('winners')
   @ApiOperation({ summary: 'Mendapatkan daftar semua pemenang doorprize' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar pemenang berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar pemenang berhasil diambil.',
+  })
   async listWinners(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,

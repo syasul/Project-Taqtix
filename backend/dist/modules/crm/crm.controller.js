@@ -72,7 +72,9 @@ __decorate([
     (0, common_1.Get)('organizer/segments/:segmentId/members'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, permissions_decorator_1.Permissions)('manage_audience_segments'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar anggota pembeli yang match kriteria segmen' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan daftar anggota pembeli yang match kriteria segmen',
+    }),
     __param(0, (0, common_1.Param)('segmentId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -83,7 +85,9 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, permissions_decorator_1.Permissions)('manage_audience_segments'),
     (0, idempotency_decorator_1.RequireIdempotency)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)',
+    }),
     __param(0, (0, common_1.Param)('segmentId')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

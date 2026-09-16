@@ -57,7 +57,11 @@ describe('VouchersService', () => {
         status: 'active',
       });
 
-      const result = await service.validateVoucher('HEMAT20', 'event-1', 200000);
+      const result = await service.validateVoucher(
+        'HEMAT20',
+        'event-1',
+        200000,
+      );
 
       expect(result.valid).toBe(true);
       expect(result.code).toBe('HEMAT20');

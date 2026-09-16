@@ -24,7 +24,10 @@ __decorate([
     __metadata("design:type", String)
 ], AcceptInviteDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'StrongPassword123!', description: 'Kata sandi baru' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'StrongPassword123!',
+        description: 'Kata sandi baru',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Password tidak boleh kosong' }),
     (0, class_validator_1.MinLength)(6, { message: 'Password minimal 6 karakter' }),

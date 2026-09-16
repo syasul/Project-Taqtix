@@ -20,7 +20,8 @@ export class DashboardService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    const redisUrl = this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
+    const redisUrl =
+      this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
     try {
       this.redis = new Redis(redisUrl, {
         maxRetriesPerRequest: null,
@@ -194,7 +195,10 @@ export class DashboardService implements OnModuleInit {
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
-      const label = d.toLocaleString('id-ID', { month: 'short', year: '2-digit' });
+      const label = d.toLocaleString('id-ID', {
+        month: 'short',
+        year: '2-digit',
+      });
       months.push(label);
       monthlyTrends[label] = 0;
     }
@@ -365,11 +369,18 @@ export class DashboardService implements OnModuleInit {
     });
 
     // byCategory
-    const categoryMap = new Map<string, { categoryName: string; sold: number; revenue: number }>();
+    const categoryMap = new Map<
+      string,
+      { categoryName: string; sold: number; revenue: number }
+    >();
     for (const item of paidOrderItems) {
       const catName = item.ticketCategory.name;
       if (!categoryMap.has(catName)) {
-        categoryMap.set(catName, { categoryName: catName, sold: 0, revenue: 0 });
+        categoryMap.set(catName, {
+          categoryName: catName,
+          sold: 0,
+          revenue: 0,
+        });
       }
       const data = categoryMap.get(catName)!;
       data.sold += item.qty;
@@ -377,7 +388,10 @@ export class DashboardService implements OnModuleInit {
     }
 
     // byDay
-    const dayMap = new Map<string, { date: string; sold: number; revenue: number }>();
+    const dayMap = new Map<
+      string,
+      { date: string; sold: number; revenue: number }
+    >();
     for (const item of paidOrderItems) {
       const dateStr = item.createdAt.toISOString().split('T')[0];
       if (!dayMap.has(dateStr)) {
@@ -389,7 +403,9 @@ export class DashboardService implements OnModuleInit {
     }
 
     const byCategory = Array.from(categoryMap.values());
-    const byDay = Array.from(dayMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+    const byDay = Array.from(dayMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
 
     return {
       byCategory,
@@ -407,7 +423,10 @@ export class DashboardService implements OnModuleInit {
       },
     });
 
-    const channels: Record<string, { channel: string; buyers: number; revenue: number }> = {
+    const channels: Record<
+      string,
+      { channel: string; buyers: number; revenue: number }
+    > = {
       organic: { channel: 'organic', buyers: 0, revenue: 0 },
       affiliate: { channel: 'affiliate', buyers: 0, revenue: 0 },
     };
@@ -446,7 +465,9 @@ export class DashboardService implements OnModuleInit {
       },
     });
 
-    const uniqueEmails = Array.from(new Set(paidOrderItems.map((o) => o.attendeeEmail)));
+    const uniqueEmails = Array.from(
+      new Set(paidOrderItems.map((o) => o.attendeeEmail)),
+    );
     const totalBuyers = uniqueEmails.length;
 
     let newBuyersCount = 0;
@@ -500,7 +521,10 @@ export class DashboardService implements OnModuleInit {
       count: c._count.city,
     }));
 
-    const repeatPurchaseRate = totalBuyers > 0 ? parseFloat((returningBuyersCount / totalBuyers).toFixed(2)) : 0.0;
+    const repeatPurchaseRate =
+      totalBuyers > 0
+        ? parseFloat((returningBuyersCount / totalBuyers).toFixed(2))
+        : 0.0;
 
     return {
       totalBuyers,
@@ -538,7 +562,8 @@ export class DashboardService implements OnModuleInit {
 
     for (const order of paidOrders) {
       if (order.payment && order.payment.paidAt) {
-        const diff = (order.payment.paidAt.getTime() - order.createdAt.getTime()) / 1000;
+        const diff =
+          (order.payment.paidAt.getTime() - order.createdAt.getTime()) / 1000;
         if (diff > 0) {
           totalSeconds += diff;
           validPaymentCount++;
@@ -546,13 +571,22 @@ export class DashboardService implements OnModuleInit {
       }
     }
 
-    const avgCheckoutTimeSeconds = validPaymentCount > 0 ? Math.round(totalSeconds / validPaymentCount) : 0;
+    const avgCheckoutTimeSeconds =
+      validPaymentCount > 0 ? Math.round(totalSeconds / validPaymentCount) : 0;
 
     const totalOrdersCount = allOrders.length;
-    const refundedOrdersCount = allOrders.filter((o) => o.status === OrderStatus.REFUNDED).length;
-    const refundRate = totalOrdersCount > 0 ? parseFloat((refundedOrdersCount / totalOrdersCount).toFixed(3)) : 0.0;
+    const refundedOrdersCount = allOrders.filter(
+      (o) => o.status === OrderStatus.REFUNDED,
+    ).length;
+    const refundRate =
+      totalOrdersCount > 0
+        ? parseFloat((refundedOrdersCount / totalOrdersCount).toFixed(3))
+        : 0.0;
 
-    const conversionRate = landingPageViews > 0 ? parseFloat((checkoutCompleted / landingPageViews).toFixed(3)) : 0.0;
+    const conversionRate =
+      landingPageViews > 0
+        ? parseFloat((checkoutCompleted / landingPageViews).toFixed(3))
+        : 0.0;
 
     return {
       landingPageViews,
@@ -568,7 +602,12 @@ export class DashboardService implements OnModuleInit {
 
   async recordAdSpend(
     eventId: string,
-    dto: { channel: string; amount: number; periodStart: string; periodEnd: string },
+    dto: {
+      channel: string;
+      amount: number;
+      periodStart: string;
+      periodEnd: string;
+    },
     userId: string,
   ) {
     await this.verifyEventOwnership(eventId, userId);
@@ -596,7 +635,10 @@ export class DashboardService implements OnModuleInit {
     // Group spend by channel
     const spendMap = new Map<string, number>();
     for (const spend of adSpends) {
-      spendMap.set(spend.channel, (spendMap.get(spend.channel) || 0) + spend.amount);
+      spendMap.set(
+        spend.channel,
+        (spendMap.get(spend.channel) || 0) + spend.amount,
+      );
     }
 
     // Ambil orders paid
@@ -608,13 +650,18 @@ export class DashboardService implements OnModuleInit {
     const revenueMap = new Map<string, number>();
     for (const order of paidOrders) {
       if (order.utmSource) {
-        revenueMap.set(order.utmSource, (revenueMap.get(order.utmSource) || 0) + order.totalAmount);
+        revenueMap.set(
+          order.utmSource,
+          (revenueMap.get(order.utmSource) || 0) + order.totalAmount,
+        );
       }
     }
 
     const channelsList = Array.from(spendMap.keys());
     // Gabungkan dengan channels yang punya revenue
-    const allChannels = Array.from(new Set([...channelsList, ...Array.from(revenueMap.keys())]));
+    const allChannels = Array.from(
+      new Set([...channelsList, ...Array.from(revenueMap.keys())]),
+    );
 
     const channels = allChannels.map((ch) => {
       const spend = spendMap.get(ch) || 0;
@@ -641,7 +688,8 @@ export class DashboardService implements OnModuleInit {
       partnerId: p.id,
       name: p.name,
       revenue: p.revenueGenerated,
-      conversionRate: p.clicks > 0 ? parseFloat((p.conversions / p.clicks).toFixed(2)) : 0.0,
+      conversionRate:
+        p.clicks > 0 ? parseFloat((p.conversions / p.clicks).toFixed(2)) : 0.0,
     }));
 
     return {

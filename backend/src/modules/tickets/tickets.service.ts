@@ -165,11 +165,15 @@ export class TicketsService {
 
     if (voucher) {
       if (voucher.status !== 'active') {
-        throw new BadRequestException('Voucher sudah tidak aktif atau kedaluwarsa');
+        throw new BadRequestException(
+          'Voucher sudah tidak aktif atau kedaluwarsa',
+        );
       }
       const now = new Date();
       if (now < voucher.validFrom || now > voucher.validUntil) {
-        throw new BadRequestException('Voucher berada di luar periode masa berlaku');
+        throw new BadRequestException(
+          'Voucher berada di luar periode masa berlaku',
+        );
       }
       if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {
         throw new BadRequestException('Kuota penggunaan voucher sudah habis');
@@ -202,7 +206,9 @@ export class TicketsService {
     });
 
     if (!promo || promo.eventId !== dto.eventId) {
-      throw new BadRequestException('Kode promo/voucher tidak valid untuk event ini');
+      throw new BadRequestException(
+        'Kode promo/voucher tidak valid untuk event ini',
+      );
     }
 
     if (promo.usedCount >= promo.maxUsage) {
@@ -307,7 +313,11 @@ export class TicketsService {
   /**
    * Memblokir tiket pengunjung (nonaktifkan pengunjung).
    */
-  async blockTicket(ticketId: string, reason: string | undefined, userId: string) {
+  async blockTicket(
+    ticketId: string,
+    reason: string | undefined,
+    userId: string,
+  ) {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id: ticketId },
       include: { event: true },
@@ -440,7 +450,10 @@ export class TicketsService {
       `"${t.status}"`,
     ]);
 
-    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((r) => r.join(',')),
+    ].join('\n');
 
     return {
       filename: `wristband-export-${eventId}.csv`,

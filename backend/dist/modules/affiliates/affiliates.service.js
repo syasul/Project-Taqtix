@@ -251,15 +251,17 @@ let AffiliatesService = class AffiliatesService {
             },
         });
         const ranking = higherRankCount + 1;
-        const payoutHistory = partner.commissionEarned > 0 ? [
-            {
-                id: `payout-${partner.id.slice(0, 8)}`,
-                date: partner.updatedAt,
-                amount: partner.commissionEarned,
-                status: 'PAID',
-                bankAccount: 'BCA •••• 8829',
-            }
-        ] : [];
+        const payoutHistory = partner.commissionEarned > 0
+            ? [
+                {
+                    id: `payout-${partner.id.slice(0, 8)}`,
+                    date: partner.updatedAt,
+                    amount: partner.commissionEarned,
+                    status: 'PAID',
+                    bankAccount: 'BCA •••• 8829',
+                },
+            ]
+            : [];
         return {
             partnerId: partner.id,
             name: partner.name,
@@ -285,7 +287,8 @@ let AffiliatesService = class AffiliatesService {
         if (!partner) {
             throw new common_1.NotFoundException('Partner tidak ditemukan');
         }
-        const newCode = customCode?.trim().toUpperCase() || `${partner.name.replace(/\s+/g, '').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
+        const newCode = customCode?.trim().toUpperCase() ||
+            `${partner.name.replace(/\s+/g, '').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
         const existing = await this.prisma.partner.findUnique({
             where: { uniqueCode: newCode },
         });

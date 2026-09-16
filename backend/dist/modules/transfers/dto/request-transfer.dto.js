@@ -19,18 +19,27 @@ class RequestTransferDto {
 }
 exports.RequestTransferDto = RequestTransferDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Budi Santoso', description: 'Nama lengkap penerima tiket' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Budi Santoso',
+        description: 'Nama lengkap penerima tiket',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], RequestTransferDto.prototype, "toName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'budi@example.com', description: 'Email penerima tiket' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'budi@example.com',
+        description: 'Email penerima tiket',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     __metadata("design:type", String)
 ], RequestTransferDto.prototype, "toEmail", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '081298765432', description: 'Nomor WhatsApp penerima tiket' }),
+    (0, swagger_1.ApiProperty)({
+        example: '081298765432',
+        description: 'Nomor WhatsApp penerima tiket',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)

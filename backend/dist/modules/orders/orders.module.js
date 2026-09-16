@@ -13,6 +13,7 @@ const jwt_1 = require("@nestjs/jwt");
 const orders_service_1 = require("./orders.service");
 const orders_controller_1 = require("./orders.controller");
 const orders_processor_1 = require("./orders.processor");
+const payments_module_1 = require("../payments/payments.module");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -23,6 +24,7 @@ exports.OrdersModule = OrdersModule = __decorate([
                 name: 'order-expiration',
             }),
             jwt_1.JwtModule.register({}),
+            payments_module_1.PaymentsModule,
         ],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService, orders_processor_1.OrdersProcessor],

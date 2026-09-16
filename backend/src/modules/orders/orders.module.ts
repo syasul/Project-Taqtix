@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { OrdersProcessor } from './orders.processor';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { OrdersProcessor } from './orders.processor';
       name: 'order-expiration',
     }),
     JwtModule.register({}),
+    PaymentsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersProcessor],

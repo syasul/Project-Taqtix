@@ -40,7 +40,9 @@ export class VouchersService {
         where: { id: dto.eventId },
       });
       if (!event || event.organizerId !== organizer.id) {
-        throw new BadRequestException('Event tidak valid atau bukan milik organisasi Anda');
+        throw new BadRequestException(
+          'Event tidak valid atau bukan milik organisasi Anda',
+        );
       }
     }
 
@@ -53,7 +55,9 @@ export class VouchersService {
         },
       });
       if (events.length !== dto.applicableEventIds.length) {
-        throw new BadRequestException('Satu atau lebih event di applicableEventIds tidak valid atau bukan milik organisasi Anda');
+        throw new BadRequestException(
+          'Satu atau lebih event di applicableEventIds tidak valid atau bukan milik organisasi Anda',
+        );
       }
     }
 
@@ -67,7 +71,9 @@ export class VouchersService {
     });
 
     if (existing) {
-      throw new BadRequestException('Kode voucher ini sudah digunakan di organisasi Anda');
+      throw new BadRequestException(
+        'Kode voucher ini sudah digunakan di organisasi Anda',
+      );
     }
 
     return this.prisma.voucher.create({
@@ -100,10 +106,7 @@ export class VouchersService {
     };
 
     if (eventId) {
-      where.OR = [
-        { eventId },
-        { eventId: null },
-      ];
+      where.OR = [{ eventId }, { eventId: null }];
     }
 
     return this.prisma.voucher.findMany({
@@ -136,7 +139,9 @@ export class VouchersService {
         where: { id: dto.eventId },
       });
       if (!event || event.organizerId !== organizer.id) {
-        throw new BadRequestException('Event tidak valid atau bukan milik organisasi Anda');
+        throw new BadRequestException(
+          'Event tidak valid atau bukan milik organisasi Anda',
+        );
       }
     }
 
@@ -148,7 +153,9 @@ export class VouchersService {
         },
       });
       if (events.length !== dto.applicableEventIds.length) {
-        throw new BadRequestException('Satu atau lebih event di applicableEventIds tidak valid atau bukan milik organisasi Anda');
+        throw new BadRequestException(
+          'Satu atau lebih event di applicableEventIds tidak valid atau bukan milik organisasi Anda',
+        );
       }
     }
 
@@ -157,10 +164,13 @@ export class VouchersService {
     if (dto.type !== undefined) data.type = dto.type;
     if (dto.value !== undefined) data.value = dto.value;
     if (dto.usageLimit !== undefined) data.usageLimit = dto.usageLimit;
-    if (dto.maxDiscountAmount !== undefined) data.maxDiscountAmount = dto.maxDiscountAmount;
+    if (dto.maxDiscountAmount !== undefined)
+      data.maxDiscountAmount = dto.maxDiscountAmount;
     if (dto.validFrom !== undefined) data.validFrom = new Date(dto.validFrom);
-    if (dto.validUntil !== undefined) data.validUntil = new Date(dto.validUntil);
-    if (dto.applicableEventIds !== undefined) data.applicableEventIds = dto.applicableEventIds;
+    if (dto.validUntil !== undefined)
+      data.validUntil = new Date(dto.validUntil);
+    if (dto.applicableEventIds !== undefined)
+      data.applicableEventIds = dto.applicableEventIds;
     if (dto.eventId !== undefined) data.eventId = dto.eventId;
 
     return this.prisma.voucher.update({
@@ -213,12 +223,16 @@ export class VouchersService {
     }
 
     if (voucher.status !== 'active') {
-      throw new BadRequestException('Voucher sudah tidak aktif atau kedaluwarsa');
+      throw new BadRequestException(
+        'Voucher sudah tidak aktif atau kedaluwarsa',
+      );
     }
 
     const now = new Date();
     if (now < voucher.validFrom || now > voucher.validUntil) {
-      throw new BadRequestException('Voucher berada di luar periode masa berlaku');
+      throw new BadRequestException(
+        'Voucher berada di luar periode masa berlaku',
+      );
     }
 
     if (voucher.usageLimit && voucher.usageCount >= voucher.usageLimit) {

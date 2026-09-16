@@ -37,8 +37,13 @@ let CashController = class CashController {
 exports.CashController = CashController;
 __decorate([
     (0, common_1.Get)('cash/summary'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan ringkasan kas org-level lintas seluruh event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Summary kas organisasi berhasil diambil.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan ringkasan kas org-level lintas seluruh event',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Summary kas organisasi berhasil diambil.',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -47,7 +52,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)('events/:id/cash'),
     (0, swagger_1.ApiOperation)({ summary: 'Mencatat transaksi cash manual untuk 1 event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Transaksi kas berhasil dicatat.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Transaksi kas berhasil dicatat.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -57,8 +65,13 @@ __decorate([
 ], CashController.prototype, "recordCash", null);
 __decorate([
     (0, common_1.Get)('events/:id/cash'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan riwayat transaksi kas untuk 1 event beserta totalCashIn' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Riwayat kas event berhasil diambil.' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan riwayat transaksi kas untuk 1 event beserta totalCashIn',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Riwayat kas event berhasil diambil.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),

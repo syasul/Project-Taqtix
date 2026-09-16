@@ -41,7 +41,10 @@ export class CRMProcessor {
       // 4. Update status counter pada master job
       await this.updateMasterJobCounter(recipient.jobId, true);
     } catch (err: any) {
-      console.error(`Gagal mengirim WhatsApp broadcast ke ${recipient.phone}:`, err);
+      console.error(
+        `Gagal mengirim WhatsApp broadcast ke ${recipient.phone}:`,
+        err,
+      );
 
       await this.prisma.broadcastRecipient.update({
         where: { id: recipientId },
@@ -105,7 +108,9 @@ export class CRMProcessor {
         </html>
       `;
 
-      console.log(`[EMAIL BROADCAST] Mengirim ke: ${recipient.email} | Subjek: ${emailSubject}`);
+      console.log(
+        `[EMAIL BROADCAST] Mengirim ke: ${recipient.email} | Subjek: ${emailSubject}`,
+      );
 
       // Simulasi delay pengiriman network email
       await new Promise((resolve) => setTimeout(resolve, 300));
@@ -122,7 +127,10 @@ export class CRMProcessor {
       // 4. Update status counter pada master job
       await this.updateMasterJobCounter(recipient.jobId, true);
     } catch (err: any) {
-      console.error(`Gagal mengirim Email broadcast ke ${recipient.email}:`, err);
+      console.error(
+        `Gagal mengirim Email broadcast ke ${recipient.email}:`,
+        err,
+      );
 
       await this.prisma.broadcastRecipient.update({
         where: { id: recipientId },
@@ -147,7 +155,9 @@ export class CRMProcessor {
     if (!masterJob) return;
 
     const nextSent = isSuccess ? masterJob.sentCount + 1 : masterJob.sentCount;
-    const nextFailed = !isSuccess ? masterJob.failedCount + 1 : masterJob.failedCount;
+    const nextFailed = !isSuccess
+      ? masterJob.failedCount + 1
+      : masterJob.failedCount;
     const totalProcessed = nextSent + nextFailed;
     const isCompleted = totalProcessed >= masterJob.targetCount;
 

@@ -46,7 +46,10 @@ exports.LineupController = LineupController;
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Menambahkan pengisi acara / lineup baru' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'Lineup berhasil ditambahkan.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'Lineup berhasil ditambahkan.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -57,7 +60,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan daftar lineup terurut untuk event' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Daftar lineup berhasil diambil.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar lineup berhasil diambil.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -66,7 +72,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)('reorder'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengubah urutan tampil lineup' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Urutan lineup berhasil diperbarui.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Urutan lineup berhasil diperbarui.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
@@ -77,7 +86,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':itemId'),
     (0, swagger_1.ApiOperation)({ summary: 'Mengupdate data lineup' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Data lineup berhasil diupdate.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Data lineup berhasil diupdate.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('itemId')),
     __param(2, (0, common_1.Body)()),
@@ -90,7 +102,10 @@ __decorate([
     (0, common_1.Delete)(':itemId'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Menghapus lineup' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Lineup berhasil dihapus.' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Lineup berhasil dihapus.',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('itemId')),
     __param(2, (0, current_user_decorator_1.CurrentUser)('id')),

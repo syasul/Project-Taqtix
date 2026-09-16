@@ -177,7 +177,10 @@ export class TicketsController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Memblokir tiket pengunjung' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Tiket berhasil diblokir.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tiket berhasil diblokir.',
+  })
   async blockTicket(
     @Param('id') ticketId: string,
     @Body() dto: BlockTicketDto,
@@ -191,7 +194,10 @@ export class TicketsController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Membuka blokir tiket pengunjung' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Blokir tiket berhasil dibuka.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Blokir tiket berhasil dibuka.',
+  })
   async unblockTicket(
     @Param('id') ticketId: string,
     @CurrentUser('id') userId: string,
@@ -202,8 +208,13 @@ export class TicketsController {
   @Get('organizer/events/:id/blocked-visitors')
   @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan daftar pengunjung yang diblokir pada event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar tiket diblokir berhasil diambil.' })
+  @ApiOperation({
+    summary: 'Mendapatkan daftar pengunjung yang diblokir pada event',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar tiket diblokir berhasil diambil.',
+  })
   async getBlockedVisitors(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
@@ -214,8 +225,13 @@ export class TicketsController {
   @Post('organizer/events/:id/tickets/generate-wristband-codes')
   @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Generate kode wristband / gelang secara batch untuk tiket' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Kode wristband berhasil dibuat.' })
+  @ApiOperation({
+    summary: 'Generate kode wristband / gelang secara batch untuk tiket',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Kode wristband berhasil dibuat.',
+  })
   async generateWristbandCodes(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
@@ -227,7 +243,10 @@ export class TicketsController {
   @Roles('organizer', 'organizer_member')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Export data wristband tiket dalam format CSV' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Data export wristband berhasil dibuat.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Data export wristband berhasil dibuat.',
+  })
   async exportWristbandCsv(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,

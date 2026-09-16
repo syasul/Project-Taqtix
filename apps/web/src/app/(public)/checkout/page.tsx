@@ -265,17 +265,32 @@ function CheckoutContent() {
         }
       );
 
-      const orderId = orderRes.data?.data?.id;
-      const payRes = await apiClient.post(`/orders/${orderId}/pay`);
-      return { orderId, payment: payRes.data?.data };
+      const orderData = orderRes.data?.data;
+      const orderId = orderData?.id;
+      let paymentData = orderData?.paymentUrl
+        ? { redirectUrl: orderData.paymentUrl }
+        : null;
+
+      if (!paymentData?.redirectUrl) {
+        try {
+          const payRes = await apiClient.post(`/orders/${orderId}/pay`);
+          paymentData = payRes.data?.data;
+        } catch {
+          // Continue with orderId even if explicit pay call fails
+        }
+      }
+
+      return { orderId, payment: paymentData };
     },
     onSuccess: (data) => {
       setIsSubmitting(false);
       toast.success('Pemesanan tiket berhasil dibuat!');
       if (data.payment?.redirectUrl) {
-        window.open(data.payment.redirectUrl, '_blank');
+        // Opsi A — Redirect penuh ke halaman DOKU Checkout
+        window.location.href = data.payment.redirectUrl;
+      } else {
+        router.push(`/checkout?orderId=${data.orderId}`);
       }
-      router.push(`/checkout?orderId=${data.orderId}`);
     },
     onError: (error: any) => {
       setIsSubmitting(false);
@@ -333,7 +348,10 @@ function CheckoutContent() {
                 {orderDetails?.payment?.snapToken && (
                   <Button
                     onClick={() => {
-                      const url = `https://app.sandbox.midtrans.com/snap/v2/vtweb/${orderDetails.payment.snapToken}`;
+                      const token = orderDetails.payment.snapToken;
+                      const url = token.startsWith('http')
+                        ? token
+                        : `https://app.sandbox.midtrans.com/snap/v2/vtweb/${token}`;
                       window.open(url, '_blank');
                     }}
                     className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl w-full cursor-pointer py-2.5 font-bold border-0"

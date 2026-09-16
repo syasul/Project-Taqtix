@@ -35,7 +35,11 @@ export class ExportsService {
     return exportsDir;
   }
 
-  private handleCsvResult(filename: string, csv: string, rowCount: number): ExportResult {
+  private handleCsvResult(
+    filename: string,
+    csv: string,
+    rowCount: number,
+  ): ExportResult {
     // Jika data lebih dari 1000 baris, simpan sebagai file lokal terisolasi untuk background polling
     if (rowCount > 1000) {
       const exportDir = this.getExportsDirectory();
@@ -86,7 +90,10 @@ export class ExportsService {
         }
       }
     } catch (err) {
-      console.error('[ExportsCleaner] Gagal membersihkan file ekspor lama:', err);
+      console.error(
+        '[ExportsCleaner] Gagal membersihkan file ekspor lama:',
+        err,
+      );
     }
   }
 
@@ -112,7 +119,9 @@ export class ExportsService {
       where: { id: eventId },
     });
     if (!event || event.organizerId !== organizer.id) {
-      throw new NotFoundException('Event tidak ditemukan atau bukan milik Anda');
+      throw new NotFoundException(
+        'Event tidak ditemukan atau bukan milik Anda',
+      );
     }
     return { event, organizer };
   }
@@ -199,7 +208,10 @@ export class ExportsService {
   /**
    * Export data kehadiran / attendance tiket event dalam CSV.
    */
-  async exportAttendance(eventId: string, userId: string): Promise<ExportResult> {
+  async exportAttendance(
+    eventId: string,
+    userId: string,
+  ): Promise<ExportResult> {
     await this.verifyEventOwnership(eventId, userId);
 
     const tickets = await this.prisma.ticket.findMany({
@@ -252,7 +264,10 @@ export class ExportsService {
   /**
    * Export ringkasan keuangan event (revenue, fees, net) dalam CSV.
    */
-  async exportFinancialSummary(eventId: string, userId: string): Promise<ExportResult> {
+  async exportFinancialSummary(
+    eventId: string,
+    userId: string,
+  ): Promise<ExportResult> {
     const { event } = await this.verifyEventOwnership(eventId, userId);
 
     const orders = await this.prisma.order.findMany({
@@ -335,7 +350,9 @@ export class ExportsService {
     const rows = events.map((ev) => {
       const onlineRev = ev.orders.reduce((acc, o) => acc + o.totalAmount, 0);
       const cashRev = ev.cashTransactions.reduce((acc, c) => acc + c.amount, 0);
-      const checkedIn = ev.tickets.filter((t) => t.status === 'CHECKED_IN').length;
+      const checkedIn = ev.tickets.filter(
+        (t) => t.status === 'CHECKED_IN',
+      ).length;
 
       return [
         `"${ev.id}"`,

@@ -122,7 +122,9 @@ let CRMProcessor = class CRMProcessor {
         if (!masterJob)
             return;
         const nextSent = isSuccess ? masterJob.sentCount + 1 : masterJob.sentCount;
-        const nextFailed = !isSuccess ? masterJob.failedCount + 1 : masterJob.failedCount;
+        const nextFailed = !isSuccess
+            ? masterJob.failedCount + 1
+            : masterJob.failedCount;
         const totalProcessed = nextSent + nextFailed;
         const isCompleted = totalProcessed >= masterJob.targetCount;
         await this.prisma.broadcastJob.update({

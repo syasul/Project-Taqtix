@@ -24,13 +24,19 @@ class UpdatePartnerDto {
 }
 exports.UpdatePartnerDto = UpdatePartnerDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Raffi Ahmad Official', description: 'Nama partner afiliasi' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Raffi Ahmad Official',
+        description: 'Nama partner afiliasi',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdatePartnerDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'event-uuid-5678', description: 'ID Event yang dipromosikan' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'event-uuid-5678',
+        description: 'ID Event yang dipromosikan',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -48,19 +54,28 @@ __decorate([
     __metadata("design:type", String)
 ], UpdatePartnerDto.prototype, "type", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'RAFFI2026', description: 'Kode unik referral' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'RAFFI2026',
+        description: 'Kode unik referral',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdatePartnerDto.prototype, "uniqueCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'DISKONRAF', description: 'Kode voucher diskon' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'DISKONRAF',
+        description: 'Kode voucher diskon',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdatePartnerDto.prototype, "promoCode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'fixed', description: 'Tipe komisi (percentage / fixed)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'fixed',
+        description: 'Tipe komisi (percentage / fixed)',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -73,7 +88,10 @@ __decorate([
     __metadata("design:type", Number)
 ], UpdatePartnerDto.prototype, "commissionValue", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'raffi.new@partner.com', description: 'Email partner' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'raffi.new@partner.com',
+        description: 'Email partner',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

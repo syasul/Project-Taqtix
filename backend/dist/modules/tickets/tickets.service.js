@@ -335,7 +335,10 @@ let TicketsService = class TicketsService {
             `"${t.id}"`,
             `"${t.status}"`,
         ]);
-        const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+        const csvContent = [
+            headers.join(','),
+            ...rows.map((r) => r.join(',')),
+        ].join('\n');
         return {
             filename: `wristband-export-${eventId}.csv`,
             csv: csvContent,

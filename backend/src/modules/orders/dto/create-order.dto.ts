@@ -41,7 +41,8 @@ export class OrderItemDto {
   qty!: number;
 
   @ApiPropertyOptional({
-    description: 'Jawaban formulir kustom per kategori/item { [customFormFieldId]: string }',
+    description:
+      'Jawaban formulir kustom per kategori/item { [customFormFieldId]: string }',
   })
   @IsOptional()
   customFieldAnswers?: Record<string, string>;
@@ -83,7 +84,8 @@ export class CreateOrderDto {
   facilities?: FacilityOrderDto[];
 
   @ApiPropertyOptional({
-    description: 'Jawaban formulir kustom level order { [customFormFieldId]: string }',
+    description:
+      'Jawaban formulir kustom level order { [customFormFieldId]: string }',
   })
   @IsOptional()
   customFieldAnswers?: Record<string, string>;
@@ -127,7 +129,10 @@ export class CreateOrderDto {
   @IsOptional()
   buyerPhone?: string;
 
-  @ApiPropertyOptional({ example: 'Jakarta', description: 'Kota domisili pembeli' })
+  @ApiPropertyOptional({
+    example: 'Jakarta',
+    description: 'Kota domisili pembeli',
+  })
   @IsString()
   @IsOptional()
   city?: string;

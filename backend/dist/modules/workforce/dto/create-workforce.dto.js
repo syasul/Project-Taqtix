@@ -21,14 +21,20 @@ class CreateWorkforceDto {
 }
 exports.CreateWorkforceDto = CreateWorkforceDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Ahmad Fauzi', description: 'Nama crew / staff event' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Ahmad Fauzi',
+        description: 'Nama crew / staff event',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama tidak boleh kosong' }),
     (0, class_validator_1.MaxLength)(100, { message: 'Nama maksimal 100 karakter' }),
     __metadata("design:type", String)
 ], CreateWorkforceDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '08123456789', description: 'Nomor telepon / WhatsApp' }),
+    (0, swagger_1.ApiProperty)({
+        example: '08123456789',
+        description: 'Nomor telepon / WhatsApp',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nomor telepon tidak boleh kosong' }),
     __metadata("design:type", String)
@@ -46,7 +52,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateWorkforceDto.prototype, "role", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'user-uuid-pic', description: 'ID User PIC supervisor (jika ada)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'user-uuid-pic',
+        description: 'ID User PIC supervisor (jika ada)',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

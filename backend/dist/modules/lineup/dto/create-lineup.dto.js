@@ -21,7 +21,10 @@ class CreateLineupDto {
 }
 exports.CreateLineupDto = CreateLineupDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Sheila on 7', description: 'Nama artis / performer' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Sheila on 7',
+        description: 'Nama artis / performer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -33,13 +36,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreateLineupDto.prototype, "photoUrl", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: '20:00 - 21:30', description: 'Jadwal tampil artis' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '20:00 - 21:30',
+        description: 'Jadwal tampil artis',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateLineupDto.prototype, "performTime", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Main Stage', description: 'Panggung / venue tampil' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Main Stage',
+        description: 'Panggung / venue tampil',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

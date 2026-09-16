@@ -2,22 +2,63 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bullmq';
+import { Cron } from '@nestjs/schedule';
 import { OrderStatus, PaymentStatus, TicketStatus } from '@prisma/client';
 import * as crypto from 'crypto';
+import { DokuService } from './doku/doku.service';
+import {
+  generateSignature,
+  verifySignature,
+  parseDokuExpiredDate,
+  safeCompareSignatures,
+} from './doku/doku-signature.util';
+
+export interface DokuWebhookPayload {
+  service?: { id?: string };
+  transaction?: {
+    status?: string;
+    date?: string;
+    id?: string;
+    original_request_id?: string;
+  };
+  transaction_status?: string;
+  order?: {
+    invoice_number?: string;
+    invoiceNumber?: string;
+    amount?: number | string;
+  };
+}
+
+export interface DokuCheckStatusResponse {
+  transaction?: {
+    status?: string;
+    id?: string;
+    date?: string;
+  };
+  order?: {
+    session_id?: string;
+  };
+  status?: string;
+}
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly dokuService: DokuService,
   ) {}
 
   /**
@@ -63,20 +104,22 @@ export class PaymentsService {
     }
 
     // 1. Cek DOKU credentials
-    const dokuClientId =
-      this.configService.get<string>('DOKU_CLIENT_ID') ||
-      this.configService.get<string>('PAYMENT_PROVIDER_KEY');
-    const dokuSecretKey =
-      this.configService.get<string>('DOKU_SECRET_KEY') ||
-      this.configService.get<string>('PAYMENT_PROVIDER_SECRET');
+    const { clientId: dokuClientId, secretKey: dokuSecretKey } =
+      this.getDokuConfig();
 
     if (dokuClientId && dokuSecretKey) {
-      return this.createDokuPayment(order, payment, dokuClientId, dokuSecretKey);
+      return this.createDokuPayment(
+        order,
+        payment,
+        dokuClientId,
+        dokuSecretKey,
+      );
     }
 
     // 2. Cek Midtrans credentials
-    const midtransServerKey =
-      this.configService.get<string>('TAQTIX_MIDTRANS_SERVER_KEY');
+    const midtransServerKey = this.configService.get<string>(
+      'TAQTIX_MIDTRANS_SERVER_KEY',
+    );
     if (midtransServerKey) {
       return this.createMidtransPayment(order, payment, midtransServerKey);
     }
@@ -106,110 +149,139 @@ export class PaymentsService {
   }
 
   /**
-   * Membuat pembayaran menggunakan DOKU Checkout API (TASK.md requirement).
+   * Helper untuk membaca konfigurasi environment DOKU Payment Gateway.
+   */
+  getDokuConfig() {
+    const clientId =
+      this.configService.get<string>('DOKU_CLIENT_ID') ||
+      this.configService.get<string>('PAYMENT_PROVIDER_KEY') ||
+      '';
+    const secretKey =
+      this.configService.get<string>('DOKU_SECRET_KEY') ||
+      this.configService.get<string>('PAYMENT_PROVIDER_SECRET') ||
+      '';
+    const dokuEnv = (
+      this.configService.get<string>('DOKU_ENV') ||
+      (this.configService.get<string>('NODE_ENV') === 'production'
+        ? 'production'
+        : 'sandbox')
+    ).toLowerCase();
+    const isProduction = dokuEnv === 'production';
+    const baseUrl = isProduction
+      ? this.configService.get<string>('DOKU_BASE_URL_PRODUCTION') ||
+        'https://api.doku.com'
+      : this.configService.get<string>('DOKU_BASE_URL_SANDBOX') ||
+        'https://api-sandbox.doku.com';
+
+    return { clientId, secretKey, dokuEnv, isProduction, baseUrl };
+  }
+
+  /**
+   * Menghasilkan signature HMAC-SHA256 resmi DOKU.
+   * Untuk POST dengan body:
+   *   1. Digest = Base64(SHA256(rawJSONBodyString))
+   *   2. stringToSign = Client-Id:{clientId}\nRequest-Id:{requestId}\nRequest-Timestamp:{timestamp}\nRequest-Target:{path}\nDigest:{digest}
+   *   3. Signature = "HMACSHA256=" + Base64(HMAC_SHA256(secretKey, stringToSign))
+   * Untuk GET tanpa body:
+   *   Baris Digest ditiadakan seluruhnya.
+   */
+  generateDokuSignature(
+    secretKey: string,
+    clientId: string,
+    requestId: string,
+    timestamp: string,
+    requestTarget: string,
+    bodyString?: string,
+  ): string {
+    let stringToSign = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${timestamp}\nRequest-Target:${requestTarget}`;
+
+    if (bodyString !== undefined && bodyString !== null && bodyString !== '') {
+      const digest = crypto
+        .createHash('sha256')
+        .update(bodyString)
+        .digest('base64');
+      stringToSign += `\nDigest:${digest}`;
+    }
+
+    const hmac = crypto
+      .createHmac('sha256', secretKey)
+      .update(stringToSign)
+      .digest('base64');
+
+    return `HMACSHA256=${hmac}`;
+  }
+
+  /**
+   * Perbandingan signature secara timing-safe untuk menghindari timing attacks.
+   */
+  safeCompareSignatures(sigA: string, sigB: string): boolean {
+    if (!sigA || !sigB) return false;
+    const bufA = Buffer.from(sigA);
+    const bufB = Buffer.from(sigB);
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+  }
+
+  /**
+   * Mengurai format expired_date DOKU (yyyyMMddHHmmss dalam WIB UTC+7) menjadi JavaScript Date.
+   * Contoh: "20260917184542" -> 2026-09-17T18:45:42+07:00
+   */
+  parseDokuExpiredDate(rawDateStr: string): Date | null {
+    if (
+      !rawDateStr ||
+      typeof rawDateStr !== 'string' ||
+      rawDateStr.length !== 14
+    ) {
+      return null;
+    }
+    const year = rawDateStr.substring(0, 4);
+    const month = rawDateStr.substring(4, 6);
+    const day = rawDateStr.substring(6, 8);
+    const hour = rawDateStr.substring(8, 10);
+    const minute = rawDateStr.substring(10, 12);
+    const second = rawDateStr.substring(12, 14);
+
+    const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}+07:00`;
+    const date = new Date(isoString);
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  /**
+   * Membuat pembayaran menggunakan DOKU Checkout API (1 endpoint hosted checkout).
    */
   private async createDokuPayment(
     order: any,
     payment: any,
-    clientId: string,
-    secretKey: string,
+    _clientId: string,
+    _secretKey: string,
   ) {
-    const isProd =
-      this.configService.get<string>('NODE_ENV') === 'production';
-    const baseUrl = isProd
-      ? 'https://api.doku.com'
-      : 'https://api-sandbox.doku.com';
-    const requestTarget = '/checkout/v1/payment';
-    const requestId = crypto.randomUUID();
-    const requestTimestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
-
-    const firstItem = order.orderItems[0];
-    const buyerName = firstItem ? firstItem.attendeeName : 'Guest';
-    const buyerEmail = order.buyer.email;
-    const buyerPhone = firstItem ? firstItem.attendeePhone : '';
-
-    const frontendUrl =
-      this.configService.get<string>('TAQTIX_FRONTEND_URL') ||
-      this.configService.get<string>('TAQTIX_WEB_URL') ||
-      'https://taqtix.id';
-
-    const payload = {
-      order: {
-        amount: Math.round(order.totalAmount),
-        invoice_number: order.id,
-        currency: 'IDR',
-        callback_url: `${frontendUrl}/orders/${order.id}`,
-        line_items: order.orderItems.map((item: any) => ({
-          name: item.ticketCategory?.name || 'Tiket Event',
-          price: Math.round(item.unitPrice),
-          quantity: item.qty,
-        })),
-      },
-      payment: {
-        payment_due_date: 10, // 10 menit batas pembayaran
-      },
-      customer: {
-        id: order.buyer.id,
-        name: buyerName,
-        email: buyerEmail,
-        phone: buyerPhone || undefined,
-      },
-    };
-
-    const bodyString = JSON.stringify(payload);
-    const digest = crypto
-      .createHash('sha256')
-      .update(bodyString)
-      .digest('base64');
-
-    const signatureComponent = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${requestTimestamp}\nRequest-Target:${requestTarget}\nDigest:${digest}`;
-    const signature =
-      'HMACSHA256=' +
-      crypto
-        .createHmac('sha256', secretKey)
-        .update(signatureComponent)
-        .digest('base64');
-
     try {
-      const response = await fetch(`${baseUrl}${requestTarget}`, {
-        method: 'POST',
-        headers: {
-          'Client-Id': clientId,
-          'Request-Id': requestId,
-          'Request-Timestamp': requestTimestamp,
-          Signature: signature,
-          'Content-Type': 'application/json',
-        },
-        body: bodyString,
-      });
+      const result = await this.dokuService.createPayment(order, payment);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error('DOKU API Error:', data);
-        throw new BadRequestException(
-          data?.message || 'Gagal menghubungi payment gateway DOKU',
-        );
+      if (result.expiredDate) {
+        await this.prisma.order.update({
+          where: { id: order.id },
+          data: { expiredAt: result.expiredDate },
+        });
       }
-
-      const redirectUrl =
-        data?.response?.payment?.url || data?.payment?.url || '';
 
       await this.prisma.payment.update({
         where: { id: payment.id },
         data: {
-          snapToken: redirectUrl,
+          snapToken: result.paymentUrl,
+          externalId: result.tokenId || result.invoiceNumber,
           provider: 'doku',
         },
       });
 
       return {
-        token: redirectUrl,
-        redirectUrl,
+        token: result.paymentUrl,
+        redirectUrl: result.paymentUrl,
         provider: 'doku',
+        invoiceNumber: result.invoiceNumber,
       };
     } catch (err: any) {
-      console.error('Gagal request DOKU Checkout:', err);
+      this.logger.error('Gagal request DOKU Checkout:', err);
       throw new BadRequestException(
         err.message || 'Gagal memproses pembayaran DOKU',
       );
@@ -292,6 +364,8 @@ export class PaymentsService {
     body: any,
     provider = 'doku',
     headers: Record<string, string> = {},
+    rawBody?: Buffer | string,
+    requestPath?: string,
   ) {
     const normalized = (provider || 'doku').toLowerCase();
     console.log(`[Payment Webhook] Menerima webhook provider: ${normalized}`);
@@ -302,14 +376,11 @@ export class PaymentsService {
       body?.order?.invoice_number ||
       body?.transaction?.status
     ) {
-      return this.handleDokuWebhook(body, headers);
+      return this.handleDokuWebhook(body, headers, rawBody, requestPath);
     }
 
     // 2. Midtrans Webhook
-    if (
-      normalized === 'midtrans' ||
-      (body?.order_id && body?.signature_key)
-    ) {
+    if (normalized === 'midtrans' || (body?.order_id && body?.signature_key)) {
       return this.handleMidtransWebhook(body);
     }
 
@@ -323,72 +394,141 @@ export class PaymentsService {
       return { received: true, status: 'success' };
     }
 
-    throw new BadRequestException(`Provider webhook ${provider} tidak didukung`);
+    throw new BadRequestException(
+      `Provider webhook ${provider} tidak didukung`,
+    );
   }
 
   /**
-   * Verifikasi dan proses notifikasi webhook DOKU.
+   * Verifikasi dan proses notifikasi webhook DOKU secara aman dan idempotent.
    */
-  private async handleDokuWebhook(body: any, headers: Record<string, string>) {
-    const orderId =
-      body?.order?.invoice_number || body?.order?.invoiceNumber;
-    const transactionStatus =
-      body?.transaction?.status || body?.transaction_status;
-    const transactionId =
-      body?.transaction?.id || body?.service?.id || crypto.randomUUID();
+  private async handleDokuWebhook(
+    body: DokuWebhookPayload | Record<string, any>,
+    headers: Record<string, string>,
+    rawBody?: Buffer | string,
+    requestPath?: string,
+  ) {
+    const payload = body as DokuWebhookPayload;
+    const rawInvoice =
+      payload?.order?.invoice_number || payload?.order?.invoiceNumber;
+    const transactionStatus = String(
+      payload?.transaction?.status || payload?.transaction_status || '',
+    ).toUpperCase();
+    const transactionId = String(
+      payload?.transaction?.id ||
+        payload?.transaction?.original_request_id ||
+        payload?.service?.id ||
+        crypto.randomUUID(),
+    );
+    const transactionDateStr = payload?.transaction?.date;
 
-    if (!orderId) {
+    if (!rawInvoice) {
       throw new BadRequestException(
         'Invoice number tidak ditemukan pada payload DOKU',
       );
     }
 
-    const dokuSecretKey =
-      this.configService.get<string>('DOKU_SECRET_KEY') ||
-      this.configService.get<string>('PAYMENT_PROVIDER_SECRET');
+    const {
+      clientId: configuredClientId,
+      secretKey: dokuSecretKey,
+      isProduction,
+    } = this.getDokuConfig();
 
-    // Verifikasi Signature DOKU jika secret key diset dan header signature dikirim
-    const incomingSignature = headers['signature'] || headers['Signature'];
-    if (dokuSecretKey && incomingSignature) {
-      const clientId = headers['client-id'] || headers['Client-Id'] || '';
-      const requestId = headers['request-id'] || headers['Request-Id'] || '';
-      const requestTimestamp =
-        headers['request-timestamp'] || headers['Request-Timestamp'] || '';
-      const requestTarget = '/v1/payments/webhook/doku';
+    // 1. Verifikasi Signature DOKU
+    const isValidSignature = this.dokuService.verifyWebhookSignature(
+      headers,
+      rawBody,
+      requestPath,
+    );
 
-      const digest = crypto
-        .createHash('sha256')
-        .update(JSON.stringify(body))
-        .digest('base64');
-      const signatureComponent = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${requestTimestamp}\nRequest-Target:${requestTarget}\nDigest:${digest}`;
-      const expectedSignature =
-        'HMACSHA256=' +
-        crypto
-          .createHmac('sha256', dokuSecretKey)
-          .update(signatureComponent)
-          .digest('base64');
+    if (!isValidSignature) {
+      this.logger.warn(
+        `[DOKU Webhook] Security Alert: Invalid signature received from IP or headers! Target: ${requestPath}`,
+      );
+      throw new UnauthorizedException(
+        'Signature verifikasi webhook DOKU tidak valid',
+      );
+    }
 
-      if (
-        this.configService.get<string>('NODE_ENV') === 'production' &&
-        incomingSignature !== expectedSignature
-      ) {
-        console.warn(
-          `[DOKU Webhook] Signature mismatch. Incoming: ${incomingSignature}, Expected: ${expectedSignature}`,
-        );
-      }
+    // 2. Cari Order di Database
+    const cleanOrderId = rawInvoice.startsWith('TAQTIX-ORD-')
+      ? rawInvoice.replace('TAQTIX-ORD-', '')
+      : rawInvoice;
+
+    const order = await this.prisma.order.findFirst({
+      where: {
+        OR: [
+          { id: cleanOrderId },
+          { id: rawInvoice },
+          { payment: { externalId: rawInvoice } },
+        ],
+      },
+      include: {
+        payment: true,
+      },
+    });
+
+    if (!order) {
+      console.warn(
+        `[DOKU Webhook] Order tidak ditemukan untuk invoice: ${rawInvoice}`,
+      );
+      throw new NotFoundException(
+        `Order dengan invoice ${rawInvoice} tidak ditemukan`,
+      );
+    }
+
+    // 3. Cocokkan Nominal (order.amount WAJIB sama dengan Order.totalAmount)
+    const incomingAmount = Number(body?.order?.amount);
+    if (
+      !isNaN(incomingAmount) &&
+      Math.round(incomingAmount) !== Math.round(order.totalAmount)
+    ) {
+      console.error(
+        `[DOKU Webhook] Nominal tidak cocok! Incoming: ${incomingAmount}, Expected: ${order.totalAmount}`,
+      );
+      throw new BadRequestException(
+        'Nominal pembayaran tidak sesuai dengan total tagihan order',
+      );
+    }
+
+    // 4. Idempotensi: jika status order sudah PAID, kembalikan response 200 tanpa proses ulang
+    if (order.status === OrderStatus.PAID) {
+      console.log(
+        `[DOKU Webhook] Order ${order.id} sudah berstatus PAID (Idempotent response).`,
+      );
+      return { received: true, status: 'already_paid' };
     }
 
     console.log(
-      `[DOKU Webhook] Processing invoice: ${orderId}, status: ${transactionStatus}`,
+      `[DOKU Webhook] Memproses invoice: ${rawInvoice} (Order: ${order.id}), status: ${transactionStatus}`,
     );
 
+    // 5. Mapping Status DOKU sesuai panduan resmi
     if (transactionStatus === 'SUCCESS') {
-      await this.processPaymentSuccess(orderId, String(transactionId));
-    } else if (
-      transactionStatus === 'FAILED' ||
-      transactionStatus === 'EXPIRED'
-    ) {
-      await this.processPaymentFailed(orderId);
+      await this.processPaymentSuccess(
+        order.id,
+        String(transactionId),
+        transactionDateStr ? new Date(transactionDateStr) : new Date(),
+      );
+    } else if (transactionStatus === 'FAILED') {
+      // PENTING: DOKU merekomendasikan JANGAN langsung membatalkan Order saat status FAILED,
+      // karena pembeli dapat mengganti metode bayar di checkout page.
+      // Hanya tandai Payment sebagai FAILED, biarkan Order tetap PENDING sampai expiredAt.
+      if (order.payment) {
+        await this.prisma.payment.update({
+          where: { id: order.payment.id },
+          data: { status: PaymentStatus.FAILED },
+        });
+      }
+      console.log(
+        `[DOKU Webhook] Payment ${order.id} berstatus FAILED, order tetap PENDING sampai expiredAt.`,
+      );
+    } else if (transactionStatus === 'EXPIRED') {
+      await this.processPaymentExpired(order.id);
+    } else if (transactionStatus === 'PENDING') {
+      console.log(
+        `[DOKU Webhook] Order ${order.id} menunggu pembayaran (PENDING).`,
+      );
     }
 
     return { received: true };
@@ -453,7 +593,11 @@ export class PaymentsService {
    * 3. Akumulasi komisi partner afiliasi jika order menggunakan affiliate code.
    * 4. Kirim notifikasi e-ticket via WhatsApp dan Email secara asinkron via BullMQ.
    */
-  async processPaymentSuccess(orderId: string, transactionId?: string) {
+  async processPaymentSuccess(
+    orderId: string,
+    transactionId?: string,
+    paidAtDate?: Date,
+  ) {
     await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
@@ -484,7 +628,7 @@ export class PaymentsService {
           where: { id: order.payment.id },
           data: {
             status: PaymentStatus.SUCCESS,
-            paidAt: new Date(),
+            paidAt: paidAtDate || new Date(),
             externalId: transactionId || order.payment.externalId,
           },
         });
@@ -609,7 +753,7 @@ export class PaymentsService {
   }
 
   /**
-   * Logika transaksional saat pembayaran gagal/batal:
+   * Logika transaksional saat pembayaran gagal/dibatalkan:
    * Mengembalikan kuota tiket dan kode promo yang telah dipesan.
    */
   async processPaymentFailed(orderId: string) {
@@ -663,6 +807,163 @@ export class PaymentsService {
   }
 
   /**
+   * Logika transaksional saat pembayaran kedaluwarsa (EXPIRED):
+   * Mengubah status order dan payment menjadi EXPIRED, serta mengembalikan kuota tiket & kode promo.
+   */
+  async processPaymentExpired(orderId: string) {
+    await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          orderItems: true,
+          payment: true,
+        },
+      });
+
+      if (
+        !order ||
+        order.status === OrderStatus.EXPIRED ||
+        order.status === OrderStatus.CANCELLED ||
+        order.status === OrderStatus.PAID
+      ) {
+        return;
+      }
+
+      if (order.payment) {
+        await tx.payment.update({
+          where: { id: order.payment.id },
+          data: {
+            status: PaymentStatus.EXPIRED,
+          },
+        });
+      }
+
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.EXPIRED,
+        },
+      });
+
+      for (const item of order.orderItems) {
+        await tx.ticketCategory.update({
+          where: { id: item.ticketCategoryId },
+          data: {
+            sold: { decrement: item.qty },
+          },
+        });
+      }
+
+      if (order.promoCodeId) {
+        await tx.promoCode.update({
+          where: { id: order.promoCodeId },
+          data: {
+            usedCount: { decrement: 1 },
+          },
+        });
+      }
+
+      console.log(
+        `[DOKU] Order ${orderId} berhasil kedaluwarsa (EXPIRED) dan kuota dikembalikan.`,
+      );
+    });
+  }
+
+  /**
+   * Cek status pembayaran langsung ke server DOKU (Fallback jika webhook terhambat).
+   * GET https://api[-sandbox].doku.com/orders/v1/status/{invoice_number}
+   */
+  async checkDokuOrderStatus(invoiceNumber: string) {
+    const checkResult = await this.dokuService.checkStatus(invoiceNumber);
+    if (!checkResult.success) {
+      return checkResult;
+    }
+
+    const transactionStatus = String(
+      checkResult.transactionStatus || '',
+    ).toUpperCase();
+    const transactionId = String(checkResult.transactionId || '');
+    const transactionDateStr = checkResult.transactionDate;
+
+    const cleanOrderId = invoiceNumber.startsWith('TAQTIX-ORD-')
+      ? invoiceNumber.replace('TAQTIX-ORD-', '')
+      : invoiceNumber;
+
+    const order = await this.prisma.order.findFirst({
+      where: {
+        OR: [
+          { id: cleanOrderId },
+          { id: invoiceNumber },
+          { payment: { externalId: invoiceNumber } },
+        ],
+      },
+    });
+
+    if (order && order.status === OrderStatus.PENDING) {
+      if (transactionStatus === 'SUCCESS') {
+        await this.processPaymentSuccess(
+          order.id,
+          transactionId,
+          transactionDateStr ? new Date(transactionDateStr) : new Date(),
+        );
+      } else if (transactionStatus === 'EXPIRED') {
+        await this.processPaymentExpired(order.id);
+      }
+    }
+
+    return {
+      success: true,
+      transactionStatus,
+      data: checkResult.rawData,
+    };
+  }
+
+  /**
+   * FASE V: Fallback scheduled cron job (jalan tiap 3-5 menit).
+   * Query semua Order dengan status pending yang expiredAt-nya dalam rentang 15 menit terakhir
+   * (baik yang belum lewat maupun baru lewat sedikit).
+   */
+  @Cron('*/3 * * * *')
+  async handleScheduledStatusCheck() {
+    const { clientId, secretKey } = this.getDokuConfig();
+    if (!clientId || !secretKey) {
+      return;
+    }
+
+    const now = new Date();
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+    const fifteenMinutesAhead = new Date(now.getTime() + 15 * 60 * 1000);
+
+    const pendingOrders = await this.prisma.order.findMany({
+      where: {
+        status: OrderStatus.PENDING,
+        expiredAt: {
+          gte: fifteenMinutesAgo,
+          lte: fifteenMinutesAhead,
+        },
+        payment: {
+          provider: 'doku',
+        },
+      },
+      include: {
+        payment: true,
+      },
+    });
+
+    for (const order of pendingOrders) {
+      const invoiceNumber = `TAQTIX-ORD-${order.id}`;
+      try {
+        await this.checkDokuOrderStatus(invoiceNumber);
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        this.logger.error(
+          `Gagal fallback check status untuk order ${order.id}: ${errorMsg}`,
+        );
+      }
+    }
+  }
+
+  /**
    * Mendapatkan detail tiket untuk halaman e-ticket pembeli (Public via link).
    */
   async getTicket(ticketId: string) {
@@ -712,6 +1013,7 @@ export class PaymentsService {
 
   /**
    * Mendapatkan status pembayaran dari suatu pesanan (Polling).
+   * Mendukung fallback pengecekan langsung ke gateway DOKU jika order masih PENDING.
    */
   async getPaymentStatus(orderId: string) {
     const order = await this.prisma.order.findUnique({
@@ -723,13 +1025,47 @@ export class PaymentsService {
       throw new NotFoundException('Pesanan tidak ditemukan');
     }
 
+    // Fallback cek status ke DOKU jika order masih PENDING dan memiliki externalId/invoice
+    if (
+      order.status === OrderStatus.PENDING &&
+      order.payment?.provider === 'doku' &&
+      order.payment?.externalId
+    ) {
+      const { clientId, secretKey } = this.getDokuConfig();
+      if (clientId && secretKey) {
+        try {
+          await this.checkDokuOrderStatus(order.payment.externalId);
+          // Ambil state terkini setelah sinkronisasi
+          const refreshed = await this.prisma.order.findUnique({
+            where: { id: orderId },
+            include: { payment: true },
+          });
+          if (refreshed) {
+            let status = 'pending';
+            if (refreshed.status === OrderStatus.PAID) status = 'success';
+            else if (refreshed.status === OrderStatus.EXPIRED)
+              status = 'expired';
+            else if (refreshed.payment?.status === PaymentStatus.FAILED)
+              status = 'failed';
+            return { status, expiredAt: refreshed.expiredAt };
+          }
+        } catch {
+          // Tetap lanjutkan dengan status yang ada jika request fallback gagal
+        }
+      }
+    }
+
     let status = 'pending';
     if (order.payment) {
-      if (order.payment.status === 'SUCCESS') status = 'success';
-      else if (order.payment.status === 'FAILED') status = 'failed';
+      if (
+        order.payment.status === PaymentStatus.SUCCESS ||
+        order.status === OrderStatus.PAID
+      )
+        status = 'success';
+      else if (order.payment.status === PaymentStatus.FAILED) status = 'failed';
     }
-    if (order.status === 'EXPIRED') status = 'expired';
+    if (order.status === OrderStatus.EXPIRED) status = 'expired';
 
-    return { status };
+    return { status, expiredAt: order.expiredAt };
   }
 }

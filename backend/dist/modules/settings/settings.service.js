@@ -55,7 +55,9 @@ let SettingsService = class SettingsService {
             data: {
                 ...(data.name ? { name: data.name } : {}),
                 ...(data.logoUrl !== undefined ? { logoUrl: data.logoUrl } : {}),
-                ...(data.contactEmail !== undefined ? { contactEmail: data.contactEmail } : {}),
+                ...(data.contactEmail !== undefined
+                    ? { contactEmail: data.contactEmail }
+                    : {}),
                 ...(data.phone !== undefined ? { phone: data.phone } : {}),
             },
             select: {
@@ -94,8 +96,12 @@ let SettingsService = class SettingsService {
             where: { id: organizerId },
             data: {
                 ...(data.bankName !== undefined ? { bankName: data.bankName } : {}),
-                ...(data.bankAccountNumber !== undefined ? { bankAccountNumber: data.bankAccountNumber } : {}),
-                ...(data.bankAccountHolder !== undefined ? { bankAccountHolder: data.bankAccountHolder } : {}),
+                ...(data.bankAccountNumber !== undefined
+                    ? { bankAccountNumber: data.bankAccountNumber }
+                    : {}),
+                ...(data.bankAccountHolder !== undefined
+                    ? { bankAccountHolder: data.bankAccountHolder }
+                    : {}),
             },
             select: {
                 bankName: true,

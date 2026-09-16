@@ -53,9 +53,7 @@ describe('CashService', () => {
           title: 'Festival B',
           status: 'PUBLISHED',
           startDate: new Date(),
-          cashTransactions: [
-            { amount: 300000, type: 'ticket_sale' },
-          ],
+          cashTransactions: [{ amount: 300000, type: 'ticket_sale' }],
         },
       ]);
 

@@ -1,12 +1,10 @@
+import { Controller, Get, Post, Param, Body, HttpStatus } from '@nestjs/common';
 import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Body,
-  HttpStatus,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PosService } from './pos.service';
 import { CreatePosTransactionDto } from './dto/create-pos-transaction.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -22,8 +20,13 @@ export class PosController {
 
   @Post('transaction')
   @RequireIdempotency()
-  @ApiOperation({ summary: 'Membuat transaksi pembelian langsung di POS (on-site)' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Transaksi POS berhasil diproses.' })
+  @ApiOperation({
+    summary: 'Membuat transaksi pembelian langsung di POS (on-site)',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Transaksi POS berhasil diproses.',
+  })
   async createTransaction(
     @Param('id') eventId: string,
     @Body() dto: CreatePosTransactionDto,
@@ -34,7 +37,10 @@ export class PosController {
 
   @Get('transactions')
   @ApiOperation({ summary: 'Mendapatkan daftar transaksi POS pada event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Daftar transaksi POS berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar transaksi POS berhasil diambil.',
+  })
   async listTransactions(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,
@@ -44,7 +50,10 @@ export class PosController {
 
   @Get('summary')
   @ApiOperation({ summary: 'Mendapatkan ringkasan penjualan POS' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Ringkasan POS berhasil diambil.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Ringkasan POS berhasil diambil.',
+  })
   async getSummary(
     @Param('id') eventId: string,
     @CurrentUser('id') userId: string,

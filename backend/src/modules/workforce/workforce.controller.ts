@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { WorkforceService } from './workforce.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -27,7 +20,11 @@ export class WorkforceController {
     @Body() dto: CreateWorkforceDto,
     @CurrentUser('id') addedByUserId: string,
   ) {
-    const result = await this.workforceService.create(eventId, dto, addedByUserId);
+    const result = await this.workforceService.create(
+      eventId,
+      dto,
+      addedByUserId,
+    );
     return { success: true, data: result };
   }
 
@@ -40,7 +37,11 @@ export class WorkforceController {
     @Query('division') division?: string,
     @Query('status') status?: string,
   ) {
-    const result = await this.workforceService.findAll(eventId, division, status);
+    const result = await this.workforceService.findAll(
+      eventId,
+      division,
+      status,
+    );
     return { success: true, data: result };
   }
 
@@ -53,7 +54,11 @@ export class WorkforceController {
     @CurrentUser('id') userId: string,
     @Query('division') divisionFilter?: string,
   ) {
-    const result = await this.workforceService.getPicDashboard(eventId, userId, divisionFilter);
+    const result = await this.workforceService.getPicDashboard(
+      eventId,
+      userId,
+      divisionFilter,
+    );
     return { success: true, data: result };
   }
 
@@ -82,7 +87,11 @@ export class WorkforceController {
     @Body('latitude') latitude: number,
     @Body('longitude') longitude: number,
   ) {
-    const result = await this.workforceService.selfCheckIn(token, latitude, longitude);
+    const result = await this.workforceService.selfCheckIn(
+      token,
+      latitude,
+      longitude,
+    );
     return { success: true, data: result };
   }
 

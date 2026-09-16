@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CRMService } from './crm.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -26,7 +20,11 @@ export class CRMController {
     @Param('eventId') eventId: string,
     @Body() dto: CreateSegmentDto,
   ) {
-    const result = await this.crmService.createSegment(eventId, dto.name, dto.criteria);
+    const result = await this.crmService.createSegment(
+      eventId,
+      dto.name,
+      dto.criteria,
+    );
     return { success: true, data: result };
   }
 
@@ -42,7 +40,9 @@ export class CRMController {
   @Get('organizer/segments/:segmentId/members')
   @ApiBearerAuth()
   @Permissions('manage_audience_segments')
-  @ApiOperation({ summary: 'Mendapatkan daftar anggota pembeli yang match kriteria segmen' })
+  @ApiOperation({
+    summary: 'Mendapatkan daftar anggota pembeli yang match kriteria segmen',
+  })
   async getSegmentMembers(@Param('segmentId') segmentId: string) {
     const result = await this.crmService.getSegmentMembers(segmentId);
     return { success: true, data: result };
@@ -52,7 +52,9 @@ export class CRMController {
   @ApiBearerAuth()
   @Permissions('manage_audience_segments')
   @RequireIdempotency()
-  @ApiOperation({ summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)' })
+  @ApiOperation({
+    summary: 'Mengirim broadcast pesan ke segmen (WhatsApp / Email)',
+  })
   async createBroadcast(
     @Param('segmentId') segmentId: string,
     @Body() dto: CreateBroadcastDto,

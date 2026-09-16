@@ -17,7 +17,10 @@ class BlockTicketDto {
 }
 exports.BlockTicketDto = BlockTicketDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Indikasi tiket duplikat / fraud', description: 'Alasan pemblokiran tiket' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Indikasi tiket duplikat / fraud',
+        description: 'Alasan pemblokiran tiket',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

@@ -135,7 +135,8 @@ let GateService = class GateService {
                 });
                 throw new common_1.HttpException({
                     code: 'TICKET_BLOCKED',
-                    message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+                    message: ticket.blockedReason ||
+                        'Tiket telah dinonaktifkan / diblokir oleh panitia',
                 }, common_1.HttpStatus.FORBIDDEN);
             }
             const isOrganizer = await tx.organizer.findFirst({
@@ -312,7 +313,8 @@ let GateService = class GateService {
                 });
                 throw new common_1.HttpException({
                     code: 'TICKET_BLOCKED',
-                    message: ticket.blockedReason || 'Tiket telah dinonaktifkan / diblokir oleh panitia',
+                    message: ticket.blockedReason ||
+                        'Tiket telah dinonaktifkan / diblokir oleh panitia',
                 }, common_1.HttpStatus.FORBIDDEN);
             }
             const isOrganizer = await tx.organizer.findFirst({

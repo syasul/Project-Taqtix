@@ -130,7 +130,10 @@ export class AuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mengubah password pengguna saat ini' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Password berhasil diubah.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password berhasil diubah.',
+  })
   async changePassword(
     @CurrentUser('id') userId: string,
     @Body() dto: ChangePasswordDto,

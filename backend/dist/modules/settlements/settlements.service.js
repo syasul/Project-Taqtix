@@ -31,10 +31,7 @@ let SettlementsService = class SettlementsService {
         const now = new Date();
         const endedEvents = await this.prisma.event.findMany({
             where: {
-                OR: [
-                    { status: client_1.EventStatus.ENDED },
-                    { endDate: { lte: now } },
-                ],
+                OR: [{ status: client_1.EventStatus.ENDED }, { endDate: { lte: now } }],
                 settlements: {
                     none: {},
                 },

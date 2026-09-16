@@ -8,7 +8,12 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AdminService } from './admin.service';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -29,7 +34,9 @@ export class AdminController {
   @Get('admin/dashboard')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Ringkasan platform & analitik lintas organizer (Admin Only)' })
+  @ApiOperation({
+    summary: 'Ringkasan platform & analitik lintas organizer (Admin Only)',
+  })
   async getDashboard() {
     const result = await this.adminService.getDashboard();
     return { success: true, data: result };
@@ -47,7 +54,10 @@ export class AdminController {
   @Get('admin/organizers/:id')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan detail organizer beserta list event miliknya (Admin Only)' })
+  @ApiOperation({
+    summary:
+      'Mendapatkan detail organizer beserta list event miliknya (Admin Only)',
+  })
   async getOrganizerById(@Param('id') id: string) {
     const result = await this.adminService.getOrganizerById(id);
     return { success: true, data: result };
@@ -56,7 +66,9 @@ export class AdminController {
   @Post('admin/organizers/:id/approve')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Menyetujui pendaftaran organizer baru (Admin Only)' })
+  @ApiOperation({
+    summary: 'Menyetujui pendaftaran organizer baru (Admin Only)',
+  })
   async approveOrganizer(
     @Param('id') id: string,
     @CurrentUser('id') adminId: string,
@@ -80,7 +92,9 @@ export class AdminController {
   @Patch('admin/organizers/:id/plan')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mengubah paket langganan (plan) organizer (Admin Only)' })
+  @ApiOperation({
+    summary: 'Mengubah paket langganan (plan) organizer (Admin Only)',
+  })
   async updatePlan(
     @Param('id') id: string,
     @Body() dto: UpdatePlanDto,
@@ -116,14 +130,19 @@ export class AdminController {
     @Param('id') id: string,
     @Body() dto: UpdateOrganizerDto,
   ) {
-    const result = await this.adminService.updateOrganizerSegmentAndPlan(id, dto);
+    const result = await this.adminService.updateOrganizerSegmentAndPlan(
+      id,
+      dto,
+    );
     return { success: true, data: result };
   }
 
   @Get('admin/partners')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan data audit/rekap partner afiliasi (Admin Only)' })
+  @ApiOperation({
+    summary: 'Mendapatkan data audit/rekap partner afiliasi (Admin Only)',
+  })
   async getPartners() {
     const result = await this.adminService.getPartnersOversight();
     return { success: true, data: result };
@@ -142,10 +161,7 @@ export class AdminController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Memperbarui data partner afiliasi (Admin Only)' })
-  async updatePartner(
-    @Param('id') id: string,
-    @Body() dto: UpdatePartnerDto,
-  ) {
+  async updatePartner(@Param('id') id: string, @Body() dto: UpdatePartnerDto) {
     const result = await this.adminService.updatePartner(id, dto);
     return { success: true, data: result };
   }
@@ -193,10 +209,7 @@ export class AdminController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Menugaskan admin ke lead (Admin Only)' })
-  async assignLead(
-    @Param('id') id: string,
-    @Body('adminId') adminId: string,
-  ) {
+  async assignLead(@Param('id') id: string, @Body('adminId') adminId: string) {
     const result = await this.adminService.assignLead(id, adminId);
     return { success: true, data: result };
   }
@@ -204,7 +217,9 @@ export class AdminController {
   @Get('admin/billing')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan rekap billing subscription (Admin Only)' })
+  @ApiOperation({
+    summary: 'Mendapatkan rekap billing subscription (Admin Only)',
+  })
   async getBilling() {
     const result = await this.adminService.getBillingOversight();
     return { success: true, data: result };
@@ -213,7 +228,9 @@ export class AdminController {
   @Get('admin/events')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan seluruh event untuk moderasi (Admin Only)' })
+  @ApiOperation({
+    summary: 'Mendapatkan seluruh event untuk moderasi (Admin Only)',
+  })
   async getEvents() {
     const result = await this.adminService.getEvents();
     return { success: true, data: result };
@@ -222,7 +239,9 @@ export class AdminController {
   @Post('admin/events/:id/approve')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Menyetujui event untuk dipublikasikan (Admin Only)' })
+  @ApiOperation({
+    summary: 'Menyetujui event untuk dipublikasikan (Admin Only)',
+  })
   async approveEvent(@Param('id') id: string) {
     const result = await this.adminService.approveEvent(id);
     return { success: true, data: result };
@@ -232,10 +251,7 @@ export class AdminController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Menolak penerbitan event (Admin Only)' })
-  async rejectEvent(
-    @Param('id') id: string,
-    @Body('reason') reason?: string,
-  ) {
+  async rejectEvent(@Param('id') id: string, @Body('reason') reason?: string) {
     const result = await this.adminService.rejectEvent(id, reason);
     return { success: true, data: result };
   }
@@ -255,8 +271,15 @@ export class AdminController {
   @Get('admin/orders')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiQuery({ name: 'q', required: false, description: 'Kata kunci pencarian order (order ID / email buyer / nama attendee)' })
-  @ApiOperation({ summary: 'Pencarian pesanan lintas seluruh organizer (Admin Only)' })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description:
+      'Kata kunci pencarian order (order ID / email buyer / nama attendee)',
+  })
+  @ApiOperation({
+    summary: 'Pencarian pesanan lintas seluruh organizer (Admin Only)',
+  })
   async searchOrders(@Query('q') q?: string) {
     const result = await this.adminService.searchOrders(q);
     return { success: true, data: result };
@@ -265,7 +288,9 @@ export class AdminController {
   @Get('admin/settlements')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan daftar settlement yang perlu diproses (Admin Only)' })
+  @ApiOperation({
+    summary: 'Mendapatkan daftar settlement yang perlu diproses (Admin Only)',
+  })
   async getSettlements() {
     const result = await this.adminService.getSettlements();
     return { success: true, data: result };
@@ -274,7 +299,10 @@ export class AdminController {
   @Post('admin/settlements/calculate')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Memicu kalkulasi otomatis settlement event yang telah berakhir (Admin Only)' })
+  @ApiOperation({
+    summary:
+      'Memicu kalkulasi otomatis settlement event yang telah berakhir (Admin Only)',
+  })
   async calculateSettlements() {
     const result = await this.adminService.calculateSettlements();
     return { success: true, data: result };
@@ -283,7 +311,9 @@ export class AdminController {
   @Post('admin/settlements/:id/mark-paid')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Menandai settlement sudah ditransfer manual (Admin Only)' })
+  @ApiOperation({
+    summary: 'Menandai settlement sudah ditransfer manual (Admin Only)',
+  })
   async markSettlementPaid(
     @Param('id') id: string,
     @CurrentUser('id') adminId: string,
@@ -295,7 +325,9 @@ export class AdminController {
   @Get('admin/audit-log')
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mendapatkan log audit aktivitas admin (Admin Only)' })
+  @ApiOperation({
+    summary: 'Mendapatkan log audit aktivitas admin (Admin Only)',
+  })
   async getAuditLogs() {
     const result = await this.adminService.getAuditLogs();
     return { success: true, data: result };

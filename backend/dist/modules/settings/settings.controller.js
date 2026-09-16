@@ -71,7 +71,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('payment'),
     (0, permissions_decorator_1.Permissions)('manage_payment_settings'),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan data rekening settlement (Owner & Finance Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan data rekening settlement (Owner & Finance Only)',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -80,7 +82,9 @@ __decorate([
 __decorate([
     (0, common_1.Patch)('payment'),
     (0, permissions_decorator_1.Permissions)('manage_payment_settings'),
-    (0, swagger_1.ApiOperation)({ summary: 'Memperbarui data rekening settlement (Owner & Finance Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Memperbarui data rekening settlement (Owner & Finance Only)',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -99,7 +103,9 @@ __decorate([
 __decorate([
     (0, common_1.Patch)('integrations'),
     (0, permissions_decorator_1.Permissions)('edit_organization_settings'),
-    (0, swagger_1.ApiOperation)({ summary: 'Memperbarui ID pixel & tracking integrasi (Owner Only)' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Memperbarui ID pixel & tracking integrasi (Owner Only)',
+    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

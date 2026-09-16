@@ -46,7 +46,9 @@ let CustomFieldsService = class CustomFieldsService {
         await this.verifyEventOwnership(eventId, userId);
         let orderIndex = dto.order;
         if (orderIndex === undefined) {
-            const count = await this.prisma.customFormField.count({ where: { eventId } });
+            const count = await this.prisma.customFormField.count({
+                where: { eventId },
+            });
             orderIndex = count;
         }
         return this.prisma.customFormField.create({

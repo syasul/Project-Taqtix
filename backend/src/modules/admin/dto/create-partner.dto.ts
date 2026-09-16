@@ -11,12 +11,18 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePartnerDto {
-  @ApiProperty({ example: 'Raffi Ahmad Ambassador', description: 'Nama partner afiliasi' })
+  @ApiProperty({
+    example: 'Raffi Ahmad Ambassador',
+    description: 'Nama partner afiliasi',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Nama partner tidak boleh kosong' })
   name!: string;
 
-  @ApiProperty({ example: 'event-uuid-1234', description: 'ID Event yang dipromosikan' })
+  @ApiProperty({
+    example: 'event-uuid-1234',
+    description: 'ID Event yang dipromosikan',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Event ID tidak boleh kosong' })
   eventId!: string;
@@ -27,7 +33,8 @@ export class CreatePartnerDto {
     description: 'Tipe kategori partner',
   })
   @IsIn(['AMBASSADOR', 'COMMUNITY', 'INFLUENCER', 'CORPORATE'], {
-    message: 'Tipe partner harus salah satu dari: AMBASSADOR, COMMUNITY, INFLUENCER, CORPORATE',
+    message:
+      'Tipe partner harus salah satu dari: AMBASSADOR, COMMUNITY, INFLUENCER, CORPORATE',
   })
   @IsOptional()
   type?: 'AMBASSADOR' | 'COMMUNITY' | 'INFLUENCER' | 'CORPORATE';
@@ -37,12 +44,18 @@ export class CreatePartnerDto {
   @IsNotEmpty({ message: 'Kode unik referral tidak boleh kosong' })
   uniqueCode!: string;
 
-  @ApiPropertyOptional({ example: 'PROMORAF', description: 'Kode voucher diskon' })
+  @ApiPropertyOptional({
+    example: 'PROMORAF',
+    description: 'Kode voucher diskon',
+  })
   @IsString()
   @IsOptional()
   promoCode?: string;
 
-  @ApiPropertyOptional({ example: 'percentage', description: 'Tipe komisi (percentage / fixed)' })
+  @ApiPropertyOptional({
+    example: 'percentage',
+    description: 'Tipe komisi (percentage / fixed)',
+  })
   @IsString()
   @IsOptional()
   commissionType?: string;
@@ -53,33 +66,51 @@ export class CreatePartnerDto {
   @IsOptional()
   commissionValue?: number;
 
-  @ApiPropertyOptional({ example: 'raffi@partner.com', description: 'Email partner' })
+  @ApiPropertyOptional({
+    example: 'raffi@partner.com',
+    description: 'Email partner',
+  })
   @IsEmail({}, { message: 'Format email tidak valid' })
   @IsOptional()
   email?: string;
 
-  @ApiPropertyOptional({ example: 'PartnerSecret123', description: 'Password akun portal partner' })
+  @ApiPropertyOptional({
+    example: 'PartnerSecret123',
+    description: 'Password akun portal partner',
+  })
   @IsString()
   @MinLength(6, { message: 'Password minimal 6 karakter' })
   @IsOptional()
   password?: string;
 
-  @ApiPropertyOptional({ example: '3201234567890001', description: 'Nomor KTP / NIK partner' })
+  @ApiPropertyOptional({
+    example: '3201234567890001',
+    description: 'Nomor KTP / NIK partner',
+  })
   @IsString()
   @IsOptional()
   idCardNumber?: string;
 
-  @ApiPropertyOptional({ example: 'BCA', description: 'Nama Bank pencairan komisi' })
+  @ApiPropertyOptional({
+    example: 'BCA',
+    description: 'Nama Bank pencairan komisi',
+  })
   @IsString()
   @IsOptional()
   bankName?: string;
 
-  @ApiPropertyOptional({ example: '8820192831', description: 'Nomor Rekening bank' })
+  @ApiPropertyOptional({
+    example: '8820192831',
+    description: 'Nomor Rekening bank',
+  })
   @IsString()
   @IsOptional()
   bankAccountNumber?: string;
 
-  @ApiPropertyOptional({ example: 'Budi Santoso', description: 'Nama pemilik rekening bank' })
+  @ApiPropertyOptional({
+    example: 'Budi Santoso',
+    description: 'Nama pemilik rekening bank',
+  })
   @IsString()
   @IsOptional()
   bankAccountName?: string;

@@ -94,9 +94,10 @@
   promoCode: string | null;
   discountAmount: number;
   affiliateCode: string | null;
+  paymentUrl?: string; // URL pembayaran DOKU Checkout (TASK_ADDENDUM_4.md)
   items: OrderItem[];
   createdAt: string;
-  expiredAt: string; // batas waktu bayar — 10 menit dari createdAt (lihat SPAM_CLICK_AND_MEMORY_BUDGET.md)
+  expiredAt: string; // batas waktu bayar — disinkronkan dengan expired_date DOKU (10 menit)
 }
 ```
 
@@ -252,7 +253,7 @@ Scanner cukup decode & verify signature — tidak perlu hit API dulu untuk valid
 ### Checkout & Orders
 | Method | Path | Role | Deskripsi |
 |---|---|---|---|
-| POST | `/orders` | public/buyer | Create order (reserve quota sementara, expire 10 menit — wajib kirim header `Idempotency-Key`, lihat SPAM_CLICK_AND_MEMORY_BUDGET.md) |
+| POST | `/orders` | public/buyer | Create order (reserve quota sementara, panggil DOKU Checkout, return order + paymentUrl — wajib kirim header `Idempotency-Key`) |
 | GET | `/orders/:id` | buyer | Detail order + status |
 | POST | `/orders/validate-promo` | public | Validasi promo code |
 

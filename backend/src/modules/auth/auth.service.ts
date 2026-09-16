@@ -117,8 +117,14 @@ export class AuthService {
     }
 
     // Jika deviceId dikirim, periksa jika user sedang aktif di device lain
-    if (dto.deviceId && user.activeDeviceId && user.activeDeviceId !== dto.deviceId) {
-      throw new UnauthorizedException('Akun ini sedang aktif di perangkat lain');
+    if (
+      dto.deviceId &&
+      user.activeDeviceId &&
+      user.activeDeviceId !== dto.deviceId
+    ) {
+      throw new UnauthorizedException(
+        'Akun ini sedang aktif di perangkat lain',
+      );
     }
 
     // Update activeDeviceId dan lastLoginAt

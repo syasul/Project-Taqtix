@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var OrdersService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,13 +19,20 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
 const bull_1 = require("@nestjs/bull");
 const bullmq_1 = require("bullmq");
-let OrdersService = class OrdersService {
+const doku_service_1 = require("../payments/doku/doku.service");
+const config_1 = require("@nestjs/config");
+let OrdersService = OrdersService_1 = class OrdersService {
     prisma;
     orderExpirationQueue;
+    dokuService;
+    configService;
+    logger = new common_1.Logger(OrdersService_1.name);
     idempotencyStore = new Map();
-    constructor(prisma, orderExpirationQueue) {
+    constructor(prisma, orderExpirationQueue, dokuService, configService) {
         this.prisma = prisma;
         this.orderExpirationQueue = orderExpirationQueue;
+        this.dokuService = dokuService;
+        this.configService = configService;
     }
     async create(dto, authenticatedUserId, idempotencyKey) {
         if (idempotencyKey) {
@@ -223,7 +231,8 @@ let OrdersService = class OrdersService {
                                 message: `Fasilitas "${facility.name}" tidak berlaku untuk kategori tiket "${ticketCategory.name}".`,
                             });
                         }
-                        if (facility.quota !== null && facility.quota - facility.sold < fac.qty) {
+                        if (facility.quota !== null &&
+                            facility.quota - facility.sold < fac.qty) {
                             throw new common_1.HttpException({
                                 code: 'FACILITY_SOLD_OUT',
                                 message: `Kuota fasilitas "${facility.name}" tidak mencukupi (sisa ${facility.quota - facility.sold}, diminta: ${fac.qty}).`,
@@ -253,11 +262,14 @@ let OrdersService = class OrdersService {
                 });
             }
             if (voucherId) {
-                const voucher = await tx.voucher.findUnique({ where: { id: voucherId } });
+                const voucher = await tx.voucher.findUnique({
+                    where: { id: voucherId },
+                });
                 if (voucher) {
                     if (voucher.type === 'percentage') {
                         discountAmt = (basePriceTotal * voucher.value) / 100;
-                        if (voucher.maxDiscountAmount && discountAmt > voucher.maxDiscountAmount) {
+                        if (voucher.maxDiscountAmount &&
+                            discountAmt > voucher.maxDiscountAmount) {
                             discountAmt = voucher.maxDiscountAmount;
                         }
                     }
@@ -272,7 +284,9 @@ let OrdersService = class OrdersService {
                 }
             }
             else if (promoCodeId) {
-                const promo = await tx.promoCode.findUnique({ where: { id: promoCodeId } });
+                const promo = await tx.promoCode.findUnique({
+                    where: { id: promoCodeId },
+                });
                 if (promo) {
                     if (promo.discount <= 100) {
                         discountAmt = basePriceTotal * (promo.discount / 100);
@@ -322,6 +336,75 @@ let OrdersService = class OrdersService {
             }
             return newOrder;
         });
+        const fullOrder = await this.prisma.order.findUnique({
+            where: { id: order.id },
+            include: {
+                buyer: true,
+                orderItems: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+                payment: true,
+            },
+        });
+        let payment = fullOrder?.payment;
+        if (!payment) {
+            payment = await this.prisma.payment.create({
+                data: {
+                    orderId: order.id,
+                    amount: order.totalAmount,
+                    status: client_1.PaymentStatus.PENDING,
+                    provider: 'doku',
+                },
+            });
+        }
+        const dokuConfig = this.dokuService.getConfig();
+        let paymentUrl = undefined;
+        let expirationDelay = 10 * 60 * 1000;
+        if (dokuConfig.clientId && dokuConfig.secretKey) {
+            try {
+                const result = await this.dokuService.createPayment(fullOrder, payment);
+                paymentUrl = result.paymentUrl;
+                await this.prisma.payment.update({
+                    where: { id: payment.id },
+                    data: {
+                        externalId: result.tokenId || result.invoiceNumber,
+                        snapToken: result.paymentUrl,
+                        provider: 'doku',
+                    },
+                });
+                if (result.expiredDate) {
+                    await this.prisma.order.update({
+                        where: { id: order.id },
+                        data: { expiredAt: result.expiredDate },
+                    });
+                    order.expiredAt = result.expiredDate;
+                    expirationDelay = Math.max(1000, result.expiredDate.getTime() - Date.now());
+                }
+            }
+            catch (dokuError) {
+                this.logger.error(`Gagal memanggil DokuService.createPayment untuk order ${order.id}:`, dokuError);
+                await this.rollbackOrder(order.id, dto);
+                throw new common_1.BadRequestException(dokuError?.message ||
+                    'Gagal memproses pembuatan pembayaran dengan DOKU Checkout');
+            }
+        }
+        else {
+            const frontendUrl = this.configService.get('TAQTIX_FRONTEND_URL') ||
+                this.configService.get('TAQTIX_WEB_URL') ||
+                'http://localhost:3000';
+            paymentUrl = `${frontendUrl}/checkout?orderId=${order.id}&simulation=true`;
+            await this.prisma.payment.update({
+                where: { id: payment.id },
+                data: {
+                    externalId: 'DEV_MOCK_' + order.id,
+                    snapToken: paymentUrl,
+                    provider: 'doku_sandbox_mock',
+                },
+            });
+        }
+        order.paymentUrl = paymentUrl;
         if (idempotencyKey) {
             this.idempotencyStore.set(idempotencyKey, {
                 order,
@@ -335,8 +418,65 @@ let OrdersService = class OrdersService {
                 }
             }
         }
-        await this.orderExpirationQueue.add('expire-order', { orderId: order.id }, { delay: 10 * 60 * 1000 });
+        await this.orderExpirationQueue.add('expire-order', { orderId: order.id }, { delay: expirationDelay });
         return order;
+    }
+    async rollbackOrder(orderId, dto) {
+        try {
+            await this.prisma.$transaction(async (tx) => {
+                await tx.order.update({
+                    where: { id: orderId },
+                    data: { status: client_1.OrderStatus.CANCELLED },
+                });
+                const payment = await tx.payment.findUnique({
+                    where: { orderId },
+                });
+                if (payment) {
+                    await tx.payment.update({
+                        where: { id: payment.id },
+                        data: { status: client_1.PaymentStatus.FAILED },
+                    });
+                }
+                for (const item of dto.items) {
+                    await tx.ticketCategory.update({
+                        where: { id: item.ticketCategoryId },
+                        data: { sold: { decrement: item.qty } },
+                    });
+                    if (item.facilities && item.facilities.length > 0) {
+                        for (const fac of item.facilities) {
+                            await tx.eventFacility.update({
+                                where: { id: fac.facilityId },
+                                data: { sold: { decrement: fac.qty } },
+                            });
+                        }
+                    }
+                }
+                const order = await tx.order.findUnique({
+                    where: { id: orderId },
+                });
+                if (order?.promoCodeId) {
+                    await tx.promoCode.update({
+                        where: { id: order.promoCodeId },
+                        data: { usedCount: { decrement: 1 } },
+                    });
+                }
+                if (dto.promoCode) {
+                    const voucher = await tx.voucher.findFirst({
+                        where: { code: dto.promoCode.toUpperCase() },
+                    });
+                    if (voucher) {
+                        await tx.voucher.update({
+                            where: { id: voucher.id },
+                            data: { usageCount: { decrement: 1 } },
+                        });
+                    }
+                }
+            });
+            this.logger.warn(`[OrdersService] Rollback order ${orderId} berhasil dieksekusi.`);
+        }
+        catch (rollbackErr) {
+            this.logger.error(`[OrdersService] Gagal melakukan rollback order ${orderId}:`, rollbackErr);
+        }
     }
     async findOne(id) {
         const order = await this.prisma.order.findUnique({
@@ -389,10 +529,12 @@ let OrdersService = class OrdersService {
     }
 };
 exports.OrdersService = OrdersService;
-exports.OrdersService = OrdersService = __decorate([
+exports.OrdersService = OrdersService = OrdersService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, bull_1.InjectQueue)('order-expiration')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        bullmq_1.Queue])
+        bullmq_1.Queue,
+        doku_service_1.DokuService,
+        config_1.ConfigService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

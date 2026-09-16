@@ -23,43 +23,64 @@ class CreateOrganizerDto {
 }
 exports.CreateOrganizerDto = CreateOrganizerDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Nusantara Creative EO', description: 'Nama penyelenggara/organizer' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Nusantara Creative EO',
+        description: 'Nama penyelenggara/organizer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama organizer tidak boleh kosong' }),
     __metadata("design:type", String)
 ], CreateOrganizerDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'contact@nusantara.id', description: 'Email akun organizer' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'contact@nusantara.id',
+        description: 'Email akun organizer',
+    }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     __metadata("design:type", String)
 ], CreateOrganizerDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'OrganizerPassword123!', description: 'Password default jika diisi admin' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'OrganizerPassword123!',
+        description: 'Password default jika diisi admin',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.MinLength)(6, { message: 'Password minimal 6 karakter' }),
     __metadata("design:type", String)
 ], CreateOrganizerDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: '081234567890', description: 'Nomor telepon WhatsApp' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '081234567890',
+        description: 'Nomor telepon WhatsApp',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrganizerDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'ENTERPRISE', description: 'Segmentasi bisnis organizer' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'ENTERPRISE',
+        description: 'Segmentasi bisnis organizer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrganizerDto.prototype, "segment", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'PRO', description: 'Paket langganan/plan organizer' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'PRO',
+        description: 'Paket langganan/plan organizer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrganizerDto.prototype, "plan", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'BCA - 1234567890 a.n Nusantara', description: 'Informasi rekening bank transfer' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'BCA - 1234567890 a.n Nusantara',
+        description: 'Informasi rekening bank transfer',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

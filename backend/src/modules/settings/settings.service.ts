@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -40,7 +44,12 @@ export class SettingsService {
 
   async updateOrganization(
     userId: string,
-    data: { name?: string; logoUrl?: string; contactEmail?: string; phone?: string },
+    data: {
+      name?: string;
+      logoUrl?: string;
+      contactEmail?: string;
+      phone?: string;
+    },
   ) {
     const organizerId = await this.getOrganizerId(userId);
     const updated = await this.prisma.organizer.update({
@@ -48,7 +57,9 @@ export class SettingsService {
       data: {
         ...(data.name ? { name: data.name } : {}),
         ...(data.logoUrl !== undefined ? { logoUrl: data.logoUrl } : {}),
-        ...(data.contactEmail !== undefined ? { contactEmail: data.contactEmail } : {}),
+        ...(data.contactEmail !== undefined
+          ? { contactEmail: data.contactEmail }
+          : {}),
         ...(data.phone !== undefined ? { phone: data.phone } : {}),
       },
       select: {
@@ -85,15 +96,23 @@ export class SettingsService {
 
   async updatePayment(
     userId: string,
-    data: { bankName?: string; bankAccountNumber?: string; bankAccountHolder?: string },
+    data: {
+      bankName?: string;
+      bankAccountNumber?: string;
+      bankAccountHolder?: string;
+    },
   ) {
     const organizerId = await this.getOrganizerId(userId);
     const updated = await this.prisma.organizer.update({
       where: { id: organizerId },
       data: {
         ...(data.bankName !== undefined ? { bankName: data.bankName } : {}),
-        ...(data.bankAccountNumber !== undefined ? { bankAccountNumber: data.bankAccountNumber } : {}),
-        ...(data.bankAccountHolder !== undefined ? { bankAccountHolder: data.bankAccountHolder } : {}),
+        ...(data.bankAccountNumber !== undefined
+          ? { bankAccountNumber: data.bankAccountNumber }
+          : {}),
+        ...(data.bankAccountHolder !== undefined
+          ? { bankAccountHolder: data.bankAccountHolder }
+          : {}),
       },
       select: {
         bankName: true,
@@ -124,7 +143,11 @@ export class SettingsService {
 
   async updateIntegrations(
     userId: string,
-    data: { metaPixelId?: string; tiktokPixelId?: string; gaTrackingId?: string },
+    data: {
+      metaPixelId?: string;
+      tiktokPixelId?: string;
+      gaTrackingId?: string;
+    },
   ) {
     const organizerId = await this.getOrganizerId(userId);
     const updated = await this.prisma.organizer.update({

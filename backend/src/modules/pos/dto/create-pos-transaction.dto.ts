@@ -38,7 +38,10 @@ export class PosItemDto {
 }
 
 export class CreatePosTransactionDto {
-  @ApiProperty({ type: [PosItemDto], description: 'Daftar item belanja di POS' })
+  @ApiProperty({
+    type: [PosItemDto],
+    description: 'Daftar item belanja di POS',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PosItemDto)
@@ -56,7 +59,9 @@ export class CreatePosTransactionDto {
   @IsString()
   buyerName?: string;
 
-  @ApiPropertyOptional({ description: 'Nomor WhatsApp / HP pembeli (opsional)' })
+  @ApiPropertyOptional({
+    description: 'Nomor WhatsApp / HP pembeli (opsional)',
+  })
   @IsOptional()
   @IsString()
   buyerPhone?: string;

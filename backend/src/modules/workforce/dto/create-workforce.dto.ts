@@ -2,13 +2,19 @@ import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateWorkforceDto {
-  @ApiProperty({ example: 'Ahmad Fauzi', description: 'Nama crew / staff event' })
+  @ApiProperty({
+    example: 'Ahmad Fauzi',
+    description: 'Nama crew / staff event',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Nama tidak boleh kosong' })
   @MaxLength(100, { message: 'Nama maksimal 100 karakter' })
   name!: string;
 
-  @ApiProperty({ example: '08123456789', description: 'Nomor telepon / WhatsApp' })
+  @ApiProperty({
+    example: '08123456789',
+    description: 'Nomor telepon / WhatsApp',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Nomor telepon tidak boleh kosong' })
   phone!: string;
@@ -23,7 +29,10 @@ export class CreateWorkforceDto {
   @IsNotEmpty({ message: 'Role/peran tidak boleh kosong' })
   role!: string;
 
-  @ApiPropertyOptional({ example: 'user-uuid-pic', description: 'ID User PIC supervisor (jika ada)' })
+  @ApiPropertyOptional({
+    example: 'user-uuid-pic',
+    description: 'ID User PIC supervisor (jika ada)',
+  })
   @IsString()
   @IsOptional()
   picUserId?: string;

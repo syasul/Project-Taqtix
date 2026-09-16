@@ -80,25 +80,37 @@ __decorate([
     __metadata("design:type", Boolean)
 ], UpdateEventDto.prototype, "requireLogin", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi', required: false }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "seoTitle", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026', required: false }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "seoDescription", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'konser musik, festival islam 2026', required: false }),
+    (0, swagger_1.ApiProperty)({
+        example: 'konser musik, festival islam 2026',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "seoKeywords", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Taqtix Official, Tiket Resmi Jakarta', required: false }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Taqtix Official, Tiket Resmi Jakarta',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

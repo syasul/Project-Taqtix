@@ -2,7 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateLineupDto {
-  @ApiProperty({ example: 'Sheila on 7', description: 'Nama artis / performer' })
+  @ApiProperty({
+    example: 'Sheila on 7',
+    description: 'Nama artis / performer',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -12,12 +15,18 @@ export class CreateLineupDto {
   @IsString()
   photoUrl?: string;
 
-  @ApiPropertyOptional({ example: '20:00 - 21:30', description: 'Jadwal tampil artis' })
+  @ApiPropertyOptional({
+    example: '20:00 - 21:30',
+    description: 'Jadwal tampil artis',
+  })
   @IsOptional()
   @IsString()
   performTime?: string;
 
-  @ApiPropertyOptional({ example: 'Main Stage', description: 'Panggung / venue tampil' })
+  @ApiPropertyOptional({
+    example: 'Main Stage',
+    description: 'Panggung / venue tampil',
+  })
   @IsOptional()
   @IsString()
   stage?: string;

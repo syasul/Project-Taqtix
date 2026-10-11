@@ -16,7 +16,7 @@ const lineupDataBySlug: Record<
     {
       name: 'Ustadz Dr. Firanda Andirja, Lc., M.A.',
       photoUrl:
-        'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop',
       performTime: '08:30 - 10:00 WIB',
       stage: 'Panggung Utama Masjid Istiqlal',
       socialUrl: 'https://instagram.com/firanda_andirja_official',

@@ -92,7 +92,7 @@ const curatedLineupsBySlug: Record<string, LineUpItem[]> = {
       id: 'kajian-1',
       name: 'Ustadz Dr. Firanda Andirja, Lc., M.A.',
       photoUrl:
-        'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop',
       performTime: '08:30 - 10:00 WIB',
       stage: 'Panggung Utama (Masjid Istiqlal)',
       socialUrl: 'https://instagram.com/firanda_andirja_official',
@@ -718,59 +718,63 @@ export default function EventDetailPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
                   {displayLineup.map((artist) => {
                     const social = parseSocialLink(artist.socialUrl, artist.name);
                     return (
                       <div
                         key={artist.id}
-                        className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-[#08ADAE]/50 transition-all flex flex-col justify-between space-y-3 group"
+                        className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90 hover:border-[#08ADAE]/60 hover:bg-white hover:shadow-md transition-all duration-200 flex flex-col justify-between text-center group"
                       >
-                        <div className="flex items-center gap-3.5">
-                          {artist.photoUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={artist.photoUrl}
-                              alt={artist.name}
-                              className="h-16 w-16 rounded-2xl object-cover border border-slate-200 shadow-xs group-hover:scale-105 transition-transform shrink-0"
-                            />
-                          ) : (
-                            <div className="h-16 w-16 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] font-black text-lg shrink-0">
-                              {artist.name.substring(0, 2).toUpperCase()}
-                            </div>
-                          )}
+                        {/* Top: Avatar & Performer Badge */}
+                        <div className="flex flex-col items-center">
+                          <div className="relative mb-3">
+                            {artist.photoUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={artist.photoUrl}
+                                alt={artist.name}
+                                className="h-20 w-20 rounded-2xl object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform duration-200"
+                              />
+                            ) : (
+                              <div className="h-20 w-20 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/25 flex items-center justify-center text-[#08ADAE] font-black text-xl shadow-xs">
+                                {artist.name.substring(0, 2).toUpperCase()}
+                              </div>
+                            )}
+                            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-900 text-white shadow-2xs whitespace-nowrap">
+                              Pengisi Acara
+                            </span>
+                          </div>
 
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-sm font-bold text-slate-900 line-clamp-2 group-hover:text-[#08ADAE] transition-colors leading-snug">
-                              {artist.name}
-                            </h4>
-                            <div className="space-y-1 mt-1">
-                              {artist.performTime && (
-                                <span className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-slate-600">
-                                  <Clock className="w-3 h-3 text-[#08ADAE] shrink-0" />
-                                  <span>{artist.performTime}</span>
-                                </span>
-                              )}
-                              {artist.stage && (
-                                <span className="flex items-center gap-1.5 text-[11px] text-slate-500 truncate">
-                                  <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
-                                  <span className="truncate">{artist.stage}</span>
-                                </span>
-                              )}
-                            </div>
+                          {/* Full Name without cut-off */}
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#08ADAE] transition-colors leading-snug line-clamp-2 min-h-[38px] flex items-center justify-center px-1">
+                            {artist.name}
+                          </h4>
+
+                          {/* Schedule & Stage */}
+                          <div className="mt-2.5 space-y-1.5 w-full">
+                            {artist.performTime && (
+                              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-slate-700 bg-white border border-slate-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                                <Clock className="w-3 h-3 text-[#08ADAE] shrink-0" />
+                                <span>{artist.performTime}</span>
+                              </div>
+                            )}
+                            {artist.stage && (
+                              <p className="text-[11px] text-slate-500 flex items-center justify-center gap-1 px-1 truncate">
+                                <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                                <span className="truncate">{artist.stage}</span>
+                              </p>
+                            )}
                           </div>
                         </div>
 
-                        {/* Social Media Link / Button */}
-                        <div className="pt-2.5 border-t border-slate-200/70 flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                            Sosmed
-                          </span>
+                        {/* Bottom: Full Width Clean Social Media Button */}
+                        <div className="pt-3.5 mt-3 border-t border-slate-200/70 w-full">
                           <a
                             href={social.href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs active:scale-95 ${
+                            className={`w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 ${
                               social.type === 'instagram'
                                 ? 'bg-pink-50 border border-pink-200/80 text-pink-700 hover:bg-pink-100 hover:border-pink-300'
                                 : social.type === 'youtube'
@@ -786,7 +790,7 @@ export default function EventDetailPage() {
                             {social.type !== 'instagram' &&
                               social.type !== 'youtube' &&
                               social.type !== 'twitter' && <Globe className="w-3.5 h-3.5" />}
-                            <span className="truncate max-w-[120px]">{social.label}</span>
+                            <span className="truncate max-w-[140px]">{social.label}</span>
                             <ExternalLink className="w-3 h-3 opacity-60 shrink-0" />
                           </a>
                         </div>

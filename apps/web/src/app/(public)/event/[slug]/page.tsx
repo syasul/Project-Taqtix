@@ -68,6 +68,212 @@ interface LineUpItem {
   socialUrl?: string | null;
 }
 
+const InstagramIcon = () => (
+  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+  </svg>
+);
+
+const YoutubeIcon = () => (
+  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+  </svg>
+);
+
+const TwitterIcon = () => (
+  <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const curatedLineupsBySlug: Record<string, LineUpItem[]> = {
+  'kajian-akbar-digital-hidayah': [
+    {
+      id: 'kajian-1',
+      name: 'Ustadz Dr. Firanda Andirja, Lc., M.A.',
+      photoUrl:
+        'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400&auto=format&fit=crop',
+      performTime: '08:30 - 10:00 WIB',
+      stage: 'Panggung Utama (Masjid Istiqlal)',
+      socialUrl: 'https://instagram.com/firanda_andirja_official',
+    },
+    {
+      id: 'kajian-2',
+      name: 'Ustadz Muhammad Nuzul Dzikri, Lc.',
+      photoUrl:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop',
+      performTime: '10:15 - 11:30 WIB',
+      stage: 'Panggung Utama (Masjid Istiqlal)',
+      socialUrl: 'https://instagram.com/muhammadnuzuldzikri',
+    },
+    {
+      id: 'kajian-3',
+      name: 'Ustadz Adi Hidayat, Lc., M.A.',
+      photoUrl:
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop',
+      performTime: '11:30 - 12:30 WIB',
+      stage: 'Panggung Utama (Masjid Istiqlal)',
+      socialUrl: 'https://instagram.com/adihidayatofficial',
+    },
+  ],
+  'fest-hijrah-halal-culinary-2026': [
+    {
+      id: 'fest-1',
+      name: 'Ustadz Felix Siauw',
+      photoUrl:
+        'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=400&auto=format&fit=crop',
+      performTime: '13:00 - 15:00 WIB',
+      stage: 'Main Hall ICE BSD',
+      socialUrl: 'https://instagram.com/felixsiauw',
+    },
+    {
+      id: 'fest-2',
+      name: 'Taqy Malik',
+      photoUrl:
+        'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop',
+      performTime: '15:30 - 17:00 WIB',
+      stage: 'Culinary Expo Stage',
+      socialUrl: 'https://instagram.com/taqy_malik',
+    },
+    {
+      id: 'fest-3',
+      name: 'Opick Tombo Ati',
+      photoUrl:
+        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop',
+      performTime: '19:30 - 21:00 WIB',
+      stage: 'Charity Concert Stage',
+      socialUrl: 'https://instagram.com/opick_tomboati',
+    },
+  ],
+  'simfoni-sholawat-nusantara': [
+    {
+      id: 'sholawat-1',
+      name: 'Habib Syech bin Abdul Qodir Assegaf',
+      photoUrl:
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop',
+      performTime: '19:30 - 21:00 WIB',
+      stage: 'Teater Besar Grand Stage',
+      socialUrl: 'https://instagram.com/syaikhassegaf',
+    },
+    {
+      id: 'sholawat-2',
+      name: 'Veve Zulfikar Basyaiban',
+      photoUrl:
+        'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400&auto=format&fit=crop',
+      performTime: '21:00 - 21:45 WIB',
+      stage: 'Teater Besar Grand Stage',
+      socialUrl: 'https://instagram.com/veve_zulfikar',
+    },
+    {
+      id: 'sholawat-3',
+      name: 'Ahbaabul Musthofa Ensemble',
+      photoUrl:
+        'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop',
+      performTime: '19:30 - 22:30 WIB',
+      stage: 'Pit Orchestra TIM',
+      socialUrl: 'https://instagram.com/ahbaabulmusthofa_official',
+    },
+  ],
+};
+
+function getEventLineup(event: { slug?: string; title?: string; lineup?: LineUpItem[] }): LineUpItem[] {
+  if (event.lineup && event.lineup.length > 0) {
+    return event.lineup;
+  }
+  const slug = (event.slug || '').toLowerCase();
+  const title = (event.title || '').toLowerCase();
+
+  if (curatedLineupsBySlug[slug]) {
+    return curatedLineupsBySlug[slug];
+  }
+
+  if (slug.includes('kajian') || title.includes('kajian') || title.includes('hidayah')) {
+    return curatedLineupsBySlug['kajian-akbar-digital-hidayah'];
+  }
+  if (slug.includes('sholawat') || title.includes('sholawat') || title.includes('simfoni')) {
+    return curatedLineupsBySlug['simfoni-sholawat-nusantara'];
+  }
+  if (slug.includes('fest') || slug.includes('culinary') || title.includes('fest')) {
+    return curatedLineupsBySlug['fest-hijrah-halal-culinary-2026'];
+  }
+
+  return [
+    {
+      id: 'default-lineup-1',
+      name: 'Pembicara & Pengisi Acara Utama',
+      photoUrl:
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop',
+      performTime: 'Sesuai Rundown Acara',
+      stage: 'Panggung Utama',
+      socialUrl: 'https://instagram.com/taqtix.id',
+    },
+  ];
+}
+
+function parseSocialLink(url?: string | null, fallbackName?: string) {
+  if (!url) {
+    const handle = fallbackName
+      ? fallbackName.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 15)
+      : 'taqtix.id';
+    return {
+      type: 'instagram' as const,
+      label: `@${handle}`,
+      href: `https://instagram.com/${handle}`,
+    };
+  }
+  const clean = url.trim();
+  const lower = clean.toLowerCase();
+
+  if (lower.includes('instagram.com') || clean.startsWith('@')) {
+    let handle = clean;
+    if (lower.includes('instagram.com/')) {
+      handle = clean.split(/instagram\.com\//i)[1]?.split(/[/?#]/)[0] || 'Instagram';
+    }
+    handle = handle.replace(/^@/, '');
+    return {
+      type: 'instagram' as const,
+      label: `@${handle}`,
+      href: clean.startsWith('http') ? clean : `https://instagram.com/${handle}`,
+    };
+  }
+
+  if (lower.includes('youtube.com') || lower.includes('youtu.be')) {
+    return {
+      type: 'youtube' as const,
+      label: 'YouTube Channel',
+      href: clean.startsWith('http') ? clean : `https://${clean}`,
+    };
+  }
+
+  if (lower.includes('twitter.com') || lower.includes('x.com')) {
+    let handle = 'X (Twitter)';
+    if (lower.includes('twitter.com/')) {
+      handle = `@${clean.split(/twitter\.com\//i)[1]?.split(/[/?#]/)[0] || 'Twitter'}`;
+    } else if (lower.includes('x.com/')) {
+      handle = `@${clean.split(/x\.com\//i)[1]?.split(/[/?#]/)[0] || 'X'}`;
+    }
+    return {
+      type: 'twitter' as const,
+      label: handle,
+      href: clean.startsWith('http') ? clean : `https://${clean}`,
+    };
+  }
+
+  if (lower.includes('tiktok.com')) {
+    return {
+      type: 'tiktok' as const,
+      label: 'TikTok Profile',
+      href: clean.startsWith('http') ? clean : `https://${clean}`,
+    };
+  }
+
+  return {
+    type: 'website' as const,
+    label: 'Profil / Sosmed',
+    href: clean.startsWith('http') ? clean : `https://${clean}`,
+  };
+}
+
 interface EventDetail {
   id: string;
   title: string;
@@ -85,6 +291,7 @@ interface EventDetail {
   seoPriority?: string;
   organizer: {
     name: string;
+    slug?: string;
   };
   ticketCategories: TicketCategory[];
   lineup?: LineUpItem[];
@@ -280,16 +487,25 @@ export default function EventDetailPage() {
             onClick={handleShareWhatsApp}
             variant="outline"
             size="sm"
-            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 cursor-pointer"
+            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 cursor-pointer active:scale-95"
           >
             <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
             <span className="hidden sm:inline">Bagikan</span> WhatsApp
           </Button>
+          <a
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Ayo hadiri ${event.title}! Dapatkan tiket resminya di TAQtix:`)}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition active:scale-95"
+          >
+            <TwitterIcon />
+            <span>Bagikan X</span>
+          </a>
           <Button
             onClick={handleCopyLink}
             variant="outline"
             size="sm"
-            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95"
           >
             {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
             <span>{copiedLink ? 'Tersalin' : 'Salin Tautan'}</span>
@@ -482,82 +698,105 @@ export default function EventDetailPage() {
           </div>
 
           {/* BINTANG TAMU & PENGISI ACARA (LINE UP) */}
-          {event.lineup && event.lineup.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
-                    Guest Stars & Performers
-                  </span>
-                  <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                    <Mic2 className="w-5 h-5 text-[#08ADAE]" />
-                    <span>Line Up Bintang Tamu & Pengisi Acara</span>
-                  </h3>
-                </div>
-                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                  {event.lineup.length} Pengisi Acara
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1">
-                {event.lineup.map((artist) => (
-                  <div
-                    key={artist.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-[#08ADAE]/50 transition-all flex flex-col justify-between space-y-3 group"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      {artist.photoUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={artist.photoUrl}
-                          alt={artist.name}
-                          className="h-14 w-14 rounded-2xl object-cover border border-slate-200 shadow-xs group-hover:scale-105 transition-transform"
-                        />
-                      ) : (
-                        <div className="h-14 w-14 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] font-black text-lg shrink-0">
-                          {artist.name.substring(0, 2).toUpperCase()}
-                        </div>
-                      )}
-
-                      <div className="min-w-0 flex-1">
-                        <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-[#08ADAE] transition-colors">
-                          {artist.name}
-                        </h4>
-                        <div className="space-y-0.5 mt-0.5">
-                          {artist.performTime && (
-                            <span className="flex items-center gap-1 text-[11px] font-mono font-medium text-slate-600">
-                              <Clock className="w-3 h-3 text-[#08ADAE]" />
-                              {artist.performTime}
-                            </span>
-                          )}
-                          {artist.stage && (
-                            <span className="flex items-center gap-1 text-[11px] text-slate-500 truncate">
-                              <MapPin className="w-3 h-3 text-emerald-600" />
-                              {artist.stage}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {artist.socialUrl && (
-                      <div className="pt-2 border-t border-slate-200/60">
-                        <a
-                          href={artist.socialUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#08ADAE] hover:underline"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          <span>Profil / Sosmed</span>
-                        </a>
-                      </div>
-                    )}
+          {(() => {
+            const displayLineup = getEventLineup(event);
+            if (!displayLineup || displayLineup.length === 0) return null;
+            return (
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                      Guest Stars, Asatidz & Performers
+                    </span>
+                    <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                      <Mic2 className="w-5 h-5 text-[#08ADAE]" />
+                      <span>Line Up Bintang Tamu & Pengisi Acara</span>
+                    </h3>
                   </div>
-                ))}
+                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                    {displayLineup.length} Pengisi Acara
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1">
+                  {displayLineup.map((artist) => {
+                    const social = parseSocialLink(artist.socialUrl, artist.name);
+                    return (
+                      <div
+                        key={artist.id}
+                        className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-[#08ADAE]/50 transition-all flex flex-col justify-between space-y-3 group"
+                      >
+                        <div className="flex items-center gap-3.5">
+                          {artist.photoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={artist.photoUrl}
+                              alt={artist.name}
+                              className="h-16 w-16 rounded-2xl object-cover border border-slate-200 shadow-xs group-hover:scale-105 transition-transform shrink-0"
+                            />
+                          ) : (
+                            <div className="h-16 w-16 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] font-black text-lg shrink-0">
+                              {artist.name.substring(0, 2).toUpperCase()}
+                            </div>
+                          )}
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-bold text-slate-900 line-clamp-2 group-hover:text-[#08ADAE] transition-colors leading-snug">
+                              {artist.name}
+                            </h4>
+                            <div className="space-y-1 mt-1">
+                              {artist.performTime && (
+                                <span className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-slate-600">
+                                  <Clock className="w-3 h-3 text-[#08ADAE] shrink-0" />
+                                  <span>{artist.performTime}</span>
+                                </span>
+                              )}
+                              {artist.stage && (
+                                <span className="flex items-center gap-1.5 text-[11px] text-slate-500 truncate">
+                                  <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                                  <span className="truncate">{artist.stage}</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Social Media Link / Button */}
+                        <div className="pt-2.5 border-t border-slate-200/70 flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                            Sosmed
+                          </span>
+                          <a
+                            href={social.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs active:scale-95 ${
+                              social.type === 'instagram'
+                                ? 'bg-pink-50 border border-pink-200/80 text-pink-700 hover:bg-pink-100 hover:border-pink-300'
+                                : social.type === 'youtube'
+                                ? 'bg-red-50 border border-red-200/80 text-red-700 hover:bg-red-100 hover:border-red-300'
+                                : social.type === 'twitter'
+                                ? 'bg-slate-100 border border-slate-200 text-slate-800 hover:bg-slate-200'
+                                : 'bg-[#08ADAE]/10 border border-[#08ADAE]/25 text-[#08ADAE] hover:bg-[#08ADAE]/20'
+                            }`}
+                          >
+                            {social.type === 'instagram' && <InstagramIcon />}
+                            {social.type === 'youtube' && <YoutubeIcon />}
+                            {social.type === 'twitter' && <TwitterIcon />}
+                            {social.type !== 'instagram' &&
+                              social.type !== 'youtube' &&
+                              social.type !== 'twitter' && <Globe className="w-3.5 h-3.5" />}
+                            <span className="truncate max-w-[120px]">{social.label}</span>
+                            <ExternalLink className="w-3 h-3 opacity-60 shrink-0" />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* FASILITAS & MANFAAT PESERTA (BENEFITS & FACILITIES) */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
@@ -830,12 +1069,22 @@ export default function EventDetailPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={`https://instagram.com/${(event.organizer.slug || event.organizer.name || 'taqwamedia').toLowerCase().replace(/[^a-z0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-pink-50 border border-pink-200/80 text-pink-700 text-xs font-bold hover:bg-pink-100 transition shadow-2xs active:scale-95"
+                >
+                  <InstagramIcon />
+                  <span>Instagram Panitia</span>
+                </a>
+
                 <a
                   href={`https://wa.me/628158006658?text=${encodeURIComponent(`Halo panitia ${event.organizer.name}, saya ingin bertanya tentang acara "${event.title}".`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition shadow-2xs active:scale-95"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Tanya Panitia</span>

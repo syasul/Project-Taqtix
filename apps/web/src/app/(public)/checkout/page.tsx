@@ -18,6 +18,9 @@ import {
   LogIn,
   UserCheck,
   User,
+  ShieldCheck,
+  Clock,
+  Users,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -46,6 +49,16 @@ type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 interface CheckoutItem {
   categoryId: string;
   qty: number;
+}
+
+interface QueueRoomState {
+  queueId: string;
+  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  position: number;
+  initialPosition: number;
+  estimatedWaitSeconds: number;
+  message?: string;
+  error?: string;
 }
 
 function CheckoutContent() {
@@ -231,7 +244,123 @@ function CheckoutContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const lastSubmitTimeRef = React.useRef(0);
 
-  // Submit checkout
+  // State Ruang Tunggu Virtual (Redis Queue)
+  const [waitingRoom, setWaitingRoom] = useState<QueueRoomState | null>(null);
+
+  // Polling status antrean di Redis (BullMQ Virtual Waiting Room)
+  useEffect(() => {
+    if (
+      !waitingRoom?.queueId ||
+      waitingRoom.status === 'COMPLETED' ||
+      waitingRoom.status === 'FAILED'
+    ) {
+      return;
+    }
+
+    let isMounted = true;
+    const interval = setInterval(async () => {
+      try {
+        const res = await apiClient.get(`/orders/queue/${waitingRoom.queueId}`);
+        const queueData = res.data?.data;
+        if (!queueData || !isMounted) return;
+
+        if (queueData.status === 'COMPLETED') {
+          setWaitingRoom((prev) =>
+            prev ? { ...prev, status: 'COMPLETED', position: 0 } : null
+          );
+          clearInterval(interval);
+
+          const resultData = queueData.data;
+          const orderId = resultData?.orderId;
+          const paymentUrl = resultData?.paymentUrl;
+
+          if (orderId) {
+            try {
+              localStorage.setItem(
+                'taqtix_recent_order',
+                JSON.stringify({
+                  orderId,
+                  eventId,
+                  timestamp: Date.now(),
+                })
+              );
+            } catch {}
+          }
+
+          toast.success('Giliran Anda tiba! Tiket Anda berhasil diamankan.');
+
+          setTimeout(() => {
+            if (paymentUrl) {
+              window.location.href = paymentUrl;
+            } else if (orderId) {
+              router.push(`/checkout?orderId=${orderId}`);
+            }
+          }, 1200);
+        } else if (queueData.status === 'FAILED') {
+          setWaitingRoom((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  status: 'FAILED',
+                  error:
+                    queueData.error || 'Gagal memproses pesanan di antrean.',
+                }
+              : null
+          );
+          clearInterval(interval);
+          toast.error(queueData.error || 'Pemesanan gagal diproses.');
+        } else {
+          // Status masih QUEUED atau PROCESSING
+          setWaitingRoom((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              status: queueData.status,
+              position:
+                queueData.position !== undefined
+                  ? queueData.position
+                  : prev.position,
+              estimatedWaitSeconds:
+                queueData.estimatedWaitSeconds !== undefined
+                  ? queueData.estimatedWaitSeconds
+                  : prev.estimatedWaitSeconds,
+              message: queueData.message || prev.message,
+            };
+          });
+        }
+      } catch (err: any) {
+        console.error('Error polling queue status:', err);
+      }
+    }, 1500);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [waitingRoom?.queueId, waitingRoom?.status, eventId, router]);
+
+  // Countdown timer estimasi antrean
+  useEffect(() => {
+    if (
+      !waitingRoom ||
+      waitingRoom.status === 'COMPLETED' ||
+      waitingRoom.status === 'FAILED'
+    ) {
+      return;
+    }
+    const timer = setInterval(() => {
+      setWaitingRoom((prev) => {
+        if (!prev || prev.estimatedWaitSeconds <= 1) return prev;
+        return {
+          ...prev,
+          estimatedWaitSeconds: prev.estimatedWaitSeconds - 1,
+        };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [waitingRoom?.status]);
+
+  // Submit checkout via Redis Queue
   const checkoutMutation = useMutation({
     mutationFn: async (values: CheckoutFormValues) => {
       const storedAff = eventId 
@@ -243,7 +372,7 @@ function CheckoutContent() {
         .map(([facilityId, qty]) => ({ facilityId, qty }));
 
       const orderRes = await apiClient.post(
-        '/orders',
+        '/orders/queue',
         {
           eventId,
           buyerName: values.buyerName,
@@ -251,7 +380,8 @@ function CheckoutContent() {
           buyerPhone: values.buyerPhone,
           promoCode: appliedPromo || undefined,
           affiliateCode: storedAff || undefined,
-          customFieldAnswers: Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
+          customFieldAnswers:
+            Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
           facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
           items: checkoutItems.map((item) => ({
             ticketCategoryId: item.categoryId,
@@ -261,49 +391,55 @@ function CheckoutContent() {
         {
           headers: {
             'Idempotency-Key': idempotencyKey,
+            'x-use-queue': 'true',
           },
         }
       );
 
-      const orderData = orderRes.data?.data;
-      const orderId = orderData?.id;
-      let paymentData = orderData?.paymentUrl
-        ? { redirectUrl: orderData.paymentUrl }
-        : null;
+      return orderRes.data?.data;
+    },
+    onSuccess: (data: any) => {
+      setIsSubmitting(false);
 
-      if (!paymentData?.redirectUrl) {
-        try {
-          const payRes = await apiClient.post(`/orders/${orderId}/pay`);
-          paymentData = payRes.data?.data;
-        } catch {
-          // Continue with orderId even if explicit pay call fails
-        }
+      // 1. Jika respons masuk ke Ruang Tunggu Virtual Redis Queue
+      if (data?.status === 'QUEUED' || data?.status === 'PROCESSING') {
+        setWaitingRoom({
+          queueId: data.queueId,
+          status: data.status,
+          position: data.position || 1,
+          initialPosition: data.position || 1,
+          estimatedWaitSeconds: data.estimatedWaitSeconds || 3,
+          message: data.message,
+        });
+        return;
       }
 
-      return { orderId, payment: paymentData };
-    },
-    onSuccess: (data) => {
-      setIsSubmitting(false);
-      try {
-        if (data.orderId) {
+      // 2. Jika langsung selesai (misal cache idempotency atau sync response)
+      const orderId =
+        data?.orderId || data?.id || data?.data?.orderId || data?.data?.id;
+      const redirectUrl =
+        data?.paymentUrl ||
+        data?.data?.paymentUrl ||
+        data?.payment?.redirectUrl;
+
+      if (orderId) {
+        try {
           localStorage.setItem(
             'taqtix_recent_order',
             JSON.stringify({
-              orderId: data.orderId,
+              orderId,
               eventId,
               timestamp: Date.now(),
             })
           );
-        }
-      } catch (err) {
-        // Ignore localStorage error if private browsing restricts it
+        } catch {}
       }
+
       toast.success('Pemesanan tiket berhasil dibuat!');
-      if (data.payment?.redirectUrl) {
-        // Opsi A — Redirect penuh ke halaman DOKU Checkout
-        window.location.href = data.payment.redirectUrl;
-      } else {
-        router.push(`/checkout?orderId=${data.orderId}`);
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else if (orderId) {
+        router.push(`/checkout?orderId=${orderId}`);
       }
     },
     onError: (error: any) => {
@@ -316,7 +452,7 @@ function CheckoutContent() {
     // 500ms debounce guard & immediate disable
     const now = Date.now();
     if (now - lastSubmitTimeRef.current < 500) return;
-    if (isSubmitting || checkoutMutation.isPending) return;
+    if (isSubmitting || checkoutMutation.isPending || waitingRoom !== null) return;
 
     lastSubmitTimeRef.current = now;
     setIsSubmitting(true);
@@ -912,6 +1048,190 @@ function CheckoutContent() {
           </Card>
         </div>
       </div>
+
+      {/* VIRTUAL WAITING ROOM MODAL (REDIS HIGH-CONCURRENCY QUEUE) */}
+      {waitingRoom && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="relative w-full max-w-lg rounded-3xl bg-slate-900/95 border border-slate-700/60 shadow-[0_25px_60px_-15px_rgba(8,180,181,0.3)] p-6 sm:p-8 text-white overflow-hidden backdrop-filter">
+            {/* Ambient glowing orbs */}
+            <div className="absolute -top-24 -right-24 w-60 h-60 bg-[#08B4B5]/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Content Container */}
+            <div className="relative z-10 flex flex-col items-center text-center space-y-5">
+              {/* Animated Status Radar / Icon */}
+              <div className="relative flex items-center justify-center pt-2">
+                {waitingRoom.status === 'COMPLETED' ? (
+                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <CheckCircle2 className="w-10 h-10 animate-bounce" />
+                  </div>
+                ) : waitingRoom.status === 'FAILED' ? (
+                  <div className="w-20 h-20 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
+                    <AlertCircle className="w-10 h-10" />
+                  </div>
+                ) : (
+                  <div className="relative w-20 h-20 flex items-center justify-center">
+                    <span className="absolute inset-0 rounded-2xl bg-[#08B4B5]/20 animate-ping" />
+                    <span className="absolute inset-1 rounded-2xl bg-[#08B4B5]/30 animate-pulse" />
+                    <div className="relative w-20 h-20 rounded-2xl bg-slate-800/90 border border-[#08B4B5]/40 flex items-center justify-center text-[#08B4B5] shadow-lg shadow-[#08B4B5]/20">
+                      <Loader2 className="w-9 h-9 animate-spin text-[#08B4B5]" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Status Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-white/10 text-xs font-semibold">
+                {waitingRoom.status === 'COMPLETED' ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-emerald-300">Tiket Berhasil Diamankan!</span>
+                  </>
+                ) : waitingRoom.status === 'FAILED' ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-rose-400" />
+                    <span className="text-rose-300">Antrean Selesai - Gagal</span>
+                  </>
+                ) : waitingRoom.status === 'PROCESSING' ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <span className="text-amber-300">Sedang Memvalidasi & Mengunci Kuota...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-[#08B4B5] animate-ping" />
+                    <span className="text-[#08B4B5]">Ruang Tunggu Virtual TAQtix</span>
+                  </>
+                )}
+              </div>
+
+              {/* Title & Description */}
+              <div className="space-y-1.5">
+                <h2 className="text-2xl font-black tracking-tight text-white">
+                  {waitingRoom.status === 'COMPLETED'
+                    ? 'Giliran Anda Tiba!'
+                    : waitingRoom.status === 'FAILED'
+                    ? 'Pesanan Belum Berhasil'
+                    : 'Anda Berada di Ruang Tunggu'}
+                </h2>
+                <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+                  {waitingRoom.status === 'COMPLETED'
+                    ? 'Tiket Anda berhasil diamankan. Mengalihkan Anda ke halaman pembayaran dalam sekejap...'
+                    : waitingRoom.status === 'FAILED'
+                    ? waitingRoom.error || 'Tiket telah habis terjual selagi antrean Anda diproses.'
+                    : 'Sistem antrean berkecepatan tinggi mengamankan pesanan Anda secara berurutan dan adil (First-Come, First-Served).'}
+                </p>
+              </div>
+
+              {/* Big Queue Number Card */}
+              {waitingRoom.status !== 'FAILED' && (
+                <div className="w-full bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 space-y-3">
+                  <div className="flex items-center justify-between text-xs text-slate-400">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <Users className="w-3.5 h-3.5 text-[#08B4B5]" />
+                      Nomor Antrean Anda
+                    </span>
+                    <span className="font-mono text-[11px] text-slate-400">
+                      {waitingRoom.status === 'COMPLETED'
+                        ? 'Selesai'
+                        : `ID: ${waitingRoom.queueId.slice(-8)}`}
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#08B4B5] via-teal-300 to-emerald-400 tracking-tight font-mono">
+                      {waitingRoom.status === 'COMPLETED' ? '#0' : `#${waitingRoom.position}`}
+                    </span>
+                    {waitingRoom.status === 'QUEUED' && (
+                      <span className="text-xs text-slate-400 font-mono">
+                        / awal #{waitingRoom.initialPosition}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Dynamic Progress Bar */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden relative">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#08B4B5] to-emerald-400 transition-all duration-700 ease-out rounded-full"
+                        style={{
+                          width: `${
+                            waitingRoom.status === 'COMPLETED'
+                              ? 100
+                              : Math.max(
+                                  8,
+                                  Math.min(
+                                    95,
+                                    Math.round(
+                                      ((waitingRoom.initialPosition - waitingRoom.position + 1) /
+                                        waitingRoom.initialPosition) *
+                                        100
+                                    )
+                                  )
+                                )
+                          }%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center text-[11px] text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-[#08B4B5]" />
+                        Estimasi waktu:{' '}
+                        <strong className="text-slate-200">
+                          ~{waitingRoom.estimatedWaitSeconds} detik
+                        </strong>
+                      </span>
+                      <span className="text-slate-400 font-mono">
+                        {waitingRoom.status === 'PROCESSING'
+                          ? 'Memproses...'
+                          : waitingRoom.status === 'COMPLETED'
+                          ? '100% Selesai'
+                          : 'Dalam antrean'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Warning & Instructions */}
+              {waitingRoom.status !== 'COMPLETED' && waitingRoom.status !== 'FAILED' && (
+                <div className="w-full rounded-xl bg-slate-800/40 border border-slate-700/50 p-3.5 text-left flex items-start gap-3">
+                  <ShieldCheck className="w-4 h-4 text-[#08B4B5] shrink-0 mt-0.5" />
+                  <div className="space-y-0.5 text-xs text-slate-300">
+                    <p className="font-semibold text-slate-100">
+                      Jangan refresh atau tinggalkan halaman ini
+                    </p>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Antrean Anda dikelola langsung oleh Redis Queue Engine. Anda akan dialihkan otomatis ke halaman pembayaran saat giliran Anda selesai.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions on Failure */}
+              {waitingRoom.status === 'FAILED' && (
+                <div className="w-full space-y-2 pt-2">
+                  <Button
+                    type="button"
+                    onClick={() => setWaitingRoom(null)}
+                    className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold rounded-xl py-2.5 border-0 cursor-pointer"
+                  >
+                    Coba Kategori / Tiket Lain
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push(eventId ? `/events/${eventId}` : '/')}
+                    className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 rounded-xl py-2 cursor-pointer"
+                  >
+                    Kembali ke Detail Event
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

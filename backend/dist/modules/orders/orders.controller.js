@@ -49,7 +49,33 @@ let OrdersController = class OrdersController {
         const idempotencyKey = req.headers['idempotency-key'] ||
             req.headers['x-idempotency-key'] ||
             undefined;
+        const useQueue = req.headers['x-use-queue'] === 'true' || dto.useQueue === true;
+        if (useQueue) {
+            return this.ordersService.enqueueOrder(dto, authenticatedUserId, idempotencyKey);
+        }
         return this.ordersService.create(dto, authenticatedUserId, idempotencyKey);
+    }
+    async enqueueOrder(dto, req) {
+        let authenticatedUserId;
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            try {
+                const payload = await this.jwtService.verifyAsync(token, {
+                    secret: this.configService.get('TAQTIX_JWT_ACCESS_SECRET'),
+                });
+                authenticatedUserId = payload?.sub;
+            }
+            catch {
+            }
+        }
+        const idempotencyKey = req.headers['idempotency-key'] ||
+            req.headers['x-idempotency-key'] ||
+            undefined;
+        return this.ordersService.enqueueOrder(dto, authenticatedUserId, idempotencyKey);
+    }
+    async getQueueStatus(queueId) {
+        return this.ordersService.getQueueStatus(queueId);
     }
     async getMyOrders(userId) {
         return this.ordersService.findMyOrders(userId);
@@ -85,6 +111,39 @@ __decorate([
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto, Object]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "createOrder", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('queue'),
+    (0, idempotency_decorator_1.RequireIdempotency)(),
+    (0, throttler_1.Throttle)({ default: { limit: 120, ttl: 60000 } }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Memasukkan pesanan ke antrean ruang tunggu Redis (High-Concurrency Virtual Waiting Room)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.ACCEPTED,
+        description: 'Pesanan masuk antrean ruang tunggu.',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto, Object]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "enqueueOrder", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('queue/:queueId'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengecek status dan posisi antrean ruang tunggu pembeli',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Status antrean berhasil diambil.',
+    }),
+    __param(0, (0, common_1.Param)('queueId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "getQueueStatus", null);
 __decorate([
     (0, common_1.Get)('my'),
     (0, swagger_1.ApiBearerAuth)(),

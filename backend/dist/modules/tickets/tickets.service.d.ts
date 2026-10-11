@@ -16,8 +16,8 @@ export declare class TicketsService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        price: number;
         eventId: string;
+        price: number;
         quota: number;
         sold: number;
         maxPerOrder: number;
@@ -29,8 +29,8 @@ export declare class TicketsService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        price: number;
         eventId: string;
+        price: number;
         quota: number;
         sold: number;
         maxPerOrder: number;
@@ -42,8 +42,8 @@ export declare class TicketsService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
-        price: number;
         eventId: string;
+        price: number;
         quota: number;
         sold: number;
         maxPerOrder: number;
@@ -127,9 +127,9 @@ export declare class TicketsService {
     }>;
     blockTicket(ticketId: string, reason: string | undefined, userId: string): Promise<{
         id: string;
-        status: import("@prisma/client").$Enums.TicketStatus;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.TicketStatus;
         eventId: string;
         qrPayload: string;
         orderItemId: string;
@@ -146,9 +146,9 @@ export declare class TicketsService {
     }>;
     unblockTicket(ticketId: string, userId: string): Promise<{
         id: string;
-        status: import("@prisma/client").$Enums.TicketStatus;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.TicketStatus;
         eventId: string;
         qrPayload: string;
         orderItemId: string;
@@ -170,8 +170,8 @@ export declare class TicketsService {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
-                price: number;
                 eventId: string;
+                price: number;
                 quota: number;
                 sold: number;
                 maxPerOrder: number;
@@ -194,9 +194,9 @@ export declare class TicketsService {
         };
     } & {
         id: string;
-        status: import("@prisma/client").$Enums.TicketStatus;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.TicketStatus;
         eventId: string;
         qrPayload: string;
         orderItemId: string;
@@ -222,13 +222,13 @@ export declare class TicketsService {
     }>;
     getMyTickets(userId: string): Promise<({
         event: {
-            id: string;
             title: string;
+            id: string;
             slug: string;
-            bannerUrl: string;
             location: string;
             startDate: Date;
             endDate: Date;
+            bannerUrl: string;
         };
         orderItem: {
             ticketCategory: {
@@ -236,8 +236,8 @@ export declare class TicketsService {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
-                price: number;
                 eventId: string;
+                price: number;
                 quota: number;
                 sold: number;
                 maxPerOrder: number;
@@ -260,9 +260,9 @@ export declare class TicketsService {
         };
     } & {
         id: string;
-        status: import("@prisma/client").$Enums.TicketStatus;
         createdAt: Date;
         updatedAt: Date;
+        status: import("@prisma/client").$Enums.TicketStatus;
         eventId: string;
         qrPayload: string;
         orderItemId: string;

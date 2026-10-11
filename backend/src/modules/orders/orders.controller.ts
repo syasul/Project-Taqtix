@@ -70,7 +70,69 @@ export class OrdersController {
       (req.headers['x-idempotency-key'] as string) ||
       undefined;
 
+    const useQueue =
+      req.headers['x-use-queue'] === 'true' || (dto as any).useQueue === true;
+
+    if (useQueue) {
+      return this.ordersService.enqueueOrder(
+        dto,
+        authenticatedUserId,
+        idempotencyKey,
+      );
+    }
+
     return this.ordersService.create(dto, authenticatedUserId, idempotencyKey);
+  }
+
+  @Public()
+  @Post('queue')
+  @RequireIdempotency()
+  @Throttle({ default: { limit: 120, ttl: 60000 } })
+  @ApiOperation({
+    summary:
+      'Memasukkan pesanan ke antrean ruang tunggu Redis (High-Concurrency Virtual Waiting Room)',
+  })
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Pesanan masuk antrean ruang tunggu.',
+  })
+  async enqueueOrder(@Body() dto: CreateOrderDto, @Req() req: Request) {
+    let authenticatedUserId: string | undefined;
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const payload = await this.jwtService.verifyAsync(token, {
+          secret: this.configService.get<string>('TAQTIX_JWT_ACCESS_SECRET'),
+        });
+        authenticatedUserId = payload?.sub;
+      } catch {
+        // Token invalid atau expired
+      }
+    }
+    const idempotencyKey =
+      (req.headers['idempotency-key'] as string) ||
+      (req.headers['x-idempotency-key'] as string) ||
+      undefined;
+
+    return this.ordersService.enqueueOrder(
+      dto,
+      authenticatedUserId,
+      idempotencyKey,
+    );
+  }
+
+  @Public()
+  @Get('queue/:queueId')
+  @ApiOperation({
+    summary: 'Mengecek status dan posisi antrean ruang tunggu pembeli',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Status antrean berhasil diambil.',
+  })
+  async getQueueStatus(@Param('queueId') queueId: string) {
+    return this.ordersService.getQueueStatus(queueId);
   }
 
   @Get('my')

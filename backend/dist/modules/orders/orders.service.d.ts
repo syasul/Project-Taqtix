@@ -6,11 +6,12 @@ import { ConfigService } from '@nestjs/config';
 export declare class OrdersService {
     private prisma;
     private orderExpirationQueue;
+    private checkoutQueue;
     private readonly dokuService;
     private readonly configService;
     private readonly logger;
     private idempotencyStore;
-    constructor(prisma: PrismaService, orderExpirationQueue: Queue, dokuService: DokuService, configService: ConfigService);
+    constructor(prisma: PrismaService, orderExpirationQueue: Queue, checkoutQueue: Queue, dokuService: DokuService, configService: ConfigService);
     create(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string): Promise<any>;
     private rollbackOrder;
     findOne(id: string): Promise<{
@@ -190,4 +191,48 @@ export declare class OrdersService {
         utmCampaign: string | null;
         expiredAt: Date;
     })[]>;
+    enqueueOrder(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string): Promise<{
+        status: string;
+        queueId: string;
+        position: number;
+        data: {
+            orderId: any;
+            paymentUrl: any;
+            totalAmount: any;
+        };
+        estimatedWaitSeconds?: undefined;
+        message?: undefined;
+    } | {
+        status: string;
+        queueId: string;
+        position: number;
+        estimatedWaitSeconds: number;
+        message: string;
+        data?: undefined;
+    }>;
+    getQueueStatus(queueId: string): Promise<{
+        status: string;
+        queueId: string;
+        position: number;
+        data: any;
+        error?: undefined;
+        estimatedWaitSeconds?: undefined;
+        message?: undefined;
+    } | {
+        status: string;
+        queueId: string;
+        position: number;
+        error: string;
+        data?: undefined;
+        estimatedWaitSeconds?: undefined;
+        message?: undefined;
+    } | {
+        status: string;
+        queueId: string;
+        position: number;
+        estimatedWaitSeconds: number;
+        message: string;
+        data?: undefined;
+        error?: undefined;
+    }>;
 }

@@ -24,13 +24,15 @@ const config_1 = require("@nestjs/config");
 let OrdersService = OrdersService_1 = class OrdersService {
     prisma;
     orderExpirationQueue;
+    checkoutQueue;
     dokuService;
     configService;
     logger = new common_1.Logger(OrdersService_1.name);
     idempotencyStore = new Map();
-    constructor(prisma, orderExpirationQueue, dokuService, configService) {
+    constructor(prisma, orderExpirationQueue, checkoutQueue, dokuService, configService) {
         this.prisma = prisma;
         this.orderExpirationQueue = orderExpirationQueue;
+        this.checkoutQueue = checkoutQueue;
         this.dokuService = dokuService;
         this.configService = configService;
     }
@@ -527,12 +529,105 @@ let OrdersService = OrdersService_1 = class OrdersService {
             },
         });
     }
+    async enqueueOrder(dto, authenticatedUserId, idempotencyKey) {
+        if (idempotencyKey) {
+            const cached = this.idempotencyStore.get(idempotencyKey);
+            if (cached && cached.expiresAt > Date.now()) {
+                return {
+                    status: 'COMPLETED',
+                    queueId: 'idempotent-cached',
+                    position: 0,
+                    data: {
+                        orderId: cached.order.id,
+                        paymentUrl: cached.order.paymentUrl || null,
+                        totalAmount: cached.order.totalAmount,
+                    },
+                };
+            }
+        }
+        const event = await this.prisma.event.findUnique({
+            where: { id: dto.eventId },
+            select: { id: true, title: true, requireLogin: true },
+        });
+        if (!event) {
+            throw new common_1.NotFoundException('Event tidak ditemukan');
+        }
+        if (event.requireLogin && !authenticatedUserId) {
+            throw new common_1.UnauthorizedException('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.');
+        }
+        const queueId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        await this.checkoutQueue.add('process-checkout', {
+            queueId,
+            dto,
+            authenticatedUserId,
+            idempotencyKey,
+        }, {
+            jobId: queueId,
+            attempts: 1,
+            removeOnComplete: 1000,
+            removeOnFail: 1000,
+        });
+        const waitingCount = await this.checkoutQueue.getWaitingCount();
+        return {
+            status: 'QUEUED',
+            queueId,
+            position: Math.max(1, waitingCount),
+            estimatedWaitSeconds: Math.max(2, Math.ceil(waitingCount / 25)),
+            message: 'Pesanan Anda berhasil masuk ke antrean ruang tunggu resmi TAQtix.',
+        };
+    }
+    async getQueueStatus(queueId) {
+        const job = await this.checkoutQueue.getJob(queueId);
+        if (!job) {
+            throw new common_1.NotFoundException('Antrean tidak ditemukan atau sudah selesai.');
+        }
+        const state = await job.getState();
+        if (state === 'completed') {
+            return {
+                status: 'COMPLETED',
+                queueId,
+                position: 0,
+                data: job.returnvalue,
+            };
+        }
+        if (state === 'failed') {
+            return {
+                status: 'FAILED',
+                queueId,
+                position: 0,
+                error: job.failedReason || 'Gagal memproses pesanan di antrean.',
+            };
+        }
+        if (state === 'active') {
+            return {
+                status: 'PROCESSING',
+                queueId,
+                position: 1,
+                estimatedWaitSeconds: 1,
+                message: 'Pesanan Anda sedang diproses oleh worker...',
+            };
+        }
+        const waitingJobs = await this.checkoutQueue.getWaiting(0, 50);
+        const index = waitingJobs.findIndex((j) => j.id === queueId);
+        const position = index >= 0
+            ? index + 1
+            : Math.max(1, await this.checkoutQueue.getWaitingCount());
+        return {
+            status: 'QUEUED',
+            queueId,
+            position,
+            estimatedWaitSeconds: Math.max(2, Math.ceil(position / 25)),
+            message: 'Anda sedang mengantre di ruang tunggu.',
+        };
+    }
 };
 exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = OrdersService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, bull_1.InjectQueue)('order-expiration')),
+    __param(2, (0, bull_1.InjectQueue)('order-checkout-queue')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        bullmq_1.Queue,
         bullmq_1.Queue,
         doku_service_1.DokuService,
         config_1.ConfigService])

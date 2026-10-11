@@ -9,6 +9,50 @@ export declare class OrdersController {
     private readonly configService;
     constructor(ordersService: OrdersService, jwtService: JwtService, configService: ConfigService);
     createOrder(dto: CreateOrderDto, req: Request): Promise<any>;
+    enqueueOrder(dto: CreateOrderDto, req: Request): Promise<{
+        status: string;
+        queueId: string;
+        position: number;
+        data: {
+            orderId: any;
+            paymentUrl: any;
+            totalAmount: any;
+        };
+        estimatedWaitSeconds?: undefined;
+        message?: undefined;
+    } | {
+        status: string;
+        queueId: string;
+        position: number;
+        estimatedWaitSeconds: number;
+        message: string;
+        data?: undefined;
+    }>;
+    getQueueStatus(queueId: string): Promise<{
+        status: string;
+        queueId: string;
+        position: number;
+        data: any;
+        error?: undefined;
+        estimatedWaitSeconds?: undefined;
+        message?: undefined;
+    } | {
+        status: string;
+        queueId: string;
+        position: number;
+        error: string;
+        data?: undefined;
+        estimatedWaitSeconds?: undefined;
+        message?: undefined;
+    } | {
+        status: string;
+        queueId: string;
+        position: number;
+        estimatedWaitSeconds: number;
+        message: string;
+        data?: undefined;
+        error?: undefined;
+    }>;
     getMyOrders(userId: string): Promise<({
         event: {
             title: string;

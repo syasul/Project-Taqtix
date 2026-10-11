@@ -371,30 +371,50 @@ function CheckoutContent() {
         .filter(([_, qty]) => qty > 0)
         .map(([facilityId, qty]) => ({ facilityId, qty }));
 
-      const orderRes = await apiClient.post(
-        '/orders/queue',
-        {
-          eventId,
-          buyerName: values.buyerName,
-          buyerEmail: values.buyerEmail,
-          buyerPhone: values.buyerPhone,
-          promoCode: appliedPromo || undefined,
-          affiliateCode: storedAff || undefined,
-          customFieldAnswers:
-            Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
-          facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
-          items: checkoutItems.map((item) => ({
-            ticketCategoryId: item.categoryId,
-            qty: item.qty,
-          })),
-        },
-        {
-          headers: {
-            'Idempotency-Key': idempotencyKey,
-            'x-use-queue': 'true',
-          },
+      const orderPayload = {
+        eventId,
+        buyerName: values.buyerName,
+        buyerEmail: values.buyerEmail,
+        buyerPhone: values.buyerPhone,
+        promoCode: appliedPromo || undefined,
+        affiliateCode: storedAff || undefined,
+        customFieldAnswers:
+          Object.keys(customAnswers).length > 0 ? customAnswers : undefined,
+        facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
+        items: checkoutItems.map((item) => ({
+          ticketCategoryId: item.categoryId,
+          qty: item.qty,
+        })),
+      };
+
+      let orderRes;
+      try {
+        orderRes = await apiClient.post(
+          '/orders/queue',
+          orderPayload,
+          {
+            headers: {
+              'Idempotency-Key': idempotencyKey,
+              'x-use-queue': 'true',
+            },
+          }
+        );
+      } catch (err: any) {
+        // Fallback langsung ke endpoint /orders jika /orders/queue 404
+        if (err.response?.status === 404) {
+          orderRes = await apiClient.post(
+            '/orders',
+            orderPayload,
+            {
+              headers: {
+                'Idempotency-Key': idempotencyKey,
+              },
+            }
+          );
+        } else {
+          throw err;
         }
-      );
+      }
 
       return orderRes.data?.data;
     },

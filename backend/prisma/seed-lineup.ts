@@ -107,7 +107,18 @@ async function main() {
     }
 
     if (event.lineup.length > 0) {
-      console.log(`Event "${event.title}" already has ${event.lineup.length} lineup items, updating/skipping.`);
+      console.log(`Event "${event.title}" already has ${event.lineup.length} lineup items, updating data...`);
+      for (const item of items) {
+        await prisma.lineUpItem.updateMany({
+          where: { eventId: event.id, name: item.name },
+          data: {
+            photoUrl: item.photoUrl,
+            performTime: item.performTime,
+            stage: item.stage,
+            socialUrl: item.socialUrl,
+          },
+        });
+      }
       continue;
     }
 

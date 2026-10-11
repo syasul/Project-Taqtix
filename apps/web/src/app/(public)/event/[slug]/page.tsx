@@ -210,6 +210,14 @@ function getEventLineup(event: { slug?: string; title?: string; lineup?: LineUpI
   ];
 }
 
+function getSanitizedPhotoUrl(photoUrl?: string | null): string | null {
+  if (!photoUrl) return null;
+  if (photoUrl.includes('photo-1544717305-2782549b5136')) {
+    return 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop';
+  }
+  return photoUrl;
+}
+
 function parseSocialLink(url?: string | null, fallbackName?: string) {
   if (!url) {
     const handle = fallbackName
@@ -718,50 +726,56 @@ export default function EventDetailPage() {
                   </span>
                 </div>
 
-                <div className="space-y-3.5 pt-1">
+                <div className="space-y-3 pt-1">
                   {displayLineup.map((artist) => {
                     const social = parseSocialLink(artist.socialUrl, artist.name);
+                    const photoUrl = getSanitizedPhotoUrl(artist.photoUrl);
+
                     return (
                       <div
                         key={artist.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/90 border border-slate-200/90 hover:border-[#08ADAE]/50 hover:bg-white hover:shadow-sm transition-all duration-200 group"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all duration-150 group"
                       >
-                        {/* Left: Avatar + Performer Details */}
+                        {/* Left: Avatar + Details */}
                         <div className="flex items-center gap-4 min-w-0 flex-1">
                           {/* Avatar */}
                           <div className="relative shrink-0">
-                            {artist.photoUrl ? (
+                            {photoUrl ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
-                                src={artist.photoUrl}
+                                src={photoUrl}
                                 alt={artist.name}
-                                className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform duration-200"
+                                className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl object-cover border border-slate-200 shadow-2xs"
                               />
                             ) : (
                               <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/25 flex items-center justify-center text-[#08ADAE] font-black text-xl shadow-xs">
                                 {artist.name.substring(0, 2).toUpperCase()}
                               </div>
                             )}
-                            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider bg-slate-900 text-white shadow-2xs whitespace-nowrap">
-                              Pengisi Acara
-                            </span>
                           </div>
 
-                          {/* Info: Name, Time, Stage */}
+                          {/* Info: Role Tag, Full Name, Time & Stage */}
                           <div className="space-y-1.5 min-w-0 flex-1">
-                            <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#08ADAE] transition-colors leading-snug">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#08ADAE]/10 text-[#08ADAE] border border-[#08ADAE]/20">
+                                Pemateri
+                              </span>
+                            </div>
+
+                            <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                               {artist.name}
                             </h4>
-                            <div className="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs">
+
+                            <div className="flex flex-wrap items-center gap-2 pt-0.5 text-xs">
                               {artist.performTime && (
-                                <span className="inline-flex items-center gap-1.5 font-mono font-medium text-slate-700 bg-white border border-slate-200/80 px-2.5 py-1 rounded-lg shadow-2xs">
+                                <span className="inline-flex items-center gap-1.5 font-mono font-medium text-slate-700 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
                                   <Clock className="w-3.5 h-3.5 text-[#08ADAE] shrink-0" />
                                   <span>{artist.performTime}</span>
                                 </span>
                               )}
                               {artist.stage && (
-                                <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium bg-white/80 px-2.5 py-1 rounded-lg border border-slate-200/70">
-                                  <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                                <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
+                                  <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                   <span>{artist.stage}</span>
                                 </span>
                               )}
@@ -770,7 +784,7 @@ export default function EventDetailPage() {
                         </div>
 
                         {/* Right: Social Media Action Button */}
-                        <div className="shrink-0 flex sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60">
+                        <div className="shrink-0 flex sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                           <a
                             href={social.href}
                             target="_blank"

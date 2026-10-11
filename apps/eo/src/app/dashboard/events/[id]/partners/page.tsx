@@ -118,7 +118,7 @@ export default function AffiliatePartnersPage() {
   });
 
   const handleCopyLink = (code: string) => {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/v1';
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.taqtix.id/v1';
     const cleanBaseUrl = apiBaseUrl.endsWith('/v1') ? apiBaseUrl.slice(0, -3) : apiBaseUrl;
     const redirectUrl = `${cleanBaseUrl}/v1/r/${code}`;
     

@@ -55,7 +55,9 @@ function LoginForm() {
       const errMsg =
         error.response?.data?.error?.message ||
         error.response?.data?.message ||
-        'Email atau kata sandi yang Anda masukkan salah.';
+        (!error.response
+          ? 'Gagal terhubung ke server API. Periksa koneksi internet Anda.'
+          : 'Email atau kata sandi yang Anda masukkan salah.');
       toast.error(errMsg);
     } finally {
       setIsLoading(false);

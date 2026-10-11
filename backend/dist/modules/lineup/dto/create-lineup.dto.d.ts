@@ -3,5 +3,6 @@ export declare class CreateLineupDto {
     photoUrl?: string;
     performTime?: string;
     stage?: string;
+    socialUrl?: string;
     order?: number;
 }

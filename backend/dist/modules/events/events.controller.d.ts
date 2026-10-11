@@ -93,6 +93,7 @@ export declare class EventsController {
             photoUrl: string | null;
             performTime: string | null;
             stage: string | null;
+            socialUrl: string | null;
         }[];
         description: string | null;
         title: string;

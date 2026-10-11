@@ -17,6 +17,7 @@ export declare class LineupService {
         photoUrl: string | null;
         performTime: string | null;
         stage: string | null;
+        socialUrl: string | null;
     }>;
     findAll(eventId: string): Promise<{
         order: number;
@@ -28,6 +29,7 @@ export declare class LineupService {
         photoUrl: string | null;
         performTime: string | null;
         stage: string | null;
+        socialUrl: string | null;
     }[]>;
     update(eventId: string, itemId: string, dto: UpdateLineupDto, userId: string): Promise<{
         order: number;
@@ -39,6 +41,7 @@ export declare class LineupService {
         photoUrl: string | null;
         performTime: string | null;
         stage: string | null;
+        socialUrl: string | null;
     }>;
     delete(eventId: string, itemId: string, userId: string): Promise<{
         order: number;
@@ -50,6 +53,7 @@ export declare class LineupService {
         photoUrl: string | null;
         performTime: string | null;
         stage: string | null;
+        socialUrl: string | null;
     }>;
     reorder(eventId: string, dto: ReorderLineupDto, userId: string): Promise<{
         success: boolean;

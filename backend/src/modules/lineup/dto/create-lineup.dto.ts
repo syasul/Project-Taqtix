@@ -31,6 +31,14 @@ export class CreateLineupDto {
   @IsString()
   stage?: string;
 
+  @ApiPropertyOptional({
+    example: 'https://instagram.com/sheilaon7',
+    description: 'Link profil atau sosial media artis / performer',
+  })
+  @IsOptional()
+  @IsString()
+  socialUrl?: string;
+
   @ApiPropertyOptional({ default: 0, description: 'Urutan tampil' })
   @IsOptional()
   @IsNumber()

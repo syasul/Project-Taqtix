@@ -36,6 +36,8 @@ import {
   MessageCircle,
   ArrowRight,
   Users,
+  Mic2,
+  Globe,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -63,6 +65,7 @@ interface LineUpItem {
   photoUrl: string | null;
   performTime: string | null;
   stage: string | null;
+  socialUrl?: string | null;
 }
 
 interface EventDetail {
@@ -477,6 +480,84 @@ export default function EventDetailPage() {
               </div>
             )}
           </div>
+
+          {/* BINTANG TAMU & PENGISI ACARA (LINE UP) */}
+          {event.lineup && event.lineup.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                    Guest Stars & Performers
+                  </span>
+                  <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                    <Mic2 className="w-5 h-5 text-[#08ADAE]" />
+                    <span>Line Up Bintang Tamu & Pengisi Acara</span>
+                  </h3>
+                </div>
+                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                  {event.lineup.length} Pengisi Acara
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1">
+                {event.lineup.map((artist) => (
+                  <div
+                    key={artist.id}
+                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-[#08ADAE]/50 transition-all flex flex-col justify-between space-y-3 group"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      {artist.photoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={artist.photoUrl}
+                          alt={artist.name}
+                          className="h-14 w-14 rounded-2xl object-cover border border-slate-200 shadow-xs group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <div className="h-14 w-14 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] font-black text-lg shrink-0">
+                          {artist.name.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-[#08ADAE] transition-colors">
+                          {artist.name}
+                        </h4>
+                        <div className="space-y-0.5 mt-0.5">
+                          {artist.performTime && (
+                            <span className="flex items-center gap-1 text-[11px] font-mono font-medium text-slate-600">
+                              <Clock className="w-3 h-3 text-[#08ADAE]" />
+                              {artist.performTime}
+                            </span>
+                          )}
+                          {artist.stage && (
+                            <span className="flex items-center gap-1 text-[11px] text-slate-500 truncate">
+                              <MapPin className="w-3 h-3 text-emerald-600" />
+                              {artist.stage}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {artist.socialUrl && (
+                      <div className="pt-2 border-t border-slate-200/60">
+                        <a
+                          href={artist.socialUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#08ADAE] hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Profil / Sosmed</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* FASILITAS & MANFAAT PESERTA (BENEFITS & FACILITIES) */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">

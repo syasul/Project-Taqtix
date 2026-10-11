@@ -17,6 +17,7 @@ class CreateLineupDto {
     photoUrl;
     performTime;
     stage;
+    socialUrl;
     order;
 }
 exports.CreateLineupDto = CreateLineupDto;
@@ -53,6 +54,15 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateLineupDto.prototype, "stage", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'https://instagram.com/sheilaon7',
+        description: 'Link profil atau sosial media artis / performer',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateLineupDto.prototype, "socialUrl", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ default: 0, description: 'Urutan tampil' }),
     (0, class_validator_1.IsOptional)(),

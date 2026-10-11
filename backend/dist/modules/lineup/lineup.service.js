@@ -56,6 +56,7 @@ let LineupService = class LineupService {
                 photoUrl: dto.photoUrl || null,
                 performTime: dto.performTime || null,
                 stage: dto.stage || null,
+                socialUrl: dto.socialUrl || null,
                 order: orderIndex,
             },
         });
@@ -83,6 +84,8 @@ let LineupService = class LineupService {
             data.performTime = dto.performTime;
         if (dto.stage !== undefined)
             data.stage = dto.stage;
+        if (dto.socialUrl !== undefined)
+            data.socialUrl = dto.socialUrl;
         if (dto.order !== undefined)
             data.order = dto.order;
         return this.prisma.lineUpItem.update({

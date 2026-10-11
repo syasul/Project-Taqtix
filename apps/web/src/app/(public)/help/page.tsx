@@ -26,7 +26,7 @@ const faqs: FAQItem[] = [
   {
     category: 'Pemesanan & Tiket',
     question: 'Bolehkah saya melakukan refund (pengembalian dana) atas tiket yang dibeli?',
-    answer: 'Tiket yang sudah dibeli bersifat non-refundable. Pengajuan pengembalian dana atau kompensasi tunduk sepenuhnya pada kebijakan dan persetujuan pihak penyelenggara event. Kebijakan pemindahan kepemilikan tiket dapat bervariasi sesuai aturan masing-masing event.',
+    answer: 'Tiket yang sudah dibeli tidak dapat dibatalkan atau direfund, kecuali Jika terjadi pembatalan acara oleh penyelenggara, maka refund sepenuhnya ditanggung oleh pihak penyelenggara.',
   },
   {
     category: 'Pembayaran',

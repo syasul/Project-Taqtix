@@ -129,10 +129,14 @@ let DokuService = DokuService_1 = class DokuService {
             });
             const data = await response.json();
             if (!response.ok) {
-                this.logger.error('DOKU Create Payment Error response:', data);
-                throw new common_1.BadRequestException(data?.message ||
+                this.logger.error(`DOKU Create Payment Error response from ${baseUrl}${requestTarget}:`, data);
+                let errorMsg = data?.message ||
                     data?.error?.message ||
-                    'Gagal menghubungi payment gateway DOKU');
+                    'Gagal menghubungi payment gateway DOKU';
+                if (Array.isArray(errorMsg)) {
+                    errorMsg = errorMsg.join(', ');
+                }
+                throw new common_1.BadRequestException(errorMsg);
             }
             const paymentUrl = data?.response?.payment?.url || data?.payment?.url || '';
             const tokenId = data?.response?.payment?.token_id || data?.payment?.token_id || '';

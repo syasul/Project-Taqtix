@@ -134,11 +134,12 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
         const secretKey = this.configService.get('DOKU_SECRET_KEY') ||
             this.configService.get('PAYMENT_PROVIDER_SECRET') ||
             '';
+        const isBrnProdKey = clientId.startsWith('BRN-');
         const dokuEnv = (this.configService.get('DOKU_ENV') ||
-            (this.configService.get('NODE_ENV') === 'production'
+            (this.configService.get('NODE_ENV') === 'production' || isBrnProdKey
                 ? 'production'
                 : 'sandbox')).toLowerCase();
-        const isProduction = dokuEnv === 'production';
+        const isProduction = dokuEnv === 'production' || isBrnProdKey;
         const baseUrl = isProduction
             ? this.configService.get('DOKU_BASE_URL_PRODUCTION') ||
                 'https://api.doku.com'

@@ -136,12 +136,18 @@ export class DokuService {
       const data = await response.json();
 
       if (!response.ok) {
-        this.logger.error('DOKU Create Payment Error response:', data);
-        throw new BadRequestException(
-          data?.message ||
-            data?.error?.message ||
-            'Gagal menghubungi payment gateway DOKU',
+        this.logger.error(
+          `DOKU Create Payment Error response from ${baseUrl}${requestTarget}:`,
+          data,
         );
+        let errorMsg =
+          data?.message ||
+          data?.error?.message ||
+          'Gagal menghubungi payment gateway DOKU';
+        if (Array.isArray(errorMsg)) {
+          errorMsg = errorMsg.join(', ');
+        }
+        throw new BadRequestException(errorMsg);
       }
 
       const paymentUrl =

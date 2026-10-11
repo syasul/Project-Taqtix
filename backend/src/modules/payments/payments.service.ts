@@ -160,13 +160,14 @@ export class PaymentsService {
       this.configService.get<string>('DOKU_SECRET_KEY') ||
       this.configService.get<string>('PAYMENT_PROVIDER_SECRET') ||
       '';
+    const isBrnProdKey = clientId.startsWith('BRN-');
     const dokuEnv = (
       this.configService.get<string>('DOKU_ENV') ||
-      (this.configService.get<string>('NODE_ENV') === 'production'
+      (this.configService.get<string>('NODE_ENV') === 'production' || isBrnProdKey
         ? 'production'
         : 'sandbox')
     ).toLowerCase();
-    const isProduction = dokuEnv === 'production';
+    const isProduction = dokuEnv === 'production' || isBrnProdKey;
     const baseUrl = isProduction
       ? this.configService.get<string>('DOKU_BASE_URL_PRODUCTION') ||
         'https://api.doku.com'

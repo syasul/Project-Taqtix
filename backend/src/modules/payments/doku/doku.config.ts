@@ -31,12 +31,15 @@ export function getDokuConfig(configService?: ConfigService): DokuConfig {
     getVal('DOKU_CLIENT_ID') || getVal('PAYMENT_PROVIDER_KEY') || '';
   const secretKey =
     getVal('DOKU_SECRET_KEY') || getVal('PAYMENT_PROVIDER_SECRET') || '';
+
+  // Kredensial dengan prefix "BRN-" adalah Production Merchant ID resmi DOKU.
+  const isBrnProdKey = clientId.startsWith('BRN-');
   const envRaw = (
     getVal('DOKU_ENV') ||
-    (getVal('NODE_ENV') === 'production' ? 'production' : 'sandbox')
+    (getVal('NODE_ENV') === 'production' || isBrnProdKey ? 'production' : 'sandbox')
   ).toLowerCase();
   const env: 'sandbox' | 'production' =
-    envRaw === 'production' ? 'production' : 'sandbox';
+    envRaw === 'production' || isBrnProdKey ? 'production' : 'sandbox';
   const isProduction = env === 'production';
 
   const baseUrl = isProduction

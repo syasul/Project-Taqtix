@@ -86,20 +86,12 @@ export default function Header() {
             Contact
           </Link>
           <Link
-            href="/check-ticket"
+            href="/tickets"
             className="px-4 py-2 rounded-full transition-all duration-200 hover:text-[#08ADAE] hover:bg-black/[0.03] active:scale-95 flex items-center gap-1.5"
           >
             <Ticket className="w-3.5 h-3.5 text-[#08ADAE]" />
-            <span>Cek Tiket</span>
+            <span>Tiket Saya</span>
           </Link>
-          {user && (
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 rounded-full transition-all duration-200 text-[#08ADAE] font-semibold bg-[#08ADAE]/10 hover:bg-[#08ADAE]/20"
-            >
-              Tiket Saya
-            </Link>
-          )}
         </nav>
 
         {/* User Account & Actions */}
@@ -207,11 +199,11 @@ export default function Header() {
                   Contact
                 </Link>
                 <Link
-                  href="/check-ticket"
+                  href="/tickets"
                   className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-[#08ADAE]/10 hover:text-[#08ADAE] transition flex items-center gap-2"
                 >
                   <Ticket className="w-4 h-4 text-[#08ADAE]" />
-                  <span>Cek Tiket</span>
+                  <span>Tiket Saya</span>
                 </Link>
                 {user ? (
                   <>

@@ -284,13 +284,13 @@ function MarketplaceContent() {
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto pt-4 sm:pt-8 space-y-6">
           {recentOrder && (
             <Link
-              href="/check-ticket"
+              href="/tickets"
               className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#08ADAE]/10 border border-[#08ADAE]/30 text-[#08ADAE] hover:bg-[#08ADAE]/20 transition flex items-center gap-2 shadow-xs group"
             >
               <Ticket className="w-3.5 h-3.5" />
               <span>Kamu memiliki transaksi tiket di perangkat ini</span>
               <span className="underline group-hover:translate-x-0.5 transition-transform flex items-center">
-                Lihat E-Ticket
+                Lihat Semua Tiket
                 <ArrowRight className="w-3 h-3 ml-0.5 inline" />
               </span>
             </Link>

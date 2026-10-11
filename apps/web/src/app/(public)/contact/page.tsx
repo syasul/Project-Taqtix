@@ -45,8 +45,8 @@ export default function ContactPage() {
                 <Mail className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">Email Support</p>
-                  <a href="mailto:taqtix.id@gmail.com" className="hover:underline text-[#08B4B5]">
-                    taqtix.id@gmail.com
+                  <a href="mailto:halo@taqtix.id" className="hover:underline text-[#08B4B5]">
+                    halo@taqtix.id
                   </a>
                 </div>
               </div>
@@ -55,8 +55,8 @@ export default function ContactPage() {
                 <Phone className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-slate-800">WhatsApp Hotline</p>
-                  <a href="https://wa.me/6281244442474" target="_blank" rel="noreferrer" className="hover:underline text-[#08B4B5]">
-                    +62 81244442474
+                  <a href="https://wa.me/628158006658" target="_blank" rel="noreferrer" className="hover:underline text-[#08B4B5]">
+                    +62 815-800-6658
                   </a>
                 </div>
               </div>

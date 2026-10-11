@@ -28,19 +28,19 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 />
               </Link>
               <p className="text-sm text-slate-500 leading-relaxed max-w-sm">
-                Infrastruktur ticketing modern anti double-booking dengan pengiriman e-ticket WhatsApp otomatis dan verifikasi QR kilat untuk seluruh acara di Indonesia.
+                Cari konser, festival, workshop, olahraga, pertunjukan seni, dan berbagai pengalaman menarik lainnya. Temukan event favoritmu dan pesan tiketnya dengan mudah di TAQtix.
               </p>
               <div className="text-xs text-slate-500 space-y-1.5 pt-1">
                 <p>
                   <span className="font-semibold text-slate-700">Email:</span>{' '}
-                  <a href="mailto:taqtix.id@gmail.com" className="hover:text-[#08ADAE] transition-colors">
-                    taqtix.id@gmail.com
+                  <a href="mailto:halo@taqtix.id" className="hover:text-[#08ADAE] transition-colors">
+                    halo@taqtix.id
                   </a>
                 </p>
                 <p>
                   <span className="font-semibold text-slate-700">WhatsApp:</span>{' '}
-                  <a href="https://wa.me/6281244442474" target="_blank" rel="noopener noreferrer" className="hover:text-[#08ADAE] transition-colors">
-                    +62 81244442474
+                  <a href="https://wa.me/628158006658" target="_blank" rel="noopener noreferrer" className="hover:text-[#08ADAE] transition-colors">
+                    +62 815-800-6658
                   </a>
                 </p>
                 <p className="text-[11px] text-slate-400 leading-relaxed pt-0.5">
@@ -66,18 +66,38 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Konser" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
-                      Konser Musik
+                    <Link href="/?category=Konser%20%26%20Festival%20Musik" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Konser & Festival Musik
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Kajian" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
-                      Kajian & Halal Expo
+                    <Link href="/?category=Workshop%2C%20Seminar%20%26%20Konferensi" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Workshop, Seminar & Konferensi
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Workshop" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
-                      Workshop & Edukasi
+                    <Link href="/?category=Sport" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Sport
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/?category=Pertunjukan%20Seni%20%26%20Budaya" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Pertunjukan Seni & Budaya
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/?category=Event%20Komunitas%20%26%20Gathering" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Event Komunitas & Gathering
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/?category=Event%20Religi%20%26%20Sosial" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Event Religi & Sosial
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/?category=Pameran" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                      Pameran
                     </Link>
                   </li>
                 </ul>

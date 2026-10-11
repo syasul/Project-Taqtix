@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
   Calendar,
@@ -48,13 +49,14 @@ interface Event {
 
 // Kategori jumbotron
 const categories = [
-  'Semua',
-  'Konser',
-  'Kajian',
-  'Bazaar & Culinary',
-  'Art & Culture',
-  'Workshop',
+  'Semua Event',
+  'Konser & Festival Musik',
+  'Workshop, Seminar & Konferensi',
   'Sport',
+  'Pertunjukan Seni & Budaya',
+  'Event Komunitas & Gathering',
+  'Event Religi & Sosial',
+  'Pameran',
 ];
 
 const cities = [
@@ -72,10 +74,10 @@ const cities = [
 const heroBanners = [
   {
     id: 'bnr-1',
-    title: 'Taqwa Movement Concert 2026',
-    subtitle: 'Simfoni Religi Akbar & Kolaborasi Musisi Terkemuka Indonesia',
+    title: 'Jakarta Live Fest 2026',
+    subtitle: 'Simfoni Musik Akbar & Kolaborasi Musisi Terkemuka Indonesia',
     imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
-    targetUrl: '/event/taqwa-movement-2026',
+    targetUrl: '/event/jakarta-live-fest-2026',
     tag: 'EVENT PILIHAN',
     price: 'Mulai Rp 100.000',
     date: '12 September 2026',
@@ -83,10 +85,10 @@ const heroBanners = [
   },
   {
     id: 'bnr-2',
-    title: 'Festival Hijrah & Halal Expo 2026',
-    subtitle: 'Eksibisi Halal Lifestyle & Kuliner Terbesar Se-Indonesia',
+    title: 'Indonesia Creative & Culinary Expo 2026',
+    subtitle: 'Eksibisi Lifestyle & Kuliner Terbesar Se-Indonesia',
     imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-    targetUrl: '/event/fest-hijrah-halal-culinary-2026',
+    targetUrl: '/event/indo-creative-culinary-expo-2026',
     tag: 'BAZAAR & CULINARY',
     price: 'Mulai Rp 35.000',
     date: '20-22 November 2026',
@@ -109,11 +111,11 @@ const heroBanners = [
 const trustedPartners = [
   'Soundrenaline Waves',
   'Jakarta Music Fest',
-  'Hijrah Halal Expo',
+  'Indo Culinary Expo',
   'Indo Creative Summit',
   'Borobudur Marathon',
   'Java Jazz Festival',
-  'Svara Religi Concert',
+  'Nusantara Arts Fest',
   'Nusantara Coffee Week',
 ];
 
@@ -141,12 +143,22 @@ const faqs = [
   },
 ];
 
-export default function MarketplacePage() {
+function MarketplaceContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams?.get('category');
+
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Semua');
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'Semua Event');
   const [selectedCity, setSelectedCity] = useState('Semua Kota');
   const [activeBannerIdx, setActiveBannerIdx] = useState(0);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
+
+  // Sync category param from URL if changed
+  useEffect(() => {
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+  }, [categoryParam]);
 
   // Auto slide hero banner
   useEffect(() => {
@@ -175,38 +187,22 @@ export default function MarketplacePage() {
 
     if (!matchesSearch) return false;
 
-    if (selectedCategory === 'Semua') return true;
-    if (selectedCategory === 'Konser') {
+    if (selectedCategory === 'Semua Event' || selectedCategory === 'Semua') return true;
+    if (selectedCategory === 'Konser & Festival Musik' || selectedCategory === 'Konser') {
       return (
         e.title.toLowerCase().includes('concert') ||
-        e.title.toLowerCase().includes('sholawat') ||
-        e.title.toLowerCase().includes('simfoni') ||
-        e.title.toLowerCase().includes('musik')
+        e.title.toLowerCase().includes('konser') ||
+        e.title.toLowerCase().includes('musik') ||
+        e.title.toLowerCase().includes('music') ||
+        e.title.toLowerCase().includes('festival') ||
+        e.title.toLowerCase().includes('fest')
       );
     }
-    if (selectedCategory === 'Kajian') {
-      return e.title.toLowerCase().includes('kajian');
-    }
-    if (selectedCategory === 'Bazaar & Culinary') {
-      return (
-        e.title.toLowerCase().includes('culinary') ||
-        e.title.toLowerCase().includes('fest') ||
-        e.title.toLowerCase().includes('hijrah') ||
-        e.title.toLowerCase().includes('bazaar')
-      );
-    }
-    if (selectedCategory === 'Art & Culture') {
-      return (
-        e.title.toLowerCase().includes('art') ||
-        e.title.toLowerCase().includes('culture') ||
-        e.title.toLowerCase().includes('budaya') ||
-        e.title.toLowerCase().includes('seni') ||
-        e.title.toLowerCase().includes('pameran')
-      );
-    }
-    if (selectedCategory === 'Workshop') {
+    if (selectedCategory === 'Workshop, Seminar & Konferensi' || selectedCategory === 'Workshop') {
       return (
         e.title.toLowerCase().includes('workshop') ||
+        e.title.toLowerCase().includes('seminar') ||
+        e.title.toLowerCase().includes('konferensi') ||
         e.title.toLowerCase().includes('kelas') ||
         e.title.toLowerCase().includes('pelatihan')
       );
@@ -217,6 +213,41 @@ export default function MarketplacePage() {
         e.title.toLowerCase().includes('lari') ||
         e.title.toLowerCase().includes('marathon') ||
         e.title.toLowerCase().includes('olahraga')
+      );
+    }
+    if (selectedCategory === 'Pertunjukan Seni & Budaya' || selectedCategory === 'Art & Culture') {
+      return (
+        e.title.toLowerCase().includes('art') ||
+        e.title.toLowerCase().includes('culture') ||
+        e.title.toLowerCase().includes('budaya') ||
+        e.title.toLowerCase().includes('seni') ||
+        e.title.toLowerCase().includes('teater') ||
+        e.title.toLowerCase().includes('tari')
+      );
+    }
+    if (selectedCategory === 'Event Komunitas & Gathering') {
+      return (
+        e.title.toLowerCase().includes('komunitas') ||
+        e.title.toLowerCase().includes('gathering') ||
+        e.title.toLowerCase().includes('meetup') ||
+        e.title.toLowerCase().includes('community')
+      );
+    }
+    if (selectedCategory === 'Event Religi & Sosial' || selectedCategory === 'Kajian') {
+      return (
+        e.title.toLowerCase().includes('religi') ||
+        e.title.toLowerCase().includes('kajian') ||
+        e.title.toLowerCase().includes('sosial') ||
+        e.title.toLowerCase().includes('amal')
+      );
+    }
+    if (selectedCategory === 'Pameran' || selectedCategory === 'Bazaar & Culinary') {
+      return (
+        e.title.toLowerCase().includes('pameran') ||
+        e.title.toLowerCase().includes('expo') ||
+        e.title.toLowerCase().includes('bazaar') ||
+        e.title.toLowerCase().includes('culinary') ||
+        e.title.toLowerCase().includes('exhibition')
       );
     }
     return true;
@@ -240,9 +271,7 @@ export default function MarketplacePage() {
           {/* Liquid Glass Badge */}
           <div className="liquid-glass-pill px-4 py-1.5 rounded-full inline-flex items-center gap-2.5 text-xs font-semibold text-slate-700 shadow-xs">
             <span className="h-2 w-2 rounded-full bg-[#08ADAE] ring-4 ring-[#08ADAE]/20" />
-            <span>Platform Tiket Resmi & Terverifikasi</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500 font-medium">500+ Event Organizer</span>
+            <span>Temukan event seru di sekitarmu</span>
           </div>
 
           {/* Main Headline (Solid Colors) */}
@@ -253,7 +282,7 @@ export default function MarketplacePage() {
 
           {/* Subtitle */}
           <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
-            Infrastruktur ticketing modern dengan sistem anti double-booking real-time, pengiriman e-ticket otomatis ke WhatsApp, dan validasi gate scanner super kilat.
+            Cari konser, festival, workshop, olahraga, pertunjukan seni, dan berbagai pengalaman menarik lainnya. Temukan event favoritmu dan pesan tiketnya dengan mudah di TAQtix.
           </p>
 
           {/* Liquid Glass Unified Search Dock */}
@@ -262,7 +291,7 @@ export default function MarketplacePage() {
               <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
                 type="text"
-                placeholder="Cari nama konser, artis, workshop..."
+                placeholder="Cari konser, festival, workshop, olahraga, seni..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
@@ -345,7 +374,7 @@ export default function MarketplacePage() {
                     TAQtix Event Partner
                   </span>
                   <h4 className="text-base font-bold text-slate-900 leading-snug">
-                    Taqwa Movement Concert 2026
+                    Nusantara Live Music Festival 2026
                   </h4>
                   <div className="flex items-center gap-4 text-xs text-slate-600 pt-1">
                     <span className="flex items-center gap-1">
@@ -409,49 +438,49 @@ export default function MarketplacePage() {
                   Pengalaman Transaksi Bebas Masalah
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
-                  Platform kami dirancang untuk memastikan setiap detik proses pembelian hingga gate check-in berjalan lancar dan aman.
+                  TAQtix dirancang untuk memastikan setiap detik proses pembelian hingga gate check-in berjalan lancar dan aman.
                 </p>
               </div>
 
               <div className="space-y-3 pt-1">
                 <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
                   <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
-                    <Lock className="w-4 h-4" />
+                    <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
                     <h5 className="text-xs font-bold text-slate-900">
-                      Garansi Bebas Double Booking
+                      Tiket Resmi, Lebih Tenang
                     </h5>
                     <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                      Sistem locking kuota otomatis mengunci tiket yang dipilih selama sesi checkout pengguna.
+                      Beli tiket melalui kanal resmi event yang tersedia di TAQtix.
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
                   <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
-                    <MessageSquare className="w-4 h-4" />
+                    <Ticket className="w-4 h-4" />
                   </div>
                   <div>
                     <h5 className="text-xs font-bold text-slate-900">
-                      Pengiriman Barcode Langsung ke WhatsApp
+                      Tiket Digital, Praktis Diakses
                     </h5>
                     <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                      E-ticket resmi lengkap dengan QR code dikirim otomatis ke nomor pembeli tanpa harus cek spam email.
+                      Temukan tiket dan informasi akses setelah transaksi berhasil.
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
                   <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
-                    <Zap className="w-4 h-4" />
+                    <QrCode className="w-4 h-4" />
                   </div>
                   <div>
                     <h5 className="text-xs font-bold text-slate-900">
-                      Scanner Kru Cepat (&lt;0.4 Detik)
+                      Check-in Lebih Praktis
                     </h5>
                     <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                      Aplikasi scanner kru memverifikasi barcode secara presisi, memangkas antrean pengunjung di venue.
+                      Proses masuk event dengan sistem pemindaian tiket, jika fitur tersebut digunakan oleh penyelenggara.
                     </p>
                   </div>
                 </div>
@@ -583,7 +612,7 @@ export default function MarketplacePage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Temukan konser musik, festival, kajian, dan workshop di kota pilihan Anda.
+              Temukan konser musik, festival, workshop, olahraga, dan seni di kota pilihan Anda.
             </p>
           </div>
 
@@ -886,7 +915,7 @@ export default function MarketplacePage() {
               Siap Menghadiri Acara Impian Anda?
             </h2>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              Jelajahi konser musik, festival kuliner, kajian akbar, dan workshop terbaik sekarang. Atau daftarkan acaramu sendiri sebagai Event Organizer.
+              Jelajahi konser musik, festival, workshop, olahraga, pertunjukan seni, dan pameran terbaik sekarang. Atau daftarkan acaramu sendiri sebagai Event Organizer.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -911,5 +940,13 @@ export default function MarketplacePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function MarketplacePage() {
+  return (
+    <Suspense fallback={null}>
+      <MarketplaceContent />
+    </Suspense>
   );
 }

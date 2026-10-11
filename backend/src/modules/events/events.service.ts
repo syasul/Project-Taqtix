@@ -94,9 +94,7 @@ export class EventsService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException(
-        'Akses ditolak: Anda bukan pemilik event ini',
-      );
+      throw new NotFoundException('Event tidak ditemukan');
     }
 
     const updateData: any = {};
@@ -158,9 +156,7 @@ export class EventsService {
     }
 
     if (event.organizerId !== organizer.id) {
-      throw new ForbiddenException(
-        'Akses ditolak: Anda bukan pemilik event ini',
-      );
+      throw new NotFoundException('Event tidak ditemukan');
     }
 
     return this.prisma.event.update({

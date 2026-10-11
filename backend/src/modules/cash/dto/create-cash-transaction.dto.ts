@@ -19,6 +19,7 @@ export class CreateCashTransactionDto {
   @ApiProperty({ description: 'Nominal kas (Rupiah)' })
   @IsNumber()
   @Min(0)
+  
   amount: number;
 
   @ApiPropertyOptional({ description: 'ID order terkait jika ada' })

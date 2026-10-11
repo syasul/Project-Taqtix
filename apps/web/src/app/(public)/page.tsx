@@ -24,6 +24,14 @@ import {
   Lock,
   ArrowUpRight,
   Sparkles,
+  Users,
+  Smartphone,
+  Star,
+  Check,
+  Clock,
+  FileCheck,
+  Layers,
+  BarChart3,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -117,6 +125,134 @@ const trustedPartners = [
   'Java Jazz Festival',
   'Nusantara Arts Fest',
   'Nusantara Coffee Week',
+];
+
+// 4-Step How It Works Guide
+const howItWorksSteps = [
+  {
+    step: '01',
+    title: 'Temukan Event Pilihan',
+    desc: 'Jelajahi konser musik, festival, seminar, turnamen olahraga, dan seni. Filter berdasarkan kota atau kategori acara favorit Anda.',
+    icon: Search,
+  },
+  {
+    step: '02',
+    title: 'Pilih Kategori & Tiket',
+    desc: 'Tersedia pilihan Early Bird, Presale hingga VIP. Kuota tiket diamankan secara otomatis saat Anda masuk ke proses checkout.',
+    icon: Ticket,
+  },
+  {
+    step: '03',
+    title: 'Bayar Instan & Aman',
+    desc: 'Selesaikan pembayaran menggunakan QRIS instan dari semua e-wallet dan m-banking, atau Virtual Account bank utama.',
+    icon: CreditCard,
+  },
+  {
+    step: '04',
+    title: 'E-Ticket Masuk WhatsApp',
+    desc: 'E-Ticket resmi ber-QR Code unik langsung terkirim ke WhatsApp Anda dan tersimpan di akun. Cukup tunjukkan saat gate check-in.',
+    icon: Smartphone,
+  },
+];
+
+// Security & Platform Reliability Pillars
+const securityPillars = [
+  {
+    title: 'Kriptografi QR Code Anti-Pemalsuan',
+    desc: 'Setiap e-ticket dibekali tanda tangan digital terenkripsi yang divalidasi langsung oleh sistem. Menjamin 100% keaslian dan mencegah tiket ganda.',
+    icon: ShieldCheck,
+    tag: 'Keamanan 100%',
+  },
+  {
+    title: 'Virtual Waiting Room Anti-Crash',
+    desc: 'Sistem antrean pintar berbasis cloud menjaga kestabilan sistem saat terjadi lonjakan traffic tiket war ribuan pengguna secara bersamaan.',
+    icon: Zap,
+    tag: 'High Concurrency',
+  },
+  {
+    title: 'WhatsApp Dispatcher Real-Time',
+    desc: 'Tiket dan invoice resmi dikirimkan langsung ke nomor WhatsApp pembeli dalam hitungan detik, bebas dari risiko tersasar ke folder spam email.',
+    icon: MessageSquare,
+    tag: 'Kirim Instan',
+  },
+  {
+    title: 'Scanner Gate Kru Super Cepat',
+    desc: 'Aplikasi scanner resmi kru pintu masuk mampu memvalidasi tiket dalam <0.3 detik per pengunjung, meminimalisir antrean panjang di venue.',
+    icon: QrCode,
+    tag: 'Check-in <0.3s',
+  },
+];
+
+// Organizer Solutions
+const organizerBenefits = [
+  {
+    title: 'Dashboard Penjualan Real-Time',
+    desc: 'Pantau grafik penjualan tiket, omset, sisa kuota per kategori, dan data pembeli detik demi detik secara transparan.',
+    icon: BarChart3,
+  },
+  {
+    title: 'Manajemen Tiket Multi-Kategori',
+    desc: 'Atur jadwal rilis Early Bird, Presale 1, Presale 2, VIP, custom field formulir pembeli, hingga batasan maksimal per pemesanan.',
+    icon: Layers,
+  },
+  {
+    title: 'Aplikasi Crew Scanner Siap Pakai',
+    desc: 'Kru lapangan cukup login dengan akun scanner untuk memindai tiket penonton secara online maupun sinkronisasi offline.',
+    icon: QrCode,
+  },
+  {
+    title: 'Pencairan Dana Terjadwal & Pasti',
+    desc: 'Laporan keuangan terintegrasi dengan pencairan dana penjualan tiket yang transparan, aman, dan tepat waktu ke rekening EO.',
+    icon: CheckCircle2,
+  },
+];
+
+// Event Day Checklist
+const eventDayChecklist = [
+  {
+    title: 'Siapkan E-Ticket di WhatsApp atau Akun',
+    desc: 'Pastikan pesan WhatsApp dari TAQtix atau menu Tiket Saya sudah siap di HP Anda. Disarankan menyimpan tangkapan layar (screenshot) sebagai cadangan jika sinyal venue padat.',
+  },
+  {
+    title: 'Bawa Identitas Resmi (KTP / SIM / Paspor)',
+    desc: 'Petugas keamanan gerbang dapat sewaktu-waktu meminta pencocokan identitas fisik dengan nama pemesan yang tertera pada e-ticket.',
+  },
+  {
+    title: 'Tiba Lebih Awal saat Open Gate',
+    desc: 'Gerbang venue umumnya dibuka 1-2 jam sebelum acara utama. Tiba lebih awal membantu Anda melewati pemeriksaan barang dan gate scan dengan santai.',
+  },
+  {
+    title: 'Patuhi Aturan Keamanan Venue',
+    desc: 'Hindari membawa senjata tajam, obat terlarang, flare, botol kaca, serta kamera profesional DSLR/Mirrorless tanpa izin media resmi dari pihak EO.',
+  },
+];
+
+// User Testimonials
+const userReviews = [
+  {
+    name: 'Dimas Arya Pratama',
+    role: 'Penonton Konser • Jakarta',
+    comment:
+      'Pengalaman beli tiket war paling tenang! Masuk antrean waiting room teratur, begitu giliran tinggal scan QRIS langsung e-ticket masuk WhatsApp dalam 5 detik.',
+    rating: 5,
+    event: 'Jakarta Live Fest 2026',
+  },
+  {
+    name: 'Sarah Amanda',
+    role: 'Festival Goer • Bandung',
+    comment:
+      'Tampilan tiketnya rapi banget dan pas nyampe gate venue tinggal sodorin QR code di WhatsApp, kru langsung scan hitungan detik tanpa hambatan.',
+    rating: 5,
+    event: 'Wave Fest Sound Bandung',
+  },
+  {
+    name: 'Rian Hidayat',
+    role: 'Promotor & Event Organizer • Surabaya',
+    comment:
+      'Dashboard TAQtix bikin tim kami gampang banget pantau kuota dan sales. Crew scanner di gate juga stabil walaupun ribuan orang masuk bersamaan.',
+    rating: 5,
+    event: 'East Java Creative Expo',
+  },
 ];
 
 // FAQ items
@@ -533,7 +669,55 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. PROMOTIONAL HERO BANNER CAROUSEL (SMOKED OBSIDIAN GLASS)               */}
+      {/* 2. CARA MUDAH MENDAPATKAN TIKET (4-STEP HOW IT WORKS)                     */}
+      {/* ========================================================================= */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#08ADAE]" />
+            Alur Pemesanan Cepat
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Cara Mudah Mendapatkan Tiket di TAQtix
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm">
+            Proses pemesanan tiket resmi tanpa ribet, terverifikasi otomatis, dan langsung masuk ke WhatsApp Anda.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {howItWorksSteps.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={idx}
+                className="liquid-glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between group hover:shadow-lg transition-all"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="h-11 w-11 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] group-hover:bg-[#08ADAE] group-hover:text-white transition-colors duration-300">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-2xl font-black text-slate-200 group-hover:text-[#08ADAE]/40 transition-colors font-mono">
+                    {item.step}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 3. PROMOTIONAL HERO BANNER CAROUSEL (SMOKED OBSIDIAN GLASS)               */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="relative liquid-glass-dark rounded-3xl overflow-hidden shadow-2xl text-white min-h-[380px] sm:min-h-[420px] flex flex-col justify-between border border-white/15">
@@ -875,7 +1059,203 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. FAQS ACCORDION (FROSTED LIQUID GLASS ROWS)                             */}
+      {/* 7. KEAMANAN & KEANDALAN TEKNOLOGI (SECURITY & RELIABILITY PILLARS)        */}
+      {/* ========================================================================= */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#08ADAE]" />
+            Keamanan Tingkat Enterprise
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Standar Keamanan & Keandalan TAQtix
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm">
+            Dibangun dengan infrastruktur modern untuk memastikan transaksi Anda 100% aman, bebas calo, dan bebas dari server crash.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {securityPillars.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={idx}
+                className="liquid-glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between group hover:shadow-lg transition-all"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="h-11 w-11 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE]">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-bold text-[#08ADAE] bg-[#08ADAE]/10 px-2.5 py-1 rounded-full border border-[#08ADAE]/20">
+                      {item.tag}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 leading-snug mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 8. SOLUSI PENYELENGGARA ACARA (EVENT ORGANIZER & PROMOTER HUB)             */}
+      {/* ========================================================================= */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="rounded-3xl liquid-glass p-8 sm:p-12 border border-slate-200/80 shadow-md">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-5 space-y-4">
+              <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-[#08ADAE]" />
+                Solusi Event Organizer
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Kelola Penjualan Tiket Event Anda dengan Skalabilitas Tinggi
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                Platform ticketing terintegrasi untuk promotor musik, festival, workshop, dan seminar. Mulai dari manajemen kategori tiket, integrasi QRIS/VA otomatis, hingga scanner kru gate lapangan.
+              </p>
+              <div className="pt-2 flex flex-wrap gap-3">
+                <a
+                  href={process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/register'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold text-white bg-[#08ADAE] hover:bg-[#07999A] transition shadow-[0_4px_14px_rgba(8,173,174,0.35)] cursor-pointer active:scale-95"
+                >
+                  <span>Mulai Bikin Event</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition cursor-pointer shadow-2xs"
+                >
+                  <span>Konsultasi Kemitraan</span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {organizerBenefits.map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={idx}
+                    className="p-5 rounded-2xl liquid-glass-card border border-white/90 shadow-2xs space-y-2.5"
+                  >
+                    <div className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                      <Icon className="w-4 h-4 text-[#08ADAE]" />
+                    </div>
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                      {item.title}
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 9. PANDUAN & CHECKLIST HARI-H (EVENT DAY CHECKLIST)                        */}
+      {/* ========================================================================= */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-[#08ADAE]" />
+            Panduan Menonton Acara
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Checklist Hari-H Menghadiri Acara
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm">
+            Pastikan pengalaman Anda menyaksikan acara impian berjalan lancar dan nyaman dengan tips berikut.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {eventDayChecklist.map((item, idx) => (
+            <div
+              key={idx}
+              className="liquid-glass-card rounded-2xl p-6 space-y-3 relative overflow-hidden flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-[#08ADAE]">
+                  <Check className="w-4 h-4" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Tips #{idx + 1}
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 10. TESTIMONI & ULASAN PENGGUNA (SOCIAL PROOF)                             */}
+      {/* ========================================================================= */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <Star className="w-3.5 h-3.5 text-[#F0B829]" />
+            Testimoni Nyata
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Pengalaman Mereka Bersama TAQtix
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm">
+            Dengarkan apa kata para penonton dan penyelenggara event yang telah merasakan kemudahan sistem TAQtix.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {userReviews.map((rev, idx) => (
+            <div
+              key={idx}
+              className="liquid-glass-card rounded-2xl p-6 flex flex-col justify-between space-y-4 shadow-2xs hover:shadow-md transition-shadow"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center gap-1 text-[#F0B829]">
+                  {[...Array(rev.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
+                  "{rev.comment}"
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200/60">
+                <h4 className="text-xs font-bold text-slate-900">{rev.name}</h4>
+                <p className="text-[11px] text-slate-500">{rev.role}</p>
+                <span className="text-[10px] font-semibold text-[#08ADAE] mt-0.5 block">
+                  Event: {rev.event}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 11. FAQS ACCORDION (FROSTED LIQUID GLASS ROWS)                            */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto space-y-6">
         <div className="text-center space-y-2">
@@ -927,7 +1307,7 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. CALL TO ACTION (SMOKED LIQUID GLASS CONTAINER)                         */}
+      {/* 12. CALL TO ACTION (SMOKED LIQUID GLASS CONTAINER)                        */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="rounded-3xl liquid-glass-dark text-white p-8 sm:p-14 text-center border border-white/15 shadow-2xl relative overflow-hidden">

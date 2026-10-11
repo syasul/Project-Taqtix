@@ -200,9 +200,8 @@ export default function AllTicketsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-radial from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-10 text-white shadow-xl border border-white/10">
-        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#08ADAE]/20 blur-3xl pointer-events-none" />
+      {/* Header Banner (Solid Professional Dark) */}
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-10 text-white shadow-xl">
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#08ADAE] bg-[#08ADAE]/10 border border-[#08ADAE]/30">
             <Ticket className="w-3.5 h-3.5" />
@@ -226,7 +225,7 @@ export default function AllTicketsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari via No WhatsApp (08...), Email, atau Order ID..."
-                className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-white placeholder-slate-400 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#08ADAE] focus:bg-white/15 transition"
+                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition"
               />
             </div>
             <Button

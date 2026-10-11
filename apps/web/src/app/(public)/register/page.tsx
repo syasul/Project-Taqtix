@@ -153,7 +153,7 @@ function RegisterForm() {
                 type="email"
                 placeholder="nama@email.com"
                 {...register('email')}
-                className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs font-medium"
               />
             </div>
             {errors.email && (
@@ -177,7 +177,7 @@ function RegisterForm() {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Minimal 6 karakter"
                 {...register('password')}
-                className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
+                className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs font-medium"
               />
               <button
                 type="button"
@@ -208,7 +208,7 @@ function RegisterForm() {
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Ulangi kata sandi"
                 {...register('confirmPassword')}
-                className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:ring-2 focus:ring-[#08B4B5]/20 transition-all text-xs font-medium"
+                className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs font-medium"
               />
               <button
                 type="button"

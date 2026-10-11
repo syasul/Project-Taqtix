@@ -95,7 +95,7 @@ export default function Checkout() {
                     value={buyerName}
                     onChange={(e) => setBuyerName(e.target.value)}
                     placeholder="Sesuai kartu identitas"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08B4B5] focus:outline-none focus:ring-2 focus:ring-[#08B4B5]/20 text-xs font-medium"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08ADAE] focus:outline-none focus:ring-0 text-xs font-medium transition-colors"
                   />
                 </div>
 
@@ -110,7 +110,7 @@ export default function Checkout() {
                     value={buyerEmail}
                     onChange={(e) => setBuyerEmail(e.target.value)}
                     placeholder="e-ticket akan dikirim ke email ini"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08B4B5] focus:outline-none focus:ring-2 focus:ring-[#08B4B5]/20 text-xs font-medium"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08ADAE] focus:outline-none focus:ring-0 text-xs font-medium transition-colors"
                   />
                 </div>
 
@@ -125,7 +125,7 @@ export default function Checkout() {
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
                       placeholder="PROMO10"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08B4B5] focus:outline-none focus:ring-2 focus:ring-[#08B4B5]/20 text-xs font-mono uppercase"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08ADAE] focus:outline-none focus:ring-0 text-xs font-mono uppercase transition-colors"
                     />
                   </div>
                   <div>
@@ -138,7 +138,7 @@ export default function Checkout() {
                       value={affiliateCode}
                       onChange={(e) => setAffiliateCode(e.target.value)}
                       placeholder="PARTNERX"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08B4B5] focus:outline-none focus:ring-2 focus:ring-[#08B4B5]/20 text-xs font-mono uppercase"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 focus:border-[#08ADAE] focus:outline-none focus:ring-0 text-xs font-mono uppercase transition-colors"
                     />
                   </div>
                 </div>

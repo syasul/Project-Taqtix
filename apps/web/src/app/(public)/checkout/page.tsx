@@ -716,7 +716,7 @@ function CheckoutContent() {
                         <FormControl>
                           <Input
                             placeholder="Contoh: Budi Santoso"
-                            className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
+                            className="bg-white border-slate-200 text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] focus-visible:outline-none focus-visible:ring-0 focus-visible:border-[#08ADAE]"
                             {...field}
                           />
                         </FormControl>
@@ -736,7 +736,7 @@ function CheckoutContent() {
                             <Input
                               placeholder="budi@contoh.com"
                               type="email"
-                              className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] focus-visible:outline-none focus-visible:ring-0 focus-visible:border-[#08ADAE]"
                               {...field}
                             />
                           </FormControl>
@@ -754,7 +754,7 @@ function CheckoutContent() {
                           <FormControl>
                             <Input
                               placeholder="Contoh: 081234567890"
-                              className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] focus-visible:outline-none focus-visible:ring-0 focus-visible:border-[#08ADAE]"
                               {...field}
                             />
                           </FormControl>
@@ -808,7 +808,7 @@ function CheckoutContent() {
                                     [cf.id]: e.target.checked ? 'true' : 'false',
                                   })
                                 }
-                                className="h-4 w-4 rounded border-slate-300 text-[#08B4B5] focus:ring-[#08B4B5] cursor-pointer"
+                                className="h-4 w-4 rounded border-slate-300 accent-[#08ADAE] focus:ring-0 focus:outline-none cursor-pointer"
                               />
                               <label
                                 htmlFor={`cf-${cf.id}`}
@@ -832,7 +832,7 @@ function CheckoutContent() {
                                 setCustomAnswers({ ...customAnswers, [cf.id]: e.target.value })
                               }
                               placeholder={`Masukkan ${cf.label}`}
-                              className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20"
+                              className="bg-white border-slate-200 text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] focus-visible:outline-none focus-visible:ring-0 focus-visible:border-[#08ADAE]"
                             />
                           )}
                         </div>
@@ -927,7 +927,7 @@ function CheckoutContent() {
                             <FormControl>
                               <Input
                                 placeholder="Contoh: DISKON10"
-                                className="bg-white border-slate-200 text-slate-800 focus:border-[#08B4B5] focus:ring-[#08B4B5]/20 uppercase"
+                                className="bg-white border-slate-200 text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] focus-visible:outline-none focus-visible:ring-0 focus-visible:border-[#08ADAE] uppercase"
                                 {...field}
                               />
                             </FormControl>
@@ -1069,87 +1069,75 @@ function CheckoutContent() {
         </div>
       </div>
 
-      {/* VIRTUAL WAITING ROOM MODAL (REDIS HIGH-CONCURRENCY QUEUE) */}
+      {/* VIRTUAL WAITING ROOM MODAL (CLEAN & PROFESSIONAL - NO AI GRADIENTS) */}
       {waitingRoom && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="relative w-full max-w-lg rounded-3xl bg-slate-900/95 border border-slate-700/60 shadow-[0_25px_60px_-15px_rgba(8,180,181,0.3)] p-6 sm:p-8 text-white overflow-hidden backdrop-filter">
-            {/* Ambient glowing orbs */}
-            <div className="absolute -top-24 -right-24 w-60 h-60 bg-[#08B4B5]/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 text-slate-900 overflow-hidden">
             {/* Content Container */}
-            <div className="relative z-10 flex flex-col items-center text-center space-y-5">
-              {/* Animated Status Radar / Icon */}
-              <div className="relative flex items-center justify-center pt-2">
+            <div className="flex flex-col items-center text-center space-y-4">
+              {/* Status Icon */}
+              <div className="flex items-center justify-center pt-1">
                 {waitingRoom.status === 'COMPLETED' ? (
-                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                    <CheckCircle2 className="w-10 h-10 animate-bounce" />
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                    <CheckCircle2 className="w-8 h-8" />
                   </div>
                 ) : waitingRoom.status === 'FAILED' ? (
-                  <div className="w-20 h-20 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
-                    <AlertCircle className="w-10 h-10" />
+                  <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+                    <AlertCircle className="w-8 h-8" />
                   </div>
                 ) : (
-                  <div className="relative w-20 h-20 flex items-center justify-center">
-                    <span className="absolute inset-0 rounded-2xl bg-[#08B4B5]/20 animate-ping" />
-                    <span className="absolute inset-1 rounded-2xl bg-[#08B4B5]/30 animate-pulse" />
-                    <div className="relative w-20 h-20 rounded-2xl bg-slate-800/90 border border-[#08B4B5]/40 flex items-center justify-center text-[#08B4B5] shadow-lg shadow-[#08B4B5]/20">
-                      <Loader2 className="w-9 h-9 animate-spin text-[#08B4B5]" />
-                    </div>
+                  <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#08ADAE]">
+                    <Loader2 className="w-7 h-7 animate-spin text-[#08ADAE]" />
                   </div>
                 )}
               </div>
 
               {/* Status Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-white/10 text-xs font-semibold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold">
                 {waitingRoom.status === 'COMPLETED' ? (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-emerald-300">Tiket Berhasil Diamankan!</span>
-                  </>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-0.5 rounded-full">
+                    Tiket Berhasil Diamankan
+                  </span>
                 ) : waitingRoom.status === 'FAILED' ? (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-rose-400" />
-                    <span className="text-rose-300">Antrean Selesai - Gagal</span>
-                  </>
+                  <span className="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-0.5 rounded-full">
+                    Antrean Selesai - Gagal
+                  </span>
                 ) : waitingRoom.status === 'PROCESSING' ? (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                    <span className="text-amber-300">Sedang Memvalidasi & Mengunci Kuota...</span>
-                  </>
+                  <span className="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-0.5 rounded-full">
+                    Sedang Memvalidasi Kuota...
+                  </span>
                 ) : (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-[#08B4B5] animate-ping" />
-                    <span className="text-[#08B4B5]">Ruang Tunggu Virtual TAQtix</span>
-                  </>
+                  <span className="bg-slate-100 text-slate-700 border border-slate-200 px-3 py-0.5 rounded-full">
+                    Ruang Tunggu Antrean
+                  </span>
                 )}
               </div>
 
               {/* Title & Description */}
-              <div className="space-y-1.5">
-                <h2 className="text-2xl font-black tracking-tight text-white">
+              <div className="space-y-1">
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight">
                   {waitingRoom.status === 'COMPLETED'
                     ? 'Giliran Anda Tiba!'
                     : waitingRoom.status === 'FAILED'
                     ? 'Pesanan Belum Berhasil'
-                    : 'Anda Berada di Ruang Tunggu'}
+                    : 'Anda Berada di Antrean'}
                 </h2>
-                <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+                <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
                   {waitingRoom.status === 'COMPLETED'
-                    ? 'Tiket Anda berhasil diamankan. Mengalihkan Anda ke halaman pembayaran dalam sekejap...'
+                    ? 'Tiket berhasil diamankan. Mengalihkan Anda ke halaman pembayaran...'
                     : waitingRoom.status === 'FAILED'
-                    ? waitingRoom.error || 'Tiket telah habis terjual selagi antrean Anda diproses.'
-                    : 'Sistem antrean berkecepatan tinggi mengamankan pesanan Anda secara berurutan dan adil (First-Come, First-Served).'}
+                    ? waitingRoom.error || 'Tiket telah habis terjual selagi antrean diproses.'
+                    : 'Pesanan diproses secara berurutan dan adil (First-Come, First-Served).'}
                 </p>
               </div>
 
-              {/* Big Queue Number Card */}
+              {/* Queue Number Card */}
               {waitingRoom.status !== 'FAILED' && (
-                <div className="w-full bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 space-y-3">
-                  <div className="flex items-center justify-between text-xs text-slate-400">
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <Users className="w-3.5 h-3.5 text-[#08B4B5]" />
-                      Nomor Antrean Anda
+                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-left">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="flex items-center gap-1.5 font-semibold text-slate-700">
+                      <Users className="w-3.5 h-3.5 text-[#08ADAE]" />
+                      Nomor Antrean
                     </span>
                     <span className="font-mono text-[11px] text-slate-400">
                       {waitingRoom.status === 'COMPLETED'
@@ -1158,22 +1146,22 @@ function CheckoutContent() {
                     </span>
                   </div>
 
-                  <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#08B4B5] via-teal-300 to-emerald-400 tracking-tight font-mono">
+                  <div className="flex items-baseline justify-center gap-1.5 py-1">
+                    <span className="text-4xl font-black text-slate-900 font-mono tracking-tight">
                       {waitingRoom.status === 'COMPLETED' ? '#0' : `#${waitingRoom.position}`}
                     </span>
                     {waitingRoom.status === 'QUEUED' && (
                       <span className="text-xs text-slate-400 font-mono">
-                        / awal #{waitingRoom.initialPosition}
+                        / #{waitingRoom.initialPosition}
                       </span>
                     )}
                   </div>
 
-                  {/* Dynamic Progress Bar */}
-                  <div className="space-y-1.5 pt-1">
-                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden relative">
+                  {/* Progress Bar (Solid Color - No Gradient) */}
+                  <div className="space-y-1">
+                    <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#08B4B5] to-emerald-400 transition-all duration-700 ease-out rounded-full"
+                        className="h-full bg-[#08ADAE] transition-all duration-500 ease-out rounded-full"
                         style={{
                           width: `${
                             waitingRoom.status === 'COMPLETED'
@@ -1193,19 +1181,16 @@ function CheckoutContent() {
                         }}
                       />
                     </div>
-                    <div className="flex justify-between items-center text-[11px] text-slate-400">
+                    <div className="flex justify-between items-center text-[11px] text-slate-500">
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-[#08B4B5]" />
-                        Estimasi waktu:{' '}
-                        <strong className="text-slate-200">
-                          ~{waitingRoom.estimatedWaitSeconds} detik
-                        </strong>
+                        <Clock className="w-3 h-3 text-[#08ADAE]" />
+                        Estimasi: <strong>~{waitingRoom.estimatedWaitSeconds} detik</strong>
                       </span>
-                      <span className="text-slate-400 font-mono">
+                      <span>
                         {waitingRoom.status === 'PROCESSING'
                           ? 'Memproses...'
                           : waitingRoom.status === 'COMPLETED'
-                          ? '100% Selesai'
+                          ? 'Selesai'
                           : 'Dalam antrean'}
                       </span>
                     </div>
@@ -1213,18 +1198,13 @@ function CheckoutContent() {
                 </div>
               )}
 
-              {/* Warning & Instructions */}
+              {/* Information Notice */}
               {waitingRoom.status !== 'COMPLETED' && waitingRoom.status !== 'FAILED' && (
-                <div className="w-full rounded-xl bg-slate-800/40 border border-slate-700/50 p-3.5 text-left flex items-start gap-3">
-                  <ShieldCheck className="w-4 h-4 text-[#08B4B5] shrink-0 mt-0.5" />
-                  <div className="space-y-0.5 text-xs text-slate-300">
-                    <p className="font-semibold text-slate-100">
-                      Jangan refresh atau tinggalkan halaman ini
-                    </p>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Antrean Anda dikelola langsung oleh Redis Queue Engine. Anda akan dialihkan otomatis ke halaman pembayaran saat giliran Anda selesai.
-                    </p>
-                  </div>
+                <div className="w-full rounded-xl bg-slate-50 border border-slate-200 p-3 text-left flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-[#08ADAE] shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Mohon jangan tutup atau muat ulang halaman ini. Sistem akan mengarahkan Anda ke pembayaran otomatis.
+                  </p>
                 </div>
               )}
 
@@ -1234,7 +1214,7 @@ function CheckoutContent() {
                   <Button
                     type="button"
                     onClick={() => setWaitingRoom(null)}
-                    className="w-full bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold rounded-xl py-2.5 border-0 cursor-pointer"
+                    className="w-full bg-[#08ADAE] hover:bg-[#07999A] text-slate-950 font-bold rounded-xl py-2.5 cursor-pointer shadow-xs"
                   >
                     Coba Kategori / Tiket Lain
                   </Button>
@@ -1242,7 +1222,7 @@ function CheckoutContent() {
                     type="button"
                     variant="outline"
                     onClick={() => router.push(eventId ? `/events/${eventId}` : '/')}
-                    className="w-full border-slate-700 text-slate-300 hover:bg-slate-800 rounded-xl py-2 cursor-pointer"
+                    className="w-full border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl py-2 cursor-pointer"
                   >
                     Kembali ke Detail Event
                   </Button>

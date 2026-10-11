@@ -96,7 +96,7 @@ export default function ContactPage() {
                   <input
                     id="name"
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs"
                     placeholder="Contoh: Ahmad Fauzi"
                     required
                   />
@@ -106,7 +106,7 @@ export default function ContactPage() {
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs"
                     placeholder="Contoh: fauzi@email.com"
                     required
                   />
@@ -117,7 +117,7 @@ export default function ContactPage() {
                 <label htmlFor="subject" className="text-xs font-semibold text-slate-700">Subjek Kategori</label>
                 <select
                   id="subject"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs cursor-pointer"
                   required
                 >
                   <option value="tiket">Masalah Pembelian Tiket & Pembayaran</option>
@@ -132,7 +132,7 @@ export default function ContactPage() {
                 <textarea
                   id="message"
                   rows={5}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:border-[#08B4B5] focus:outline-none text-xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs"
                   placeholder="Tuliskan keluhan atau pertanyaan Anda secara lengkap di sini..."
                   required
                 ></textarea>
@@ -141,7 +141,7 @@ export default function ContactPage() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm border-0"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm border-0 active:scale-95"
                 >
                   <span>Kirim Pesan</span>
                   <Send className="h-4 w-4" />

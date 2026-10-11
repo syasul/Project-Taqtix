@@ -152,6 +152,20 @@ function MarketplaceContent() {
   const [selectedCity, setSelectedCity] = useState('Semua Kota');
   const [activeBannerIdx, setActiveBannerIdx] = useState(0);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
+  const [recentOrder, setRecentOrder] = useState<{ orderId: string; timestamp: number } | null>(null);
+
+  // Check recent order in localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('taqtix_recent_order');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Date.now() - parsed.timestamp < 3 * 24 * 60 * 60 * 1000) {
+          setRecentOrder(parsed);
+        }
+      }
+    } catch {}
+  }, []);
 
   // Sync category param from URL if changed
   useEffect(() => {
@@ -268,6 +282,20 @@ function MarketplaceContent() {
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto pt-4 sm:pt-8 space-y-6">
+          {recentOrder && (
+            <Link
+              href="/check-ticket"
+              className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#08ADAE]/10 border border-[#08ADAE]/30 text-[#08ADAE] hover:bg-[#08ADAE]/20 transition flex items-center gap-2 shadow-xs group"
+            >
+              <Ticket className="w-3.5 h-3.5" />
+              <span>Kamu memiliki transaksi tiket di perangkat ini</span>
+              <span className="underline group-hover:translate-x-0.5 transition-transform flex items-center">
+                Lihat E-Ticket
+                <ArrowRight className="w-3 h-3 ml-0.5 inline" />
+              </span>
+            </Link>
+          )}
+
           {/* Liquid Glass Badge */}
           <div className="liquid-glass-pill px-4 py-1.5 rounded-full inline-flex items-center gap-2.5 text-xs font-semibold text-slate-700 shadow-xs">
             <span className="h-2 w-2 rounded-full bg-[#08ADAE] ring-4 ring-[#08ADAE]/20" />

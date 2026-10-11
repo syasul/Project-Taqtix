@@ -8,6 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TicketsModule = void 0;
 const common_1 = require("@nestjs/common");
+const bull_1 = require("@nestjs/bull");
+const config_1 = require("@nestjs/config");
 const tickets_service_1 = require("./tickets.service");
 const tickets_controller_1 = require("./tickets.controller");
 let TicketsModule = class TicketsModule {
@@ -15,6 +17,12 @@ let TicketsModule = class TicketsModule {
 exports.TicketsModule = TicketsModule;
 exports.TicketsModule = TicketsModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            bull_1.BullModule.registerQueue({
+                name: 'notifications',
+            }),
+            config_1.ConfigModule,
+        ],
         controllers: [tickets_controller_1.TicketsController],
         providers: [tickets_service_1.TicketsService],
         exports: [tickets_service_1.TicketsService],

@@ -4,6 +4,9 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bullmq';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTicketCategoryDto } from './dto/create-ticket-category.dto';
 import { UpdateTicketCategoryDto } from './dto/update-ticket-category.dto';
@@ -12,7 +15,11 @@ import { ValidatePromoCodeDto } from './dto/validate-promo-code.dto';
 
 @Injectable()
 export class TicketsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @InjectQueue('notifications') private notificationsQueue: Queue,
+    private configService: ConfigService,
+  ) {}
 
   /**
    * Helper untuk memastikan pengguna adalah pemilik event terkait.
@@ -308,6 +315,157 @@ export class TicketsService {
       eventTitle: ticket.event.title,
       signedQrPayload: ticket.qrPayload,
     }));
+  }
+
+  /**
+   * Mencari daftar tiket pembeli berdasarkan Email, Nomor WhatsApp, atau ID Pesanan (Guest/Public).
+   */
+  async lookupTickets(identifier: string) {
+    const trimmed = (identifier || '').trim();
+    if (!trimmed || trimmed.length < 3) {
+      throw new BadRequestException(
+        'Masukkan nomor WhatsApp, Email, atau ID Pesanan yang valid (minimal 3 karakter).',
+      );
+    }
+
+    const cleanPhone = trimmed.replace(/[^0-9]/g, '');
+
+    const tickets = await this.prisma.ticket.findMany({
+      where: {
+        orderItem: {
+          order: {
+            status: 'PAID',
+          },
+          OR: [
+            { attendeeEmail: { equals: trimmed, mode: 'insensitive' } },
+            { order: { buyer: { email: { equals: trimmed, mode: 'insensitive' } } } },
+            { orderId: { equals: trimmed } },
+            ...(cleanPhone.length >= 7
+              ? [
+                  { attendeePhone: { contains: cleanPhone } },
+                  {
+                    attendeePhone: {
+                      contains: cleanPhone.startsWith('0')
+                        ? cleanPhone.slice(1)
+                        : cleanPhone,
+                    },
+                  },
+                  {
+                    attendeePhone: {
+                      contains: cleanPhone.startsWith('62')
+                        ? cleanPhone.slice(2)
+                        : cleanPhone,
+                    },
+                  },
+                ]
+              : []),
+          ],
+        },
+      },
+      include: {
+        orderItem: {
+          include: {
+            ticketCategory: true,
+            order: true,
+          },
+        },
+        event: {
+          include: {
+            organizer: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 30,
+    });
+
+    return tickets.map((t) => ({
+      ticketId: t.id,
+      ticketStatus: t.status,
+      ticketCategory: t.orderItem.ticketCategory.name,
+      buyerName: t.orderItem.attendeeName,
+      buyerEmail: t.orderItem.attendeeEmail,
+      buyerPhone: t.orderItem.attendeePhone,
+      orderId: t.orderItem.orderId,
+      orderDate: t.orderItem.order.createdAt,
+      totalAmount: t.orderItem.order.totalAmount,
+      eventTitle: t.event.title,
+      eventLocation: t.event.location,
+      eventStartDate: t.event.startDate,
+      eventEndDate: t.event.endDate,
+      organizerName: t.event.organizer.name,
+      signedQrPayload: t.qrPayload,
+    }));
+  }
+
+  /**
+   * Mengirim ulang e-ticket ke WhatsApp dan Email pembeli (Public/Guest).
+   */
+  async resendTicketNotification(ticketId: string) {
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: ticketId },
+      include: {
+        orderItem: {
+          include: {
+            order: true,
+            ticketCategory: true,
+          },
+        },
+        event: true,
+      },
+    });
+
+    if (!ticket) {
+      throw new NotFoundException('Tiket tidak ditemukan');
+    }
+
+    if (ticket.orderItem.order.status !== 'PAID') {
+      throw new BadRequestException(
+        'Tiket belum berstatus PAID atau tidak aktif',
+      );
+    }
+
+    const qrUrl = `${this.configService.get<string>('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/v1/tickets/${ticket.id}`;
+    const attendeePhone = ticket.orderItem.attendeePhone;
+    const attendeeName = ticket.orderItem.attendeeName;
+    const attendeeEmail = ticket.orderItem.attendeeEmail;
+
+    if (attendeePhone) {
+      await this.notificationsQueue.add('send-ticket-whatsapp', {
+        ticketId: ticket.id,
+        phone: attendeePhone,
+        buyerName: attendeeName,
+        eventTitle: ticket.event.title,
+        ticketCategory: ticket.orderItem.ticketCategory.name,
+        qrUrl,
+      });
+    }
+
+    if (attendeeEmail) {
+      await this.notificationsQueue.add('send-ticket-email', {
+        ticketId: ticket.id,
+        email: attendeeEmail,
+        buyerName: attendeeName,
+        eventTitle: ticket.event.title,
+        ticketCategory: ticket.orderItem.ticketCategory.name,
+        qrUrl,
+      });
+    }
+
+    return {
+      message:
+        'Notifikasi e-ticket berhasil dikirimkan ulang ke WhatsApp dan Email Anda!',
+      sentTo: {
+        phone: attendeePhone,
+        email: attendeeEmail,
+      },
+    };
   }
 
   /**

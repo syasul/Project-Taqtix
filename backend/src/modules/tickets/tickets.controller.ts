@@ -4,6 +4,7 @@ import {
   Post,
   Patch,
   Param,
+  Query,
   Body,
   HttpStatus,
   HttpCode,
@@ -28,6 +29,35 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @Controller()
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
+
+  @Public()
+  @Get('tickets/lookup')
+  @ApiOperation({
+    summary:
+      'Mencari daftar tiket elektronik berdasarkan Email, WhatsApp, atau ID Pesanan (Public/Guest)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Daftar e-ticket berhasil didapatkan.',
+  })
+  async lookupTickets(@Query('q') query: string) {
+    return this.ticketsService.lookupTickets(query);
+  }
+
+  @Public()
+  @Post('tickets/:id/resend')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Kirim ulang notifikasi e-ticket ke WhatsApp dan Email pembeli (Public/Guest)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Notifikasi berhasil dikirim ulang.',
+  })
+  async resendTicketNotification(@Param('id') ticketId: string) {
+    return this.ticketsService.resendTicketNotification(ticketId);
+  }
 
   @Public()
   @Get('events/:id/ticket-categories')

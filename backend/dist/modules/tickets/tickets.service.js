@@ -8,14 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TicketsService = void 0;
 const common_1 = require("@nestjs/common");
+const bull_1 = require("@nestjs/bull");
+const bullmq_1 = require("bullmq");
+const config_1 = require("@nestjs/config");
 const prisma_service_1 = require("../prisma/prisma.service");
 let TicketsService = class TicketsService {
     prisma;
-    constructor(prisma) {
+    notificationsQueue;
+    configService;
+    constructor(prisma, notificationsQueue, configService) {
         this.prisma = prisma;
+        this.notificationsQueue = notificationsQueue;
+        this.configService = configService;
     }
     async verifyEventOwnership(eventId, userId) {
         const organizer = await this.prisma.organizer.findUnique({
@@ -232,6 +242,135 @@ let TicketsService = class TicketsService {
             signedQrPayload: ticket.qrPayload,
         }));
     }
+    async lookupTickets(identifier) {
+        const trimmed = (identifier || '').trim();
+        if (!trimmed || trimmed.length < 3) {
+            throw new common_1.BadRequestException('Masukkan nomor WhatsApp, Email, atau ID Pesanan yang valid (minimal 3 karakter).');
+        }
+        const cleanPhone = trimmed.replace(/[^0-9]/g, '');
+        const tickets = await this.prisma.ticket.findMany({
+            where: {
+                orderItem: {
+                    order: {
+                        status: 'PAID',
+                    },
+                    OR: [
+                        { attendeeEmail: { equals: trimmed, mode: 'insensitive' } },
+                        { order: { buyer: { email: { equals: trimmed, mode: 'insensitive' } } } },
+                        { orderId: { equals: trimmed } },
+                        ...(cleanPhone.length >= 7
+                            ? [
+                                { attendeePhone: { contains: cleanPhone } },
+                                {
+                                    attendeePhone: {
+                                        contains: cleanPhone.startsWith('0')
+                                            ? cleanPhone.slice(1)
+                                            : cleanPhone,
+                                    },
+                                },
+                                {
+                                    attendeePhone: {
+                                        contains: cleanPhone.startsWith('62')
+                                            ? cleanPhone.slice(2)
+                                            : cleanPhone,
+                                    },
+                                },
+                            ]
+                            : []),
+                    ],
+                },
+            },
+            include: {
+                orderItem: {
+                    include: {
+                        ticketCategory: true,
+                        order: true,
+                    },
+                },
+                event: {
+                    include: {
+                        organizer: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: 30,
+        });
+        return tickets.map((t) => ({
+            ticketId: t.id,
+            ticketStatus: t.status,
+            ticketCategory: t.orderItem.ticketCategory.name,
+            buyerName: t.orderItem.attendeeName,
+            buyerEmail: t.orderItem.attendeeEmail,
+            buyerPhone: t.orderItem.attendeePhone,
+            orderId: t.orderItem.orderId,
+            orderDate: t.orderItem.order.createdAt,
+            totalAmount: t.orderItem.order.totalAmount,
+            eventTitle: t.event.title,
+            eventLocation: t.event.location,
+            eventStartDate: t.event.startDate,
+            eventEndDate: t.event.endDate,
+            organizerName: t.event.organizer.name,
+            signedQrPayload: t.qrPayload,
+        }));
+    }
+    async resendTicketNotification(ticketId) {
+        const ticket = await this.prisma.ticket.findUnique({
+            where: { id: ticketId },
+            include: {
+                orderItem: {
+                    include: {
+                        order: true,
+                        ticketCategory: true,
+                    },
+                },
+                event: true,
+            },
+        });
+        if (!ticket) {
+            throw new common_1.NotFoundException('Tiket tidak ditemukan');
+        }
+        if (ticket.orderItem.order.status !== 'PAID') {
+            throw new common_1.BadRequestException('Tiket belum berstatus PAID atau tidak aktif');
+        }
+        const qrUrl = `${this.configService.get('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/v1/tickets/${ticket.id}`;
+        const attendeePhone = ticket.orderItem.attendeePhone;
+        const attendeeName = ticket.orderItem.attendeeName;
+        const attendeeEmail = ticket.orderItem.attendeeEmail;
+        if (attendeePhone) {
+            await this.notificationsQueue.add('send-ticket-whatsapp', {
+                ticketId: ticket.id,
+                phone: attendeePhone,
+                buyerName: attendeeName,
+                eventTitle: ticket.event.title,
+                ticketCategory: ticket.orderItem.ticketCategory.name,
+                qrUrl,
+            });
+        }
+        if (attendeeEmail) {
+            await this.notificationsQueue.add('send-ticket-email', {
+                ticketId: ticket.id,
+                email: attendeeEmail,
+                buyerName: attendeeName,
+                eventTitle: ticket.event.title,
+                ticketCategory: ticket.orderItem.ticketCategory.name,
+                qrUrl,
+            });
+        }
+        return {
+            message: 'Notifikasi e-ticket berhasil dikirimkan ulang ke WhatsApp dan Email Anda!',
+            sentTo: {
+                phone: attendeePhone,
+                email: attendeeEmail,
+            },
+        };
+    }
     async blockTicket(ticketId, reason, userId) {
         const ticket = await this.prisma.ticket.findUnique({
             where: { id: ticketId },
@@ -380,6 +519,9 @@ let TicketsService = class TicketsService {
 exports.TicketsService = TicketsService;
 exports.TicketsService = TicketsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(1, (0, bull_1.InjectQueue)('notifications')),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        bullmq_1.Queue,
+        config_1.ConfigService])
 ], TicketsService);
 //# sourceMappingURL=tickets.service.js.map

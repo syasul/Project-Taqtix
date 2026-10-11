@@ -6,10 +6,10 @@ export declare class CashService {
     private getOrganizerOrThrow;
     private verifyEventOwnership;
     recordCash(eventId: string, dto: CreateCashTransactionDto, userId: string): Promise<{
-        type: string;
         id: string;
         createdAt: Date;
         eventId: string;
+        type: string;
         amount: number;
         relatedOrderId: string | null;
         relatedPosTransactionId: string | null;
@@ -18,10 +18,10 @@ export declare class CashService {
     }>;
     getEventCash(eventId: string, userId: string): Promise<{
         data: {
-            type: string;
             id: string;
             createdAt: Date;
             eventId: string;
+            type: string;
             amount: number;
             relatedOrderId: string | null;
             relatedPosTransactionId: string | null;

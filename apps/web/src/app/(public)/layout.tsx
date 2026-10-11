@@ -139,6 +139,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Bantuan & Info</h4>
                 <ul className="space-y-2 text-sm">
                   <li>
+                    <Link href="/check-ticket" className="text-[#08ADAE] font-semibold hover:underline transition-colors flex items-center gap-1.5">
+                      <span>Cek & Cari Tiket</span>
+                      <span className="text-[10px] bg-[#08ADAE]/10 px-1.5 py-0.5 rounded-full font-bold">GUEST</span>
+                    </Link>
+                  </li>
+                  <li>
                     <Link href="/about" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
                       Tentang TAQtix
                     </Link>

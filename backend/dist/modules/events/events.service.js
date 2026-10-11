@@ -80,7 +80,7 @@ let EventsService = class EventsService {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
         if (event.organizerId !== organizer.id) {
-            throw new common_1.ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+            throw new common_1.NotFoundException('Event tidak ditemukan');
         }
         const updateData = {};
         if (dto.title !== undefined) {
@@ -136,7 +136,7 @@ let EventsService = class EventsService {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
         if (event.organizerId !== organizer.id) {
-            throw new common_1.ForbiddenException('Akses ditolak: Anda bukan pemilik event ini');
+            throw new common_1.NotFoundException('Event tidak ditemukan');
         }
         return this.prisma.event.update({
             where: { id },

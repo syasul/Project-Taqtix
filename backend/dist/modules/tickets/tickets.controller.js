@@ -29,6 +29,12 @@ let TicketsController = class TicketsController {
     constructor(ticketsService) {
         this.ticketsService = ticketsService;
     }
+    async lookupTickets(query) {
+        return this.ticketsService.lookupTickets(query);
+    }
+    async resendTicketNotification(ticketId) {
+        return this.ticketsService.resendTicketNotification(ticketId);
+    }
     async getCategories(eventId) {
         return this.ticketsService.getCategories(eventId);
     }
@@ -70,6 +76,37 @@ let TicketsController = class TicketsController {
     }
 };
 exports.TicketsController = TicketsController;
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('tickets/lookup'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mencari daftar tiket elektronik berdasarkan Email, WhatsApp, atau ID Pesanan (Public/Guest)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Daftar e-ticket berhasil didapatkan.',
+    }),
+    __param(0, (0, common_1.Query)('q')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "lookupTickets", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('tickets/:id/resend'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Kirim ulang notifikasi e-ticket ke WhatsApp dan Email pembeli (Public/Guest)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Notifikasi berhasil dikirim ulang.',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "resendTicketNotification", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)('events/:id/ticket-categories'),

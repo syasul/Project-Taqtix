@@ -284,6 +284,20 @@ function CheckoutContent() {
     },
     onSuccess: (data) => {
       setIsSubmitting(false);
+      try {
+        if (data.orderId) {
+          localStorage.setItem(
+            'taqtix_recent_order',
+            JSON.stringify({
+              orderId: data.orderId,
+              eventId,
+              timestamp: Date.now(),
+            })
+          );
+        }
+      } catch (err) {
+        // Ignore localStorage error if private browsing restricts it
+      }
       toast.success('Pemesanan tiket berhasil dibuat!');
       if (data.payment?.redirectUrl) {
         // Opsi A — Redirect penuh ke halaman DOKU Checkout

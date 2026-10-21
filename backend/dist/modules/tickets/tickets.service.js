@@ -52,6 +52,7 @@ let TicketsService = class TicketsService {
                 name: dto.name,
                 price: dto.price,
                 quota: dto.quota,
+                ticketPerPackage: dto.ticketPerPackage ? Number(dto.ticketPerPackage) : 1,
                 saleStartAt: new Date(dto.saleStart),
                 saleEndAt: new Date(dto.saleEnd),
             },
@@ -72,6 +73,8 @@ let TicketsService = class TicketsService {
             updateData.price = dto.price;
         if (dto.quota !== undefined)
             updateData.quota = dto.quota;
+        if (dto.ticketPerPackage !== undefined)
+            updateData.ticketPerPackage = Number(dto.ticketPerPackage);
         if (dto.saleStart !== undefined)
             updateData.saleStartAt = new Date(dto.saleStart);
         if (dto.saleEnd !== undefined)
@@ -200,12 +203,15 @@ let TicketsService = class TicketsService {
             ticketId: ticket.id,
             ticketStatus: ticket.status,
             ticketCategory: ticket.orderItem.ticketCategory.name,
-            buyerName: ticket.orderItem.attendeeName,
+            buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
+            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
+            attendeeGender: ticket.attendeeGender || null,
             buyerEmail: ticket.orderItem.attendeeEmail,
             eventTitle: ticket.event.title,
             eventLocation: ticket.event.location,
             eventStartDate: ticket.event.startDate,
             eventEndDate: ticket.event.endDate,
+            isDateTba: ticket.event.isDateTba,
             organizerName: ticket.event.organizer.name,
             signedQrPayload: ticket.qrPayload,
         };
@@ -236,7 +242,9 @@ let TicketsService = class TicketsService {
             ticketId: ticket.id,
             ticketStatus: ticket.status,
             ticketCategory: ticket.orderItem.ticketCategory.name,
-            buyerName: ticket.orderItem.attendeeName,
+            buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
+            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
+            attendeeGender: ticket.attendeeGender || null,
             buyerEmail: ticket.orderItem.attendeeEmail,
             eventTitle: ticket.event.title,
             signedQrPayload: ticket.qrPayload,
@@ -306,7 +314,9 @@ let TicketsService = class TicketsService {
             ticketId: t.id,
             ticketStatus: t.status,
             ticketCategory: t.orderItem.ticketCategory.name,
-            buyerName: t.orderItem.attendeeName,
+            buyerName: t.attendeeName || t.orderItem.attendeeName,
+            attendeeName: t.attendeeName || t.orderItem.attendeeName,
+            attendeeGender: t.attendeeGender || null,
             buyerEmail: t.orderItem.attendeeEmail,
             buyerPhone: t.orderItem.attendeePhone,
             orderId: t.orderItem.orderId,
@@ -316,6 +326,7 @@ let TicketsService = class TicketsService {
             eventLocation: t.event.location,
             eventStartDate: t.event.startDate,
             eventEndDate: t.event.endDate,
+            isDateTba: t.event.isDateTba,
             organizerName: t.event.organizer.name,
             signedQrPayload: t.qrPayload,
         }));
@@ -502,6 +513,7 @@ let TicketsService = class TicketsService {
                         location: true,
                         startDate: true,
                         endDate: true,
+                        isDateTba: true,
                     },
                 },
                 orderItem: {

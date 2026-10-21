@@ -53,7 +53,7 @@ const multer_1 = require("multer");
 const path = __importStar(require("path"));
 const crypto = __importStar(require("crypto"));
 const upload_service_1 = require("./upload.service");
-const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const public_decorator_1 = require("../../common/decorators/public.decorator");
 let UploadController = class UploadController {
     uploadService;
     constructor(uploadService) {
@@ -66,7 +66,7 @@ let UploadController = class UploadController {
 exports.UploadController = UploadController;
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)('organizer', 'admin', 'buyer'),
+    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({

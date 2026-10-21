@@ -645,14 +645,27 @@ export class PaymentsService {
 
       const generatedTickets: any[] = [];
 
-      // Generate tiket elektronik & signed payload
+      // Generate tiket elektronik & signed payload (mendukung paket bundling/couple)
       for (const item of order.orderItems) {
-        for (let i = 0; i < item.qty; i++) {
+        const ticketPerPackage = Number(item.ticketCategory?.ticketPerPackage) || 1;
+        const totalTicketsToGenerate = item.qty * ticketPerPackage;
+
+        // Ambil data detail peserta dari customFieldAnswers jika ada paket bundling
+        const answersObj: any = item.customFieldAnswers || {};
+        const packageAttendees: any[] = Array.isArray(answersObj.attendees) ? answersObj.attendees : [];
+
+        for (let i = 0; i < totalTicketsToGenerate; i++) {
+          const attendeeInfo = packageAttendees[i] || {};
+          const attendeeName = attendeeInfo.name || item.attendeeName || 'Pengunjung';
+          const attendeeGender = attendeeInfo.gender || answersObj.gender || null;
+
           const ticket = await tx.ticket.create({
             data: {
               orderItemId: item.id,
               eventId: order.eventId,
               status: TicketStatus.VALID,
+              attendeeName,
+              attendeeGender,
               qrPayload: 'TEMP_' + crypto.randomUUID(),
             },
           });
@@ -725,7 +738,7 @@ export class PaymentsService {
       for (const ticket of generatedTickets) {
         const qrUrl = `${this.configService.get<string>('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/v1/tickets/${ticket.id}`;
         const attendeePhone = ticket.orderItem.attendeePhone;
-        const attendeeName = ticket.orderItem.attendeeName;
+        const attendeeName = ticket.attendeeName || ticket.orderItem.attendeeName;
         const attendeeEmail = ticket.orderItem.attendeeEmail;
 
         // Job WhatsApp

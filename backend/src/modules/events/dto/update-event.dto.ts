@@ -20,6 +20,11 @@ export class UpdateEventDto {
   @IsOptional()
   location?: string;
 
+  @ApiProperty({ example: false, required: false })
+  @IsBoolean()
+  @IsOptional()
+  isDateTba?: boolean;
+
   @ApiProperty({ example: '2026-09-12T13:00:00Z', required: false })
   @IsDateString({}, { message: 'Tanggal mulai tidak valid' })
   @IsOptional()

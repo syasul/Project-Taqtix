@@ -31,6 +31,7 @@ interface OrderDetail {
     title: string;
     location?: string;
     startDate?: string;
+    isDateTba?: boolean;
   };
 }
 

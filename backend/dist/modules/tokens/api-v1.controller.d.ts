@@ -20,6 +20,7 @@ export declare class ApiV1Controller {
                 quota: number;
                 sold: number;
                 maxPerOrder: number;
+                ticketPerPackage: number;
                 saleStartAt: Date;
                 saleEndAt: Date;
             }[];
@@ -33,6 +34,7 @@ export declare class ApiV1Controller {
             status: import("@prisma/client").$Enums.EventStatus;
             organizerId: string;
             location: string;
+            isDateTba: boolean;
             startDate: Date;
             endDate: Date;
             bannerUrl: string;
@@ -75,6 +77,7 @@ export declare class ApiV1Controller {
                     quota: number;
                     sold: number;
                     maxPerOrder: number;
+                    ticketPerPackage: number;
                     saleStartAt: Date;
                     saleEndAt: Date;
                 };
@@ -82,11 +85,11 @@ export declare class ApiV1Controller {
                 id: string;
                 createdAt: Date;
                 facilities: import("@prisma/client/runtime/library").JsonValue | null;
+                attendeeName: string;
                 orderId: string;
                 ticketCategoryId: string;
                 qty: number;
                 unitPrice: number;
-                attendeeName: string;
                 attendeeEmail: string;
                 attendeePhone: string;
                 city: string | null;

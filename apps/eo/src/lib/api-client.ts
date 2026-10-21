@@ -70,6 +70,9 @@ apiClient.interceptors.response.use(
       if (!refreshToken) {
         useAuth.getState().logout();
         isRefreshing = false;
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }
         return Promise.reject(error);
       }
 
@@ -81,7 +84,13 @@ apiClient.interceptors.response.use(
           { headers: { 'Content-Type': 'application/json' } },
         );
 
-        const { accessToken: newAccess, refreshToken: newRefresh } = response.data;
+        const tokenData = response.data?.data || response.data;
+        const newAccess = tokenData?.accessToken;
+        const newRefresh = tokenData?.refreshToken;
+
+        if (!newAccess || !newRefresh) {
+          throw new Error('Format token refresh tidak valid');
+        }
 
         // Perbarui Zustand auth store
         useAuth.getState().setAuth(newAccess, newRefresh);
@@ -98,6 +107,9 @@ apiClient.interceptors.response.use(
         processQueue(refreshError, null);
         useAuth.getState().logout();
         isRefreshing = false;
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }
         return Promise.reject(refreshError);
       }
     }

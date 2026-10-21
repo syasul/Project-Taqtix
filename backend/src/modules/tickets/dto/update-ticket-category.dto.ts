@@ -25,6 +25,12 @@ export class UpdateTicketCategoryDto {
   @IsOptional()
   quota?: number;
 
+  @ApiProperty({ example: 2, required: false, description: 'Jumlah tiket/orang per paket (contoh: 2 untuk Couple)' })
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  ticketPerPackage?: number;
+
   @ApiProperty({ example: '2026-08-01T00:00:00Z', required: false })
   @IsDateString()
   @IsOptional()

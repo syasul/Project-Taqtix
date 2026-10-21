@@ -6,6 +6,10 @@ export interface OrderItemInput {
   attendeeName?: string;
   attendeeEmail?: string;
   attendeePhone?: string;
+  attendeeIdType?: string;
+  attendeeIdNumber?: string;
+  attendeeGender?: string;
+  customFieldAnswers?: Record<string, any>;
 }
 
 export interface CreateOrderInput {
@@ -13,6 +17,8 @@ export interface CreateOrderInput {
   buyerName: string;
   buyerEmail: string;
   buyerPhone?: string;
+  buyerIdType?: string;
+  buyerIdNumber?: string;
   promoCode?: string;
   affiliateCode?: string;
   items: OrderItemInput[];
@@ -43,6 +49,7 @@ export interface OrderDetail {
     bannerUrl?: string;
     location?: string;
     startDate?: string;
+    isDateTba?: boolean;
   };
   items?: Array<{
     id: string;

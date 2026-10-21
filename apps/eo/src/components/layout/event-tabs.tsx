@@ -10,7 +10,10 @@ import {
   UserCheck, 
   ArrowLeft,
   Settings,
-  HeartHandshake
+  HeartHandshake,
+  Edit3,
+  ClipboardList,
+  Ticket
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +26,24 @@ export default function EventTabs({ eventId }: EventTabsProps) {
 
   const tabs = [
     {
+      label: 'Detail Event',
+      href: `/dashboard/events/${eventId}/edit`,
+      icon: Edit3,
+      active: pathname === `/dashboard/events/${eventId}/edit`
+    },
+    {
+      label: 'Syarat & Formulir Pembeli',
+      href: `/dashboard/events/${eventId}/custom-fields`,
+      icon: ClipboardList,
+      active: pathname === `/dashboard/events/${eventId}/custom-fields`
+    },
+    {
+      label: 'Kategori Tiket',
+      href: `/dashboard/events/${eventId}/ticket-categories`,
+      icon: Ticket,
+      active: pathname === `/dashboard/events/${eventId}/ticket-categories`
+    },
+    {
       label: 'Ringkasan',
       href: `/dashboard/events/${eventId}/sales`,
       icon: BarChart3,
@@ -33,12 +54,6 @@ export default function EventTabs({ eventId }: EventTabsProps) {
       href: `/dashboard/events/${eventId}/live`,
       icon: TrendingUp,
       active: pathname === `/dashboard/events/${eventId}/live`
-    },
-    {
-      label: 'Formulir Kustom',
-      href: `/dashboard/events/${eventId}/custom-fields`,
-      icon: UserCheck,
-      active: pathname === `/dashboard/events/${eventId}/custom-fields`
     },
     {
       label: 'Voucher & Promo',

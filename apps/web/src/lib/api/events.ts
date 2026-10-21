@@ -10,6 +10,7 @@ export interface EventDetail {
   location: string;
   startDate: string;
   endDate: string;
+  isDateTba?: boolean;
   status: 'draft' | 'published' | 'ended' | 'cancelled';
   requireLogin?: boolean;
   createdAt: string;

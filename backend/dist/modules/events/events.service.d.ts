@@ -1,6 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { Prisma } from '@prisma/client';
 export declare class EventsService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -15,6 +16,7 @@ export declare class EventsService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -39,6 +41,7 @@ export declare class EventsService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -63,6 +66,7 @@ export declare class EventsService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -82,6 +86,9 @@ export declare class EventsService {
             name: string;
             slug: string;
         };
+        ticketCategories: {
+            price: number;
+        }[];
     } & {
         description: string | null;
         title: string;
@@ -92,6 +99,7 @@ export declare class EventsService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -116,7 +124,7 @@ export declare class EventsService {
             eventId: string;
             label: string;
             fieldType: string;
-            options: import("@prisma/client/runtime/library").JsonValue | null;
+            options: Prisma.JsonValue | null;
         }[];
         organizer: {
             name: string;
@@ -132,6 +140,7 @@ export declare class EventsService {
             quota: number;
             sold: number;
             maxPerOrder: number;
+            ticketPerPackage: number;
             saleStartAt: Date;
             saleEndAt: Date;
         }[];
@@ -144,7 +153,7 @@ export declare class EventsService {
             eventId: string;
             label: string;
             fieldType: string;
-            options: import("@prisma/client/runtime/library").JsonValue | null;
+            options: Prisma.JsonValue | null;
         }[];
         facilities: {
             description: string | null;
@@ -156,7 +165,7 @@ export declare class EventsService {
             price: number;
             quota: number | null;
             sold: number;
-            applicableTicketCategoryIds: import("@prisma/client/runtime/library").JsonValue | null;
+            applicableTicketCategoryIds: Prisma.JsonValue | null;
         }[];
         lineup: {
             order: number;
@@ -179,6 +188,7 @@ export declare class EventsService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -203,6 +213,7 @@ export declare class EventsService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;

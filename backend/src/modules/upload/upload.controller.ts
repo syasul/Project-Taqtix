@@ -21,6 +21,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { UploadService } from './upload.service';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('Uploads')
 @Controller('upload')
@@ -28,7 +29,7 @@ export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post()
-  @Roles('organizer', 'admin', 'buyer')
+  @Public()
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

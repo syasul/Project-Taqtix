@@ -12,6 +12,7 @@ export const eventSchema = z.object({
   location: z.string().min(1, 'Lokasi tidak boleh kosong'),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
+  isDateTba: z.boolean().optional(),
   status: eventStatusSchema,
   requireLogin: z.boolean().optional(),
   createdAt: z.string().datetime().optional(),

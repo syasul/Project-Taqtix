@@ -16,6 +16,7 @@ class CreateEventDto {
     title;
     description;
     location;
+    isDateTba;
     startDate;
     endDate;
     bannerUrl;
@@ -57,18 +58,32 @@ __decorate([
 ], CreateEventDto.prototype, "location", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
+        example: false,
+        required: false,
+        description: 'Status tanggal & waktu TBA (To Be Announced)',
+    }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateEventDto.prototype, "isDateTba", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
         example: '2026-09-12T13:00:00Z',
-        description: 'Waktu mulai acara',
+        required: false,
+        description: 'Waktu mulai acara (opsional jika TBA)',
     }),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal mulai tidak valid' }),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "startDate", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: '2026-09-12T22:00:00Z',
-        description: 'Waktu selesai acara',
+        required: false,
+        description: 'Waktu selesai acara (opsional jika TBA)',
     }),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal selesai tidak valid' }),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateEventDto.prototype, "endDate", void 0);
 __decorate([

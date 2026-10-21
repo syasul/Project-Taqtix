@@ -2,6 +2,7 @@ export declare class UpdateEventDto {
     title?: string;
     description?: string;
     location?: string;
+    isDateTba?: boolean;
     startDate?: string;
     endDate?: string;
     bannerUrl?: string;

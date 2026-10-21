@@ -425,12 +425,21 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
             });
             const generatedTickets = [];
             for (const item of order.orderItems) {
-                for (let i = 0; i < item.qty; i++) {
+                const ticketPerPackage = Number(item.ticketCategory?.ticketPerPackage) || 1;
+                const totalTicketsToGenerate = item.qty * ticketPerPackage;
+                const answersObj = item.customFieldAnswers || {};
+                const packageAttendees = Array.isArray(answersObj.attendees) ? answersObj.attendees : [];
+                for (let i = 0; i < totalTicketsToGenerate; i++) {
+                    const attendeeInfo = packageAttendees[i] || {};
+                    const attendeeName = attendeeInfo.name || item.attendeeName || 'Pengunjung';
+                    const attendeeGender = attendeeInfo.gender || answersObj.gender || null;
                     const ticket = await tx.ticket.create({
                         data: {
                             orderItemId: item.id,
                             eventId: order.eventId,
                             status: client_1.TicketStatus.VALID,
+                            attendeeName,
+                            attendeeGender,
                             qrPayload: 'TEMP_' + crypto.randomUUID(),
                         },
                     });
@@ -487,7 +496,7 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
             for (const ticket of generatedTickets) {
                 const qrUrl = `${this.configService.get('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/v1/tickets/${ticket.id}`;
                 const attendeePhone = ticket.orderItem.attendeePhone;
-                const attendeeName = ticket.orderItem.attendeeName;
+                const attendeeName = ticket.attendeeName || ticket.orderItem.attendeeName;
                 const attendeeEmail = ticket.orderItem.attendeeEmail;
                 if (attendeePhone) {
                     await this.notificationsQueue.add('send-ticket-whatsapp', {

@@ -47,6 +47,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface TicketCategory {
   id: string;
@@ -291,6 +292,7 @@ interface EventDetail {
   location: string;
   startDate: string;
   endDate: string;
+  isDateTba?: boolean;
   requireLogin?: boolean;
   seoTitle?: string;
   seoDescription?: string;
@@ -456,9 +458,11 @@ export default function EventDetailPage() {
     );
   }
 
-  const formattedDateRange = `${format(new Date(event.startDate), 'd MMMM yyyy', {
-    locale: localeId,
-  })} s/d ${format(new Date(event.endDate), 'd MMMM yyyy', { locale: localeId })}`;
+  const formattedDateRange = event.isDateTba
+    ? 'Tanggal & Waktu Segera Diumumkan (TBA)'
+    : `${format(new Date(event.startDate), 'd MMMM yyyy', {
+        locale: localeId,
+      })} s/d ${format(new Date(event.endDate), 'd MMMM yyyy', { locale: localeId })}`;
 
   const totalCost = selectedItems.reduce((sum, item) => {
     const category = event.ticketCategories.find((c) => c.id === item.categoryId);
@@ -595,6 +599,12 @@ export default function EventDetailPage() {
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                   <span>Pendaftaran Dibuka</span>
                 </span>
+                {event.isDateTba && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    <Clock className="w-3 h-3 text-amber-600" />
+                    <span>Jadwal TBA</span>
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
                   <Users className="w-3 h-3 text-[#08ADAE]" />
                   <span>Sisa {totalRemainingQuota.toLocaleString('id-ID')} Kuota</span>
@@ -623,13 +633,24 @@ export default function EventDetailPage() {
             {/* Date, Time & Venue Key Highlights */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-slate-100 py-4 text-xs sm:text-sm text-slate-700">
               <div className="flex items-start space-x-3.5">
-                <div className="h-10 w-10 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
+                <div
+                  className={cn(
+                    'h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border',
+                    event.isDateTba
+                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                      : 'bg-[#08ADAE]/10 border-[#08ADAE]/20 text-[#08ADAE]'
+                  )}
+                >
                   <Calendar className="h-5 w-5" />
                 </div>
                 <div>
                   <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Tanggal & Waktu Acara</h4>
-                  <p className="text-slate-800 font-semibold mt-0.5">{formattedDateRange}</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Waktu Indonesia Barat (WIB)</p>
+                  <p className={cn('mt-0.5', event.isDateTba ? 'text-amber-600 font-bold' : 'text-slate-800 font-semibold')}>
+                    {formattedDateRange}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {event.isDateTba ? 'Akan diumumkan lebih lanjut oleh penyelenggara' : 'Waktu Indonesia Barat (WIB)'}
+                  </p>
                 </div>
               </div>
 

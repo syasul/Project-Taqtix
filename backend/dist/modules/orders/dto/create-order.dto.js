@@ -34,6 +34,12 @@ class OrderItemDto {
     ticketCategoryId;
     qty;
     customFieldAnswers;
+    attendeeName;
+    attendeeEmail;
+    attendeePhone;
+    attendeeIdType;
+    attendeeIdNumber;
+    attendeeGender;
     facilities;
 }
 exports.OrderItemDto = OrderItemDto;
@@ -64,6 +70,59 @@ __decorate([
 ], OrderItemDto.prototype, "customFieldAnswers", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
+        example: 'Budi Santoso',
+        description: 'Nama peserta pemegang tiket',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "attendeeName", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'budi@example.com',
+        description: 'Email peserta pemegang tiket',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "attendeeEmail", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '081234567890',
+        description: 'Nomor WhatsApp peserta pemegang tiket',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "attendeePhone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'KTP',
+        description: 'Tipe identitas peserta (KTP, SIM, Paspor, Kartu Pelajar)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "attendeeIdType", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '3201234567890001',
+        description: 'Nomor identitas peserta',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "attendeeIdNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Laki-laki',
+        description: 'Jenis kelamin peserta',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "attendeeGender", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
         type: [FacilityOrderDto],
         description: 'Fasilitas yang dipilih per tiket item',
     }),
@@ -83,6 +142,8 @@ class CreateOrderDto {
     buyerEmail;
     buyerName;
     buyerPhone;
+    buyerIdType;
+    buyerIdNumber;
     city;
     utmSource;
     utmMedium;
@@ -167,6 +228,24 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "buyerPhone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'KTP',
+        description: 'Tipe identitas pembeli (KTP, SIM, Paspor, Kartu Pelajar)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "buyerIdType", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: '3201234567890001',
+        description: 'Nomor identitas pembeli',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "buyerIdNumber", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
         example: 'Jakarta',

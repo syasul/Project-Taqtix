@@ -21,6 +21,7 @@ export declare class TicketsService {
         quota: number;
         sold: number;
         maxPerOrder: number;
+        ticketPerPackage: number;
         saleStartAt: Date;
         saleEndAt: Date;
     }>;
@@ -34,6 +35,7 @@ export declare class TicketsService {
         quota: number;
         sold: number;
         maxPerOrder: number;
+        ticketPerPackage: number;
         saleStartAt: Date;
         saleEndAt: Date;
     }>;
@@ -47,6 +49,7 @@ export declare class TicketsService {
         quota: number;
         sold: number;
         maxPerOrder: number;
+        ticketPerPackage: number;
         saleStartAt: Date;
         saleEndAt: Date;
     }[]>;
@@ -84,11 +87,14 @@ export declare class TicketsService {
         ticketStatus: import("@prisma/client").$Enums.TicketStatus;
         ticketCategory: string;
         buyerName: string;
+        attendeeName: string;
+        attendeeGender: string | null;
         buyerEmail: string;
         eventTitle: string;
         eventLocation: string;
         eventStartDate: Date;
         eventEndDate: Date;
+        isDateTba: boolean;
         organizerName: string;
         signedQrPayload: string;
     }>;
@@ -97,6 +103,8 @@ export declare class TicketsService {
         ticketStatus: import("@prisma/client").$Enums.TicketStatus;
         ticketCategory: string;
         buyerName: string;
+        attendeeName: string;
+        attendeeGender: string | null;
         buyerEmail: string;
         eventTitle: string;
         signedQrPayload: string;
@@ -106,6 +114,8 @@ export declare class TicketsService {
         ticketStatus: import("@prisma/client").$Enums.TicketStatus;
         ticketCategory: string;
         buyerName: string;
+        attendeeName: string;
+        attendeeGender: string | null;
         buyerEmail: string;
         buyerPhone: string;
         orderId: string;
@@ -115,6 +125,7 @@ export declare class TicketsService {
         eventLocation: string;
         eventStartDate: Date;
         eventEndDate: Date;
+        isDateTba: boolean;
         organizerName: string;
         signedQrPayload: string;
     }[]>;
@@ -133,6 +144,8 @@ export declare class TicketsService {
         eventId: string;
         qrPayload: string;
         orderItemId: string;
+        attendeeName: string | null;
+        attendeeGender: string | null;
         checkedInAt: Date | null;
         checkedInBy: string | null;
         checkedOutAt: Date | null;
@@ -152,6 +165,8 @@ export declare class TicketsService {
         eventId: string;
         qrPayload: string;
         orderItemId: string;
+        attendeeName: string | null;
+        attendeeGender: string | null;
         checkedInAt: Date | null;
         checkedInBy: string | null;
         checkedOutAt: Date | null;
@@ -175,6 +190,7 @@ export declare class TicketsService {
                 quota: number;
                 sold: number;
                 maxPerOrder: number;
+                ticketPerPackage: number;
                 saleStartAt: Date;
                 saleEndAt: Date;
             };
@@ -182,11 +198,11 @@ export declare class TicketsService {
             id: string;
             createdAt: Date;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
+            attendeeName: string;
             orderId: string;
             ticketCategoryId: string;
             qty: number;
             unitPrice: number;
-            attendeeName: string;
             attendeeEmail: string;
             attendeePhone: string;
             city: string | null;
@@ -200,6 +216,8 @@ export declare class TicketsService {
         eventId: string;
         qrPayload: string;
         orderItemId: string;
+        attendeeName: string | null;
+        attendeeGender: string | null;
         checkedInAt: Date | null;
         checkedInBy: string | null;
         checkedOutAt: Date | null;
@@ -226,6 +244,7 @@ export declare class TicketsService {
             id: string;
             slug: string;
             location: string;
+            isDateTba: boolean;
             startDate: Date;
             endDate: Date;
             bannerUrl: string;
@@ -241,6 +260,7 @@ export declare class TicketsService {
                 quota: number;
                 sold: number;
                 maxPerOrder: number;
+                ticketPerPackage: number;
                 saleStartAt: Date;
                 saleEndAt: Date;
             };
@@ -248,11 +268,11 @@ export declare class TicketsService {
             id: string;
             createdAt: Date;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
+            attendeeName: string;
             orderId: string;
             ticketCategoryId: string;
             qty: number;
             unitPrice: number;
-            attendeeName: string;
             attendeeEmail: string;
             attendeePhone: string;
             city: string | null;
@@ -266,6 +286,8 @@ export declare class TicketsService {
         eventId: string;
         qrPayload: string;
         orderItemId: string;
+        attendeeName: string | null;
+        attendeeGender: string | null;
         checkedInAt: Date | null;
         checkedInBy: string | null;
         checkedOutAt: Date | null;

@@ -32,6 +32,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 export interface UnifiedTicket {
   ticketId: string;
@@ -47,6 +48,7 @@ export interface UnifiedTicket {
   eventLocation?: string;
   eventStartDate?: string;
   eventEndDate?: string;
+  isDateTba?: boolean;
   organizerName?: string;
   signedQrPayload?: string;
 }
@@ -76,7 +78,7 @@ export default function AllTicketsPage() {
                 ticketId: t.id,
                 ticketStatus: t.status,
                 ticketCategory: t.orderItem?.ticketCategory?.name || 'Reguler',
-                buyerName: t.orderItem?.attendeeName || t.orderItem?.order?.buyerName || 'Pemegang Tiket',
+                buyerName: t.attendeeName || t.orderItem?.attendeeName || t.orderItem?.order?.buyerName || 'Pemegang Tiket',
                 buyerEmail: t.orderItem?.attendeeEmail || t.orderItem?.order?.buyerEmail,
                 buyerPhone: t.orderItem?.attendeePhone || t.orderItem?.order?.buyerPhone,
                 orderId: t.orderItem?.orderId,
@@ -85,6 +87,7 @@ export default function AllTicketsPage() {
                 eventLocation: t.event?.location || 'Lokasi Belum Ditentukan',
                 eventStartDate: t.event?.startDate,
                 eventEndDate: t.event?.endDate,
+                isDateTba: t.event?.isDateTba || t.isDateTba,
                 signedQrPayload: t.qrPayload || t.id,
               }));
               setTickets(mapped);
@@ -183,6 +186,11 @@ export default function AllTicketsPage() {
   // Filter tickets by upcoming / past
   const filteredTickets = tickets.filter((t) => {
     if (activeFilter === 'all') return true;
+    if (t.isDateTba) {
+      if (activeFilter === 'upcoming') return true;
+      if (activeFilter === 'past') return t.ticketStatus === 'CHECKED_IN';
+      return true;
+    }
     if (!t.eventStartDate) return true;
     try {
       const start = new Date(t.eventStartDate);
@@ -415,9 +423,11 @@ export default function AllTicketsPage() {
                   {/* Event Metadata */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-[#08ADAE] shrink-0" />
-                      <span className="truncate">
-                        {ticket.eventStartDate
+                      <Calendar className={cn('w-4 h-4 shrink-0', ticket.isDateTba ? 'text-amber-500' : 'text-[#08ADAE]')} />
+                      <span className={cn('truncate', ticket.isDateTba && 'text-amber-600 font-semibold')}>
+                        {ticket.isDateTba
+                          ? 'Waktu & Tanggal TBA'
+                          : ticket.eventStartDate
                           ? format(new Date(ticket.eventStartDate), 'EEEE, dd MMM yyyy', { locale: localeId })
                           : 'Tanggal TBA'}
                       </span>

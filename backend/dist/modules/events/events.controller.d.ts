@@ -7,6 +7,9 @@ export declare class EventsController {
             name: string;
             slug: string;
         };
+        ticketCategories: {
+            price: number;
+        }[];
     } & {
         description: string | null;
         title: string;
@@ -17,6 +20,7 @@ export declare class EventsController {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -57,6 +61,7 @@ export declare class EventsController {
             quota: number;
             sold: number;
             maxPerOrder: number;
+            ticketPerPackage: number;
             saleStartAt: Date;
             saleEndAt: Date;
         }[];
@@ -104,6 +109,7 @@ export declare class EventsController {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;

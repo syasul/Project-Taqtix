@@ -19,6 +19,7 @@ export declare class GateController {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;

@@ -265,7 +265,12 @@ export default function UserDashboardPage() {
                   </CardHeader>
                   <CardContent className="p-5 space-y-4 text-xs">
                     <div className="space-y-2 text-slate-600">
-                      {ticket.event?.startDate && (
+                      {ticket.event?.isDateTba ? (
+                        <div className="flex items-center gap-2 text-amber-600 font-semibold">
+                          <Calendar className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                          <span>Waktu & Tanggal TBA (Segera Diumumkan)</span>
+                        </div>
+                      ) : ticket.event?.startDate ? (
                         <div className="flex items-center gap-2">
                           <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span>
@@ -274,7 +279,7 @@ export default function UserDashboardPage() {
                             })}
                           </span>
                         </div>
-                      )}
+                      ) : null}
                       {ticket.event?.location && (
                         <div className="flex items-center gap-2">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />

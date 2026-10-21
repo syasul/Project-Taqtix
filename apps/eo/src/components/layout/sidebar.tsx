@@ -40,6 +40,21 @@ import {
   X,
 } from 'lucide-react';
 
+interface EventLinkItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  resource?: string;
+  badge?: string;
+}
+
+interface EventLinkGroup {
+  groupTitle: string;
+  groupBadge?: string;
+  isHighlighted?: boolean;
+  links: EventLinkItem[];
+}
+
 interface SidebarProps {
   className?: string;
   onItemClick?: () => void;
@@ -81,29 +96,161 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
     { href: '/dashboard/settings/integrations', label: 'Integrasi Pixel', icon: SlidersHorizontal, resource: 'edit_organization_settings' },
   ];
 
-  // Menu Event-Scoped (Section 0)
-  const eventLinks = eventId
+  // Menu Event-Scoped Berkelompok (Grouped by Function)
+  const eventLinkGroups: EventLinkGroup[] = eventId
     ? [
-        { href: `/dashboard/events/${eventId}/sales`, label: 'Statistik Ringkasan', icon: BarChart3, resource: 'view_sales_revenue' },
-        { href: `/dashboard/events/${eventId}/analytics/sales`, label: 'Analitik Mendalam', icon: TrendingUp, resource: 'view_analytics_growth' },
-        { href: `/dashboard/events/${eventId}/edit`, label: 'Detail Event', icon: Edit3, resource: 'create_edit_event' },
-        { href: `/dashboard/events/${eventId}/custom-fields`, label: 'Formulir Tambahan', icon: ClipboardList, resource: 'create_edit_event' },
-        { href: `/dashboard/events/${eventId}/ticket-categories`, label: 'Kategori Tiket', icon: Ticket, resource: 'manage_ticket_category' },
-        { href: `/dashboard/events/${eventId}/facilities`, label: 'Fasilitas Event', icon: Sparkles, resource: 'create_edit_event' },
-        { href: `/dashboard/events/${eventId}/staff`, label: 'Staff (Penugasan)', icon: UserCheck, resource: 'manage_workforce_crew' },
-        { href: `/dashboard/events/${eventId}/workforce`, label: 'Workforce (Kru)', icon: Users, resource: 'manage_workforce_crew' },
-        { href: `/dashboard/events/${eventId}/lineup`, label: 'Line Up', icon: Mic2, resource: 'create_edit_event' },
-        { href: `/dashboard/events/${eventId}/vouchers`, label: 'Voucher', icon: TicketPercent, resource: 'manage_promo_code' },
-        { href: `/dashboard/events/${eventId}/cash`, label: 'Cash', icon: Banknote, resource: 'view_sales_revenue' },
-        { href: `/dashboard/events/${eventId}/transfers`, label: 'Transfer Tiket', icon: ArrowLeftRight, resource: 'view_sales_revenue' },
-        { href: `/dashboard/events/${eventId}/buyers`, label: 'Pengunjung', icon: Users, resource: 'view_sales_revenue' },
-        { href: `/dashboard/events/${eventId}/blocked-visitors`, label: 'Pengunjung Nonaktif', icon: UserX, resource: 'view_sales_revenue' },
-        { href: `/dashboard/events/${eventId}/pos`, label: 'Point Of Sales (POS)', icon: Store, resource: 'pos_cashier' },
-        { href: `/dashboard/events/${eventId}/doorprize`, label: 'Doorprize', icon: Gift, resource: 'view_sales_revenue' },
-        { href: `/dashboard/events/${eventId}/live`, label: 'Validasi Tiket (Check-In)', icon: QrCode, resource: 'pos_cashier' },
-        { href: `/dashboard/events/${eventId}/audience/segments`, label: 'Marketing (Broadcast)', icon: Megaphone, resource: 'manage_audience_segments' },
-        { href: `/dashboard/events/${eventId}/growth`, label: 'Penjualan (Sales Insight)', icon: TrendingUp, resource: 'view_analytics_growth' },
-        { href: `/dashboard/events/${eventId}/export`, label: 'Laporan (Rekap Data)', icon: Download, resource: 'view_sales_revenue' },
+        {
+          groupTitle: 'Setup & Syarat Event',
+          groupBadge: 'Utama',
+          isHighlighted: true,
+          links: [
+            {
+              href: `/dashboard/events/${eventId}/edit`,
+              label: 'Detail Event',
+              icon: Edit3,
+              resource: 'create_edit_event',
+            },
+            {
+              href: `/dashboard/events/${eventId}/custom-fields`,
+              label: 'Syarat & Formulir Pembeli',
+              icon: ClipboardList,
+              resource: 'create_edit_event',
+              badge: 'Syarat Pembeli',
+            },
+            {
+              href: `/dashboard/events/${eventId}/ticket-categories`,
+              label: 'Kategori Tiket',
+              icon: Ticket,
+              resource: 'manage_ticket_category',
+            },
+            {
+              href: `/dashboard/events/${eventId}/facilities`,
+              label: 'Fasilitas Event',
+              icon: Sparkles,
+              resource: 'create_edit_event',
+            },
+            {
+              href: `/dashboard/events/${eventId}/lineup`,
+              label: 'Line Up Pengisi Acara',
+              icon: Mic2,
+              resource: 'create_edit_event',
+            },
+          ],
+        },
+        {
+          groupTitle: 'Tiket & Penjualan',
+          isHighlighted: false,
+          links: [
+            {
+              href: `/dashboard/events/${eventId}/vouchers`,
+              label: 'Voucher & Promo',
+              icon: TicketPercent,
+              resource: 'manage_promo_code',
+            },
+            {
+              href: `/dashboard/events/${eventId}/pos`,
+              label: 'Point Of Sales (POS)',
+              icon: Store,
+              resource: 'pos_cashier',
+            },
+            {
+              href: `/dashboard/events/${eventId}/cash`,
+              label: 'Kas Kasir (Cash)',
+              icon: Banknote,
+              resource: 'view_sales_revenue',
+            },
+            {
+              href: `/dashboard/events/${eventId}/transfers`,
+              label: 'Transfer Tiket',
+              icon: ArrowLeftRight,
+              resource: 'view_sales_revenue',
+            },
+            {
+              href: `/dashboard/events/${eventId}/partners`,
+              label: 'Leaderboard Partner',
+              icon: TrendingUp,
+              resource: 'view_sales_revenue',
+            },
+          ],
+        },
+        {
+          groupTitle: 'Operasional & Gate',
+          isHighlighted: false,
+          links: [
+            {
+              href: `/dashboard/events/${eventId}/live`,
+              label: 'Validasi Tiket (Check-In)',
+              icon: QrCode,
+              resource: 'pos_cashier',
+            },
+            {
+              href: `/dashboard/events/${eventId}/workforce`,
+              label: 'Workforce (Kru)',
+              icon: Users,
+              resource: 'manage_workforce_crew',
+            },
+            {
+              href: `/dashboard/events/${eventId}/staff`,
+              label: 'Staff (Penugasan)',
+              icon: UserCheck,
+              resource: 'manage_workforce_crew',
+            },
+            {
+              href: `/dashboard/events/${eventId}/doorprize`,
+              label: 'Doorprize',
+              icon: Gift,
+              resource: 'view_sales_revenue',
+            },
+            {
+              href: `/dashboard/events/${eventId}/buyers`,
+              label: 'Pengunjung (Tamu)',
+              icon: Users,
+              resource: 'view_sales_revenue',
+            },
+            {
+              href: `/dashboard/events/${eventId}/blocked-visitors`,
+              label: 'Pengunjung Nonaktif',
+              icon: UserX,
+              resource: 'view_sales_revenue',
+            },
+          ],
+        },
+        {
+          groupTitle: 'Laporan & Analitik',
+          isHighlighted: false,
+          links: [
+            {
+              href: `/dashboard/events/${eventId}/sales`,
+              label: 'Statistik Ringkasan',
+              icon: BarChart3,
+              resource: 'view_sales_revenue',
+            },
+            {
+              href: `/dashboard/events/${eventId}/analytics/sales`,
+              label: 'Analitik Mendalam',
+              icon: TrendingUp,
+              resource: 'view_analytics_growth',
+            },
+            {
+              href: `/dashboard/events/${eventId}/audience/segments`,
+              label: 'Marketing (Broadcast)',
+              icon: Megaphone,
+              resource: 'manage_audience_segments',
+            },
+            {
+              href: `/dashboard/events/${eventId}/growth`,
+              label: 'Growth (Sales Insight)',
+              icon: TrendingUp,
+              resource: 'view_analytics_growth',
+            },
+            {
+              href: `/dashboard/events/${eventId}/export`,
+              label: 'Laporan (Rekap Data)',
+              icon: Download,
+              resource: 'view_sales_revenue',
+            },
+          ],
+        },
       ]
     : [];
 
@@ -116,7 +263,13 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const inactiveLinkClass = 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium';
 
   return (
-    <aside className={cn('w-64 border-r border-slate-200 bg-white flex flex-col justify-between shrink-0 h-full', className)}>
+    <aside
+      className={cn(
+        'w-64 border-r flex flex-col justify-between shrink-0 h-full transition-colors',
+        isEventScope ? 'bg-slate-50/50 border-teal-200/70' : 'bg-white border-slate-200',
+        className
+      )}
+    >
       <div className="flex flex-col flex-1 min-h-0">
         {/* 1. Logo & Portal Title (Centered, consistent with Admin & Affiliates) */}
         <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between relative shrink-0">
@@ -150,53 +303,113 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
           )}
         </div>
 
-        {/* 2. Event Context Header (if in specific event scope) */}
+        {/* 2. Event Context Header (Distinct Color for Event Scope) */}
         {isEventScope && (
-          <div className="p-3.5 border-b border-slate-100 bg-slate-50/70 shrink-0">
+          <div className="p-3 border-b border-teal-100 bg-gradient-to-b from-teal-500/10 via-teal-50/60 to-transparent shrink-0">
             <Link
               href="/dashboard/events"
               onClick={onItemClick}
-              className="flex items-center gap-2 text-xs font-bold text-[#08B4B5] hover:text-[#079b9c] transition py-2 px-3 rounded-xl bg-white border border-slate-200 shadow-2xs w-full mb-2"
+              className="flex items-center gap-1.5 text-xs font-bold text-teal-800 hover:text-teal-950 transition py-1.5 px-2.5 rounded-xl bg-white border border-teal-200 shadow-2xs w-full mb-2"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Kembali ke Daftar Event</span>
+              <ArrowLeft className="h-3.5 w-3.5 text-[#08B4B5]" />
+              <span className="truncate">Kembali ke Daftar Event</span>
             </Link>
-            <div className="flex items-center gap-2 px-1">
-              <div className="h-2 w-2 rounded-full bg-[#08B4B5] animate-pulse" />
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
-                Event Workspace
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#08B4B5] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#08B4B5]"></span>
+                </span>
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
+                  Event Workspace
+                </span>
+              </div>
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#08B4B5] text-white shadow-2xs">
+                Kelola Event
               </span>
             </div>
           </div>
         )}
 
         {/* 3. Navigation Links */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto min-h-0">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
-            {isEventScope ? 'Fitur Event' : 'Menu Organisasi'}
-          </span>
-
-          {/* Level Event */}
+        <nav className="flex-1 px-3 py-4 space-y-3 overflow-y-auto min-h-0">
+          {/* Level Event (Grouped & Spaced) */}
           {isEventScope &&
-            eventLinks
-              .filter((link) => !link.resource || can(link.resource))
-              .map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={onItemClick}
-                    className={`flex items-center space-x-3 px-3 py-2.5 border-l-3 rounded-r-xl transition text-xs ${
-                      isActive ? activeLinkClass : inactiveLinkClass
-                    }`}
+            eventLinkGroups.map((group, groupIdx) => {
+              const filteredLinks = group.links.filter(
+                (link) => !link.resource || can(link.resource)
+              );
+              if (filteredLinks.length === 0) return null;
+
+              const isSetup = group.isHighlighted;
+
+              return (
+                <div key={group.groupTitle} className="space-y-1.5">
+                  {/* Group Header Label */}
+                  <div className="flex items-center justify-between px-2 pt-1">
+                    <span
+                      className={cn(
+                        'text-[10px] font-black uppercase tracking-wider',
+                        isSetup ? 'text-[#08ADAE]' : 'text-slate-400'
+                      )}
+                    >
+                      {group.groupTitle}
+                    </span>
+                    {group.groupBadge && (
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-teal-100 text-[#08ADAE] border border-teal-200">
+                        {group.groupBadge}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Group Container (Setup group is indented and highlighted) */}
+                  <div
+                    className={cn(
+                      'space-y-1',
+                      isSetup
+                        ? 'p-1.5 bg-white border border-teal-100/90 rounded-2xl shadow-2xs ml-1 space-y-1'
+                        : 'pl-1 space-y-0.5'
+                    )}
                   >
-                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#08B4B5]' : 'text-slate-400'}`} />
-                    <span className="truncate">{link.label}</span>
-                  </Link>
-                );
-              })}
+                    {filteredLinks.map((link) => {
+                      const Icon = link.icon;
+                      const isActive =
+                        pathname === link.href || pathname.startsWith(link.href + '/');
+
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={onItemClick}
+                          className={cn(
+                            'flex items-center justify-between px-2.5 py-2 rounded-xl transition text-xs',
+                            isActive
+                              ? 'bg-[#08B4B5] text-white font-bold shadow-xs'
+                              : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-medium'
+                          )}
+                        >
+                          <div className="flex items-center space-x-2.5 truncate">
+                            <Icon
+                              className={cn(
+                                'h-4 w-4 shrink-0',
+                                isActive ? 'text-white' : isSetup ? 'text-[#08B4B5]' : 'text-slate-400'
+                              )}
+                            />
+                            <span className="truncate">{link.label}</span>
+                          </div>
+
+                          {link.badge && !isActive && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 border border-amber-300 shrink-0">
+                              {link.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
 
           {/* Level Organisasi */}
           {!isEventScope &&

@@ -16,6 +16,7 @@ class CreateTicketCategoryDto {
     name;
     price;
     quota;
+    ticketPerPackage;
     saleStart;
     saleEnd;
 }
@@ -38,6 +39,13 @@ __decorate([
     (0, class_validator_1.Min)(1, { message: 'Kuota minimal harus 1' }),
     __metadata("design:type", Number)
 ], CreateTicketCategoryDto.prototype, "quota", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 1, required: false, description: 'Jumlah tiket/orang per paket (contoh: 2 untuk Couple)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1, { message: 'Jumlah tiket per paket minimal 1' }),
+    __metadata("design:type", Number)
+], CreateTicketCategoryDto.prototype, "ticketPerPackage", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2026-08-01T00:00:00Z' }),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal mulai penjualan tidak valid' }),

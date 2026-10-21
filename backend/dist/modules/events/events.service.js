@@ -51,24 +51,30 @@ let EventsService = class EventsService {
         if (existingEvent) {
             slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
         }
+        const isDateTba = dto.isDateTba ?? false;
+        const defaultPlaceholderDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        const startDate = dto.startDate ? new Date(dto.startDate) : defaultPlaceholderDate;
+        const endDate = dto.endDate ? new Date(dto.endDate) : new Date(startDate.getTime() + 4 * 60 * 60 * 1000);
+        const createData = {
+            organizerId: organizer.id,
+            title: dto.title,
+            slug,
+            description: dto.description,
+            bannerUrl: dto.bannerUrl || '',
+            location: dto.location,
+            isDateTba,
+            startDate,
+            endDate,
+            requireLogin: dto.requireLogin ?? false,
+            seoTitle: dto.seoTitle,
+            seoDescription: dto.seoDescription,
+            seoKeywords: dto.seoKeywords,
+            adminSeoKeywords: dto.adminSeoKeywords,
+            seoPriority: dto.seoPriority || 'NORMAL',
+            status: client_1.EventStatus.DRAFT,
+        };
         return this.prisma.event.create({
-            data: {
-                organizerId: organizer.id,
-                title: dto.title,
-                slug,
-                description: dto.description,
-                bannerUrl: dto.bannerUrl || '',
-                location: dto.location,
-                startDate: new Date(dto.startDate),
-                endDate: new Date(dto.endDate),
-                requireLogin: dto.requireLogin ?? false,
-                seoTitle: dto.seoTitle,
-                seoDescription: dto.seoDescription,
-                seoKeywords: dto.seoKeywords,
-                adminSeoKeywords: dto.adminSeoKeywords,
-                seoPriority: dto.seoPriority || 'NORMAL',
-                status: client_1.EventStatus.DRAFT,
-            },
+            data: createData,
         });
     }
     async update(id, dto, userId) {
@@ -103,9 +109,11 @@ let EventsService = class EventsService {
             updateData.bannerUrl = dto.bannerUrl;
         if (dto.location !== undefined)
             updateData.location = dto.location;
-        if (dto.startDate !== undefined)
+        if (dto.isDateTba !== undefined)
+            updateData.isDateTba = dto.isDateTba;
+        if (dto.startDate !== undefined && dto.startDate)
             updateData.startDate = new Date(dto.startDate);
-        if (dto.endDate !== undefined)
+        if (dto.endDate !== undefined && dto.endDate)
             updateData.endDate = new Date(dto.endDate);
         if (dto.requireLogin !== undefined)
             updateData.requireLogin = dto.requireLogin;
@@ -155,6 +163,14 @@ let EventsService = class EventsService {
                     select: {
                         name: true,
                         slug: true,
+                    },
+                },
+                ticketCategories: {
+                    select: {
+                        price: true,
+                    },
+                    orderBy: {
+                        price: 'asc',
                     },
                 },
             },

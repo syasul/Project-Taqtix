@@ -180,7 +180,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
             const verifiedItems = [];
             for (const item of dto.items) {
                 const ticketCategories = await tx.$queryRaw `
-          SELECT id, quota, sold, name, price FROM "TicketCategory"
+          SELECT id, quota, sold, name, price, "ticketPerPackage" FROM "TicketCategory"
           WHERE id = ${item.ticketCategoryId} AND "eventId" = ${dto.eventId}
           FOR UPDATE
         `;
@@ -254,12 +254,23 @@ let OrdersService = OrdersService_1 = class OrdersService {
                         });
                     }
                 }
-                basePriceTotal += itemFacilityCost;
+                const combinedAnswers = {
+                    ...(dto.customFieldAnswers || {}),
+                    ...(item.customFieldAnswers || {}),
+                    ...(item.attendeeIdType ? { identityType: item.attendeeIdType } : {}),
+                    ...(item.attendeeIdNumber ? { identityNumber: item.attendeeIdNumber } : {}),
+                    ...(item.attendeeGender ? { gender: item.attendeeGender } : {}),
+                    ...(dto.buyerIdType ? { buyerIdType: dto.buyerIdType } : {}),
+                    ...(dto.buyerIdNumber ? { buyerIdNumber: dto.buyerIdNumber } : {}),
+                };
                 verifiedItems.push({
                     ticketCategoryId: ticketCategory.id,
                     qty: item.qty,
                     price: ticketCategory.price,
-                    customFieldAnswers: item.customFieldAnswers || dto.customFieldAnswers || null,
+                    attendeeName: item.attendeeName || dto.buyerName,
+                    attendeeEmail: item.attendeeEmail || dto.buyerEmail,
+                    attendeePhone: item.attendeePhone || dto.buyerPhone || '',
+                    customFieldAnswers: Object.keys(combinedAnswers).length > 0 ? combinedAnswers : null,
                     facilities: verifiedItemFacilities.length > 0 ? verifiedItemFacilities : null,
                 });
             }
@@ -327,9 +338,9 @@ let OrdersService = OrdersService_1 = class OrdersService {
                         ticketCategoryId: item.ticketCategoryId,
                         qty: item.qty,
                         unitPrice: item.price,
-                        attendeeName: dto.buyerName,
-                        attendeeEmail: dto.buyerEmail,
-                        attendeePhone: dto.buyerPhone || '',
+                        attendeeName: item.attendeeName || dto.buyerName,
+                        attendeeEmail: item.attendeeEmail || dto.buyerEmail,
+                        attendeePhone: item.attendeePhone || dto.buyerPhone || '',
                         city: dto.city || null,
                         customFieldAnswers: item.customFieldAnswers,
                         facilities: item.facilities,
@@ -514,6 +525,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
                         location: true,
                         startDate: true,
                         endDate: true,
+                        isDateTba: true,
                     },
                 },
                 payment: true,

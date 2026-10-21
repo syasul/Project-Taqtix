@@ -3,7 +3,7 @@ import * as crypto from 'crypto';
 
 export async function createTestUser(
   prisma: PrismaClient,
-  overrides: Partial<Parameters<PrismaClient['user']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   const randomSuffix = crypto.randomBytes(4).toString('hex');
   return prisma.user.create({
@@ -12,14 +12,14 @@ export async function createTestUser(
       passwordHash: '$2b$10$abcdefghijklmnopqrstuv',
       role: 'buyer',
       ...overrides,
-    },
+    } as any,
   });
 }
 
 export async function createTestOrganizer(
   prisma: PrismaClient,
   userId: string,
-  overrides: Partial<Parameters<PrismaClient['organizer']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   const randomSuffix = crypto.randomBytes(4).toString('hex');
   const organizer = await prisma.organizer.create({
@@ -29,7 +29,7 @@ export async function createTestOrganizer(
       slug: `test-org-${randomSuffix}`,
       status: 'active',
       ...overrides,
-    },
+    } as any,
   });
 
   // Pastikan ada OrganizerMember owner
@@ -37,6 +37,8 @@ export async function createTestOrganizer(
     data: {
       organizerId: organizer.id,
       userId,
+      email: 'owner@test.com',
+      invitedBy: userId,
       role: 'owner',
       status: 'active',
     },
@@ -48,7 +50,7 @@ export async function createTestOrganizer(
 export async function createTestEvent(
   prisma: PrismaClient,
   organizerId: string,
-  overrides: Partial<Parameters<PrismaClient['event']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   const randomSuffix = crypto.randomBytes(4).toString('hex');
   return prisma.event.create({
@@ -59,17 +61,16 @@ export async function createTestEvent(
       status: EventStatus.PUBLISHED,
       startDate: new Date(Date.now() + 86400000),
       endDate: new Date(Date.now() + 172800000),
-      venue: 'Jakarta Convention Center',
-      city: 'Jakarta',
+      location: 'Jakarta Convention Center',
       ...overrides,
-    },
+    } as any,
   });
 }
 
 export async function createTestTicketCategory(
   prisma: PrismaClient,
   eventId: string,
-  overrides: Partial<Parameters<PrismaClient['ticketCategory']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   const randomSuffix = crypto.randomBytes(3).toString('hex');
   return prisma.ticketCategory.create({
@@ -80,14 +81,14 @@ export async function createTestTicketCategory(
       quota: 10,
       sold: 0,
       ...overrides,
-    },
+    } as any,
   });
 }
 
 export async function createTestVoucher(
   prisma: PrismaClient,
   organizerId: string,
-  overrides: Partial<Parameters<PrismaClient['voucher']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
   return prisma.voucher.create({
@@ -102,14 +103,14 @@ export async function createTestVoucher(
       usageCount: 0,
       usageLimit: 100,
       ...overrides,
-    },
+    } as any,
   });
 }
 
 export async function createTestFacility(
   prisma: PrismaClient,
   eventId: string,
-  overrides: Partial<Parameters<PrismaClient['eventFacility']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   const randomSuffix = crypto.randomBytes(3).toString('hex');
   return prisma.eventFacility.create({
@@ -120,7 +121,7 @@ export async function createTestFacility(
       quota: 10,
       sold: 0,
       ...overrides,
-    },
+    } as any,
   });
 }
 
@@ -128,7 +129,7 @@ export async function createTestOrder(
   prisma: PrismaClient,
   buyerId: string,
   eventId: string,
-  overrides: Partial<Parameters<PrismaClient['order']['create']>[0]['data']> = {},
+  overrides: Record<string, any> = {},
 ) {
   return prisma.order.create({
     data: {
@@ -138,6 +139,6 @@ export async function createTestOrder(
       status: OrderStatus.PENDING,
       expiredAt: new Date(Date.now() + 10 * 60 * 1000),
       ...overrides,
-    },
+    } as any,
   });
 }

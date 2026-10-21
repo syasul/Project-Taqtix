@@ -48,6 +48,53 @@ export class OrderItemDto {
   customFieldAnswers?: Record<string, string>;
 
   @ApiPropertyOptional({
+    example: 'Budi Santoso',
+    description: 'Nama peserta pemegang tiket',
+  })
+  @IsString()
+  @IsOptional()
+  attendeeName?: string;
+
+  @ApiPropertyOptional({
+    example: 'budi@example.com',
+    description: 'Email peserta pemegang tiket',
+  })
+  @IsOptional()
+  attendeeEmail?: string;
+
+  @ApiPropertyOptional({
+    example: '081234567890',
+    description: 'Nomor WhatsApp peserta pemegang tiket',
+  })
+  @IsString()
+  @IsOptional()
+  attendeePhone?: string;
+
+  @ApiPropertyOptional({
+    example: 'KTP',
+    description: 'Tipe identitas peserta (KTP, SIM, Paspor, Kartu Pelajar)',
+  })
+  @IsString()
+  @IsOptional()
+  attendeeIdType?: string;
+
+  @ApiPropertyOptional({
+    example: '3201234567890001',
+    description: 'Nomor identitas peserta',
+  })
+  @IsString()
+  @IsOptional()
+  attendeeIdNumber?: string;
+
+  @ApiPropertyOptional({
+    example: 'Laki-laki',
+    description: 'Jenis kelamin peserta',
+  })
+  @IsString()
+  @IsOptional()
+  attendeeGender?: string;
+
+  @ApiPropertyOptional({
     type: [FacilityOrderDto],
     description: 'Fasilitas yang dipilih per tiket item',
   })
@@ -128,6 +175,22 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   buyerPhone?: string;
+
+  @ApiPropertyOptional({
+    example: 'KTP',
+    description: 'Tipe identitas pembeli (KTP, SIM, Paspor, Kartu Pelajar)',
+  })
+  @IsString()
+  @IsOptional()
+  buyerIdType?: string;
+
+  @ApiPropertyOptional({
+    example: '3201234567890001',
+    description: 'Nomor identitas pembeli',
+  })
+  @IsString()
+  @IsOptional()
+  buyerIdNumber?: string;
 
   @ApiPropertyOptional({
     example: 'Jakarta',

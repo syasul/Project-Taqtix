@@ -34,18 +34,31 @@ export class CreateEventDto {
   location!: string;
 
   @ApiProperty({
+    example: false,
+    required: false,
+    description: 'Status tanggal & waktu TBA (To Be Announced)',
+  })
+  @IsBoolean()
+  @IsOptional()
+  isDateTba?: boolean;
+
+  @ApiProperty({
     example: '2026-09-12T13:00:00Z',
-    description: 'Waktu mulai acara',
+    required: false,
+    description: 'Waktu mulai acara (opsional jika TBA)',
   })
   @IsDateString({}, { message: 'Tanggal mulai tidak valid' })
-  startDate!: string;
+  @IsOptional()
+  startDate?: string;
 
   @ApiProperty({
     example: '2026-09-12T22:00:00Z',
-    description: 'Waktu selesai acara',
+    required: false,
+    description: 'Waktu selesai acara (opsional jika TBA)',
   })
   @IsDateString({}, { message: 'Tanggal selesai tidak valid' })
-  endDate!: string;
+  @IsOptional()
+  endDate?: string;
 
   @ApiProperty({
     example: 'https://images.taqtix.id/banners/event1.jpg',

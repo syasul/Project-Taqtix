@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import {
@@ -28,6 +29,8 @@ import {
   Building,
   AtSign,
   HeartPulse,
+  Ticket,
+  User,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -126,6 +129,15 @@ const PRESET_FIELDS = [
     required: false,
     icon: HeartPulse,
     desc: 'Penanganan tim medis saat hari H',
+  },
+  {
+    key: 'blood_type',
+    label: 'Golongan Darah',
+    fieldType: 'dropdown' as const,
+    options: ['A', 'B', 'AB', 'O'],
+    required: false,
+    icon: HeartPulse,
+    desc: 'Informasi medis krusial untuk event lari (RUN), maraton, atau olahraga',
   },
 ];
 
@@ -266,7 +278,7 @@ export default function CustomFieldsPage() {
 
   const breadcrumbs = [
     { label: 'Daftar Event', href: '/dashboard/events' },
-    { label: 'Formulir Kustom Peserta' },
+    { label: 'Syarat & Formulir Pembeli' },
   ];
 
   return (
@@ -274,15 +286,71 @@ export default function CustomFieldsPage() {
       <Breadcrumb items={breadcrumbs} />
       <EventTabs eventId={eventId} />
 
+      {/* 3-Step Setup Workflow Indicator */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Link
+          href={`/dashboard/events/${eventId}/edit`}
+          className="p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-teal-300 transition flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-[#08B4B5]/10 text-slate-600 group-hover:text-[#08B4B5] flex items-center justify-center font-black text-xs shrink-0 transition">
+            1
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+              Tahap 1
+            </span>
+            <span className="font-bold text-xs text-slate-700 group-hover:text-[#08B4B5] truncate block">
+              Detail Informasi Event
+            </span>
+          </div>
+        </Link>
+
+        <div className="p-3.5 rounded-2xl bg-[#08B4B5]/10 border-2 border-[#08B4B5] text-[#08B4B5] flex items-center gap-3 shadow-xs">
+          <div className="w-8 h-8 rounded-xl bg-[#08B4B5] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+            2
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#08B4B5] block">
+                Tahap 2 (Aktif)
+              </span>
+              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-800 border border-amber-300">
+                Syarat Pembeli
+              </span>
+            </div>
+            <span className="font-extrabold text-xs text-slate-900 truncate block">
+              Syarat & Formulir Pembeli
+            </span>
+          </div>
+        </div>
+
+        <Link
+          href={`/dashboard/events/${eventId}/ticket-categories`}
+          className="p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-teal-300 transition flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-[#08B4B5]/10 text-slate-600 group-hover:text-[#08B4B5] flex items-center justify-center font-black text-xs shrink-0 transition">
+            3
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+              Tahap 3
+            </span>
+            <span className="font-bold text-xs text-slate-700 group-hover:text-[#08B4B5] truncate block">
+              Kategori & Kuota Tiket
+            </span>
+          </div>
+        </Link>
+      </div>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
             <ClipboardList className="w-6 h-6 text-[#08B4B5]" />
-            Formulir Tambahan Peserta
+            Syarat & Formulir Pembeli Tiket
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm mt-1">
-            Kumpulkan informasi khusus dari pembeli tiket saat checkout. Formulir ini otomatis muncul baik untuk pemesanan tiket tanpa login (Guest Checkout) maupun user yang login.
+            Atur data dan syarat apa saja yang wajib atau opsional diisi oleh pembeli saat memesan tiket di halaman checkout (misal: NIK/KTP, Tanggal Lahir, Ukuran Kaos, dll).
           </p>
         </div>
 
@@ -385,12 +453,50 @@ export default function CustomFieldsPage() {
         </Dialog>
       </div>
 
-      {/* Guest & Logged In User Notice */}
-      <div className="p-4 bg-teal-50/60 border border-teal-200 rounded-2xl flex items-start gap-3 text-xs text-teal-900">
-        <UserCheck className="w-5 h-5 text-[#08B4B5] shrink-0 mt-0.5" />
-        <div>
-          <strong className="block font-bold">Dukungan Pemesanan Fleksibel</strong>
-          Semua field formulir kustom di bawah ini otomatis diintegrasikan ke halaman checkout event publik Taqtix. Pembeli dapat memesan tanpa wajib login terlebih dahulu (Guest Checkout), maupun dengan akun terdaftar.
+      {/* Default Mandatory Fields Notice (WhatsApp, Nama, Email sudah otomatis) */}
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/90 border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row items-start gap-4 text-xs shadow-2xs">
+        <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+          <CheckCircle2 className="w-5 h-5" />
+        </div>
+        <div className="space-y-2 flex-1">
+          <div>
+            <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+              <span>Data Pokok Pembeli Sudah Otomatis Wajib (Default System)</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                Otomatis Aktif
+              </span>
+            </h4>
+            <p className="text-slate-600 text-xs mt-0.5 leading-relaxed">
+              Anda <strong>tidak perlu membuat form manual</strong> untuk 5 data pokok pemesan berikut. Kelima data ini <strong>sudah otomatis tersedia dan wajib diisi</strong> saat checkout di sistem TAQtix untuk pengiriman e-ticket & verifikasi tiket:
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-0.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold shadow-2xs text-xs">
+              <User className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Nama Lengkap</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold shadow-2xs text-xs">
+              <IdCard className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Tipe Identitas (KTP/SIM/Paspor/Kartu Pelajar)</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold shadow-2xs text-xs">
+              <IdCard className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Nomor Identitas</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold shadow-2xs text-xs">
+              <AtSign className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Alamat Email</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 font-bold shadow-2xs text-xs">
+              <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Nomor WhatsApp (Aktif)</span>
+            </span>
+          </div>
+
+          <p className="text-[11px] text-slate-500 pt-1 leading-normal border-t border-emerald-100/90">
+            💡 <em>Di halaman checkout, pembeli juga otomatis mengisi data pemegang tiket per-tiket (Detail Pesanan) dengan opsi gender, serta opsi &ldquo;Samakan dengan detail pemesan&rdquo;. Preset di bawah ini adalah untuk data khusus (seperti Ukuran Kaos, Golongan Darah untuk event RUN, Kontak Darurat, dll).</em>
+          </p>
         </div>
       </div>
 

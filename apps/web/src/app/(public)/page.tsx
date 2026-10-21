@@ -40,6 +40,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EventCard } from '@/components/event/event-card';
 
 interface Event {
   id: string;
@@ -50,9 +51,15 @@ interface Event {
   location: string;
   startDate: string;
   endDate: string;
+  isDateTba?: boolean;
   organizer: {
     name: string;
+    slug?: string;
+    avatarUrl?: string;
   };
+  ticketCategories?: {
+    price: number;
+  }[];
 }
 
 // Kategori jumbotron
@@ -812,7 +819,7 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 3. SLIDER EVENT PER KOTA (CITY EXPLORER)                                  */}
+      {/* 3. SLIDER EVENT PER KOTA / OFFICIAL EVENTS                                */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -820,11 +827,11 @@ function MarketplaceContent() {
             <div className="flex items-center gap-2">
               <Building2 className="w-5 h-5 text-[#08ADAE]" />
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                Jelajahi Event per Kota
+                Official Event
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Temukan konser musik, festival, workshop, olahraga, dan seni di kota pilihan Anda.
+              Event resmi yang bisa dibeli tiketnya langsung lewat TAQtix.
             </p>
           </div>
 
@@ -850,69 +857,31 @@ function MarketplaceContent() {
         {/* Horizontal Event Slider */}
         {cityEvents.length === 0 ? (
           <div className="p-8 text-center liquid-glass rounded-2xl text-xs sm:text-sm text-slate-500">
-            Belum ada jadwal event di kota <span className="font-semibold text-slate-700">{selectedCity}</span>. Coba pilih kota lain atau "Semua Kota".
+            Belum ada jadwal event di kota <span className="font-semibold text-slate-700">{selectedCity}</span>. Coba pilih kota lain atau &quot;Semua Kota&quot;.
           </div>
         ) : (
-          <div className="flex gap-6 overflow-x-auto pb-4 pt-1 scrollbar-none snap-x">
-            {cityEvents.map((evt) => (
-              <div
-                key={evt.id}
-                className="w-72 sm:w-80 shrink-0 liquid-glass-card rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition flex flex-col justify-between snap-start group"
-              >
-                <div className="relative h-44 w-full bg-slate-100 overflow-hidden">
-                  {evt.bannerUrl ? (
-                    <img
-                      src={evt.bannerUrl}
-                      alt={evt.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                      <Ticket className="w-10 h-10 text-[#08ADAE]/30" />
-                    </div>
-                  )}
-                  <span className="absolute top-3 left-3 px-3 py-1 liquid-glass-pill text-slate-800 text-[10px] font-bold shadow-xs">
-                    {evt.location.split(',')[0]}
-                  </span>
+          <div className="flex gap-5 overflow-x-auto pb-4 pt-1 scrollbar-none snap-x">
+            {cityEvents.map((evt) => {
+              const minPrice = evt.ticketCategories?.[0]?.price ?? 100000;
+              return (
+                <div key={evt.id} className="w-72 sm:w-80 shrink-0 snap-start">
+                  <EventCard
+                    id={evt.id}
+                    slug={evt.slug}
+                    title={evt.title}
+                    description={evt.description}
+                    bannerUrl={evt.bannerUrl}
+                    location={evt.location}
+                    startDate={evt.startDate}
+                    endDate={evt.endDate}
+                    isDateTba={evt.isDateTba}
+                    organizer={evt.organizer}
+                    minPrice={minPrice}
+                    isOfficial={true}
+                  />
                 </div>
-
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider block">
-                      {evt.organizer.name}
-                    </span>
-                    <h3 className="font-bold text-slate-900 text-sm line-clamp-2 leading-snug">
-                      {evt.title}
-                    </h3>
-                    <div className="space-y-1 text-xs text-slate-500 pt-1">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#08ADAE]" />
-                        <span className="text-[11px]">
-                          {format(new Date(evt.startDate), 'd MMM yyyy', { locale: localeId })}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-[#08ADAE]" />
-                        <span className="text-[11px] truncate">{evt.location}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-medium">Mulai dari</span>
-                      <span className="text-xs font-black text-slate-900">Rp 100.000</span>
-                    </div>
-                    <Link
-                      href={`/event/${evt.slug}`}
-                      className="px-4 py-2 bg-[#08ADAE] hover:bg-[#07999A] text-white rounded-full text-xs font-bold transition shadow-[0_2px_10px_rgba(8,173,174,0.3)] active:scale-95"
-                    >
-                      Beli Tiket
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
@@ -964,13 +933,13 @@ function MarketplaceContent() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="liquid-glass overflow-hidden shadow-xs rounded-2xl">
-                <Skeleton className="h-48 w-full bg-slate-200/60" />
-                <CardContent className="p-6 space-y-4">
-                  <Skeleton className="h-4 w-1/4 bg-slate-200/60" />
-                  <Skeleton className="h-6 w-3/4 bg-slate-200/60" />
-                  <Skeleton className="h-4 w-full bg-slate-200/60" />
-                </CardContent>
+              <Card key={i} className="bg-white border border-slate-200 overflow-hidden shadow-xs rounded-3xl p-3.5 space-y-3">
+                <Skeleton className="aspect-[16/9] w-full rounded-2xl bg-slate-200/60" />
+                <div className="p-2 space-y-3">
+                  <Skeleton className="h-5 w-3/4 bg-slate-200/60" />
+                  <Skeleton className="h-4 w-1/2 bg-slate-200/60" />
+                  <Skeleton className="h-4 w-2/3 bg-slate-200/60" />
+                </div>
               </Card>
             ))}
           </div>
@@ -984,76 +953,26 @@ function MarketplaceContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => (
-              <Card
-                key={event.id}
-                className="liquid-glass-card overflow-hidden rounded-2xl shadow-xs hover:shadow-xl transition-all flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="relative h-48 w-full bg-slate-100 overflow-hidden">
-                    {event.bannerUrl ? (
-                      <img
-                        src={event.bannerUrl}
-                        alt={event.title}
-                        className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center bg-slate-50">
-                        <Ticket className="h-10 w-10 text-[#08ADAE]/30" />
-                      </div>
-                    )}
-                    <span className="absolute top-3 left-3 text-[10px] font-bold text-slate-800 liquid-glass-pill px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                      {event.location.split(',')[0]}
-                    </span>
-                  </div>
-
-                  <CardContent className="p-5 space-y-3">
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
-                        {event.organizer.name}
-                      </span>
-                      <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">
-                        {event.title}
-                      </h3>
-                    </div>
-
-                    <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed">
-                      {event.description}
-                    </p>
-
-                    <div className="space-y-1.5 pt-2 border-t border-slate-200/60 text-xs text-slate-600 font-medium">
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-3.5 w-3.5 text-[#08ADAE] shrink-0" />
-                        <span>
-                          {format(new Date(event.startDate), 'd MMMM yyyy, HH:mm', { locale: localeId })} WIB
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-3.5 w-3.5 text-[#08ADAE] shrink-0" />
-                        <span className="truncate">{event.location}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </div>
-
-                <div className="p-5 pt-0 border-t border-slate-200/60 flex items-center justify-between mt-auto">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] text-slate-400 block font-medium">Mulai dari</span>
-                    <span className="text-sm font-black text-slate-900">Rp 100.000</span>
-                  </div>
-                  <Link
-                    href={`/event/${event.slug}`}
-                    className={cn(
-                      buttonVariants({ variant: 'default' }),
-                      'bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold px-4 py-2 rounded-full transition shadow-[0_2px_10px_rgba(8,173,174,0.35)] text-xs flex items-center gap-1.5 cursor-pointer border-0 active:scale-95'
-                    )}
-                  >
-                    <span>Beli Tiket</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              </Card>
-            ))}
+            {filteredEvents.map((event) => {
+              const minPrice = event.ticketCategories?.[0]?.price ?? 100000;
+              return (
+                <EventCard
+                  key={event.id}
+                  id={event.id}
+                  slug={event.slug}
+                  title={event.title}
+                  description={event.description}
+                  bannerUrl={event.bannerUrl}
+                  location={event.location}
+                  startDate={event.startDate}
+                  endDate={event.endDate}
+                  isDateTba={event.isDateTba}
+                  organizer={event.organizer}
+                  minPrice={minPrice}
+                  isOfficial={true}
+                />
+              );
+            })}
           </div>
         )}
       </section>

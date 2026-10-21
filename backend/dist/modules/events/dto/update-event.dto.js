@@ -16,6 +16,7 @@ class UpdateEventDto {
     title;
     description;
     location;
+    isDateTba;
     startDate;
     endDate;
     bannerUrl;
@@ -48,6 +49,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "location", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, required: false }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpdateEventDto.prototype, "isDateTba", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2026-09-12T13:00:00Z', required: false }),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal mulai tidak valid' }),

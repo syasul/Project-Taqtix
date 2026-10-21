@@ -16,6 +16,7 @@ class UpdateTicketCategoryDto {
     name;
     price;
     quota;
+    ticketPerPackage;
     saleStart;
     saleEnd;
 }
@@ -40,6 +41,13 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], UpdateTicketCategoryDto.prototype, "quota", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 2, required: false, description: 'Jumlah tiket/orang per paket (contoh: 2 untuk Couple)' }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], UpdateTicketCategoryDto.prototype, "ticketPerPackage", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2026-08-01T00:00:00Z', required: false }),
     (0, class_validator_1.IsDateString)(),

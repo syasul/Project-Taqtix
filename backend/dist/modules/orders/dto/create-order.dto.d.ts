@@ -6,6 +6,12 @@ export declare class OrderItemDto {
     ticketCategoryId: string;
     qty: number;
     customFieldAnswers?: Record<string, string>;
+    attendeeName?: string;
+    attendeeEmail?: string;
+    attendeePhone?: string;
+    attendeeIdType?: string;
+    attendeeIdNumber?: string;
+    attendeeGender?: string;
     facilities?: FacilityOrderDto[];
 }
 export declare class CreateOrderDto {
@@ -18,6 +24,8 @@ export declare class CreateOrderDto {
     buyerEmail: string;
     buyerName: string;
     buyerPhone?: string;
+    buyerIdType?: string;
+    buyerIdNumber?: string;
     city?: string;
     utmSource?: string;
     utmMedium?: string;

@@ -270,6 +270,7 @@ export declare class AdminService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -294,6 +295,7 @@ export declare class AdminService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
@@ -420,6 +422,7 @@ export declare class AdminService {
         status: import("@prisma/client").$Enums.EventStatus;
         organizerId: string;
         location: string;
+        isDateTba: boolean;
         startDate: Date;
         endDate: Date;
         bannerUrl: string;

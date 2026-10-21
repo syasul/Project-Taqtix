@@ -16,6 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import EventTabs from '@/components/layout/event-tabs';
+import Link from 'next/link';
 import { toast } from 'sonner';
 
 // Validasi Zod
@@ -23,6 +25,7 @@ const categorySchema = z.object({
   name: z.string().min(3, { message: 'Nama kategori minimal 3 karakter' }),
   price: z.number().min(0, { message: 'Harga tidak boleh kurang dari 0' }),
   quota: z.number().min(1, { message: 'Kuota minimal harus 1' }),
+  ticketPerPackage: z.number().min(1, { message: 'Jumlah tiket per paket minimal 1' }).default(1),
   saleStart: z.string().refine((val) => !isNaN(Date.parse(val)), { message: 'Tanggal mulai tidak valid' }),
   saleEnd: z.string().refine((val) => !isNaN(Date.parse(val)), { message: 'Tanggal selesai tidak valid' }),
 }).refine((data) => {
@@ -40,6 +43,7 @@ interface TicketCategory {
   price: number;
   quota: number;
   sold: number;
+  ticketPerPackage?: number;
   saleStartAt: string;
   saleEndAt: string;
 }
@@ -81,6 +85,7 @@ export default function TicketCategoriesPage() {
       name: '',
       price: 0,
       quota: 0,
+      ticketPerPackage: 1,
       saleStart: '',
       saleEnd: '',
     },
@@ -98,6 +103,7 @@ export default function TicketCategoriesPage() {
         name: values.name,
         price: values.price,
         quota: values.quota,
+        ticketPerPackage: Number(values.ticketPerPackage) || 1,
         saleStart: new Date(values.saleStart).toISOString(),
         saleEnd: new Date(values.saleEnd).toISOString(),
       };
@@ -122,6 +128,7 @@ export default function TicketCategoriesPage() {
         name: values.name,
         price: values.price,
         quota: values.quota,
+        ticketPerPackage: Number(values.ticketPerPackage) || 1,
         saleStart: new Date(values.saleStart).toISOString(),
         saleEnd: new Date(values.saleEnd).toISOString(),
       };
@@ -152,6 +159,7 @@ export default function TicketCategoriesPage() {
       name: category.name,
       price: category.price,
       quota: category.quota,
+      ticketPerPackage: category.ticketPerPackage || 1,
       saleStart: toLocalString(category.saleStartAt),
       saleEnd: toLocalString(category.saleEndAt),
     });
@@ -167,6 +175,65 @@ export default function TicketCategoriesPage() {
     <div className="space-y-6 max-w-5xl">
       {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbs} />
+
+      {/* Event Sub-Navigation Tabs */}
+      <EventTabs eventId={eventId as string} />
+
+      {/* 3-Step Setup Workflow Indicator */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Link
+          href={`/dashboard/events/${eventId}/edit`}
+          className="p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-teal-300 transition flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-[#08B4B5]/10 text-slate-600 group-hover:text-[#08B4B5] flex items-center justify-center font-black text-xs shrink-0 transition">
+            1
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+              Tahap 1
+            </span>
+            <span className="font-bold text-xs text-slate-700 group-hover:text-[#08B4B5] truncate block">
+              Detail Informasi Event
+            </span>
+          </div>
+        </Link>
+
+        <Link
+          href={`/dashboard/events/${eventId}/custom-fields`}
+          className="p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-teal-300 transition flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-[#08B4B5]/10 text-slate-600 group-hover:text-[#08B4B5] flex items-center justify-center font-black text-xs shrink-0 transition">
+            2
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+                Tahap 2
+              </span>
+              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                Syarat Pembeli
+              </span>
+            </div>
+            <span className="font-bold text-xs text-slate-700 group-hover:text-[#08B4B5] truncate block">
+              Syarat & Formulir Pembeli
+            </span>
+          </div>
+        </Link>
+
+        <div className="p-3.5 rounded-2xl bg-[#08B4B5]/10 border-2 border-[#08B4B5] text-[#08B4B5] flex items-center gap-3 shadow-xs">
+          <div className="w-8 h-8 rounded-xl bg-[#08B4B5] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+            3
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#08B4B5] block">
+              Tahap 3 (Aktif)
+            </span>
+            <span className="font-extrabold text-xs text-slate-900 truncate block">
+              Kategori & Kuota Tiket
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Top Header */}
       <div className="flex justify-between items-center">
@@ -216,9 +283,14 @@ export default function TicketCategoriesPage() {
                   <Card key={category.id} className="bg-white border-slate-200 p-6 relative group overflow-hidden shadow-sm rounded-2xl">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <h4 className="text-base font-bold text-slate-900 flex flex-wrap items-center gap-2">
                           <Ticket className="h-4.5 w-4.5 text-[#08B4B5]" />
                           <span>{category.name}</span>
+                          {(category.ticketPerPackage || 1) > 1 && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                              Paket {category.ticketPerPackage} Orang • {category.ticketPerPackage} Barcode
+                            </span>
+                          )}
                         </h4>
                         <p className="text-xs font-bold text-emerald-600 font-mono">
                           {category.price.toLocaleString('id-ID', {
@@ -344,6 +416,37 @@ export default function TicketCategoriesPage() {
 
                   <FormField
                     control={newForm.control}
+                    name="ticketPerPackage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Jumlah Orang per Paket
+                          </FormLabel>
+                          <span className="text-[10px] font-bold text-[#08B4B5]">
+                            {(field.value || 1) > 1 ? `Paket ${field.value} Orang (${field.value} Barcode)` : '1 Orang (Normal)'}
+                          </span>
+                        </div>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1}
+                            placeholder="1 (Ketik 2 untuk Couple / Berdua, 4 untuk Group)"
+                            className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
+                            {...field}
+                            onChange={(e) => field.onChange(Math.max(1, Number(e.target.value) || 1))}
+                          />
+                        </FormControl>
+                        <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                          💡 Contoh: Tiket <strong>&quot;Reguler Berdua&quot;</strong> diisi <strong>2</strong> agar pembeli otomatis mendapat <strong>2 Barcode Tiket</strong> dan mengisi 2 data peserta saat checkout.
+                        </p>
+                        <FormMessage className="text-rose-500 text-[10px]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={newForm.control}
                     name="saleStart"
                     render={({ field }) => (
                       <FormItem>
@@ -461,6 +564,37 @@ export default function TicketCategoriesPage() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={editForm.control}
+                name="ticketPerPackage"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Jumlah Orang per Paket
+                      </FormLabel>
+                      <span className="text-[10px] font-bold text-[#08B4B5]">
+                        {(field.value || 1) > 1 ? `Paket ${field.value} Orang (${field.value} Barcode)` : '1 Orang (Normal)'}
+                      </span>
+                    </div>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        placeholder="1 (Ketik 2 untuk Couple / Berdua, 4 untuk Group)"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
+                        {...field}
+                        onChange={(e) => field.onChange(Math.max(1, Number(e.target.value) || 1))}
+                      />
+                    </FormControl>
+                    <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                      💡 Contoh: Tiket <strong>&quot;Reguler Berdua&quot;</strong> diisi <strong>2</strong> agar pembeli otomatis mendapat <strong>2 Barcode Tiket</strong> dan mengisi 2 data peserta saat checkout.
+                    </p>
+                    <FormMessage className="text-rose-500 text-[10px]" />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid grid-cols-2 gap-3">
                 <FormField

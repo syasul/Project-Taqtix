@@ -79,9 +79,10 @@ export default function OrganizationSettingsPage() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      if (res.data?.success && res.data?.data?.url) {
-        setForm(prev => ({ ...prev, logoUrl: res.data.data.url }));
-        toast.success('Logo berhasil diunggah!');
+      const uploadedUrl = res.data?.data?.url || res.data?.url;
+      if (uploadedUrl) {
+        setForm(prev => ({ ...prev, logoUrl: uploadedUrl }));
+        toast.success('Logo berhasil diunggah langsung!');
       }
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Gagal mengunggah logo');

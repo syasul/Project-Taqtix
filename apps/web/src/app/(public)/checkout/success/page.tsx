@@ -54,6 +54,7 @@ interface OrderDetail {
     title: string;
     location?: string;
     startDate?: string;
+    isDateTba?: boolean;
   };
 }
 
@@ -318,7 +319,12 @@ function CheckoutSuccessContent() {
                     {order.event.title}
                   </h3>
                   <div className="flex flex-wrap gap-4 text-xs text-slate-500">
-                    {order.event.startDate && (
+                    {order.event.isDateTba ? (
+                      <span className="flex items-center gap-1 text-amber-600 font-semibold">
+                        <Calendar className="h-3.5 w-3.5 text-amber-500" />
+                        Tanggal & Waktu TBA
+                      </span>
+                    ) : order.event.startDate ? (
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5 text-[#08B4B5]" />
                         {new Date(order.event.startDate).toLocaleDateString('id-ID', {
@@ -328,7 +334,7 @@ function CheckoutSuccessContent() {
                           year: 'numeric',
                         })}
                       </span>
-                    )}
+                    ) : null}
                     {order.event.location && (
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5 text-[#08B4B5]" />

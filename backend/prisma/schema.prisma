@@ -124,6 +124,7 @@ model Event {
   geofenceRadius      Float?
   allowTicketTransfer Boolean           @default(true)
   requireLogin        Boolean           @default(false)
+  isDateTba           Boolean           @default(false)
   
   // SEO & Double Engagement Fields
   seoTitle            String?
@@ -165,6 +166,7 @@ model TicketCategory {
   quota       Int
   sold        Int      @default(0)
   maxPerOrder Int      @default(5)
+  ticketPerPackage Int @default(1)
   saleStartAt DateTime
   saleEndAt   DateTime
   createdAt   DateTime @default(now())
@@ -226,6 +228,8 @@ model Ticket {
   eventId            String
   qrPayload          String          @unique // Signed JWT format
   status             TicketStatus    @default(VALID)
+  attendeeName       String?
+  attendeeGender     String?
   checkedInAt        DateTime?
   checkedInBy        String?
   checkedOutAt       DateTime?

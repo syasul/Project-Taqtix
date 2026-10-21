@@ -53,11 +53,11 @@ export declare class DoorprizeController {
                 id: string;
                 createdAt: Date;
                 facilities: import("@prisma/client/runtime/library").JsonValue | null;
+                attendeeName: string;
                 orderId: string;
                 ticketCategoryId: string;
                 qty: number;
                 unitPrice: number;
-                attendeeName: string;
                 attendeeEmail: string;
                 attendeePhone: string;
                 city: string | null;
@@ -71,6 +71,8 @@ export declare class DoorprizeController {
             eventId: string;
             qrPayload: string;
             orderItemId: string;
+            attendeeName: string | null;
+            attendeeGender: string | null;
             checkedInAt: Date | null;
             checkedInBy: string | null;
             checkedOutAt: Date | null;

@@ -258,7 +258,7 @@ export class GateService {
           message:
             'Check-out berhasil! Tiket dinonaktifkan sementara (bisa masuk kembali).',
           ticketId: ticket.id,
-          buyerName: ticket.orderItem.attendeeName,
+          buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
           ticketCategory: ticket.orderItem.ticketCategory.name,
           eventTitle: ticket.orderItem.ticketCategory.name,
           ticket: {
@@ -267,7 +267,7 @@ export class GateService {
             checkedInAt: updatedTicket.checkedInAt,
             checkedOutAt: updatedTicket.checkedOutAt,
             orderItem: {
-              attendeeName: ticket.orderItem.attendeeName,
+              attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
               ticketCategory: {
                 name: ticket.orderItem.ticketCategory.name,
               },
@@ -352,7 +352,7 @@ export class GateService {
         success: true,
         message: 'Check-in berhasil! Selamat menikmati acara.',
         ticketId: ticket.id,
-        buyerName: ticket.orderItem.attendeeName,
+        buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
         ticketCategory: ticket.orderItem.ticketCategory.name,
         eventTitle: ticket.orderItem.ticketCategory.name, // Event title or default
         ticket: {
@@ -361,7 +361,7 @@ export class GateService {
           checkedInAt: updatedTicket.checkedInAt,
           checkedOutAt: updatedTicket.checkedOutAt,
           orderItem: {
-            attendeeName: ticket.orderItem.attendeeName,
+            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
             ticketCategory: {
               name: ticket.orderItem.ticketCategory.name,
             },
@@ -544,7 +544,7 @@ export class GateService {
         success: true,
         message: 'Check-in manual berhasil!',
         ticketId: ticket.id,
-        buyerName: ticket.orderItem.attendeeName,
+        buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
         ticketCategory: ticket.orderItem.ticketCategory.name,
         eventTitle: ticket.orderItem.ticketCategory.name,
         ticket: {
@@ -553,7 +553,7 @@ export class GateService {
           checkedInAt: updatedTicket.checkedInAt,
           checkedOutAt: updatedTicket.checkedOutAt,
           orderItem: {
-            attendeeName: ticket.orderItem.attendeeName,
+            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
             ticketCategory: {
               name: ticket.orderItem.ticketCategory.name,
             },

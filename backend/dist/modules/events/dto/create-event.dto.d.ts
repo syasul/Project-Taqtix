@@ -2,8 +2,9 @@ export declare class CreateEventDto {
     title: string;
     description?: string;
     location: string;
-    startDate: string;
-    endDate: string;
+    isDateTba?: boolean;
+    startDate?: string;
+    endDate?: string;
     bannerUrl?: string;
     requireLogin?: boolean;
     seoTitle?: string;

@@ -235,6 +235,9 @@ export class OrdersService {
         ticketCategoryId: string;
         qty: number;
         price: number;
+        attendeeName?: string;
+        attendeeEmail?: string;
+        attendeePhone?: string;
         customFieldAnswers?: any;
         facilities?: any;
       }[] = [];
@@ -242,7 +245,7 @@ export class OrdersService {
       for (const item of dto.items) {
         // Pessimistic locking pada baris TicketCategory
         const ticketCategories = await tx.$queryRaw<any[]>`
-          SELECT id, quota, sold, name, price FROM "TicketCategory"
+          SELECT id, quota, sold, name, price, "ticketPerPackage" FROM "TicketCategory"
           WHERE id = ${item.ticketCategoryId} AND "eventId" = ${dto.eventId}
           FOR UPDATE
         `;
@@ -347,14 +350,25 @@ export class OrdersService {
           }
         }
 
-        basePriceTotal += itemFacilityCost;
+        const combinedAnswers = {
+          ...(dto.customFieldAnswers || {}),
+          ...(item.customFieldAnswers || {}),
+          ...(item.attendeeIdType ? { identityType: item.attendeeIdType } : {}),
+          ...(item.attendeeIdNumber ? { identityNumber: item.attendeeIdNumber } : {}),
+          ...(item.attendeeGender ? { gender: item.attendeeGender } : {}),
+          ...(dto.buyerIdType ? { buyerIdType: dto.buyerIdType } : {}),
+          ...(dto.buyerIdNumber ? { buyerIdNumber: dto.buyerIdNumber } : {}),
+        };
 
         verifiedItems.push({
           ticketCategoryId: ticketCategory.id,
           qty: item.qty,
           price: ticketCategory.price,
+          attendeeName: item.attendeeName || dto.buyerName,
+          attendeeEmail: item.attendeeEmail || dto.buyerEmail,
+          attendeePhone: item.attendeePhone || dto.buyerPhone || '',
           customFieldAnswers:
-            item.customFieldAnswers || dto.customFieldAnswers || null,
+            Object.keys(combinedAnswers).length > 0 ? combinedAnswers : null,
           facilities:
             verifiedItemFacilities.length > 0 ? verifiedItemFacilities : null,
         });
@@ -431,9 +445,9 @@ export class OrdersService {
             ticketCategoryId: item.ticketCategoryId,
             qty: item.qty,
             unitPrice: item.price,
-            attendeeName: dto.buyerName,
-            attendeeEmail: dto.buyerEmail,
-            attendeePhone: dto.buyerPhone || '',
+            attendeeName: item.attendeeName || dto.buyerName,
+            attendeeEmail: item.attendeeEmail || dto.buyerEmail,
+            attendeePhone: item.attendeePhone || dto.buyerPhone || '',
             city: dto.city || null,
             customFieldAnswers: item.customFieldAnswers,
             facilities: item.facilities,
@@ -683,6 +697,7 @@ export class OrdersService {
             location: true,
             startDate: true,
             endDate: true,
+            isDateTba: true,
           },
         },
         payment: true,

@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/use-auth';
 import { apiClient } from '@/lib/api-client';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, UserPlus, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const registerSchema = z
@@ -29,12 +29,11 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuth((state) => state.setAuth);
-  const [role, setRole] = useState<'buyer' | 'organizer'>('buyer');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const redirectPath = searchParams?.get('redirect') || (role === 'organizer' ? 'http://localhost:3003/dashboard' : '/dashboard');
+  const redirectPath = searchParams?.get('redirect') || '/dashboard';
 
   const {
     register,
@@ -52,11 +51,11 @@ function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // 1. Panggil endpoint register dengan role terpilih
+      // 1. Panggil endpoint register dengan role buyer
       await apiClient.post('/auth/register', {
         email: values.email,
         password: values.password,
-        role,
+        role: 'buyer',
       });
 
       // 2. Lakukan auto-login langsung
@@ -70,13 +69,7 @@ function RegisterForm() {
 
       if (accessToken && refreshToken) {
         setAuth(accessToken, refreshToken);
-        toast.success(`Pendaftaran ${role === 'organizer' ? 'Penyelenggara' : 'Pembeli'} berhasil!`);
-
-        if (role === 'organizer') {
-          const eoUrl = process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/dashboard';
-          window.location.href = eoUrl;
-          return;
-        }
+        toast.success('Pendaftaran akun berhasil!');
 
         router.push(redirectPath);
         router.refresh();
@@ -99,7 +92,7 @@ function RegisterForm() {
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-8 sm:p-10 relative overflow-hidden">
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 text-[#08B4B5] mb-4">
             <UserPlus className="w-6 h-6" />
           </div>
@@ -107,34 +100,8 @@ function RegisterForm() {
             Buat Akun TAQtix
           </h1>
           <p className="text-xs text-slate-500 mt-2 font-medium">
-            Daftar untuk memesan tiket event atau mengelola acara Anda secara profesional.
+            Daftar untuk memesan tiket event favorit Anda secara mudah dan aman.
           </p>
-        </div>
-
-        {/* Role Segmented Selector */}
-        <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-2xl mb-6 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => setRole('buyer')}
-            className={`py-2 px-3 rounded-xl transition-all cursor-pointer ${
-              role === 'buyer'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            Pembeli Tiket
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole('organizer')}
-            className={`py-2 px-3 rounded-xl transition-all cursor-pointer ${
-              role === 'organizer'
-                ? 'bg-white text-[#08B4B5] shadow-xs'
-                : 'text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            Penyelenggara Event
-          </button>
         </div>
 
         {/* Form */}

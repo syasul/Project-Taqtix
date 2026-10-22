@@ -78,8 +78,8 @@ export default function LineupPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setErrorMsg('Ukuran file foto maksimal 5MB');
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMsg('Ukuran file foto maksimal 10MB');
       return;
     }
 
@@ -90,7 +90,7 @@ export default function LineupPage() {
       setUploadingPhoto(true);
       setErrorMsg('');
       const res = await apiClient.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000,
       });
       const uploadedUrl = res.data?.data?.url || res.data?.url;
       if (uploadedUrl) {

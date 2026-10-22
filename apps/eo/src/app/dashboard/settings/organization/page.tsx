@@ -12,12 +12,28 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   Loader2, 
-  Image as ImageIcon 
+  Image as ImageIcon,
+  Instagram,
+  Youtube,
+  Globe,
+  Share2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    width="14"
+    height="14"
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.12V9.42a6.34 6.34 0 0 0-.86-.06 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.28 8.28 0 0 0 4.84 1.55v-3.5a4.84 4.84 0 0 1-1.07-.11Z" />
+  </svg>
+);
 
 export default function OrganizationSettingsPage() {
   const { isOwner, isLoading: isRoleLoading } = useOrganizerRole();
@@ -33,6 +49,10 @@ export default function OrganizationSettingsPage() {
     logoUrl: '',
     contactEmail: '',
     phone: '',
+    website: '',
+    instagram: '',
+    tiktok: '',
+    youtube: '',
   });
 
   useEffect(() => {
@@ -51,10 +71,14 @@ export default function OrganizationSettingsPage() {
           logoUrl: data.logoUrl || '',
           contactEmail: data.contactEmail || '',
           phone: data.phone || '',
+          website: data.website || '',
+          instagram: data.instagram || '',
+          tiktok: data.tiktok || '',
+          youtube: data.youtube || '',
         });
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Gagal memuat informasi organisasi');
+      toast.error(err.response?.data?.message || 'Gagal memuat informasi organizer');
     } finally {
       setLoading(false);
     }
@@ -64,9 +88,9 @@ export default function OrganizationSettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate size (max 3MB)
-    if (file.size > 3 * 1024 * 1024) {
-      toast.error('Ukuran file maksimal 3MB');
+    // Validate size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 10MB');
       return;
     }
 
@@ -76,7 +100,7 @@ export default function OrganizationSettingsPage() {
     try {
       setUploadingLogo(true);
       const res = await apiClient.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000,
       });
 
       const uploadedUrl = res.data?.data?.url || res.data?.url;
@@ -98,17 +122,21 @@ export default function OrganizationSettingsPage() {
     try {
       setSaving(true);
       const res = await apiClient.patch('/organizer/settings/organization', {
-        name: form.name,
-        logoUrl: form.logoUrl,
-        contactEmail: form.contactEmail,
-        phone: form.phone,
+        name: form.name.trim(),
+        logoUrl: form.logoUrl.trim(),
+        contactEmail: form.contactEmail.trim(),
+        phone: form.phone.trim(),
+        website: form.website.trim(),
+        instagram: form.instagram.trim(),
+        tiktok: form.tiktok.trim(),
+        youtube: form.youtube.trim(),
       });
 
       if (res.data?.success) {
-        toast.success('Profil organisasi berhasil diperbarui');
+        toast.success('Profil organizer berhasil diperbarui');
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Gagal menyimpan data organisasi');
+      toast.error(err.response?.data?.message || 'Gagal menyimpan data organizer');
     } finally {
       setSaving(false);
     }
@@ -118,7 +146,7 @@ export default function OrganizationSettingsPage() {
     return (
       <div className="py-24 flex flex-col items-center justify-center space-y-3">
         <Loader2 className="h-8 w-8 text-[#08B4B5] animate-spin" />
-        <span className="text-xs font-semibold text-slate-400">Memuat data organisasi...</span>
+        <span className="text-xs font-semibold text-slate-400">Memuat data organizer...</span>
       </div>
     );
   }
@@ -128,7 +156,7 @@ export default function OrganizationSettingsPage() {
       <div>
         <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
           <Building2 className="h-6 w-6 text-[#08B4B5]" />
-          Pengaturan Organisasi
+          Pengaturan Organizer
         </h1>
         <p className="text-xs text-slate-500 mt-1 font-medium">
           Kelola profil identitas organizer, logo resmi, dan saluran komunikasi utama Anda.
@@ -141,7 +169,7 @@ export default function OrganizationSettingsPage() {
           <div>
             <h4 className="text-xs font-bold text-amber-900">Mode Pratinjau (Read-Only)</h4>
             <p className="text-[11px] text-amber-700 mt-0.5">
-              Hanya anggota tim dengan role <strong>Owner</strong> yang memiliki izin untuk mengubah nama, logo, dan kontak organisasi.
+              Hanya anggota tim dengan role <strong>Owner</strong> yang memiliki izin untuk mengubah nama, logo, dan kontak organizer.
             </p>
           </div>
         </div>
@@ -158,7 +186,7 @@ export default function OrganizationSettingsPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Logo Section */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-slate-700">Logo Organisasi</Label>
+              <Label className="text-xs font-bold text-slate-700">Logo Organizer</Label>
               <div className="flex items-center gap-5">
                 <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center shrink-0">
                   {form.logoUrl ? (
@@ -202,7 +230,7 @@ export default function OrganizationSettingsPage() {
                       )}
                     </Button>
                     <p className="text-[10px] text-slate-400">
-                      Format PNG, JPG, WebP, SVG. Maks. 3MB. Disarankan rasio 1:1.
+                      Format PNG, JPG, WebP, SVG. Maks. 10MB. Disarankan rasio 1:1.
                     </p>
                   </div>
                 )}
@@ -212,7 +240,7 @@ export default function OrganizationSettingsPage() {
             {/* Nama Organisasi */}
             <div className="space-y-2">
               <Label htmlFor="org-name" className="text-xs font-bold text-slate-700">
-                Nama Organisasi / Promotor
+                Nama Organizer / Promotor
               </Label>
               <Input
                 id="org-name"
@@ -242,7 +270,7 @@ export default function OrganizationSettingsPage() {
                 />
               </div>
               <p className="text-[10px] text-slate-400">
-                Slug organisasi dibuat saat pendaftaran dan tidak dapat diubah secara mandiri.
+                Slug organizer dibuat saat pendaftaran dan tidak dapat diubah secara mandiri.
               </p>
             </div>
 
@@ -278,6 +306,90 @@ export default function OrganizationSettingsPage() {
                   placeholder="081234567890"
                   className="rounded-xl border-slate-200 text-xs font-medium"
                 />
+              </div>
+            </div>
+
+            {/* Bagian Media Sosial & Web */}
+            <div className="pt-6 border-t border-slate-100 space-y-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Share2 className="h-4 w-4 text-[#08B4B5]" />
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Media Sosial & Tautan Web
+                  </h3>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                    Opsional
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Tautan profil sosial resmi organizer untuk ditampilkan pada laman rincian event agar calon pembeli dapat mengenal dan mengikuti promotor.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Instagram */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="org-ig" className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Instagram className="h-3.5 w-3.5 text-pink-600" />
+                    Instagram
+                  </Label>
+                  <Input
+                    id="org-ig"
+                    value={form.instagram}
+                    disabled={!isOwner || saving}
+                    onChange={(e) => setForm({ ...form, instagram: e.target.value })}
+                    placeholder="@namaorganizer atau link profil"
+                    className="rounded-xl border-slate-200 text-xs font-medium"
+                  />
+                </div>
+
+                {/* TikTok */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="org-tiktok" className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <TikTokIcon className="text-slate-800" />
+                    TikTok
+                  </Label>
+                  <Input
+                    id="org-tiktok"
+                    value={form.tiktok}
+                    disabled={!isOwner || saving}
+                    onChange={(e) => setForm({ ...form, tiktok: e.target.value })}
+                    placeholder="@namaorganizer atau link profil"
+                    className="rounded-xl border-slate-200 text-xs font-medium"
+                  />
+                </div>
+
+                {/* YouTube */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="org-yt" className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Youtube className="h-3.5 w-3.5 text-red-600" />
+                    YouTube
+                  </Label>
+                  <Input
+                    id="org-yt"
+                    value={form.youtube}
+                    disabled={!isOwner || saving}
+                    onChange={(e) => setForm({ ...form, youtube: e.target.value })}
+                    placeholder="https://youtube.com/@namaorganizer"
+                    className="rounded-xl border-slate-200 text-xs font-medium"
+                  />
+                </div>
+
+                {/* Website */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="org-web" className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Globe className="h-3.5 w-3.5 text-blue-600" />
+                    Website Resmi
+                  </Label>
+                  <Input
+                    id="org-web"
+                    value={form.website}
+                    disabled={!isOwner || saving}
+                    onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    placeholder="https://organizer.id"
+                    className="rounded-xl border-slate-200 text-xs font-medium"
+                  />
+                </div>
               </div>
             </div>
 

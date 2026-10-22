@@ -57,7 +57,7 @@ let UploadService = class UploadService {
             path.join(process.cwd(), 'uploads');
         try {
             if (!fs.existsSync(configuredPath)) {
-                fs.mkdirSync(configuredPath, { recursive: true });
+                fs.mkdirSync(configuredPath, { recursive: true, mode: 0o755 });
             }
             fs.accessSync(configuredPath, fs.constants.W_OK);
             this.uploadDir = configuredPath;
@@ -65,14 +65,17 @@ let UploadService = class UploadService {
         catch {
             const fallbackPath = path.join(process.cwd(), 'uploads');
             if (!fs.existsSync(fallbackPath)) {
-                fs.mkdirSync(fallbackPath, { recursive: true });
+                fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o755 });
             }
             this.uploadDir = fallbackPath;
             console.warn(`[UploadService] Storage path ${configuredPath} tidak dapat diakses. Menggunakan local directory: ${this.uploadDir}`);
         }
+        const defaultPublicUrl = process.env.NODE_ENV === 'production'
+            ? `${this.configService.get('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/uploads`
+            : `http://localhost:${this.configService.get('PORT') || '3000'}/uploads`;
         this.publicBaseUrl =
             this.configService.get('UPLOAD_PUBLIC_BASE_URL') ||
-                'http://localhost:3000/uploads';
+                defaultPublicUrl;
     }
     getUploadDir() {
         return this.uploadDir;

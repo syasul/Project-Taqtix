@@ -30,6 +30,10 @@ export class SettingsController {
       logoUrl?: string;
       contactEmail?: string;
       phone?: string;
+      website?: string;
+      instagram?: string;
+      tiktok?: string;
+      youtube?: string;
     },
   ) {
     const data = await this.settingsService.updateOrganization(userId, body);

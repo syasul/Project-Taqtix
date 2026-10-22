@@ -84,6 +84,10 @@ model Organizer {
   phone          String?           // Nomor telepon kontak organizer
   logoUrl        String?           // URL logo organisasi
   contactEmail   String?           // Email kontak resmi organisasi
+  website        String?           // Website resmi organizer
+  instagram      String?           // Akun / URL Instagram resmi
+  tiktok         String?           // Akun / URL TikTok resmi
+  youtube        String?           // Akun / URL YouTube resmi
   bankName       String?           // Nama bank settlement
   bankAccountNumber String?        // Nomor rekening bank settlement
   bankAccountHolder String?        // Atas nama rekening bank settlement

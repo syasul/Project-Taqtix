@@ -17,6 +17,13 @@ export interface EventDetail {
   updatedAt: string;
   organizer: {
     name: string;
+    slug?: string;
+    logoUrl?: string;
+    phone?: string;
+    website?: string;
+    instagram?: string;
+    tiktok?: string;
+    youtube?: string;
   };
   ticketCategories?: TicketCategory[];
 }

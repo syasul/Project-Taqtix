@@ -23,7 +23,15 @@ async function bootstrap() {
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
-    app.use('/uploads', express.static(uploadPath));
+    app.use(
+      '/uploads',
+      express.static(uploadPath, {
+        setHeaders: (res) => {
+          res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+        },
+      }),
+    );
   } catch (err) {
     console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
   }
@@ -33,8 +41,12 @@ async function bootstrap() {
     exclude: ['payments/webhook/(.*)', 'payments/webhook'],
   });
 
-  // 3. Keamanan: Aktifkan Helmet & CORS
-  app.use(helmet());
+  // 3. Keamanan: Aktifkan Helmet & CORS (izinkan cross-origin untuk aset gambar static)
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
   app.enableCors({
     origin: true, // Menyesuaikan dengan kebutuhan origin di dev/production
     credentials: true,
@@ -43,13 +55,13 @@ async function bootstrap() {
   // 4. Batasan Ukuran Payload & capture raw body buffer untuk verifikasi HMAC signature payment gateway (DOKU)
   app.use(
     express.json({
-      limit: '10mb',
+      limit: '25mb',
       verify: (req: any, _res: any, buf: Buffer) => {
         req.rawBody = buf;
       },
     }),
   );
-  app.use(express.urlencoded({ limit: '10mb', extended: true }));
+  app.use(express.urlencoded({ limit: '25mb', extended: true }));
 
   // 5. Validasi Global (class-validator & class-transformer)
   app.useGlobalPipes(

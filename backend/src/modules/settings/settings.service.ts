@@ -36,6 +36,10 @@ export class SettingsService {
         logoUrl: true,
         contactEmail: true,
         phone: true,
+        website: true,
+        instagram: true,
+        tiktok: true,
+        youtube: true,
       },
     });
     if (!org) throw new NotFoundException('Organizer tidak ditemukan');
@@ -49,6 +53,10 @@ export class SettingsService {
       logoUrl?: string;
       contactEmail?: string;
       phone?: string;
+      website?: string;
+      instagram?: string;
+      tiktok?: string;
+      youtube?: string;
     },
   ) {
     const organizerId = await this.getOrganizerId(userId);
@@ -61,6 +69,10 @@ export class SettingsService {
           ? { contactEmail: data.contactEmail }
           : {}),
         ...(data.phone !== undefined ? { phone: data.phone } : {}),
+        ...(data.website !== undefined ? { website: data.website } : {}),
+        ...(data.instagram !== undefined ? { instagram: data.instagram } : {}),
+        ...(data.tiktok !== undefined ? { tiktok: data.tiktok } : {}),
+        ...(data.youtube !== undefined ? { youtube: data.youtube } : {}),
       },
       select: {
         id: true,
@@ -69,6 +81,10 @@ export class SettingsService {
         logoUrl: true,
         contactEmail: true,
         phone: true,
+        website: true,
+        instagram: true,
+        tiktok: true,
+        youtube: true,
       },
     });
     return updated;

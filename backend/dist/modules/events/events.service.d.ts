@@ -129,6 +129,12 @@ export declare class EventsService {
         organizer: {
             name: string;
             slug: string;
+            phone: string | null;
+            logoUrl: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
         };
         ticketCategories: {
             id: string;

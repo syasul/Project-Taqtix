@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         '/dashboard/settings/password': 'Ubah Password — TAQtix Partner',
         '/dashboard/settings/tokens': 'Token Generator — TAQtix Partner',
         '/dashboard/guide': 'Panduan Penggunaan — TAQtix Partner',
-        '/dashboard/settings/organization': 'Profil Organisasi — TAQtix Partner',
+        '/dashboard/settings/organization': 'Profil Organizer — TAQtix Partner',
         '/dashboard/settings/payment': 'Rekening Settlement — TAQtix Partner',
         '/dashboard/settings/integrations': 'Integrasi Pixel — TAQtix Partner',
       };

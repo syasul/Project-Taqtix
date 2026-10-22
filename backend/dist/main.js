@@ -55,7 +55,12 @@ async function bootstrap() {
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
-        app.use('/uploads', express.static(uploadPath));
+        app.use('/uploads', express.static(uploadPath, {
+            setHeaders: (res) => {
+                res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+                res.setHeader('Access-Control-Allow-Origin', '*');
+            },
+        }));
     }
     catch (err) {
         console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
@@ -63,18 +68,20 @@ async function bootstrap() {
     app.setGlobalPrefix('v1', {
         exclude: ['payments/webhook/(.*)', 'payments/webhook'],
     });
-    app.use((0, helmet_1.default)());
+    app.use((0, helmet_1.default)({
+        crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }));
     app.enableCors({
         origin: true,
         credentials: true,
     });
     app.use(express.json({
-        limit: '10mb',
+        limit: '25mb',
         verify: (req, _res, buf) => {
             req.rawBody = buf;
         },
     }));
-    app.use(express.urlencoded({ limit: '10mb', extended: true }));
+    app.use(express.urlencoded({ limit: '25mb', extended: true }));
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
         transform: true,

@@ -91,7 +91,7 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
     { href: '/dashboard/settings/password', label: 'Ubah Password', icon: KeyRound, resource: '' },
     { href: '/dashboard/settings/tokens', label: 'Token Generator (API)', icon: Code2, resource: 'manage_team_access' },
     { href: '/dashboard/guide', label: 'Panduan Penggunaan', icon: BookOpen, resource: '' },
-    { href: '/dashboard/settings/organization', label: 'Profil Organisasi', icon: Building2, resource: 'view_sales_revenue' },
+    { href: '/dashboard/settings/organization', label: 'Profil Organizer', icon: Building2, resource: 'view_sales_revenue' },
     { href: '/dashboard/settings/payment', label: 'Rekening Settlement', icon: CreditCard, resource: 'manage_payment_settings' },
     { href: '/dashboard/settings/integrations', label: 'Integrasi Pixel', icon: SlidersHorizontal, resource: 'edit_organization_settings' },
   ];

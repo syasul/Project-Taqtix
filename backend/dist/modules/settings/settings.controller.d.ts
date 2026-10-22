@@ -11,6 +11,10 @@ export declare class SettingsController {
             phone: string | null;
             logoUrl: string | null;
             contactEmail: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
         };
     }>;
     updateOrganization(userId: string, body: {
@@ -18,6 +22,10 @@ export declare class SettingsController {
         logoUrl?: string;
         contactEmail?: string;
         phone?: string;
+        website?: string;
+        instagram?: string;
+        tiktok?: string;
+        youtube?: string;
     }): Promise<{
         success: boolean;
         data: {
@@ -27,6 +35,10 @@ export declare class SettingsController {
             phone: string | null;
             logoUrl: string | null;
             contactEmail: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
         };
     }>;
     getPayment(userId: string): Promise<{

@@ -19,6 +19,7 @@ import {
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as fs from 'fs';
 import { UploadService } from './upload.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
@@ -56,12 +57,21 @@ export class UploadController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req, file, cb) => {
-          // Akses upload directory yang telah diverifikasi
-          const uploadService: UploadService = (req as any).uploadServiceRef;
-          const targetDir = uploadService
-            ? uploadService.getUploadDir()
-            : path.join(process.cwd(), 'uploads');
-          cb(null, targetDir);
+          const targetDir =
+            process.env.UPLOAD_STORAGE_PATH ||
+            path.join(process.cwd(), 'uploads');
+          try {
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true, mode: 0o755 });
+            }
+            cb(null, targetDir);
+          } catch (err) {
+            console.error(
+              '[UploadController] Gagal membuat direktori upload:',
+              err,
+            );
+            cb(err as Error, targetDir);
+          }
         },
         filename: (req, file, cb) => {
           const uniqueSuffix =
@@ -75,14 +85,9 @@ export class UploadController {
         },
       }),
       limits: {
-        fileSize: 5 * 1024 * 1024, // Maksimum 5MB
+        fileSize: 25 * 1024 * 1024, // Maksimum 25MB
       },
       fileFilter: (req, file, cb) => {
-        // Simpan referensi service untuk diakses di diskStorage destination
-        req.uploadServiceRef = req.res?.req?.app?.get
-          ? req.res.req.app.get(UploadService)
-          : null;
-
         const allowedMimes = [
           'image/jpeg',
           'image/jpg',

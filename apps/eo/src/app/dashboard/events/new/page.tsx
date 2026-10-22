@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Calendar, PlusCircle, Upload, Image as ImageIcon, Trash2, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Calendar, PlusCircle, Upload, Image as ImageIcon, Trash2, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -79,7 +79,9 @@ type EventFormValues = z.infer<typeof eventSchema>;
 export default function CreateEventPage() {
   const router = useRouter();
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [isDraggingBanner, setIsDraggingBanner] = useState(false);
+  const [bannerError, setBannerError] = useState(false);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const uploadBannerFile = async (file: File) => {
@@ -88,8 +90,8 @@ export default function CreateEventPage() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Ukuran banner maksimal 5MB');
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error('Ukuran banner maksimal 20MB');
       return;
     }
 
@@ -98,24 +100,39 @@ export default function CreateEventPage() {
 
     try {
       setUploadingBanner(true);
+      setUploadProgress(0);
       const res = await apiClient.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 120000,
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percent);
+          }
+        },
       });
       const uploadedUrl = res.data?.data?.url || res.data?.url;
       if (uploadedUrl) {
+        setBannerError(false);
         form.setValue('bannerUrl', uploadedUrl, { shouldValidate: true, shouldDirty: true });
         toast.success('Banner berhasil diunggah langsung!');
       } else {
         toast.error('Gagal mendapatkan URL gambar');
       }
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.error?.message ||
-        err?.response?.data?.message ||
-        'Gagal mengunggah banner'
-      );
+      if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+        toast.error('Unggahan melebihi batas waktu (timeout). Periksa koneksi internet Anda atau gunakan gambar yang lebih kecil.');
+      } else if (err?.response?.status === 413) {
+        toast.error('Ukuran file terlalu besar untuk server (Nginx client_max_body_size limit).');
+      } else {
+        toast.error(
+          err?.response?.data?.error?.message ||
+          err?.response?.data?.message ||
+          'Gagal mengunggah banner'
+        );
+      }
     } finally {
       setUploadingBanner(false);
+      setUploadProgress(null);
       if (bannerInputRef.current) bannerInputRef.current.value = '';
     }
   };
@@ -364,12 +381,24 @@ export default function CreateEventPage() {
                     />
 
                     {field.value ? (
-                      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm group">
-                        <img
-                          src={field.value}
-                          alt="Banner Event"
-                          className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.01]"
-                        />
+                      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm group">
+                        {bannerError ? (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-50 text-slate-500">
+                            <AlertTriangle className="w-10 h-10 text-amber-500 mb-2 stroke-[1.5]" />
+                            <p className="text-xs font-bold text-slate-800">Pratinjau Banner Tidak Dapat Dimuat</p>
+                            <p className="text-[11px] text-slate-500 mt-1 max-w-sm">
+                              Tautan banner ({field.value}) tidak dapat diakses oleh peramban. Silakan coba klik &quot;Ganti Banner&quot; untuk mengunggah ulang.
+                            </p>
+                          </div>
+                        ) : (
+                          <img
+                            src={field.value}
+                            alt="Banner Event"
+                            onError={() => setBannerError(true)}
+                            onLoad={() => setBannerError(false)}
+                            className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.01]"
+                          />
+                        )}
 
                         {/* Overlay Controls */}
                         <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5 p-4">
@@ -394,6 +423,24 @@ export default function CreateEventPage() {
                             <span>Hapus</span>
                           </Button>
                         </div>
+
+                        {/* Uploading Overlay during Replace */}
+                        {uploadingBanner && (
+                          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2.5 p-4 text-white z-20">
+                            <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
+                            <p className="text-xs font-bold">
+                              Mengunggah banner baru... {uploadProgress !== null && uploadProgress > 0 ? `(${uploadProgress}%)` : ''}
+                            </p>
+                            {uploadProgress !== null && (
+                              <div className="w-48 bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                                <div
+                                  className="bg-[#08B4B5] h-1.5 rounded-full transition-all duration-300"
+                                  style={{ width: `${uploadProgress}%` }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         {/* Top Badge */}
                         <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-white text-[10px] font-bold flex items-center gap-1.5">
@@ -423,9 +470,19 @@ export default function CreateEventPage() {
                         )}
                       >
                         {uploadingBanner ? (
-                          <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="flex flex-col items-center justify-center gap-2 max-w-xs w-full">
                             <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
-                            <p className="text-xs font-bold text-slate-700">Sedang mengunggah banner...</p>
+                            <p className="text-xs font-bold text-slate-700">
+                              Sedang mengunggah banner... {uploadProgress !== null && uploadProgress > 0 ? `(${uploadProgress}%)` : ''}
+                            </p>
+                            {uploadProgress !== null && (
+                              <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                <div
+                                  className="bg-[#08B4B5] h-1.5 rounded-full transition-all duration-300"
+                                  style={{ width: `${uploadProgress}%` }}
+                                />
+                              </div>
+                            )}
                             <p className="text-[11px] text-slate-400">Harap tunggu beberapa saat</p>
                           </div>
                         ) : (
@@ -438,7 +495,7 @@ export default function CreateEventPage() {
                                 <span className="text-[#08B4B5] underline">Klik untuk pilih file banner</span> atau seret file ke sini
                               </p>
                               <p className="text-[11px] text-slate-500">
-                                Format: PNG, JPG, JPEG, atau WebP (Maksimum 5MB)
+                                Format: PNG, JPG, JPEG, atau WebP (Maksimum 20MB)
                               </p>
                             </div>
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-200/60 text-slate-600 text-[10px] font-semibold mt-1">

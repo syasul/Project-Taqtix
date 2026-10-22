@@ -78,6 +78,10 @@ export declare class AdminController {
             phone: string | null;
             logoUrl: string | null;
             contactEmail: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
             bankName: string | null;
             bankAccountNumber: string | null;
             bankAccountHolder: string | null;
@@ -104,6 +108,10 @@ export declare class AdminController {
             phone: string | null;
             logoUrl: string | null;
             contactEmail: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
             bankName: string | null;
             bankAccountNumber: string | null;
             bankAccountHolder: string | null;
@@ -130,6 +138,10 @@ export declare class AdminController {
             phone: string | null;
             logoUrl: string | null;
             contactEmail: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
             bankName: string | null;
             bankAccountNumber: string | null;
             bankAccountHolder: string | null;
@@ -178,6 +190,10 @@ export declare class AdminController {
             phone: string | null;
             logoUrl: string | null;
             contactEmail: string | null;
+            website: string | null;
+            instagram: string | null;
+            tiktok: string | null;
+            youtube: string | null;
             bankName: string | null;
             bankAccountNumber: string | null;
             bankAccountHolder: string | null;

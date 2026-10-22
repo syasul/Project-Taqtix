@@ -220,6 +220,12 @@ export class EventsService {
           select: {
             name: true,
             slug: true,
+            logoUrl: true,
+            phone: true,
+            website: true,
+            instagram: true,
+            tiktok: true,
+            youtube: true,
           },
         },
         ticketCategories: {

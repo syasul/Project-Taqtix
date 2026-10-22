@@ -10,12 +10,20 @@ export declare class SettingsService {
         phone: string | null;
         logoUrl: string | null;
         contactEmail: string | null;
+        website: string | null;
+        instagram: string | null;
+        tiktok: string | null;
+        youtube: string | null;
     }>;
     updateOrganization(userId: string, data: {
         name?: string;
         logoUrl?: string;
         contactEmail?: string;
         phone?: string;
+        website?: string;
+        instagram?: string;
+        tiktok?: string;
+        youtube?: string;
     }): Promise<{
         id: string;
         name: string;
@@ -23,6 +31,10 @@ export declare class SettingsService {
         phone: string | null;
         logoUrl: string | null;
         contactEmail: string | null;
+        website: string | null;
+        instagram: string | null;
+        tiktok: string | null;
+        youtube: string | null;
     }>;
     getPayment(userId: string): Promise<{
         bankName: string;

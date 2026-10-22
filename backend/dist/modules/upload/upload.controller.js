@@ -52,6 +52,7 @@ const swagger_1 = require("@nestjs/swagger");
 const multer_1 = require("multer");
 const path = __importStar(require("path"));
 const crypto = __importStar(require("crypto"));
+const fs = __importStar(require("fs"));
 const upload_service_1 = require("./upload.service");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 let UploadController = class UploadController {
@@ -91,11 +92,18 @@ __decorate([
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
             destination: (req, file, cb) => {
-                const uploadService = req.uploadServiceRef;
-                const targetDir = uploadService
-                    ? uploadService.getUploadDir()
-                    : path.join(process.cwd(), 'uploads');
-                cb(null, targetDir);
+                const targetDir = process.env.UPLOAD_STORAGE_PATH ||
+                    path.join(process.cwd(), 'uploads');
+                try {
+                    if (!fs.existsSync(targetDir)) {
+                        fs.mkdirSync(targetDir, { recursive: true, mode: 0o755 });
+                    }
+                    cb(null, targetDir);
+                }
+                catch (err) {
+                    console.error('[UploadController] Gagal membuat direktori upload:', err);
+                    cb(err, targetDir);
+                }
             },
             filename: (req, file, cb) => {
                 const uniqueSuffix = Date.now() + '-' + crypto.randomBytes(6).toString('hex');
@@ -108,12 +116,9 @@ __decorate([
             },
         }),
         limits: {
-            fileSize: 5 * 1024 * 1024,
+            fileSize: 25 * 1024 * 1024,
         },
         fileFilter: (req, file, cb) => {
-            req.uploadServiceRef = req.res?.req?.app?.get
-                ? req.res.req.app.get(upload_service_1.UploadService)
-                : null;
             const allowedMimes = [
                 'image/jpeg',
                 'image/jpg',

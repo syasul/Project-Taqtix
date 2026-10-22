@@ -42,6 +42,10 @@ let SettingsService = class SettingsService {
                 logoUrl: true,
                 contactEmail: true,
                 phone: true,
+                website: true,
+                instagram: true,
+                tiktok: true,
+                youtube: true,
             },
         });
         if (!org)
@@ -59,6 +63,10 @@ let SettingsService = class SettingsService {
                     ? { contactEmail: data.contactEmail }
                     : {}),
                 ...(data.phone !== undefined ? { phone: data.phone } : {}),
+                ...(data.website !== undefined ? { website: data.website } : {}),
+                ...(data.instagram !== undefined ? { instagram: data.instagram } : {}),
+                ...(data.tiktok !== undefined ? { tiktok: data.tiktok } : {}),
+                ...(data.youtube !== undefined ? { youtube: data.youtube } : {}),
             },
             select: {
                 id: true,
@@ -67,6 +75,10 @@ let SettingsService = class SettingsService {
                 logoUrl: true,
                 contactEmail: true,
                 phone: true,
+                website: true,
+                instagram: true,
+                tiktok: true,
+                youtube: true,
             },
         });
         return updated;

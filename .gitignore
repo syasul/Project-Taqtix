@@ -50,3 +50,7 @@ lerna-debug.log*
 /mobile/ios/Flutter/Generated.xcconfig
 /mobile/ios/Flutter/flutter_export_environment.sh
 /mobile/android/key.properties
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep

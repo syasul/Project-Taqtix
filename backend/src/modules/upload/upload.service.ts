@@ -20,7 +20,7 @@ export class UploadService {
     // Jika direktori sistem seperti /var/www tidak dapat ditulis (misal di local macOS/dev), fallback ke local uploads
     try {
       if (!fs.existsSync(configuredPath)) {
-        fs.mkdirSync(configuredPath, { recursive: true });
+        fs.mkdirSync(configuredPath, { recursive: true, mode: 0o755 });
       }
       // Test write access
       fs.accessSync(configuredPath, fs.constants.W_OK);
@@ -28,7 +28,7 @@ export class UploadService {
     } catch {
       const fallbackPath = path.join(process.cwd(), 'uploads');
       if (!fs.existsSync(fallbackPath)) {
-        fs.mkdirSync(fallbackPath, { recursive: true });
+        fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o755 });
       }
       this.uploadDir = fallbackPath;
       console.warn(
@@ -36,9 +36,14 @@ export class UploadService {
       );
     }
 
+    const defaultPublicUrl =
+      process.env.NODE_ENV === 'production'
+        ? `${this.configService.get<string>('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/uploads`
+        : `http://localhost:${this.configService.get<string>('PORT') || '3000'}/uploads`;
+
     this.publicBaseUrl =
       this.configService.get<string>('UPLOAD_PUBLIC_BASE_URL') ||
-      'http://localhost:3000/uploads';
+      defaultPublicUrl;
   }
 
   /**

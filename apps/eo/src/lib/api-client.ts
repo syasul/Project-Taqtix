@@ -37,6 +37,13 @@ apiClient.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Jika data berupa FormData, jangan gunakan default 'application/json' agar browser menyematkan multipart boundary otomatis
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData && config.headers) {
+      delete config.headers['Content-Type'];
+      if (typeof (config.headers as any).delete === 'function') {
+        (config.headers as any).delete('Content-Type');
+      }
+    }
     return config;
   },
   (error) => Promise.reject(error),

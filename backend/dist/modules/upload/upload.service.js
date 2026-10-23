@@ -53,8 +53,11 @@ let UploadService = class UploadService {
     publicBaseUrl;
     constructor(configService) {
         this.configService = configService;
-        const configuredPath = this.configService.get('UPLOAD_STORAGE_PATH') ||
+        const rawConfiguredPath = this.configService.get('UPLOAD_STORAGE_PATH') ||
             path.join(process.cwd(), 'uploads');
+        const configuredPath = path.isAbsolute(rawConfiguredPath)
+            ? rawConfiguredPath
+            : path.resolve(process.cwd(), rawConfiguredPath);
         try {
             if (!fs.existsSync(configuredPath)) {
                 fs.mkdirSync(configuredPath, { recursive: true, mode: 0o755 });
@@ -63,19 +66,32 @@ let UploadService = class UploadService {
             this.uploadDir = configuredPath;
         }
         catch {
-            const fallbackPath = path.join(process.cwd(), 'uploads');
+            const fallbackPath = path.resolve(process.cwd(), 'uploads');
             if (!fs.existsSync(fallbackPath)) {
                 fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o755 });
             }
             this.uploadDir = fallbackPath;
             console.warn(`[UploadService] Storage path ${configuredPath} tidak dapat diakses. Menggunakan local directory: ${this.uploadDir}`);
         }
-        const defaultPublicUrl = process.env.NODE_ENV === 'production'
-            ? `${this.configService.get('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/uploads`
-            : `http://localhost:${this.configService.get('PORT') || '3000'}/uploads`;
-        this.publicBaseUrl =
-            this.configService.get('UPLOAD_PUBLIC_BASE_URL') ||
-                defaultPublicUrl;
+        const configuredPublicUrl = this.configService.get('UPLOAD_PUBLIC_BASE_URL');
+        const isProd = process.env.NODE_ENV === 'production';
+        if (isProd) {
+            if (configuredPublicUrl &&
+                !configuredPublicUrl.includes('localhost') &&
+                !configuredPublicUrl.includes('127.0.0.1')) {
+                this.publicBaseUrl = configuredPublicUrl;
+            }
+            else {
+                const taqtixBase = this.configService.get('TAQTIX_BASE_URL') ||
+                    'https://api.taqtix.id';
+                this.publicBaseUrl = `${taqtixBase.replace(/\/+$/, '')}/uploads`;
+            }
+        }
+        else {
+            this.publicBaseUrl =
+                configuredPublicUrl ||
+                    `http://localhost:${this.configService.get('PORT') || '3000'}/uploads`;
+        }
     }
     getUploadDir() {
         return this.uploadDir;

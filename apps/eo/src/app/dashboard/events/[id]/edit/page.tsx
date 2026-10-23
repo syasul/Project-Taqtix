@@ -213,6 +213,20 @@ export default function EditEventPage() {
           }
         };
 
+        const sanitizeUrl = (url: string | undefined | null) => {
+          if (!url) return '';
+          const trimmed = url.trim();
+          if (
+            trimmed === 'null' ||
+            trimmed === 'undefined' ||
+            trimmed === '""' ||
+            trimmed === "''"
+          ) {
+            return '';
+          }
+          return trimmed;
+        };
+
         form.reset({
           title: found.title,
           description: found.description || '',
@@ -220,7 +234,7 @@ export default function EditEventPage() {
           isDateTba: Boolean(found.isDateTba),
           startDate: toLocalString(found.startDate),
           endDate: toLocalString(found.endDate),
-          bannerUrl: found.bannerUrl || '',
+          bannerUrl: sanitizeUrl(found.bannerUrl),
           requireLogin: Boolean(found.requireLogin),
           seoTitle: found.seoTitle || '',
           seoDescription: found.seoDescription || '',
@@ -565,15 +579,40 @@ export default function EditEventPage() {
                       className="hidden"
                     />
 
-                    {field.value ? (
+                    {field.value && field.value.trim() !== '' && field.value !== 'null' && field.value !== 'undefined' ? (
                       <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm group">
                         {bannerError ? (
-                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-50 text-slate-500">
+                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-50 text-slate-600">
                             <AlertTriangle className="w-10 h-10 text-amber-500 mb-2 stroke-[1.5]" />
                             <p className="text-xs font-bold text-slate-800">Pratinjau Banner Tidak Dapat Dimuat</p>
                             <p className="text-[11px] text-slate-500 mt-1 max-w-sm">
-                              Tautan banner ({field.value}) tidak dapat diakses oleh peramban. Silakan coba klik &quot;Ganti Banner&quot; untuk mengunggah ulang.
+                              Tautan banner ({field.value}) tidak dapat diakses atau berkas tidak ditemukan di server.
                             </p>
+                            <div className="flex items-center gap-2 mt-4">
+                              <Button
+                                type="button"
+                                size="sm"
+                                disabled={uploadingBanner}
+                                onClick={() => bannerInputRef.current?.click()}
+                                className="bg-[#08B4B5] hover:bg-[#07999a] text-white rounded-xl text-xs font-bold shadow-xs gap-1.5 cursor-pointer h-8 px-3.5"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                <span>Ganti Banner</span>
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setBannerError(false);
+                                  form.setValue('bannerUrl', '', { shouldDirty: true });
+                                }}
+                                className="rounded-xl text-xs font-bold shadow-xs gap-1.5 cursor-pointer h-8 px-3.5 text-rose-600 border-rose-200 hover:bg-rose-50"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Hapus</span>
+                              </Button>
+                            </div>
                           </div>
                         ) : (
                           <img
@@ -586,28 +625,33 @@ export default function EditEventPage() {
                         )}
 
                         {/* Overlay Controls */}
-                        <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5 p-4">
-                          <Button
-                            type="button"
-                            size="sm"
-                            disabled={uploadingBanner}
-                            onClick={() => bannerInputRef.current?.click()}
-                            className="bg-white/95 hover:bg-white text-slate-900 rounded-xl text-xs font-bold shadow-md gap-1.5 cursor-pointer h-9 px-3.5"
-                          >
-                            <RefreshCw className="w-3.5 h-3.5 text-slate-700" />
-                            <span>Ganti Banner</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => form.setValue('bannerUrl', '', { shouldDirty: true })}
-                            className="rounded-xl text-xs font-bold shadow-md gap-1.5 cursor-pointer h-9 px-3.5"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Hapus</span>
-                          </Button>
-                        </div>
+                        {!bannerError && (
+                          <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5 p-4">
+                            <Button
+                              type="button"
+                              size="sm"
+                              disabled={uploadingBanner}
+                              onClick={() => bannerInputRef.current?.click()}
+                              className="bg-white/95 hover:bg-white text-slate-900 rounded-xl text-xs font-bold shadow-md gap-1.5 cursor-pointer h-9 px-3.5"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5 text-slate-700" />
+                              <span>Ganti Banner</span>
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                setBannerError(false);
+                                form.setValue('bannerUrl', '', { shouldDirty: true });
+                              }}
+                              className="rounded-xl text-xs font-bold shadow-md gap-1.5 cursor-pointer h-9 px-3.5"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Hapus</span>
+                            </Button>
+                          </div>
+                        )}
 
                         {/* Uploading Overlay during Replace */}
                         {uploadingBanner && (

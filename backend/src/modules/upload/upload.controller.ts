@@ -57,9 +57,12 @@ export class UploadController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req, file, cb) => {
-          const targetDir =
+          const rawTargetDir =
             process.env.UPLOAD_STORAGE_PATH ||
             path.join(process.cwd(), 'uploads');
+          const targetDir = path.isAbsolute(rawTargetDir)
+            ? rawTargetDir
+            : path.resolve(process.cwd(), rawTargetDir);
           try {
             if (!fs.existsSync(targetDir)) {
               fs.mkdirSync(targetDir, { recursive: true, mode: 0o755 });

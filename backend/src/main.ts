@@ -17,11 +17,14 @@ async function bootstrap() {
   expressApp.set('trust proxy', 1);
 
   // 1.1 Sajikan file statis upload untuk akses lokal server
-  const uploadPath =
+  const rawUploadPath =
     process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
+  const uploadPath = path.isAbsolute(rawUploadPath)
+    ? rawUploadPath
+    : path.resolve(process.cwd(), rawUploadPath);
   try {
     if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
+      fs.mkdirSync(uploadPath, { recursive: true, mode: 0o755 });
     }
     app.use(
       '/uploads',

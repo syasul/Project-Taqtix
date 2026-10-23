@@ -50,10 +50,13 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, { rawBody: true });
     const expressApp = app.getHttpAdapter().getInstance();
     expressApp.set('trust proxy', 1);
-    const uploadPath = process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
+    const rawUploadPath = process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
+    const uploadPath = path.isAbsolute(rawUploadPath)
+        ? rawUploadPath
+        : path.resolve(process.cwd(), rawUploadPath);
     try {
         if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
+            fs.mkdirSync(uploadPath, { recursive: true, mode: 0o755 });
         }
         app.use('/uploads', express.static(uploadPath, {
             setHeaders: (res) => {

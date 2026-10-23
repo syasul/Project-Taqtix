@@ -92,8 +92,11 @@ __decorate([
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
             destination: (req, file, cb) => {
-                const targetDir = process.env.UPLOAD_STORAGE_PATH ||
+                const rawTargetDir = process.env.UPLOAD_STORAGE_PATH ||
                     path.join(process.cwd(), 'uploads');
+                const targetDir = path.isAbsolute(rawTargetDir)
+                    ? rawTargetDir
+                    : path.resolve(process.cwd(), rawTargetDir);
                 try {
                     if (!fs.existsSync(targetDir)) {
                         fs.mkdirSync(targetDir, { recursive: true, mode: 0o755 });

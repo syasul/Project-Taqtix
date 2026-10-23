@@ -13,9 +13,12 @@ export class UploadService {
   private publicBaseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    const configuredPath =
+    const rawConfiguredPath =
       this.configService.get<string>('UPLOAD_STORAGE_PATH') ||
       path.join(process.cwd(), 'uploads');
+    const configuredPath = path.isAbsolute(rawConfiguredPath)
+      ? rawConfiguredPath
+      : path.resolve(process.cwd(), rawConfiguredPath);
 
     // Jika direktori sistem seperti /var/www tidak dapat ditulis (misal di local macOS/dev), fallback ke local uploads
     try {
@@ -26,7 +29,7 @@ export class UploadService {
       fs.accessSync(configuredPath, fs.constants.W_OK);
       this.uploadDir = configuredPath;
     } catch {
-      const fallbackPath = path.join(process.cwd(), 'uploads');
+      const fallbackPath = path.resolve(process.cwd(), 'uploads');
       if (!fs.existsSync(fallbackPath)) {
         fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o755 });
       }
@@ -36,14 +39,28 @@ export class UploadService {
       );
     }
 
-    const defaultPublicUrl =
-      process.env.NODE_ENV === 'production'
-        ? `${this.configService.get<string>('TAQTIX_BASE_URL') || 'https://api.taqtix.id'}/uploads`
-        : `http://localhost:${this.configService.get<string>('PORT') || '3000'}/uploads`;
+    const configuredPublicUrl =
+      this.configService.get<string>('UPLOAD_PUBLIC_BASE_URL');
+    const isProd = process.env.NODE_ENV === 'production';
 
-    this.publicBaseUrl =
-      this.configService.get<string>('UPLOAD_PUBLIC_BASE_URL') ||
-      defaultPublicUrl;
+    if (isProd) {
+      if (
+        configuredPublicUrl &&
+        !configuredPublicUrl.includes('localhost') &&
+        !configuredPublicUrl.includes('127.0.0.1')
+      ) {
+        this.publicBaseUrl = configuredPublicUrl;
+      } else {
+        const taqtixBase =
+          this.configService.get<string>('TAQTIX_BASE_URL') ||
+          'https://api.taqtix.id';
+        this.publicBaseUrl = `${taqtixBase.replace(/\/+$/, '')}/uploads`;
+      }
+    } else {
+      this.publicBaseUrl =
+        configuredPublicUrl ||
+        `http://localhost:${this.configService.get<string>('PORT') || '3000'}/uploads`;
+    }
   }
 
   /**

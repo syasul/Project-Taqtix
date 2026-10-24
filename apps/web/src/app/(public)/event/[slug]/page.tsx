@@ -562,8 +562,14 @@ export default function EventDetailPage() {
               <div className="relative h-72 sm:h-96 w-full overflow-hidden bg-slate-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={event.bannerUrl}
+                  src={event.bannerUrl || '/default-banner.svg'}
                   alt={event.title}
+                  onError={(e) => {
+                    if (e.currentTarget.src !== '/default-banner.svg' && !e.currentTarget.src.endsWith('/default-banner.svg')) {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/default-banner.svg';
+                    }
+                  }}
                   className="h-full w-full object-cover"
                 />
               </div>

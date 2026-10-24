@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Calendar, PlusCircle, Upload, Image as ImageIcon, Trash2, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Calendar, PlusCircle, Upload, Image as ImageIcon, Trash2, RefreshCw, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import SeoFormSection from '@/components/seo-form-section';
+
+const DEFAULT_BANNER_URL = '/default-banner.svg';
 
 const LocationMapPicker = dynamic(
   () => import('@/components/location-map-picker'),
@@ -40,7 +42,13 @@ const eventSchema = z
     isDateTba: z.boolean().default(false),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
-    bannerUrl: z.string().url({ message: 'URL banner tidak valid' }).or(z.literal('')),
+    bannerUrl: z
+      .string()
+      .refine(
+        (val) => !val || val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'),
+        { message: 'Format URL banner tidak valid' }
+      )
+      .or(z.literal('')),
     requireLogin: z.boolean().default(false),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
@@ -83,6 +91,7 @@ export default function CreateEventPage() {
   const [isDraggingBanner, setIsDraggingBanner] = useState(false);
   const [bannerError, setBannerError] = useState(false);
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const abortUploadRef = useRef<AbortController | null>(null);
 
   const uploadBannerFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -98,11 +107,15 @@ export default function CreateEventPage() {
     const formData = new FormData();
     formData.append('file', file);
 
+    const abortController = new AbortController();
+    abortUploadRef.current = abortController;
+
     try {
       setUploadingBanner(true);
       setUploadProgress(0);
       const res = await apiClient.post('/upload', formData, {
-        timeout: 120000,
+        signal: abortController.signal,
+        timeout: 60000,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -119,20 +132,26 @@ export default function CreateEventPage() {
         toast.error('Gagal mendapatkan URL gambar');
       }
     } catch (err: any) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
+        toast.info('Pengunggahan banner dibatalkan');
+        return;
+      }
       if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
         toast.error('Unggahan melebihi batas waktu (timeout). Periksa koneksi internet Anda atau gunakan gambar yang lebih kecil.');
       } else if (err?.response?.status === 413) {
         toast.error('Ukuran file terlalu besar untuk server (Nginx client_max_body_size limit).');
       } else {
-        toast.error(
+        const errMsg =
           err?.response?.data?.error?.message ||
           err?.response?.data?.message ||
-          'Gagal mengunggah banner'
-        );
+          err?.message ||
+          'Gagal mengunggah banner';
+        toast.error(`${errMsg}. Anda juga dapat menggunakan Banner Default TAQtix.`);
       }
     } finally {
       setUploadingBanner(false);
       setUploadProgress(null);
+      abortUploadRef.current = null;
       if (bannerInputRef.current) bannerInputRef.current.value = '';
     }
   };
@@ -151,7 +170,7 @@ export default function CreateEventPage() {
       isDateTba: false,
       startDate: '',
       endDate: '',
-      bannerUrl: '',
+      bannerUrl: DEFAULT_BANNER_URL,
       requireLogin: false,
       seoTitle: '',
       seoDescription: '',
@@ -364,12 +383,17 @@ export default function CreateEventPage() {
                       <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Banner Event (Landscape 16:9)
                       </FormLabel>
-                      {field.value && (
-                        <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Banner Siap</span>
+                      {field.value === DEFAULT_BANNER_URL ? (
+                        <span className="text-[11px] font-bold text-teal-700 flex items-center gap-1 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200 shadow-2xs">
+                          <Sparkles className="w-3.5 h-3.5 text-[#08B4B5]" />
+                          <span>Banner Default TAQtix</span>
                         </span>
-                      )}
+                      ) : field.value ? (
+                        <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Banner Khusus Terpasang</span>
+                        </span>
+                      ) : null}
                     </div>
 
                     <input
@@ -381,7 +405,7 @@ export default function CreateEventPage() {
                     />
 
                     {field.value && field.value.trim() !== '' && field.value !== 'null' && field.value !== 'undefined' ? (
-                      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm group">
+                      <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm group">
                         {bannerError ? (
                           <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-50 text-slate-600">
                             <AlertTriangle className="w-10 h-10 text-amber-500 mb-2 stroke-[1.5]" />
@@ -398,7 +422,7 @@ export default function CreateEventPage() {
                                 className="bg-[#08B4B5] hover:bg-[#07999a] text-white rounded-xl text-xs font-bold shadow-xs gap-1.5 cursor-pointer h-8 px-3.5"
                               >
                                 <RefreshCw className="w-3.5 h-3.5" />
-                                <span>Ganti Banner</span>
+                                <span>Ganti Gambar</span>
                               </Button>
                               <Button
                                 type="button"
@@ -406,12 +430,12 @@ export default function CreateEventPage() {
                                 variant="outline"
                                 onClick={() => {
                                   setBannerError(false);
-                                  form.setValue('bannerUrl', '', { shouldDirty: true });
+                                  form.setValue('bannerUrl', DEFAULT_BANNER_URL, { shouldDirty: true });
                                 }}
-                                className="rounded-xl text-xs font-bold shadow-xs gap-1.5 cursor-pointer h-8 px-3.5 text-rose-600 border-rose-200 hover:bg-rose-50"
+                                className="rounded-xl text-xs font-bold shadow-xs gap-1.5 cursor-pointer h-8 px-3.5 text-teal-700 border-teal-200 hover:bg-teal-50"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Hapus</span>
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>Gunakan Banner Default</span>
                               </Button>
                             </div>
                           </div>
@@ -419,15 +443,20 @@ export default function CreateEventPage() {
                           <img
                             src={field.value}
                             alt="Banner Event"
-                            onError={() => setBannerError(true)}
-                            onLoad={() => setBannerError(false)}
+                            onError={(e) => {
+                              if (e.currentTarget.src !== DEFAULT_BANNER_URL && !e.currentTarget.src.endsWith(DEFAULT_BANNER_URL)) {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = DEFAULT_BANNER_URL;
+                                form.setValue('bannerUrl', DEFAULT_BANNER_URL, { shouldDirty: true });
+                              }
+                            }}
                             className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.01]"
                           />
                         )}
 
                         {/* Overlay Controls */}
-                        {!bannerError && (
-                          <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5 p-4">
+                        {!bannerError && !uploadingBanner && (
+                          <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5 p-4">
                             <Button
                               type="button"
                               size="sm"
@@ -438,25 +467,27 @@ export default function CreateEventPage() {
                               <RefreshCw className="w-3.5 h-3.5 text-slate-700" />
                               <span>Ganti Banner</span>
                             </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => {
-                                setBannerError(false);
-                                form.setValue('bannerUrl', '', { shouldDirty: true });
-                              }}
-                              className="rounded-xl text-xs font-bold shadow-md gap-1.5 cursor-pointer h-9 px-3.5"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>Hapus</span>
-                            </Button>
+                            {field.value !== DEFAULT_BANNER_URL && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => {
+                                  setBannerError(false);
+                                  form.setValue('bannerUrl', DEFAULT_BANNER_URL, { shouldDirty: true });
+                                }}
+                                className="bg-slate-900/85 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shadow-md gap-1.5 cursor-pointer h-9 px-3.5"
+                              >
+                                <Sparkles className="w-3.5 h-3.5 text-teal-300" />
+                                <span>Gunakan Default</span>
+                              </Button>
+                            )}
                           </div>
                         )}
 
                         {/* Uploading Overlay during Replace */}
                         {uploadingBanner && (
-                          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2.5 p-4 text-white z-20">
+                          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2.5 p-4 text-white z-20">
                             <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
                             <p className="text-xs font-bold">
                               Mengunggah banner baru... {uploadProgress !== null && uploadProgress > 0 ? `(${uploadProgress}%)` : ''}
@@ -469,6 +500,13 @@ export default function CreateEventPage() {
                                 />
                               </div>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => abortUploadRef.current?.abort()}
+                              className="text-[11px] text-rose-300 hover:text-white underline mt-1 font-semibold cursor-pointer"
+                            >
+                              Batal Mengunggah
+                            </button>
                           </div>
                         )}
 
@@ -479,60 +517,86 @@ export default function CreateEventPage() {
                         </div>
                       </div>
                     ) : (
-                      <div
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setIsDraggingBanner(true);
-                        }}
-                        onDragLeave={() => setIsDraggingBanner(false)}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          setIsDraggingBanner(false);
-                          const file = e.dataTransfer.files?.[0];
-                          if (file) uploadBannerFile(file);
-                        }}
-                        onClick={() => bannerInputRef.current?.click()}
-                        className={cn(
-                          'relative w-full aspect-[16/9] rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 text-center cursor-pointer select-none',
-                          isDraggingBanner
-                            ? 'border-[#08B4B5] bg-[#08B4B5]/5 scale-[0.99]'
-                            : 'border-slate-300 hover:border-[#08B4B5] hover:bg-slate-50/70 bg-slate-50/40'
-                        )}
-                      >
-                        {uploadingBanner ? (
-                          <div className="flex flex-col items-center justify-center gap-2 max-w-xs w-full">
-                            <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
-                            <p className="text-xs font-bold text-slate-700">
-                              Sedang mengunggah banner... {uploadProgress !== null && uploadProgress > 0 ? `(${uploadProgress}%)` : ''}
-                            </p>
-                            {uploadProgress !== null && (
-                              <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                                <div
-                                  className="bg-[#08B4B5] h-1.5 rounded-full transition-all duration-300"
-                                  style={{ width: `${uploadProgress}%` }}
-                                />
+                      <div className="space-y-3">
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsDraggingBanner(true);
+                          }}
+                          onDragLeave={() => setIsDraggingBanner(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDraggingBanner(false);
+                            const file = e.dataTransfer.files?.[0];
+                            if (file) uploadBannerFile(file);
+                          }}
+                          onClick={() => bannerInputRef.current?.click()}
+                          className={cn(
+                            'relative w-full aspect-[16/9] rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 text-center cursor-pointer select-none',
+                            isDraggingBanner
+                              ? 'border-[#08B4B5] bg-[#08B4B5]/5 scale-[0.99]'
+                              : 'border-slate-300 hover:border-[#08B4B5] hover:bg-slate-50/70 bg-slate-50/40'
+                          )}
+                        >
+                          {uploadingBanner ? (
+                            <div className="flex flex-col items-center justify-center gap-2 max-w-xs w-full">
+                              <Loader2 className="w-8 h-8 text-[#08B4B5] animate-spin" />
+                              <p className="text-xs font-bold text-slate-700">
+                                Sedang mengunggah banner... {uploadProgress !== null && uploadProgress > 0 ? `(${uploadProgress}%)` : ''}
+                              </p>
+                              {uploadProgress !== null && (
+                                <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                  <div
+                                    className="bg-[#08B4B5] h-1.5 rounded-full transition-all duration-300"
+                                    style={{ width: `${uploadProgress}%` }}
+                                  />
+                                </div>
+                              )}
+                              <p className="text-[11px] text-slate-400">Harap tunggu beberapa saat</p>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  abortUploadRef.current?.abort();
+                                }}
+                                className="text-[11px] text-rose-500 hover:underline mt-1 font-semibold cursor-pointer"
+                              >
+                                Batal
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-[#08B4B5] flex items-center justify-center shadow-2xs">
+                                <Upload className="w-6 h-6" />
                               </div>
-                            )}
-                            <p className="text-[11px] text-slate-400">Harap tunggu beberapa saat</p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center gap-2">
-                            <div className="w-12 h-12 rounded-2xl bg-teal-50 text-[#08B4B5] flex items-center justify-center shadow-2xs">
-                              <Upload className="w-6 h-6" />
+                              <div className="space-y-0.5">
+                                <p className="text-xs font-bold text-slate-800">
+                                  <span className="text-[#08B4B5] underline">Klik untuk pilih file banner</span> atau seret file ke sini
+                                </p>
+                                <p className="text-[11px] text-slate-500">
+                                  Format: PNG, JPG, JPEG, atau WebP (Maksimum 20MB)
+                                </p>
+                              </div>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-200/60 text-slate-600 text-[10px] font-semibold mt-1">
+                                📐 Rekomendasi 16:9 Landscape (1280x720 / 1920x1080 px)
+                              </span>
                             </div>
-                            <div className="space-y-0.5">
-                              <p className="text-xs font-bold text-slate-800">
-                                <span className="text-[#08B4B5] underline">Klik untuk pilih file banner</span> atau seret file ke sini
-                              </p>
-                              <p className="text-[11px] text-slate-500">
-                                Format: PNG, JPG, JPEG, atau WebP (Maksimum 20MB)
-                              </p>
-                            </div>
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-200/60 text-slate-600 text-[10px] font-semibold mt-1">
-                              📐 Rekomendasi 16:9 Landscape (1280x720 / 1920x1080 px)
-                            </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
+
+                        {/* Quick action button to use default banner */}
+                        <div className="flex items-center justify-between gap-3 pt-1">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => form.setValue('bannerUrl', DEFAULT_BANNER_URL, { shouldDirty: true, shouldValidate: true })}
+                            className="rounded-xl border-teal-200 bg-teal-50/60 hover:bg-teal-100/70 text-teal-800 text-xs font-bold gap-1.5 h-8 cursor-pointer"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-[#08B4B5]" />
+                            <span>Gunakan Banner Default TAQtix</span>
+                          </Button>
+                        </div>
                       </div>
                     )}
                     <FormMessage className="text-rose-500 text-xs" />

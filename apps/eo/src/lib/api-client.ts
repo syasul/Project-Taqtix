@@ -10,9 +10,6 @@ export const apiClient = axios.create({
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     'https://api.taqtix.id/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Flag untuk mencegah loop tak terbatas jika refresh token juga gagal 401
@@ -37,7 +34,7 @@ apiClient.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Jika data berupa FormData, jangan gunakan default 'application/json' agar browser menyematkan multipart boundary otomatis
+    // Jika data berupa FormData, pastikan header Content-Type dihapus agar browser membuat boundary multipart secara otomatis
     if (typeof FormData !== 'undefined' && config.data instanceof FormData && config.headers) {
       delete config.headers['Content-Type'];
       delete config.headers['content-type'];

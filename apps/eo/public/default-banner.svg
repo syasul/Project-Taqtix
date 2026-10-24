@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#081426" />
+      <stop offset="50%" stop-color="#0F2238" />
+      <stop offset="100%" stop-color="#0A1828" />
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#08B4B5" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#08B4B5" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#08B4B5" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id="stageSpotlight" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#08B4B5" stop-opacity="0.25" />
+      <stop offset="50%" stop-color="#0D9488" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#081426" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#08B4B5" stroke-width="1" stroke-opacity="0.07" />
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)" />
+  <rect width="1920" height="1080" fill="url(#stageSpotlight)" />
+  <rect width="1920" height="1080" fill="url(#grid)" />
+
+  <!-- Abstract Stage Lighting Cones -->
+  <polygon points="960,100 200,1080 1720,1080" fill="url(#glowGrad)" />
+  <polygon points="480,0 0,900 960,900" fill="url(#glowGrad)" opacity="0.4" />
+  <polygon points="1440,0 960,900 1920,900" fill="url(#glowGrad)" opacity="0.4" />
+
+  <!-- Ambient Light Orbs -->
+  <circle cx="960" cy="420" r="280" fill="#08B4B5" opacity="0.12" filter="blur(80px)" />
+  <circle cx="360" cy="700" r="240" fill="#3B82F6" opacity="0.1" filter="blur(70px)" />
+  <circle cx="1560" cy="700" r="240" fill="#06B6D4" opacity="0.1" filter="blur(70px)" />
+
+  <!-- Dynamic Curved Lines / Waves -->
+  <path d="M-100,750 Q 480,500 960,700 T 2020,600" fill="none" stroke="url(#brandGrad)" stroke-width="3" opacity="0.4" />
+  <path d="M-100,820 Q 520,620 960,780 T 2020,700" fill="none" stroke="url(#brandGrad)" stroke-width="2" opacity="0.25" />
+  <path d="M-100,880 Q 560,740 960,850 T 2020,780" fill="none" stroke="#08B4B5" stroke-width="1.5" opacity="0.2" />
+
+  <!-- Central Badge & Logo Artwork -->
+  <g transform="translate(960, 480)">
+    <!-- Outer Glow Ring -->
+    <circle cx="0" cy="0" r="110" fill="#08B4B5" opacity="0.1" />
+    <circle cx="0" cy="0" r="90" fill="#0c1d33" stroke="url(#brandGrad)" stroke-width="3" stroke-dasharray="8 6" />
+    <circle cx="0" cy="0" r="74" fill="#081426" stroke="#08B4B5" stroke-width="1.5" opacity="0.9" />
+
+    <!-- Modern Ticket / Stage Icon -->
+    <path d="M-28,-22 C-28,-28 -22,-34 -16,-34 L16,-34 C22,-34 28,-28 28,-22 C24,-20 22,-14 22,-8 C22,-2 24,4 28,6 L28,22 C28,28 22,34 16,34 L-16,34 C-22,34 -28,28 -28,22 C-24,20 -22,14 -22,8 C-22,2 -24,-4 -28,-6 Z"
+          fill="none" stroke="url(#brandGrad)" stroke-width="3.5" stroke-linejoin="round" />
+    <line x1="-12" y1="-8" x2="12" y2="-8" stroke="#08B4B5" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 3" />
+    <line x1="-12" y1="8" x2="12" y2="8" stroke="#08B4B5" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 3" />
+
+    <!-- Typography -->
+    <text x="0" y="145" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="900" fill="#FFFFFF" letter-spacing="4">
+      TAQtix
+    </text>
+    <text x="0" y="185" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#08B4B5" letter-spacing="6">
+      OFFICIAL EVENT BANNER
+    </text>
+    <text x="0" y="215" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="500" fill="#94A3B8" letter-spacing="1.5">
+      Belum ada gambar yang diunggah • Rasio 16:9 Landscape
+    </text>
+  </g>
+</svg>

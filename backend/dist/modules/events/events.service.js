@@ -60,7 +60,7 @@ let EventsService = class EventsService {
             title: dto.title,
             slug,
             description: dto.description,
-            bannerUrl: dto.bannerUrl || '',
+            bannerUrl: dto.bannerUrl?.trim() || '/default-banner.svg',
             location: dto.location,
             isDateTba,
             startDate,
@@ -106,7 +106,7 @@ let EventsService = class EventsService {
         if (dto.description !== undefined)
             updateData.description = dto.description;
         if (dto.bannerUrl !== undefined)
-            updateData.bannerUrl = dto.bannerUrl;
+            updateData.bannerUrl = dto.bannerUrl?.trim() || '/default-banner.svg';
         if (dto.location !== undefined)
             updateData.location = dto.location;
         if (dto.isDateTba !== undefined)

@@ -8,7 +8,12 @@ export const eventSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(3, 'Judul event minimal 3 karakter'),
   description: z.string(),
-  bannerUrl: z.string().url('Format URL banner tidak valid'),
+  bannerUrl: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'),
+      'Format URL banner tidak valid'
+    ),
   location: z.string().min(1, 'Lokasi tidak boleh kosong'),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),

@@ -92,40 +92,56 @@ export default function OrganizerEventsPage() {
                 key={event.id}
                 className="bg-white border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm hover:border-slate-300 transition rounded-2xl"
               >
-                {/* Event Info */}
-                <div className="space-y-2.5 max-w-xl">
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <h3 className="text-base font-bold text-slate-900 leading-snug">{event.title}</h3>
-                    {statusUpper === 'DRAFT' && (
-                      <Badge className="bg-amber-50 text-amber-700 border-amber-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
-                        Draft
-                      </Badge>
-                    )}
-                    {statusUpper === 'PUBLISHED' && (
-                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
-                        Published
-                      </Badge>
-                    )}
-                    {statusUpper === 'ENDED' && (
-                      <Badge className="bg-slate-100 text-slate-600 border-slate-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
-                        Ended
-                      </Badge>
-                    )}
-                    {statusUpper === 'CANCELLED' && (
-                      <Badge className="bg-rose-50 text-rose-700 border-rose-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
-                        Cancelled
-                      </Badge>
-                    )}
+                {/* Event Thumbnail & Info */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 max-w-2xl">
+                  <div className="w-24 sm:w-28 aspect-[16/9] rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-200 shadow-2xs">
+                    <img
+                      src={event.bannerUrl || '/default-banner.svg'}
+                      alt={event.title}
+                      onError={(e) => {
+                        if (e.currentTarget.src !== '/default-banner.svg' && !e.currentTarget.src.endsWith('/default-banner.svg')) {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = '/default-banner.svg';
+                        }
+                      }}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
-                  <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-slate-500 font-medium">
-                    <div className="flex items-center space-x-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      <span>{formattedDate} WIB</span>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <h3 className="text-base font-bold text-slate-900 leading-snug">{event.title}</h3>
+                      {statusUpper === 'DRAFT' && (
+                        <Badge className="bg-amber-50 text-amber-700 border-amber-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                          Draft
+                        </Badge>
+                      )}
+                      {statusUpper === 'PUBLISHED' && (
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                          Published
+                        </Badge>
+                      )}
+                      {statusUpper === 'ENDED' && (
+                        <Badge className="bg-slate-100 text-slate-600 border-slate-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                          Ended
+                        </Badge>
+                      )}
+                      {statusUpper === 'CANCELLED' && (
+                        <Badge className="bg-rose-50 text-rose-700 border-rose-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                          Cancelled
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex items-center space-x-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      <span>{event.location}</span>
+
+                    <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-slate-500 font-medium">
+                      <div className="flex items-center space-x-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                        <span>{formattedDate} WIB</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                        <span>{event.location}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

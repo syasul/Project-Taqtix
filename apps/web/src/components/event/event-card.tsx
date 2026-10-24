@@ -58,17 +58,22 @@ export function EventCard({
         : `Mulai Rp ${minPrice.toLocaleString('id-ID')}`
       : 'Mulai Rp 100.000';
 
-  const defaultBanner =
-    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
+  const defaultBanner = '/default-banner.svg';
 
   return (
     <Link href={`/event/${slug}`} className={cn('group block h-full select-none', className)}>
       <div className="h-full bg-white border border-slate-200/90 hover:border-[#08B4B5]/40 rounded-3xl p-3 sm:p-3.5 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
         {/* Banner image memanjang (landscape 16:9) */}
-        <div className="relative w-full aspect-[16/9] bg-slate-100 rounded-2xl overflow-hidden shrink-0">
+        <div className="relative w-full aspect-[16/9] bg-slate-900 rounded-2xl overflow-hidden shrink-0">
           <img
             src={bannerUrl || defaultBanner}
             alt={title}
+            onError={(e) => {
+              if (e.currentTarget.src !== defaultBanner && !e.currentTarget.src.endsWith(defaultBanner)) {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = defaultBanner;
+              }
+            }}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />

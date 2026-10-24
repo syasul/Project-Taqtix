@@ -53,6 +53,7 @@ const multer_1 = require("multer");
 const path = __importStar(require("path"));
 const crypto = __importStar(require("crypto"));
 const fs = __importStar(require("fs"));
+const os = __importStar(require("os"));
 const upload_service_1 = require("./upload.service");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 let UploadController = class UploadController {
@@ -92,8 +93,11 @@ __decorate([
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
             destination: (req, file, cb) => {
-                const rawTargetDir = process.env.UPLOAD_STORAGE_PATH ||
+                let rawTargetDir = process.env.UPLOAD_STORAGE_PATH ||
                     path.join(process.cwd(), 'uploads');
+                if (rawTargetDir) {
+                    rawTargetDir = rawTargetDir.replace(/^["']|["']$/g, '').trim();
+                }
                 const targetDir = path.isAbsolute(rawTargetDir)
                     ? rawTargetDir
                     : path.resolve(process.cwd(), rawTargetDir);
@@ -101,11 +105,31 @@ __decorate([
                     if (!fs.existsSync(targetDir)) {
                         fs.mkdirSync(targetDir, { recursive: true, mode: 0o755 });
                     }
-                    cb(null, targetDir);
+                    fs.accessSync(targetDir, fs.constants.W_OK);
+                    return cb(null, targetDir);
                 }
                 catch (err) {
-                    console.error('[UploadController] Gagal membuat direktori upload:', err);
-                    cb(err, targetDir);
+                    console.error(`[UploadController] Storage path ${targetDir} gagal/tidak dapat ditulis:`, err);
+                    try {
+                        const fallbackPath = path.resolve(process.cwd(), 'uploads');
+                        if (!fs.existsSync(fallbackPath)) {
+                            fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o755 });
+                        }
+                        fs.accessSync(fallbackPath, fs.constants.W_OK);
+                        return cb(null, fallbackPath);
+                    }
+                    catch (fbErr) {
+                        const tmpPath = path.join(os.tmpdir(), 'taqtix-uploads');
+                        try {
+                            if (!fs.existsSync(tmpPath)) {
+                                fs.mkdirSync(tmpPath, { recursive: true, mode: 0o777 });
+                            }
+                            return cb(null, tmpPath);
+                        }
+                        catch (tmpErr) {
+                            return cb(tmpErr, tmpPath);
+                        }
+                    }
                 }
             },
             filename: (req, file, cb) => {

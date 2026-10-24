@@ -44,6 +44,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const express = __importStar(require("express"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const os = __importStar(require("os"));
 const http_exception_filter_1 = require("./common/filters/http-exception.filter");
 const response_interceptor_1 = require("./common/interceptors/response.interceptor");
 async function bootstrap() {
@@ -51,19 +52,35 @@ async function bootstrap() {
     const expressApp = app.getHttpAdapter().getInstance();
     expressApp.set('trust proxy', 1);
     const rawUploadPath = process.env.UPLOAD_STORAGE_PATH || path.join(process.cwd(), 'uploads');
-    const uploadPath = path.isAbsolute(rawUploadPath)
-        ? rawUploadPath
-        : path.resolve(process.cwd(), rawUploadPath);
+    const cleanUploadPath = rawUploadPath.replace(/^["']|["']$/g, '').trim();
+    const uploadPath = path.isAbsolute(cleanUploadPath)
+        ? cleanUploadPath
+        : path.resolve(process.cwd(), cleanUploadPath);
     try {
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true, mode: 0o755 });
         }
-        app.use('/uploads', express.static(uploadPath, {
+        const staticOptions = {
             setHeaders: (res) => {
                 res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
                 res.setHeader('Access-Control-Allow-Origin', '*');
             },
-        }));
+        };
+        app.use('/uploads', express.static(uploadPath, staticOptions));
+        app.use('/v1/uploads', express.static(uploadPath, staticOptions));
+        const localUploads = path.resolve(process.cwd(), 'uploads');
+        if (localUploads !== uploadPath) {
+            if (!fs.existsSync(localUploads)) {
+                fs.mkdirSync(localUploads, { recursive: true, mode: 0o755 });
+            }
+            app.use('/uploads', express.static(localUploads, staticOptions));
+            app.use('/v1/uploads', express.static(localUploads, staticOptions));
+        }
+        const tmpUploads = path.join(os.tmpdir(), 'taqtix-uploads');
+        if (fs.existsSync(tmpUploads)) {
+            app.use('/uploads', express.static(tmpUploads, staticOptions));
+            app.use('/v1/uploads', express.static(tmpUploads, staticOptions));
+        }
     }
     catch (err) {
         console.warn('[Main] Gagal menginisialisasi static upload handler:', err);

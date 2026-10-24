@@ -50,17 +50,18 @@ function RegisterForm() {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
+    const cleanEmail = values.email.trim().toLowerCase();
     try {
       // 1. Panggil endpoint register dengan role buyer
       await apiClient.post('/auth/register', {
-        email: values.email,
+        email: cleanEmail,
         password: values.password,
         role: 'buyer',
       });
 
       // 2. Lakukan auto-login langsung
       const loginRes = await apiClient.post('/auth/login', {
-        email: values.email,
+        email: cleanEmail,
         password: values.password,
       });
 

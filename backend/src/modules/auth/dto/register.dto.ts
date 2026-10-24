@@ -1,4 +1,5 @@
 import { IsEmail, IsString, MinLength, IsIn } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -9,6 +10,9 @@ export class RegisterDto {
     example: 'buyer@taqtix.id',
     description: 'Alamat email user baru',
   })
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  )
   @IsEmail({}, { message: 'Alamat email tidak valid' })
   email!: string;
 

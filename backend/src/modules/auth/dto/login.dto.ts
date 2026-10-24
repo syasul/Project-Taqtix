@@ -1,4 +1,5 @@
 import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -9,6 +10,9 @@ export class LoginDto {
     example: 'organizer@taqtix.id',
     description: 'Email pengguna',
   })
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  )
   @IsEmail({}, { message: 'Alamat email tidak valid' })
   email!: string;
 

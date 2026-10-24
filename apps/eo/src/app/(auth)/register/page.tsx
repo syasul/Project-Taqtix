@@ -46,7 +46,10 @@ export default function RegisterPage() {
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      await apiClient.post('/auth/register', values);
+      await apiClient.post('/auth/register', {
+        ...values,
+        email: values.email.trim().toLowerCase(),
+      });
       toast.success('Pendaftaran berhasil! Silakan masuk menggunakan akun Anda.');
       router.push('/login');
     } catch (error: any) {

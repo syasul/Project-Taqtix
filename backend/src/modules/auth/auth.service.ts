@@ -27,8 +27,9 @@ export class AuthService {
    * Secara otomatis membuat profil organizer kosong jika role yang dipilih adalah 'organizer'.
    */
   async register(dto: RegisterDto) {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const cleanEmail = dto.email.trim().toLowerCase();
+    const existingUser = await this.prisma.user.findFirst({
+      where: { email: { equals: cleanEmail, mode: 'insensitive' } },
     });
 
     if (existingUser) {
@@ -40,7 +41,7 @@ export class AuthService {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          email: dto.email,
+          email: cleanEmail,
           passwordHash: hashedPassword,
           role: dto.role,
         },
@@ -49,7 +50,7 @@ export class AuthService {
       // Jika role organizer, buat profil organizer default
       if (dto.role === 'organizer') {
         const slug =
-          dto.email.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
+          cleanEmail.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
         await tx.organizer.create({
           data: {
             userId: user.id,
@@ -73,8 +74,9 @@ export class AuthService {
    * Validasi kredensial pengguna dan mengembalikan sepasang token JWT.
    */
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const cleanEmail = dto.email.trim().toLowerCase();
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: cleanEmail, mode: 'insensitive' } },
     });
 
     if (!user) {
@@ -96,8 +98,9 @@ export class AuthService {
    * Validasi kredensial pengguna khusus untuk peran gate_staff.
    */
   async gateLogin(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const cleanEmail = dto.email.trim().toLowerCase();
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: cleanEmail, mode: 'insensitive' } },
     });
 
     if (!user) {

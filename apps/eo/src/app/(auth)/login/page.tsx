@@ -44,7 +44,10 @@ function LoginForm() {
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     try {
-      const response = await apiClient.post('/auth/login', values);
+      const response = await apiClient.post('/auth/login', {
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
+      });
       const resData = response.data?.data || response.data;
       const { accessToken, refreshToken } = resData;
 

@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 
@@ -16,6 +18,9 @@ export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -101,14 +106,24 @@ export default function ChangePasswordPage() {
               <Lock className="h-3.5 w-3.5 text-slate-400" />
               Password Saat Ini *
             </label>
-            <input
-              type="password"
-              required
-              placeholder="Masukkan password lama"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
-            />
+            <div className="relative">
+              <input
+                type={showCurrent ? 'text' : 'password'}
+                required
+                placeholder="Masukkan password lama"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrent(!showCurrent)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                aria-label={showCurrent ? 'Sembunyikan password' : 'Lihat password'}
+              >
+                {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="pt-2 border-t border-slate-100">
@@ -116,30 +131,50 @@ export default function ChangePasswordPage() {
               <KeyRound className="h-3.5 w-3.5 text-[#08B4B5]" />
               Password Baru (Minimal 6 karakter) *
             </label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              placeholder="Masukkan password baru yang kuat"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
-            />
+            <div className="relative">
+              <input
+                type={showNew ? 'text' : 'password'}
+                required
+                minLength={6}
+                placeholder="Masukkan password baru yang kuat"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                aria-label={showNew ? 'Sembunyikan password' : 'Lihat password'}
+              >
+                {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
               Konfirmasi Password Baru *
             </label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              placeholder="Ulangi password baru"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
-            />
+            <div className="relative">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                required
+                minLength={6}
+                placeholder="Ulangi password baru"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-xs text-slate-900 focus:border-[#08B4B5] focus:bg-white focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                aria-label={showConfirm ? 'Sembunyikan password' : 'Lihat password'}
+              >
+                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="pt-3">

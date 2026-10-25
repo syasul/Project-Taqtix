@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import SeoFormSection from '@/components/seo-form-section';
+import { compressImage } from '@/lib/image-compressor';
 
 const DEFAULT_BANNER_URL = '/default-banner.svg';
 
@@ -104,18 +105,32 @@ export default function CreateEventPage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     const abortController = new AbortController();
     abortUploadRef.current = abortController;
 
     try {
       setUploadingBanner(true);
       setUploadProgress(0);
+
+      // Otomatis kompresi gambar banner ke 1920x1080 WebP (< 400KB) agar upload instan dan tidak terhalang Nginx 1M limit
+      let processedFile = file;
+      try {
+        processedFile = await compressImage(file, {
+          maxWidth: 1920,
+          maxHeight: 1080,
+          quality: 0.85,
+          mimeType: 'image/webp',
+        });
+      } catch {
+        processedFile = file;
+      }
+
+      const formData = new FormData();
+      formData.append('file', processedFile);
+
       const res = await apiClient.post('/upload', formData, {
         signal: abortController.signal,
-        timeout: 60000,
+        timeout: 45000,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -127,7 +142,7 @@ export default function CreateEventPage() {
       if (uploadedUrl) {
         setBannerError(false);
         form.setValue('bannerUrl', uploadedUrl, { shouldValidate: true, shouldDirty: true });
-        toast.success('Banner berhasil diunggah langsung!');
+        toast.success('Banner berhasil diunggah!');
       } else {
         toast.error('Gagal mendapatkan URL gambar');
       }

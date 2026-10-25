@@ -7,6 +7,7 @@ export declare class VouchersService {
     private getOrganizerOrThrow;
     create(dto: CreateVoucherDto, userId: string): Promise<{
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -14,7 +15,6 @@ export declare class VouchersService {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;
@@ -29,6 +29,7 @@ export declare class VouchersService {
         } | null;
     } & {
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -36,7 +37,6 @@ export declare class VouchersService {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;
@@ -46,6 +46,7 @@ export declare class VouchersService {
     })[]>;
     update(id: string, dto: UpdateVoucherDto, userId: string): Promise<{
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -53,7 +54,6 @@ export declare class VouchersService {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;
@@ -63,6 +63,7 @@ export declare class VouchersService {
     }>;
     deactivate(id: string, userId: string): Promise<{
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -70,7 +71,6 @@ export declare class VouchersService {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;

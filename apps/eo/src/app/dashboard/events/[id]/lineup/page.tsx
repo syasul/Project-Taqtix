@@ -24,6 +24,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { compressImage } from '@/lib/image-compressor';
 
 interface LineUpItem {
   id: string;
@@ -83,14 +84,27 @@ export default function LineupPage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
       setUploadingPhoto(true);
       setErrorMsg('');
+
+      let processedFile = file;
+      try {
+        processedFile = await compressImage(file, {
+          maxWidth: 800,
+          maxHeight: 800,
+          quality: 0.85,
+          mimeType: 'image/webp',
+        });
+      } catch {
+        processedFile = file;
+      }
+
+      const formData = new FormData();
+      formData.append('file', processedFile);
+
       const res = await apiClient.post('/upload', formData, {
-        timeout: 60000,
+        timeout: 30000,
       });
       const uploadedUrl = res.data?.data?.url || res.data?.url;
       if (uploadedUrl) {

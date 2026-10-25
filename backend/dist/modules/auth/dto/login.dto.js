@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
 class LoginDto {
     email;
@@ -23,6 +24,7 @@ __decorate([
         example: 'organizer@taqtix.id',
         description: 'Email pengguna',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => typeof value === 'string' ? value.trim().toLowerCase() : value),
     (0, class_validator_1.IsEmail)({}, { message: 'Alamat email tidak valid' }),
     __metadata("design:type", String)
 ], LoginDto.prototype, "email", void 0);

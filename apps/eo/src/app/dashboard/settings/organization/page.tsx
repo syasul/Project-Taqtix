@@ -22,6 +22,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { compressImage } from '@/lib/image-compressor';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg
@@ -94,19 +95,32 @@ export default function OrganizationSettingsPage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
       setUploadingLogo(true);
+
+      let processedFile = file;
+      try {
+        processedFile = await compressImage(file, {
+          maxWidth: 500,
+          maxHeight: 500,
+          quality: 0.85,
+          mimeType: 'image/webp',
+        });
+      } catch {
+        processedFile = file;
+      }
+
+      const formData = new FormData();
+      formData.append('file', processedFile);
+
       const res = await apiClient.post('/upload', formData, {
-        timeout: 60000,
+        timeout: 30000,
       });
 
       const uploadedUrl = res.data?.data?.url || res.data?.url;
       if (uploadedUrl) {
         setForm(prev => ({ ...prev, logoUrl: uploadedUrl }));
-        toast.success('Logo berhasil diunggah langsung!');
+        toast.success('Logo berhasil diunggah!');
       }
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Gagal mengunggah logo');

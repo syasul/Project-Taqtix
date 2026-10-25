@@ -77,10 +77,14 @@ async function bootstrap() {
             app.use('/v1/uploads', express.static(localUploads, staticOptions));
         }
         const tmpUploads = path.join(os.tmpdir(), 'taqtix-uploads');
-        if (fs.existsSync(tmpUploads)) {
-            app.use('/uploads', express.static(tmpUploads, staticOptions));
-            app.use('/v1/uploads', express.static(tmpUploads, staticOptions));
+        if (!fs.existsSync(tmpUploads)) {
+            try {
+                fs.mkdirSync(tmpUploads, { recursive: true, mode: 0o777 });
+            }
+            catch { }
         }
+        app.use('/uploads', express.static(tmpUploads, staticOptions));
+        app.use('/v1/uploads', express.static(tmpUploads, staticOptions));
     }
     catch (err) {
         console.warn('[Main] Gagal menginisialisasi static upload handler:', err);

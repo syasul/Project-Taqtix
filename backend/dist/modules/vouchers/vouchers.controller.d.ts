@@ -6,6 +6,7 @@ export declare class VouchersController {
     constructor(vouchersService: VouchersService);
     create(dto: CreateVoucherDto, userId: string): Promise<{
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -13,7 +14,6 @@ export declare class VouchersController {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;
@@ -28,6 +28,7 @@ export declare class VouchersController {
         } | null;
     } & {
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -35,7 +36,6 @@ export declare class VouchersController {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;
@@ -45,6 +45,7 @@ export declare class VouchersController {
     })[]>;
     update(id: string, dto: UpdateVoucherDto, userId: string): Promise<{
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -52,7 +53,6 @@ export declare class VouchersController {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;
@@ -62,6 +62,7 @@ export declare class VouchersController {
     }>;
     deactivate(id: string, userId: string): Promise<{
         type: string;
+        value: number;
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -69,7 +70,6 @@ export declare class VouchersController {
         organizerId: string;
         eventId: string | null;
         code: string;
-        value: number;
         usageLimit: number | null;
         usageCount: number;
         maxDiscountAmount: number | null;

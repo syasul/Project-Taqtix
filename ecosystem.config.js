@@ -1,18 +1,19 @@
 /**
  * TAQtix PM2 Ecosystem Configuration
- * Alokasi RAM Terpadu Budget 2.3GB untuk Server Total 4GB
+ * Alokasi RAM Terpadu Maksimal (Mentok) untuk Dedicated Server Total 4GB (4096MB)
  *
  * Alokasi Memori:
- * - taqtix-be: 350M max (Heap: 300MB)
- * - taqtix-be-worker: 200M max (Heap: 170MB)
- * - taqtix-fe-web: 400M max (Heap: 350MB)
- * - taqtix-admin: 250M max (Heap: 220MB)
- * - taqtix-affiliates: 200M max (Heap: 170MB)
- * - Postgres: 400M (shared_buffers=128MB)
- * - Redis: 150M (maxmemory 150mb, allkeys-lru)
+ * - taqtix-be: 800M max (Heap: 700MB)
+ * - taqtix-fe-web: 800M max (Heap: 700MB)
+ * - taqtix-be-worker: 400M max (Heap: 350MB)
+ * - taqtix-admin (EO): 400M max (Heap: 350MB)
+ * - taqtix-affiliates: 300M max (Heap: 250MB)
+ * - Postgres: 600M (shared_buffers=256MB)
+ * - Redis: 250M (maxmemory 256mb, allkeys-lru)
  * - Nginx & PM2 daemon: 100M
- * - Buffer Internal Cadangan: 250M
- * TOTAL ALOKASI: 2300MB
+ * - Buffer Cadangan Internal: 100M
+ * - Spare OS Kernel / Cache: ~346M
+ * TOTAL SERVER: 4096MB (4GB)
  */
 
 module.exports = {
@@ -26,10 +27,10 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=300',
+        NODE_OPTIONS: '--max-old-space-size=700',
         PORT: 3000,
       },
-      max_memory_restart: '350M',
+      max_memory_restart: '800M',
     },
     {
       name: 'taqtix-be-worker',
@@ -40,9 +41,9 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=170',
+        NODE_OPTIONS: '--max-old-space-size=350',
       },
-      max_memory_restart: '200M',
+      max_memory_restart: '400M',
     },
     {
       name: 'taqtix-fe-web',
@@ -54,10 +55,10 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=350',
+        NODE_OPTIONS: '--max-old-space-size=700',
         PORT: 3001,
       },
-      max_memory_restart: '400M',
+      max_memory_restart: '800M',
     },
     {
       name: 'taqtix-admin',
@@ -69,14 +70,14 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=220',
+        NODE_OPTIONS: '--max-old-space-size=350',
         PORT: 3002,
       },
-      max_memory_restart: '250M',
+      max_memory_restart: '400M',
     },
     {
       name: 'taqtix-affiliates',
-      cwd: './apps/web',
+      cwd: './apps/affiliates',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -84,10 +85,10 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=170',
+        NODE_OPTIONS: '--max-old-space-size=250',
         PORT: 3003,
       },
-      max_memory_restart: '200M',
+      max_memory_restart: '300M',
     },
   ],
 };

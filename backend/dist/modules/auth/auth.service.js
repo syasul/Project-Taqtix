@@ -58,8 +58,9 @@ let AuthService = class AuthService {
         this.configService = configService;
     }
     async register(dto) {
-        const existingUser = await this.prisma.user.findUnique({
-            where: { email: dto.email },
+        const cleanEmail = dto.email.trim().toLowerCase();
+        const existingUser = await this.prisma.user.findFirst({
+            where: { email: { equals: cleanEmail, mode: 'insensitive' } },
         });
         if (existingUser) {
             throw new common_1.ConflictException('Email ini sudah terdaftar');
@@ -68,13 +69,13 @@ let AuthService = class AuthService {
         return this.prisma.$transaction(async (tx) => {
             const user = await tx.user.create({
                 data: {
-                    email: dto.email,
+                    email: cleanEmail,
                     passwordHash: hashedPassword,
                     role: dto.role,
                 },
             });
             if (dto.role === 'organizer') {
-                const slug = dto.email.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
+                const slug = cleanEmail.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
                 await tx.organizer.create({
                     data: {
                         userId: user.id,
@@ -93,8 +94,9 @@ let AuthService = class AuthService {
         });
     }
     async login(dto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
+        const cleanEmail = dto.email.trim().toLowerCase();
+        const user = await this.prisma.user.findFirst({
+            where: { email: { equals: cleanEmail, mode: 'insensitive' } },
         });
         if (!user) {
             throw new common_1.UnauthorizedException('Kredensial login salah');
@@ -106,8 +108,9 @@ let AuthService = class AuthService {
         return this.generateTokenPair(user.id, user.email, user.role);
     }
     async gateLogin(dto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
+        const cleanEmail = dto.email.trim().toLowerCase();
+        const user = await this.prisma.user.findFirst({
+            where: { email: { equals: cleanEmail, mode: 'insensitive' } },
         });
         if (!user) {
             throw new common_1.UnauthorizedException('Kredensial login salah');

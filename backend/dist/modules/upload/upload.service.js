@@ -41,38 +41,23 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var UploadService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-let UploadService = class UploadService {
+const os = __importStar(require("os"));
+const crypto = __importStar(require("crypto"));
+let UploadService = UploadService_1 = class UploadService {
     configService;
+    logger = new common_1.Logger(UploadService_1.name);
     uploadDir;
     publicBaseUrl;
     constructor(configService) {
         this.configService = configService;
-        const rawConfiguredPath = this.configService.get('UPLOAD_STORAGE_PATH') ||
-            path.join(process.cwd(), 'uploads');
-        const configuredPath = path.isAbsolute(rawConfiguredPath)
-            ? rawConfiguredPath
-            : path.resolve(process.cwd(), rawConfiguredPath);
-        try {
-            if (!fs.existsSync(configuredPath)) {
-                fs.mkdirSync(configuredPath, { recursive: true, mode: 0o755 });
-            }
-            fs.accessSync(configuredPath, fs.constants.W_OK);
-            this.uploadDir = configuredPath;
-        }
-        catch {
-            const fallbackPath = path.resolve(process.cwd(), 'uploads');
-            if (!fs.existsSync(fallbackPath)) {
-                fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o755 });
-            }
-            this.uploadDir = fallbackPath;
-            console.warn(`[UploadService] Storage path ${configuredPath} tidak dapat diakses. Menggunakan local directory: ${this.uploadDir}`);
-        }
+        this.uploadDir = this.resolveActiveUploadDir();
         const configuredPublicUrl = this.configService.get('UPLOAD_PUBLIC_BASE_URL');
         const isProd = process.env.NODE_ENV === 'production';
         if (isProd) {
@@ -93,18 +78,88 @@ let UploadService = class UploadService {
                     `http://localhost:${this.configService.get('PORT') || '3000'}/uploads`;
         }
     }
+    resolveActiveUploadDir() {
+        const rawConfiguredPath = this.configService.get('UPLOAD_STORAGE_PATH') ||
+            path.join(process.cwd(), 'uploads');
+        const cleanConfigured = rawConfiguredPath.replace(/^["']|["']$/g, '').trim();
+        const configuredPath = path.isAbsolute(cleanConfigured)
+            ? cleanConfigured
+            : path.resolve(process.cwd(), cleanConfigured);
+        const candidates = [
+            configuredPath,
+            path.resolve(process.cwd(), 'uploads'),
+            path.resolve(__dirname, '../../../../uploads'),
+            path.join(os.tmpdir(), 'taqtix-uploads'),
+        ];
+        for (const dir of candidates) {
+            try {
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir, { recursive: true, mode: 0o777 });
+                }
+                fs.accessSync(dir, fs.constants.W_OK);
+                return dir;
+            }
+            catch (err) {
+                this.logger.warn(`Direktori upload ${dir} tidak dapat ditulis, mencoba kandidat berikutnya...`);
+            }
+        }
+        const fallbackPath = path.join(os.tmpdir(), 'taqtix-uploads');
+        try {
+            if (!fs.existsSync(fallbackPath)) {
+                fs.mkdirSync(fallbackPath, { recursive: true, mode: 0o777 });
+            }
+        }
+        catch { }
+        return fallbackPath;
+    }
     getUploadDir() {
         return this.uploadDir;
     }
-    processUploadedFile(file) {
+    async processUploadedFile(file) {
         if (!file) {
             throw new common_1.BadRequestException('Tidak ada berkas file yang diunggah');
         }
+        const targetDir = this.resolveActiveUploadDir();
+        const ext = path.extname(file.originalname).toLowerCase() ||
+            (file.mimetype === 'image/webp'
+                ? '.webp'
+                : file.mimetype === 'image/jpeg'
+                    ? '.jpg'
+                    : '.png');
+        const cleanBase = path
+            .basename(file.originalname, ext)
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-');
+        const uniqueSuffix = Date.now() + '-' + crypto.randomBytes(6).toString('hex');
+        const filename = file.filename || `${cleanBase}-${uniqueSuffix}${ext}`;
+        const destinationPath = path.join(targetDir, filename);
+        if (file.buffer && file.buffer.length > 0) {
+            try {
+                await fs.promises.writeFile(destinationPath, file.buffer);
+            }
+            catch (writeErr) {
+                this.logger.error(`Gagal menulis file ke ${destinationPath}:`, writeErr);
+                const emergencyDir = path.join(os.tmpdir(), 'taqtix-uploads');
+                if (!fs.existsSync(emergencyDir)) {
+                    fs.mkdirSync(emergencyDir, { recursive: true, mode: 0o777 });
+                }
+                await fs.promises.writeFile(path.join(emergencyDir, filename), file.buffer);
+            }
+        }
+        else if (file.path && fs.existsSync(file.path)) {
+            if (path.resolve(file.path) !== path.resolve(destinationPath)) {
+                try {
+                    await fs.promises.copyFile(file.path, destinationPath);
+                }
+                catch {
+                }
+            }
+        }
         const cleanBaseUrl = this.publicBaseUrl.replace(/\/+$/, '');
-        const fileUrl = `${cleanBaseUrl}/${file.filename}`;
+        const fileUrl = `${cleanBaseUrl}/${filename}`;
         return {
             url: fileUrl,
-            filename: file.filename,
+            filename,
             originalName: file.originalname,
             mimetype: file.mimetype,
             size: file.size,
@@ -112,7 +167,7 @@ let UploadService = class UploadService {
     }
 };
 exports.UploadService = UploadService;
-exports.UploadService = UploadService = __decorate([
+exports.UploadService = UploadService = UploadService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], UploadService);

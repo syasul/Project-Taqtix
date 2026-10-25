@@ -1,30 +1,29 @@
-# TAQtix — Panduan Konfigurasi Budget RAM (2.3GB / 4GB Server) & Storage Lokal
+# TAQtix — Panduan Konfigurasi Alokasi RAM Maksimal (Dedicated 4GB Server) & Storage Lokal
 
-> Dokumen acuan operasional server produksi TAQtix. Menjamin seluruh service TAQtix beroperasi stabil di dalam pagu **2300 MB** pada server 4GB (bersama project eksternal 1024 MB dan buffer OS 700 MB).
+> Dokumen acuan operasional server produksi TAQtix. Mengoptimalkan pemanfaatan memori secara penuh (mentok) pada server VPS **4 GB (4096 MB)** agar performa transaksi tiket, SSR, dan antrean background berjalan maksimal dengan stabilitas tinggi.
 
 ---
 
-## 1. Alokasi RAM per Service (Pagu Total: 2300 MB)
+## 1. Alokasi RAM per Service (Pagu Dedicated 4GB)
 
 | Service | Alokasi RAM | Konfigurasi Memory Limit | Peran / Deskripsi |
 |---|---|---|---|
-| **PostgreSQL** | **400 MB** | `shared_buffers = 128MB` di `postgresql.conf` | Database utama (relational, row locking anti double-booking) |
-| **Redis** | **150 MB** | `maxmemory 150mb`, `maxmemory-policy allkeys-lru` | Cache idempotency, session lock, antrean BullMQ |
-| **BE — API Server (`taqtix-be`)** | **350 MB** | `NODE_OPTIONS=--max-old-space-size=300`, `max_memory_restart: 350M` | HTTP REST API core engine & checkout |
-| **BE — Worker (`taqtix-be-worker`)** | **200 MB** | `NODE_OPTIONS=--max-old-space-size=170`, `max_memory_restart: 200M` | BullMQ worker mandiri (orders, CRM, notifikasi) |
-| **FE — Web (`taqtix-fe-web`)** | **400 MB** | `NODE_OPTIONS=--max-old-space-size=350`, `max_memory_restart: 400M` | Portal pembeli (traffic tertinggi) |
-| **FE — Admin / EO (`taqtix-admin`)** | **250 MB** | `NODE_OPTIONS=--max-old-space-size=220`, `max_memory_restart: 250M` | Dashboard manajemen event organizer |
-| **FE — Affiliate (`taqtix-affiliates`)** | **200 MB** | `NODE_OPTIONS=--max-old-space-size=170`, `max_memory_restart: 200M` | Portal mitra afiliasi / partner |
+| **PostgreSQL** | **600 MB** | `shared_buffers = 256MB` di `postgresql.conf` | Database utama (relational, row locking anti double-booking) |
+| **Redis** | **250 MB** | `maxmemory 256mb`, `maxmemory-policy allkeys-lru` | Cache idempotency, session lock, antrean BullMQ |
+| **BE — API Server (`taqtix-be`)** | **800 MB** | `NODE_OPTIONS=--max-old-space-size=700`, `max_memory_restart: 800M` | HTTP REST API core engine & checkout (war tiket ready) |
+| **BE — Worker (`taqtix-be-worker`)** | **400 MB** | `NODE_OPTIONS=--max-old-space-size=350`, `max_memory_restart: 400M` | BullMQ worker mandiri (orders, CRM, invoice, notifikasi) |
+| **FE — Web (`taqtix-fe-web`)** | **800 MB** | `NODE_OPTIONS=--max-old-space-size=700`, `max_memory_restart: 800M` | Portal pembeli (traffic tertinggi, Next.js SSR) |
+| **FE — Admin / EO (`taqtix-admin`)** | **400 MB** | `NODE_OPTIONS=--max-old-space-size=350`, `max_memory_restart: 400M` | Dashboard manajemen event organizer (`apps/eo`) |
+| **FE — Affiliate (`taqtix-affiliates`)** | **300 MB** | `NODE_OPTIONS=--max-old-space-size=250`, `max_memory_restart: 300M` | Portal mitra afiliasi / partner (`apps/affiliates`) |
 | **Nginx (Reverse Proxy)** | **50 MB** | Default lightweight worker processes | Reverse proxy, SSL termination, static cache |
 | **PM2 Daemon** | **50 MB** | Default PM2 memory footprint | Monitoring & proses watchdog |
-| **Buffer Internal Cadangan** | **250 MB** | Cadangan dinamis dalam budget | Meredam spike temporer service internal |
-| **TOTAL TAQtix** | **2300 MB** | | |
+| **Buffer Internal Cadangan** | **100 MB** | Cadangan dinamis dalam budget | Meredam spike temporer service internal |
+| **TOTAL STACK TAQtix** | **3750 MB** | | |
 
 > **Keseimbangan Server Keseluruhan:**
-> - Proyek Non-TAQtix: **1024 MB**
-> - Proyek TAQtix: **2300 MB**
-> - Spare Murni (Kernel Linux, Page Cache, OS): **~770 MB**
-> - **Total Fisik Server: 4096 MB**
+> - Proyek TAQtix + Database Stack: **3750 MB**
+> - Spare Murni (Kernel Linux, Page Cache, SSH, Systemd): **~346 MB**
+> - **Total Fisik Server: 4096 MB (4 GB)**
 
 ---
 
@@ -32,7 +31,7 @@
 
 1. **Isolasi Beban Berat**: Operasi intensif seperti ekspor data laporan CSV ribuan baris atau pengiriman broadcast pesan CRM massal diproses di `taqtix-be-worker`.
 2. **Kestabilan Checkout**: Lonjakan memori pada worker **tidak akan pernah** memperlambat proses checkout tiket, validasi payment gateway, atau scanning tiket di gerbang pada `taqtix-be`.
-3. **Pemberhentian Aman**: Jika worker mencapai `max_memory_restart` (200M), PM2 merestart worker secara mandiri tanpa downtime pada API publik.
+3. **Pemberhentian Aman**: Jika worker mencapai `max_memory_restart` (400M), PM2 merestart worker secara mandiri tanpa downtime pada API publik.
 
 ---
 
@@ -41,29 +40,29 @@
 ### 3.1 PostgreSQL (`postgresql.conf`)
 Edit file konfigurasi PostgreSQL (biasanya di `/etc/postgresql/<version>/main/postgresql.conf`):
 ```ini
-shared_buffers = 128MB
-work_mem = 4MB
+shared_buffers = 256MB
+work_mem = 8MB
 maintenance_work_mem = 64MB
-effective_cache_size = 256MB
+effective_cache_size = 1GB
 ```
 Restart service dan verifikasi:
 ```bash
 sudo systemctl restart postgresql
 sudo -u postgres psql -c "SHOW shared_buffers;"
-# Output yang diharapkan: 128MB
+# Output yang diharapkan: 256MB
 ```
 
 ### 3.2 Redis (`redis.conf`)
 Edit file konfigurasi Redis (biasanya di `/etc/redis/redis.conf`):
 ```ini
-maxmemory 150mb
+maxmemory 256mb
 maxmemory-policy allkeys-lru
 ```
 Restart service dan verifikasi:
 ```bash
 sudo systemctl restart redis-server
 redis-cli CONFIG GET maxmemory
-# Output: "157286400" (150MB dalam bytes)
+# Output: "268435456" (256MB dalam bytes)
 redis-cli CONFIG GET maxmemory-policy
 # Output: "allkeys-lru"
 ```

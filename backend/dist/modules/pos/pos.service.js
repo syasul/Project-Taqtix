@@ -241,9 +241,20 @@ let PosService = class PosService {
                             attendeePhone: dto.buyerPhone || '',
                         },
                     });
-                    for (let i = 0; i < item.qty; i++) {
+                    const catRecord = await tx.ticketCategory.findUnique({
+                        where: { id: item.ticketCategoryId },
+                        select: { ticketPerPackage: true },
+                    });
+                    const ticketPerPackage = Number(catRecord?.ticketPerPackage) || 1;
+                    const totalTicketsToGenerate = item.qty * ticketPerPackage;
+                    for (let i = 0; i < totalTicketsToGenerate; i++) {
                         const ticketId = crypto.randomUUID();
                         const qrPayload = await this.generateQrPayload(ticketId, eventId);
+                        let attendeeLabel = dto.buyerName || 'Walk-in Attendee';
+                        if (ticketPerPackage > 1) {
+                            const paxNumber = (i % ticketPerPackage) + 1;
+                            attendeeLabel += ` (Peserta ${paxNumber}/${ticketPerPackage})`;
+                        }
                         const ticket = await tx.ticket.create({
                             data: {
                                 id: ticketId,
@@ -251,12 +262,13 @@ let PosService = class PosService {
                                 eventId,
                                 qrPayload,
                                 status: 'VALID',
+                                attendeeName: attendeeLabel,
                             },
                         });
                         generatedTickets.push({
                             ticketId: ticket.id,
                             categoryName: item.name,
-                            attendeeName: dto.buyerName || 'Walk-in Attendee',
+                            attendeeName: attendeeLabel,
                             qrPayload: ticket.qrPayload,
                         });
                     }

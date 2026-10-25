@@ -50,6 +50,50 @@ export declare class GateService {
                 };
             };
         };
+        isCouple?: undefined;
+        remainingPax?: undefined;
+    } | {
+        success: boolean;
+        message: string;
+        ticketId: string;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
+        isCouple: boolean;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
+        remainingPax?: undefined;
+    } | {
+        success: boolean;
+        message: string;
+        ticketId: string;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
+        isCouple: boolean;
+        remainingPax: number;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
     }>;
     manualCheckin(dto: ManualCheckinDto, staffUserId: string): Promise<{
         success: boolean;
@@ -58,6 +102,50 @@ export declare class GateService {
         buyerName: string;
         ticketCategory: string;
         eventTitle: string;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
+        isCouple?: undefined;
+        remainingPax?: undefined;
+    } | {
+        success: boolean;
+        message: string;
+        ticketId: string;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
+        isCouple: boolean;
+        ticket: {
+            id: string;
+            status: import("@prisma/client").$Enums.TicketStatus;
+            checkedInAt: Date | null;
+            checkedOutAt: Date | null;
+            orderItem: {
+                attendeeName: string;
+                ticketCategory: {
+                    name: string;
+                };
+            };
+        };
+        remainingPax?: undefined;
+    } | {
+        success: boolean;
+        message: string;
+        ticketId: string;
+        buyerName: string;
+        ticketCategory: string;
+        eventTitle: string;
+        isCouple: boolean;
+        remainingPax: number;
         ticket: {
             id: string;
             status: import("@prisma/client").$Enums.TicketStatus;

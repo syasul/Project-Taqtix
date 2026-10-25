@@ -111,6 +111,17 @@ let GateService = class GateService {
         }
         const { ticketId } = decoded;
         return this.prisma.$transaction(async (tx) => {
+            if (typeof tx.$queryRaw === 'function') {
+                try {
+                    await tx.$queryRaw `
+            SELECT id FROM "Ticket"
+            WHERE id = ${ticketId}
+            FOR UPDATE
+          `;
+                }
+                catch (lockError) {
+                }
+            }
             const ticket = await tx.ticket.findUnique({
                 where: { id: ticketId },
                 include: {
@@ -209,19 +220,6 @@ let GateService = class GateService {
                     },
                 };
             }
-            if (ticket.status === client_1.TicketStatus.CHECKED_IN) {
-                await tx.scanLog.create({
-                    data: {
-                        ticketId: ticket.id,
-                        scannedById: staffUserId,
-                        result: 'DUPLICATE',
-                    },
-                });
-                throw new common_1.HttpException({
-                    code: 'QR_ALREADY_USED',
-                    message: 'Tiket sudah pernah digunakan / check-in sebelumnya',
-                }, common_1.HttpStatus.CONFLICT);
-            }
             if (ticket.status === client_1.TicketStatus.TRANSFER_PENDING) {
                 await tx.scanLog.create({
                     data: {
@@ -235,7 +233,7 @@ let GateService = class GateService {
                     message: 'Tiket sedang dalam proses transfer kepemilikan. QR lama ini tidak dapat digunakan untuk check-in.',
                 }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
             }
-            if (ticket.status !== client_1.TicketStatus.VALID) {
+            if (ticket.status !== client_1.TicketStatus.VALID && ticket.status !== client_1.TicketStatus.CHECKED_IN) {
                 await tx.scanLog.create({
                     data: {
                         ticketId: ticket.id,
@@ -247,6 +245,147 @@ let GateService = class GateService {
                     code: 'QR_INVALID',
                     message: `Tiket tidak aktif (Status: ${ticket.status})`,
                 }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+            const category = ticket.orderItem.ticketCategory;
+            const ticketPerPackage = Number(category?.ticketPerPackage) || 1;
+            const isCategoryCouple = ticketPerPackage === 2 ||
+                /couple|pasangan|berdua|duet|paket\s*2/i.test(category?.name || '');
+            const siblingTickets = await tx.ticket.findMany({
+                where: { orderItemId: ticket.orderItemId },
+                select: { id: true, attendeeName: true },
+            });
+            const hasSeparateBarcodes = siblingTickets.length > 1;
+            const validScanCount = await tx.scanLog.count({
+                where: {
+                    ticketId: ticket.id,
+                    result: 'VALID',
+                },
+            });
+            if (hasSeparateBarcodes) {
+                if (ticket.status === client_1.TicketStatus.CHECKED_IN || validScanCount >= 1) {
+                    await tx.scanLog.create({
+                        data: {
+                            ticketId: ticket.id,
+                            scannedById: staffUserId,
+                            result: 'DUPLICATE',
+                        },
+                    });
+                    const msg = isCategoryCouple
+                        ? `Tiket untuk ${ticket.attendeeName || 'peserta ini'} sudah pernah check-in sebelumnya. Pasangan Anda wajib menggunakan barcode kedua miliknya sendiri.`
+                        : 'Tiket perorangan ini sudah pernah digunakan untuk check-in sebelumnya (1 tiket untuk 1 orang).';
+                    throw new common_1.HttpException({
+                        code: 'QR_ALREADY_USED',
+                        message: msg,
+                    }, common_1.HttpStatus.CONFLICT);
+                }
+                const updatedTicket = await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: {
+                        status: client_1.TicketStatus.CHECKED_IN,
+                        checkedInAt: new Date(),
+                        checkedInBy: staffUserId,
+                    },
+                });
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'VALID',
+                    },
+                });
+                return {
+                    success: true,
+                    message: isCategoryCouple
+                        ? 'Check-in berhasil! Tiket Berpasangan (Barcode Mandiri Peserta).'
+                        : 'Check-in berhasil! Selamat menikmati acara (Tiket Perorangan: 1 orang).',
+                    ticketId: ticket.id,
+                    buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                    ticketCategory: ticket.orderItem.ticketCategory.name,
+                    eventTitle: ticket.orderItem.ticketCategory.name,
+                    isCouple: isCategoryCouple,
+                    ticket: {
+                        id: ticket.id,
+                        status: updatedTicket.status,
+                        checkedInAt: updatedTicket.checkedInAt,
+                        checkedOutAt: updatedTicket.checkedOutAt,
+                        orderItem: {
+                            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                            ticketCategory: {
+                                name: ticket.orderItem.ticketCategory.name,
+                            },
+                        },
+                    },
+                };
+            }
+            if (isCategoryCouple) {
+                const maxAllowedPax = ticketPerPackage > 1 ? ticketPerPackage : 2;
+                if (validScanCount >= maxAllowedPax || ticket.status === client_1.TicketStatus.CHECKED_IN) {
+                    await tx.scanLog.create({
+                        data: {
+                            ticketId: ticket.id,
+                            scannedById: staffUserId,
+                            result: 'DUPLICATE',
+                        },
+                    });
+                    throw new common_1.HttpException({
+                        code: 'QR_ALREADY_USED',
+                        message: `Tiket berpasangan ini sudah memenuhi kuota maksimal (${maxAllowedPax} dari ${maxAllowedPax} orang sudah check-in).`,
+                    }, common_1.HttpStatus.CONFLICT);
+                }
+                const isLastPax = validScanCount + 1 >= maxAllowedPax;
+                const updatedTicket = await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: {
+                        status: isLastPax ? client_1.TicketStatus.CHECKED_IN : client_1.TicketStatus.VALID,
+                        checkedInAt: ticket.checkedInAt || new Date(),
+                        checkedInBy: staffUserId,
+                    },
+                });
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'VALID',
+                    },
+                });
+                const successMsg = isLastPax
+                    ? `Check-in berhasil! Tiket Berpasangan lengkap (${validScanCount + 1} dari ${maxAllowedPax} orang telah masuk).`
+                    : `Check-in berhasil! Tiket Berpasangan (${validScanCount + 1} dari ${maxAllowedPax} orang telah masuk). Barcode masih dapat digunakan untuk 1 orang pasangannya.`;
+                return {
+                    success: true,
+                    message: successMsg,
+                    ticketId: ticket.id,
+                    buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                    ticketCategory: ticket.orderItem.ticketCategory.name,
+                    eventTitle: ticket.orderItem.ticketCategory.name,
+                    isCouple: true,
+                    remainingPax: maxAllowedPax - (validScanCount + 1),
+                    ticket: {
+                        id: ticket.id,
+                        status: updatedTicket.status,
+                        checkedInAt: updatedTicket.checkedInAt,
+                        checkedOutAt: updatedTicket.checkedOutAt,
+                        orderItem: {
+                            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                            ticketCategory: {
+                                name: ticket.orderItem.ticketCategory.name,
+                            },
+                        },
+                    },
+                };
+            }
+            if (ticket.status === client_1.TicketStatus.CHECKED_IN || validScanCount >= 1) {
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'DUPLICATE',
+                    },
+                });
+                throw new common_1.HttpException({
+                    code: 'QR_ALREADY_USED',
+                    message: 'Tiket perorangan ini sudah pernah digunakan untuk check-in sebelumnya (1 tiket hanya berlaku untuk 1 orang).',
+                }, common_1.HttpStatus.CONFLICT);
             }
             const updatedTicket = await tx.ticket.update({
                 where: { id: ticket.id },
@@ -265,11 +404,12 @@ let GateService = class GateService {
             });
             return {
                 success: true,
-                message: 'Check-in berhasil! Selamat menikmati acara.',
+                message: 'Check-in berhasil! Selamat menikmati acara (Tiket Perorangan: 1 orang).',
                 ticketId: ticket.id,
                 buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
                 ticketCategory: ticket.orderItem.ticketCategory.name,
                 eventTitle: ticket.orderItem.ticketCategory.name,
+                isCouple: false,
                 ticket: {
                     id: ticket.id,
                     status: updatedTicket.status,
@@ -287,10 +427,28 @@ let GateService = class GateService {
     }
     async manualCheckin(dto, staffUserId) {
         return this.prisma.$transaction(async (tx) => {
-            const ticket = await tx.ticket.findFirst({
+            const preliminary = await tx.ticket.findFirst({
                 where: {
                     OR: [{ id: dto.code }, { qrPayload: dto.code }],
                 },
+                select: { id: true },
+            });
+            if (!preliminary) {
+                throw new common_1.NotFoundException('Tiket tidak terdaftar di sistem');
+            }
+            if (typeof tx.$queryRaw === 'function') {
+                try {
+                    await tx.$queryRaw `
+            SELECT id FROM "Ticket"
+            WHERE id = ${preliminary.id}
+            FOR UPDATE
+          `;
+                }
+                catch (lockErr) {
+                }
+            }
+            const ticket = await tx.ticket.findUnique({
+                where: { id: preliminary.id },
                 include: {
                     orderItem: {
                         include: {
@@ -384,17 +542,7 @@ let GateService = class GateService {
                     },
                 };
             }
-            if (ticket.status === client_1.TicketStatus.CHECKED_IN) {
-                await tx.scanLog.create({
-                    data: {
-                        ticketId: ticket.id,
-                        scannedById: staffUserId,
-                        result: 'DUPLICATE',
-                    },
-                });
-                throw new common_1.BadRequestException('Tiket sudah pernah digunakan / check-in sebelumnya');
-            }
-            if (ticket.status !== client_1.TicketStatus.VALID) {
+            if (ticket.status !== client_1.TicketStatus.VALID && ticket.status !== client_1.TicketStatus.CHECKED_IN) {
                 await tx.scanLog.create({
                     data: {
                         ticketId: ticket.id,
@@ -403,6 +551,138 @@ let GateService = class GateService {
                     },
                 });
                 throw new common_1.BadRequestException(`Tiket tidak aktif (Status: ${ticket.status})`);
+            }
+            const category = ticket.orderItem.ticketCategory;
+            const ticketPerPackage = Number(category?.ticketPerPackage) || 1;
+            const isCategoryCouple = ticketPerPackage === 2 ||
+                /couple|pasangan|berdua|duet|paket\s*2/i.test(category?.name || '');
+            const siblingTickets = await tx.ticket.findMany({
+                where: { orderItemId: ticket.orderItemId },
+                select: { id: true, attendeeName: true },
+            });
+            const hasSeparateBarcodes = siblingTickets.length > 1;
+            const validScanCount = await tx.scanLog.count({
+                where: {
+                    ticketId: ticket.id,
+                    result: 'VALID',
+                },
+            });
+            if (hasSeparateBarcodes) {
+                if (ticket.status === client_1.TicketStatus.CHECKED_IN || validScanCount >= 1) {
+                    await tx.scanLog.create({
+                        data: {
+                            ticketId: ticket.id,
+                            scannedById: staffUserId,
+                            result: 'DUPLICATE',
+                        },
+                    });
+                    const msg = isCategoryCouple
+                        ? `Tiket manual untuk ${ticket.attendeeName || 'peserta ini'} sudah pernah check-in. Pasangan Anda wajib menggunakan kode/barcode miliknya sendiri.`
+                        : 'Tiket perorangan ini sudah pernah digunakan untuk check-in sebelumnya (1 tiket untuk 1 orang).';
+                    throw new common_1.BadRequestException(msg);
+                }
+                const updatedTicket = await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: {
+                        status: client_1.TicketStatus.CHECKED_IN,
+                        checkedInAt: new Date(),
+                        checkedInBy: staffUserId,
+                    },
+                });
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'VALID',
+                    },
+                });
+                return {
+                    success: true,
+                    message: isCategoryCouple
+                        ? 'Check-in manual berhasil! Tiket Berpasangan (Kode Peserta).'
+                        : 'Check-in manual berhasil! (Tiket Perorangan: 1 orang).',
+                    ticketId: ticket.id,
+                    buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                    ticketCategory: ticket.orderItem.ticketCategory.name,
+                    eventTitle: ticket.orderItem.ticketCategory.name,
+                    isCouple: isCategoryCouple,
+                    ticket: {
+                        id: ticket.id,
+                        status: updatedTicket.status,
+                        checkedInAt: updatedTicket.checkedInAt,
+                        checkedOutAt: updatedTicket.checkedOutAt,
+                        orderItem: {
+                            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                            ticketCategory: {
+                                name: ticket.orderItem.ticketCategory.name,
+                            },
+                        },
+                    },
+                };
+            }
+            if (isCategoryCouple) {
+                const maxAllowedPax = ticketPerPackage > 1 ? ticketPerPackage : 2;
+                if (validScanCount >= maxAllowedPax || ticket.status === client_1.TicketStatus.CHECKED_IN) {
+                    await tx.scanLog.create({
+                        data: {
+                            ticketId: ticket.id,
+                            scannedById: staffUserId,
+                            result: 'DUPLICATE',
+                        },
+                    });
+                    throw new common_1.BadRequestException(`Tiket berpasangan ini sudah memenuhi kuota maksimal (${maxAllowedPax} dari ${maxAllowedPax} orang sudah check-in).`);
+                }
+                const isLastPax = validScanCount + 1 >= maxAllowedPax;
+                const updatedTicket = await tx.ticket.update({
+                    where: { id: ticket.id },
+                    data: {
+                        status: isLastPax ? client_1.TicketStatus.CHECKED_IN : client_1.TicketStatus.VALID,
+                        checkedInAt: ticket.checkedInAt || new Date(),
+                        checkedInBy: staffUserId,
+                    },
+                });
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'VALID',
+                    },
+                });
+                const successMsg = isLastPax
+                    ? `Check-in manual berhasil! Tiket Berpasangan lengkap (${validScanCount + 1} dari ${maxAllowedPax} orang telah masuk).`
+                    : `Check-in manual berhasil! Tiket Berpasangan (${validScanCount + 1} dari ${maxAllowedPax} orang telah masuk). Kode masih berlaku untuk 1 orang pasangannya.`;
+                return {
+                    success: true,
+                    message: successMsg,
+                    ticketId: ticket.id,
+                    buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                    ticketCategory: ticket.orderItem.ticketCategory.name,
+                    eventTitle: ticket.orderItem.ticketCategory.name,
+                    isCouple: true,
+                    remainingPax: maxAllowedPax - (validScanCount + 1),
+                    ticket: {
+                        id: ticket.id,
+                        status: updatedTicket.status,
+                        checkedInAt: updatedTicket.checkedInAt,
+                        checkedOutAt: updatedTicket.checkedOutAt,
+                        orderItem: {
+                            attendeeName: ticket.attendeeName || ticket.orderItem.attendeeName,
+                            ticketCategory: {
+                                name: ticket.orderItem.ticketCategory.name,
+                            },
+                        },
+                    },
+                };
+            }
+            if (ticket.status === client_1.TicketStatus.CHECKED_IN || validScanCount >= 1) {
+                await tx.scanLog.create({
+                    data: {
+                        ticketId: ticket.id,
+                        scannedById: staffUserId,
+                        result: 'DUPLICATE',
+                    },
+                });
+                throw new common_1.BadRequestException('Tiket perorangan ini sudah pernah digunakan untuk check-in sebelumnya (1 tiket hanya berlaku untuk 1 orang).');
             }
             const updatedTicket = await tx.ticket.update({
                 where: { id: ticket.id },
@@ -421,11 +701,12 @@ let GateService = class GateService {
             });
             return {
                 success: true,
-                message: 'Check-in manual berhasil!',
+                message: 'Check-in manual berhasil! (Tiket Perorangan: 1 orang).',
                 ticketId: ticket.id,
                 buyerName: ticket.attendeeName || ticket.orderItem.attendeeName,
                 ticketCategory: ticket.orderItem.ticketCategory.name,
                 eventTitle: ticket.orderItem.ticketCategory.name,
+                isCouple: false,
                 ticket: {
                     id: ticket.id,
                     status: updatedTicket.status,

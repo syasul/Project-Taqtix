@@ -11,13 +11,19 @@ import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
 import { ArrowRight, Eye, EyeOff, Lock, Mail, UserCheck } from 'lucide-react';
 
-const registerSchema = z.object({
-  email: z.string().email({ message: 'Alamat email tidak valid' }),
-  password: z.string().min(6, { message: 'Kata sandi minimal 6 karakter' }),
-  role: z.enum(['buyer', 'organizer', 'partner'], {
-    errorMap: () => ({ message: 'Pilih role pendaftaran Anda' }),
-  }),
-});
+const registerSchema = z
+  .object({
+    email: z.string().email({ message: 'Alamat email tidak valid' }),
+    password: z.string().min(6, { message: 'Kata sandi minimal 6 karakter' }),
+    confirmPassword: z.string().min(6, { message: 'Konfirmasi kata sandi minimal 6 karakter' }),
+    role: z.enum(['buyer', 'organizer', 'partner'], {
+      errorMap: () => ({ message: 'Pilih role pendaftaran Anda' }),
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Konfirmasi kata sandi tidak cocok',
+    path: ['confirmPassword'],
+  });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -25,6 +31,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -37,6 +44,7 @@ export default function RegisterPage() {
     defaultValues: {
       email: '',
       password: '',
+      confirmPassword: '',
       role: 'organizer',
     },
   });
@@ -47,8 +55,9 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       await apiClient.post('/auth/register', {
-        ...values,
         email: values.email.trim().toLowerCase(),
+        password: values.password,
+        role: values.role,
       });
       toast.success('Pendaftaran berhasil! Silakan masuk menggunakan akun Anda.');
       router.push('/login');
@@ -156,7 +165,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer p-1 transition"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer p-1 transition z-10"
               aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Lihat kata sandi'}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -164,6 +173,33 @@ export default function RegisterPage() {
           </div>
           {errors.password && (
             <p className="text-rose-500 text-[11px] font-semibold mt-1.5">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Ulangi Kata Sandi
+          </label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Ketik ulang kata sandi"
+              {...register('confirmPassword')}
+              className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#08B4B5] focus:bg-white text-xs font-semibold transition"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer p-1 transition z-10"
+              aria-label={showConfirmPassword ? 'Sembunyikan kata sandi' : 'Lihat kata sandi'}
+            >
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+          {errors.confirmPassword && (
+            <p className="text-rose-500 text-[11px] font-semibold mt-1.5">{errors.confirmPassword.message}</p>
           )}
         </div>
 

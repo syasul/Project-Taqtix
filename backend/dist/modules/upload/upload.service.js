@@ -88,6 +88,7 @@ let UploadService = UploadService_1 = class UploadService {
         const candidates = [
             configuredPath,
             path.resolve(process.cwd(), 'uploads'),
+            path.resolve(process.cwd(), '../uploads'),
             path.resolve(__dirname, '../../../../uploads'),
             path.join(os.tmpdir(), 'taqtix-uploads'),
         ];
@@ -135,6 +136,9 @@ let UploadService = UploadService_1 = class UploadService {
         const destinationPath = path.join(targetDir, filename);
         if (file.buffer && file.buffer.length > 0) {
             try {
+                if (!fs.existsSync(targetDir)) {
+                    fs.mkdirSync(targetDir, { recursive: true, mode: 0o777 });
+                }
                 await fs.promises.writeFile(destinationPath, file.buffer);
             }
             catch (writeErr) {

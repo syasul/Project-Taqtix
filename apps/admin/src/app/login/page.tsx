@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api/client';
 import Image from 'next/image';
-import { ShieldCheck, ArrowRight, KeyRound, Lock, Mail, Shield, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, ArrowRight, KeyRound, Lock, Mail, Shield, Eye, EyeOff, HelpCircle, X, MessageCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const [mfaCode, setMfaCode] = useState('');
   const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
@@ -124,9 +125,18 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Kata Sandi
-              </label>
+              <div className="flex justify-between items-center mb-1.5">
+                <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Kata Sandi
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(true)}
+                  className="text-[11px] text-[#08B4B5] hover:underline font-semibold cursor-pointer border-0 bg-transparent p-0"
+                >
+                  Lupa sandi?
+                </button>
+              </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
@@ -220,6 +230,59 @@ export default function LoginPage() {
           <span>Sesi diamankan dengan enkripsi audit log terpusat</span>
         </div>
       </div>
+
+      {/* Modal Bantuan Password Admin */}
+      {showForgotModal && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowForgotModal(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm cursor-default"
+        >
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-sm p-6 relative animate-in fade-in zoom-in-95 duration-200 text-slate-900">
+            <button
+              type="button"
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer transition"
+              aria-label="Tutup modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-10 h-10 rounded-xl bg-teal-50 text-[#08B4B5] flex items-center justify-center mb-3">
+              <HelpCircle className="w-5 h-5" />
+            </div>
+
+            <h3 className="text-base font-bold text-slate-900 mb-1">
+              Reset Kredensial Admin
+            </h3>
+            <p className="text-xs text-slate-500 mb-5 leading-relaxed">
+              Kredensial Super Administrator dilindungi enkripsi tingkat tinggi. Untuk pemulihan akun Admin, jalankan script CLI server:
+              <code className="block mt-2 p-2 bg-slate-100 rounded-lg text-[10px] font-mono text-slate-800 break-all select-all">
+                node scripts/reset-user-password.js &lt;email&gt; &lt;password_baru&gt; admin
+              </code>
+            </p>
+
+            <div className="space-y-2.5">
+              <a
+                href="mailto:tech@taqtix.id?subject=Permintaan%20Reset%20Kredensial%20Admin"
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 transition"
+              >
+                <Mail className="w-4 h-4" />
+                <span>Hubungi Tim Teknis (tech@taqtix.id)</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(false)}
+                className="w-full py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -58,6 +58,7 @@ export class UploadService {
     const candidates = [
       configuredPath,
       path.resolve(process.cwd(), 'uploads'),
+      path.resolve(process.cwd(), '../uploads'),
       path.resolve(__dirname, '../../../../uploads'),
       path.join(os.tmpdir(), 'taqtix-uploads'),
     ];
@@ -121,6 +122,9 @@ export class UploadService {
     // Tulis buffer ke disk jika file disimpan di memoryStorage
     if (file.buffer && file.buffer.length > 0) {
       try {
+        if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, { recursive: true, mode: 0o777 });
+        }
         await fs.promises.writeFile(destinationPath, file.buffer);
       } catch (writeErr) {
         this.logger.error(

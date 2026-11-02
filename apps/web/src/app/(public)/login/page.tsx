@@ -202,12 +202,18 @@ function LoginForm() {
 
         {/* Modal Lupa Sandi */}
         {showForgotModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs">
+          <div
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowForgotModal(false);
+            }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm cursor-default"
+          >
             <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-sm p-6 relative animate-in fade-in zoom-in-95 duration-200 text-slate-900">
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer transition"
+                aria-label="Tutup modal"
               >
                 <X className="w-4 h-4" />
               </button>

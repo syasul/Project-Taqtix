@@ -57,38 +57,38 @@ async function bootstrap() {
         ? cleanUploadPath
         : path.resolve(process.cwd(), cleanUploadPath);
     try {
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true, mode: 0o755 });
-        }
+        const candidateUploadDirs = [
+            uploadPath,
+            path.resolve(process.cwd(), 'uploads'),
+            path.resolve(process.cwd(), '../uploads'),
+            path.join(os.tmpdir(), 'taqtix-uploads'),
+        ];
         const staticOptions = {
             setHeaders: (res) => {
                 res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
                 res.setHeader('Access-Control-Allow-Origin', '*');
             },
         };
-        app.use('/uploads', express.static(uploadPath, staticOptions));
-        app.use('/v1/uploads', express.static(uploadPath, staticOptions));
-        const localUploads = path.resolve(process.cwd(), 'uploads');
-        if (localUploads !== uploadPath) {
-            if (!fs.existsSync(localUploads)) {
-                fs.mkdirSync(localUploads, { recursive: true, mode: 0o755 });
+        for (const dir of candidateUploadDirs) {
+            if (!fs.existsSync(dir)) {
+                try {
+                    fs.mkdirSync(dir, { recursive: true, mode: 0o777 });
+                }
+                catch { }
             }
-            app.use('/uploads', express.static(localUploads, staticOptions));
-            app.use('/v1/uploads', express.static(localUploads, staticOptions));
+            app.use('/uploads', express.static(dir, staticOptions));
+            app.use('/v1/uploads', express.static(dir, staticOptions));
         }
-        const tmpUploads = path.join(os.tmpdir(), 'taqtix-uploads');
-        if (!fs.existsSync(tmpUploads)) {
-            try {
-                fs.mkdirSync(tmpUploads, { recursive: true, mode: 0o777 });
-            }
-            catch { }
-        }
-        app.use('/uploads', express.static(tmpUploads, staticOptions));
-        app.use('/v1/uploads', express.static(tmpUploads, staticOptions));
     }
     catch (err) {
         console.warn('[Main] Gagal menginisialisasi static upload handler:', err);
     }
+    app.use((req, _res, next) => {
+        if (req.url === '/upload' || req.url.startsWith('/upload?')) {
+            req.url = '/v1' + req.url;
+        }
+        next();
+    });
     app.setGlobalPrefix('v1', {
         exclude: ['payments/webhook/(.*)', 'payments/webhook'],
     });

@@ -1541,7 +1541,7 @@ export default function EventDetailPage() {
                   Metode Pembayaran
                 </span>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Mendukung QRIS instan (BCA, Livin, GoPay, OVO, ShopeePay, Dana) & Virtual Account seluruh bank utama.
+                  Mendukung Virtual Account resmi (BNI, BRI BRIVA, Mandiri, Permata) serta Gerai Retail (Indomaret, Alfamart) dengan verifikasi otomatis 24 jam.
                 </p>
               </div>
 

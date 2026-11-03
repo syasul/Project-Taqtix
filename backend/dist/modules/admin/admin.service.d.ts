@@ -316,6 +316,21 @@ export declare class AdminService {
         allowTicketTransfer: boolean;
     }>;
     getDashboard(): Promise<{
+        metrics: {
+            activeOrganizers: number;
+            totalOrganizers: number;
+            publishedEvents: number;
+            totalEvents: number;
+            platformRevenue: number;
+            feesCollected: number;
+            pendingApprovals: number;
+            pendingSettlements: number;
+        };
+        recentSales: {
+            name: string;
+            sales: number;
+            revenue: number;
+        }[];
         totalOrganizers: number;
         activeOrganizers: number;
         totalEvents: number;

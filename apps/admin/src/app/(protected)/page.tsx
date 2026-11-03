@@ -60,7 +60,23 @@ export default function DashboardPage() {
     );
   }
 
-  const { metrics, recentSales } = data;
+  const rawData: any = data || {};
+  const metrics = rawData.metrics || {
+    activeOrganizers: rawData.activeOrganizers || 0,
+    publishedEvents: rawData.publishedEvents || 0,
+    platformRevenue: rawData.totalRevenue || rawData.platformRevenue || 0,
+    feesCollected: rawData.platformFee || rawData.feesCollected || 0,
+    pendingApprovals: rawData.pendingApprovals || 0,
+    pendingSettlements: rawData.pendingSettlements || 0,
+  };
+  const recentSales = Array.isArray(rawData.recentSales) && rawData.recentSales.length > 0
+    ? rawData.recentSales
+    : [
+        { name: 'Minggu 1', sales: 0, revenue: 0 },
+        { name: 'Minggu 2', sales: 0, revenue: 0 },
+        { name: 'Minggu 3', sales: 0, revenue: 0 },
+        { name: 'Minggu 4', sales: 0, revenue: 0 },
+      ];
 
   const cardList = [
     {
@@ -237,7 +253,7 @@ export default function DashboardPage() {
 
           {/* X Axis Labels */}
           <div className="absolute bottom-[-28px] left-0 right-0 flex justify-between px-10 text-slate-500 text-xs font-bold uppercase tracking-wider">
-            {recentSales.map((sales, idx) => (
+            {recentSales.map((sales: any, idx: number) => (
               <span key={idx}>{sales.name}</span>
             ))}
           </div>

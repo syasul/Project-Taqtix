@@ -42,6 +42,7 @@ const exports_module_1 = require("./modules/exports/exports.module");
 const upload_module_1 = require("./modules/upload/upload.module");
 const settlements_module_1 = require("./modules/settlements/settlements.module");
 const settings_module_1 = require("./modules/settings/settings.module");
+const banners_module_1 = require("./modules/banners/banners.module");
 const throttler_1 = require("@nestjs/throttler");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const roles_guard_1 = require("./common/guards/roles.guard");
@@ -137,6 +138,7 @@ exports.AppModule = AppModule = __decorate([
             upload_module_1.UploadModule,
             settlements_module_1.SettlementsModule,
             settings_module_1.SettingsModule,
+            banners_module_1.BannersModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

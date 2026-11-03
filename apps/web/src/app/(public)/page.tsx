@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -85,40 +85,39 @@ const cities = [
   'Semarang',
 ];
 
-// Promotional Hero Banners
-const heroBanners = [
+// Banner Item Interface & Default Fallbacks (managed by Main Admin)
+interface BannerItem {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  imageUrl: string;
+  targetUrl?: string | null;
+  position?: string;
+  order?: number;
+  isActive?: boolean;
+}
+
+const DEFAULT_HOME_BANNERS: BannerItem[] = [
   {
     id: 'bnr-1',
     title: 'Jakarta Live Fest 2026',
     subtitle: 'Simfoni Musik Akbar & Kolaborasi Musisi Terkemuka Indonesia',
-    imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
-    targetUrl: '/event/jakarta-live-fest-2026',
-    tag: 'EVENT PILIHAN',
-    price: 'Mulai Rp 100.000',
-    date: '12 September 2026',
-    location: 'Jakarta Convention Center',
+    imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80',
+    targetUrl: '/events',
   },
   {
     id: 'bnr-2',
     title: 'Indonesia Creative & Culinary Expo 2026',
     subtitle: 'Eksibisi Lifestyle & Kuliner Terbesar Se-Indonesia',
-    imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-    targetUrl: '/event/indo-creative-culinary-expo-2026',
-    tag: 'BAZAAR & CULINARY',
-    price: 'Mulai Rp 35.000',
-    date: '20-22 November 2026',
-    location: 'ICE BSD, Tangerang',
+    imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80',
+    targetUrl: '/events',
   },
   {
     id: 'bnr-3',
     title: 'Jakarta Creative Workshop & Art Expo',
     subtitle: 'Eksplorasi Kaligrafi Modern, Fotografi & Desain Visual',
-    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
-    targetUrl: '/event/jakarta-creative-workshop-2026',
-    tag: 'ART & WORKSHOP',
-    price: 'Mulai Rp 150.000',
-    date: '5-6 Desember 2026',
-    location: 'Senayan Park, Jakarta',
+    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1400&q=80',
+    targetUrl: '/events',
   },
 ];
 
@@ -317,13 +316,34 @@ function MarketplaceContent() {
     }
   }, [categoryParam]);
 
+  // Fetch dynamic banners managed by Main Admin (GET /v1/banners?position=home_hero)
+  const { data: bannersResponse } = useQuery({
+    queryKey: ['public-hero-banners'],
+    queryFn: async () => {
+      const res = await apiClient.get('/banners?position=home_hero');
+      return res.data;
+    },
+    staleTime: 60 * 1000,
+  });
+
+  const bannerList: BannerItem[] = useMemo(() => {
+    if (Array.isArray(bannersResponse?.data) && bannersResponse.data.length > 0) {
+      return bannersResponse.data;
+    }
+    if (Array.isArray(bannersResponse) && bannersResponse.length > 0) {
+      return bannersResponse;
+    }
+    return DEFAULT_HOME_BANNERS;
+  }, [bannersResponse]);
+
   // Auto slide hero banner
   useEffect(() => {
+    if (bannerList.length <= 1) return;
     const timer = setInterval(() => {
-      setActiveBannerIdx((prev) => (prev + 1) % heroBanners.length);
-    }, 6000);
+      setActiveBannerIdx((prev) => (prev + 1) % bannerList.length);
+    }, 5500);
     return () => clearInterval(timer);
-  }, []);
+  }, [bannerList.length]);
 
   const { data: eventsResponse, isLoading } = useQuery({
     queryKey: ['public-events'],
@@ -416,7 +436,7 @@ function MarketplaceContent() {
     return e.location.toLowerCase().includes(selectedCity.toLowerCase());
   });
 
-  const currentBanner = heroBanners[activeBannerIdx];
+  const currentBanner = bannerList[activeBannerIdx % bannerList.length] || bannerList[0];
 
   return (
     <div className="space-y-16 pb-20">
@@ -517,144 +537,91 @@ function MarketplaceContent() {
           </div>
         </div>
 
-        {/* AUTHENTIC LIQUID GLASS TICKET & CAPABILITIES PANEL */}
-        <div className="mt-12 max-w-5xl mx-auto rounded-3xl liquid-glass p-6 sm:p-9 shadow-xl relative overflow-hidden">
-          {/* Subtle Top Specular Glass Reflection Highlight */}
-          <div className="absolute inset-x-0 top-0 h-[1px] bg-white/90" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left: Authentic Liquid Glass Ticket Pass */}
-            <div className="lg:col-span-6 flex justify-center">
-              <div className="w-full max-w-sm rounded-2xl liquid-glass-card p-5.5 relative overflow-hidden border border-white/90 shadow-lg">
-                {/* Glass Notch Perforation Effect */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
-                      Tiket Terkonfirmasi
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-extrabold text-[#08ADAE] bg-[#08ADAE]/10 px-2.5 py-0.5 rounded-full border border-[#08ADAE]/20">
-                    VIP ACCESS
-                  </span>
-                </div>
-
-                {/* Event Details */}
-                <div className="py-4 space-y-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                    TAQtix Event Partner
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 leading-snug">
-                    Nusantara Live Music Festival 2026
-                  </h4>
-                  <div className="flex items-center gap-4 text-xs text-slate-600 pt-1">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-[#08ADAE]" />
-                      12 Sep 2026
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#08ADAE]" />
-                      JCC Senayan
-                    </span>
-                  </div>
-                </div>
-
-                {/* Perforation Line with Side Notches */}
-                <div className="relative my-2">
-                  <div className="border-t border-dashed border-slate-300" />
-                  <div className="absolute -left-8 -top-2.5 h-5 w-5 rounded-full bg-slate-50 border-r border-slate-200" />
-                  <div className="absolute -right-8 -top-2.5 h-5 w-5 rounded-full bg-slate-50 border-l border-slate-200" />
-                </div>
-
-                {/* Barcode / QR Section */}
-                <div className="pt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-white/90 border border-white rounded-xl shadow-xs">
-                      <QrCode className="w-12 h-12 text-slate-800" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <p className="text-[11px] font-mono font-bold text-slate-800">
-                        TQTX-2026-X8921
-                      </p>
-                      <p className="text-[10px] text-slate-500">
-                        Scan di Gate 3A (Kru Scanner)
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 block font-medium">Total Bayar</span>
-                    <span className="text-xs font-black text-slate-900">Rp 250.000</span>
-                  </div>
-                </div>
-
-                {/* WhatsApp badge footer */}
-                <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
-                  <span className="flex items-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50/80 px-2 py-0.5 rounded-full border border-emerald-200/50">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    Terkirim ke WhatsApp
-                  </span>
-                  <span className="font-mono text-[10px] text-slate-400">STATUS: PAID</span>
-                </div>
-              </div>
+        {/* DYNAMIC BANNER SLIDER CARD (DIATUR OLEH MAIN ADMIN) */}
+        <div className="mt-8 max-w-6xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/90 bg-slate-950 min-h-[340px] sm:min-h-[400px] md:min-h-[460px] flex flex-col justify-between text-white group">
+            {/* Background Image Slide with Smooth Transition */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+              <img
+                src={currentBanner.imageUrl}
+                alt={currentBanner.title}
+                className="w-full h-full object-cover object-center filter brightness-[0.80] contrast-105 group-hover:scale-105 transition-all duration-700 ease-out"
+              />
+              {/* Gradient Vignette Overlay to ensure text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/30" />
             </div>
 
-            {/* Right: Technical Capabilities (Frosted Glass Tiles) */}
-            <div className="lg:col-span-6 space-y-4 text-left">
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#08ADAE] mb-1">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Infrastruktur Ticketing Andal
-                </div>
-                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Pengalaman Transaksi Bebas Masalah
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
-                  TAQtix dirancang untuk memastikan setiap detik proses pembelian hingga gate check-in berjalan lancar dan aman.
-                </p>
+            {/* Top Bar: Promotion Badge & Prev/Next Navigation Controls */}
+            <div className="relative z-10 p-5 sm:p-7 flex items-center justify-between">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-[#08ADAE]" />
+                <span>Promo Unggulan TAQtix</span>
               </div>
 
-              <div className="space-y-3 pt-1">
-                <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
-                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-900">
-                      Tiket Resmi, Lebih Tenang
-                    </h5>
-                    <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                      Beli tiket melalui kanal resmi event yang tersedia di TAQtix.
-                    </p>
-                  </div>
+              {bannerList.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setActiveBannerIdx((prev) => (prev === 0 ? bannerList.length - 1 : prev - 1))
+                    }
+                    className="p-2.5 rounded-full bg-black/35 hover:bg-[#08ADAE] text-white border border-white/20 backdrop-blur-md transition-all duration-200 cursor-pointer active:scale-95 shadow-md"
+                    aria-label="Banner sebelumnya"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setActiveBannerIdx((prev) => (prev + 1) % bannerList.length)
+                    }
+                    className="p-2.5 rounded-full bg-black/35 hover:bg-[#08ADAE] text-white border border-white/20 backdrop-blur-md transition-all duration-200 cursor-pointer active:scale-95 shadow-md"
+                    aria-label="Banner berikutnya"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
+              )}
+            </div>
 
-                <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
-                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
-                    <Ticket className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-900">
-                      Tiket Digital, Praktis Diakses
-                    </h5>
-                    <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                      Temukan tiket dan informasi akses setelah transaksi berhasil.
-                    </p>
-                  </div>
-                </div>
+            {/* Bottom Content: Title, Subtitle, CTA Button & Indicators */}
+            <div className="relative z-10 p-5 sm:p-8 md:p-10 space-y-4 max-w-3xl">
+              <div className="space-y-2">
+                <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-snug drop-shadow-sm">
+                  {currentBanner.title}
+                </h2>
+                {currentBanner.subtitle && (
+                  <p className="text-xs sm:text-sm md:text-base text-slate-200/90 font-medium leading-relaxed max-w-2xl drop-shadow-xs">
+                    {currentBanner.subtitle}
+                  </p>
+                )}
+              </div>
 
-                <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
-                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
-                    <QrCode className="w-4 h-4" />
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                <Link
+                  href={currentBanner.targetUrl || '/events'}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#08ADAE] hover:bg-[#079b9c] text-white rounded-full text-xs sm:text-sm font-bold shadow-lg shadow-[#08ADAE]/25 transition-all active:scale-95 cursor-pointer"
+                >
+                  <span>Lihat Detail & Beli Tiket</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                {/* Dots indicator */}
+                {bannerList.length > 1 && (
+                  <div className="flex items-center gap-1.5 py-1">
+                    {bannerList.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveBannerIdx(idx)}
+                        className={cn(
+                          'h-2 rounded-full transition-all duration-300 cursor-pointer',
+                          activeBannerIdx === idx
+                            ? 'w-7 bg-[#08ADAE]'
+                            : 'w-2 bg-white/40 hover:bg-white/70'
+                        )}
+                        aria-label={`Pindah ke banner ${idx + 1}`}
+                      />
+                    ))}
                   </div>
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-900">
-                      Check-in Lebih Praktis
-                    </h5>
-                    <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                      Proses masuk event dengan sistem pemindaian tiket, jika fitur tersebut digunakan oleh penyelenggara.
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -723,100 +690,6 @@ function MarketplaceContent() {
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 3. PROMOTIONAL HERO BANNER CAROUSEL (SMOKED OBSIDIAN GLASS)               */}
-      {/* ========================================================================= */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="relative liquid-glass-dark rounded-3xl overflow-hidden shadow-2xl text-white min-h-[380px] sm:min-h-[420px] flex flex-col justify-between border border-white/15">
-          {/* Background Image with Solid Overlay */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src={currentBanner.imageUrl}
-              alt={currentBanner.title}
-              className="w-full h-full object-cover opacity-35 filter brightness-90 transition-all duration-700"
-            />
-            <div className="absolute inset-0 bg-slate-950/60" />
-          </div>
-
-          {/* Top Tag & Controls */}
-          <div className="relative z-10 p-6 md:p-8 flex items-center justify-between">
-            <span className="px-4 py-1.5 bg-[#08ADAE] text-white rounded-full text-xs font-extrabold tracking-wider uppercase shadow-[0_2px_10px_rgba(8,173,174,0.4),inset_0_1px_1px_rgba(255,255,255,0.4)]">
-              {currentBanner.tag}
-            </span>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() =>
-                  setActiveBannerIdx((prev) => (prev === 0 ? heroBanners.length - 1 : prev - 1))
-                }
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md transition cursor-pointer"
-                aria-label="Previous banner"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() =>
-                  setActiveBannerIdx((prev) => (prev + 1) % heroBanners.length)
-                }
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md transition cursor-pointer"
-                aria-label="Next banner"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Banner Details */}
-          <div className="relative z-10 p-6 md:p-10 space-y-4 max-w-3xl">
-            <div className="space-y-2">
-              <h2 className="text-2xl sm:text-4xl font-extrabold leading-tight tracking-tight">
-                {currentBanner.title}
-              </h2>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl">
-                {currentBanner.subtitle}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 font-medium pt-1">
-              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
-                <Calendar className="w-3.5 h-3.5 text-[#08ADAE]" />
-                <span>{currentBanner.date}</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
-                <MapPin className="w-3.5 h-3.5 text-[#08ADAE]" />
-                <span>{currentBanner.location}</span>
-              </div>
-              <span className="text-[#F0B829] font-bold font-mono text-sm sm:text-base px-3 py-1 rounded-full bg-white/10 border border-white/15">
-                {currentBanner.price}
-              </span>
-            </div>
-
-            <div className="pt-2">
-              <Link
-                href={currentBanner.targetUrl}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#08ADAE] hover:bg-[#07999A] text-white rounded-full text-xs sm:text-sm font-bold transition shadow-[0_4px_14px_rgba(8,173,174,0.35),inset_0_1px_1px_rgba(255,255,255,0.4)] cursor-pointer active:scale-95"
-              >
-                <span>Lihat Detail & Beli Tiket</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Carousel Dots */}
-          <div className="relative z-10 p-4 flex justify-center gap-2">
-            {heroBanners.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveBannerIdx(idx)}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
-                  activeBannerIdx === idx ? 'w-8 bg-[#08ADAE]' : 'w-2 bg-white/40 hover:bg-white/70'
-                }`}
-                aria-label={`Slide ${idx + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ========================================================================= */}
       {/* 3. SLIDER EVENT PER KOTA / OFFICIAL EVENTS                                */}

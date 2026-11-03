@@ -130,3 +130,4 @@ export class RundownService {
     return this.findAll(eventId);
   }
 }
+

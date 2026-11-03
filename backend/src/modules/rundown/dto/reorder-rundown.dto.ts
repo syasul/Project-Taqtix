@@ -20,3 +20,4 @@ export class ReorderRundownDto {
   @Type(() => ReorderItem)
   items!: ReorderItem[];
 }
+

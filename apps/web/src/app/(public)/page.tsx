@@ -397,9 +397,9 @@ function MarketplaceContent() {
   return (
     <div className="space-y-16 pb-20">
       {/* ========================================================================= */}
-      {/* 1. JUMBOTRON HERO BANNER CAROUSEL (3D COVERFLOW ARTATIX STYLE)           */}
+      {/* 1. JUMBOTRON WIDESCREEN PANORAMA BANNER (TAQTIX BESPOKE IDENTITY)        */}
       {/* ========================================================================= */}
-      <section className="px-2 sm:px-4 lg:px-6 max-w-7xl mx-auto relative pt-1 sm:pt-2">
+      <section className="px-2 sm:px-4 lg:px-6 max-w-[1440px] mx-auto relative pt-1 sm:pt-2">
         {recentOrder && (
           <div className="flex justify-center mb-4">
             <Link

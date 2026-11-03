@@ -49,7 +49,17 @@ let IdempotencyInterceptor = IdempotencyInterceptor_1 = class IdempotencyInterce
             const redisUrl = this.configService?.get('REDIS_URL') ||
                 process.env.REDIS_URL ||
                 'redis://localhost:6379';
+            const explicitPassword = this.configService?.get('REDIS_PASSWORD') ||
+                process.env.REDIS_PASSWORD;
+            let passwordOption = explicitPassword;
+            try {
+                const parsed = new URL(redisUrl);
+                if (parsed.password)
+                    passwordOption = parsed.password;
+            }
+            catch { }
             this.redis = new ioredis_1.default(redisUrl, {
+                password: passwordOption || undefined,
                 maxRetriesPerRequest: 1,
                 enableReadyCheck: false,
                 lazyConnect: true,

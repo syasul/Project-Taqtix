@@ -72,15 +72,23 @@ import { IdempotencyInterceptor } from './common/interceptors/idempotency.interc
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const redisUrl =
-          config.get<string>('REDIS_URL') || 'redis://localhost:6379';
+          config.get<string>('REDIS_URL') ||
+          process.env.REDIS_URL ||
+          'redis://localhost:6379';
+        const explicitPassword =
+          config.get<string>('REDIS_PASSWORD') ||
+          process.env.REDIS_PASSWORD ||
+          undefined;
+
         try {
           const parsed = new URL(redisUrl);
+          const password = parsed.password || explicitPassword || undefined;
           return {
             redis: {
-              host: parsed.hostname,
+              host: parsed.hostname || 'localhost',
               port: parseInt(parsed.port || '6379', 10),
               username: parsed.username || undefined,
-              password: parsed.password || undefined,
+              password,
             },
           };
         } catch {
@@ -88,6 +96,7 @@ import { IdempotencyInterceptor } from './common/interceptors/idempotency.interc
             redis: {
               host: 'localhost',
               port: 6379,
+              password: explicitPassword,
             },
           };
         }

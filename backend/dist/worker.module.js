@@ -26,15 +26,21 @@ exports.WorkerModule = WorkerModule = __decorate([
             bull_1.BullModule.forRootAsync({
                 inject: [config_1.ConfigService],
                 useFactory: (config) => {
-                    const redisUrl = config.get('REDIS_URL') || 'redis://localhost:6379';
+                    const redisUrl = config.get('REDIS_URL') ||
+                        process.env.REDIS_URL ||
+                        'redis://localhost:6379';
+                    const explicitPassword = config.get('REDIS_PASSWORD') ||
+                        process.env.REDIS_PASSWORD ||
+                        undefined;
                     try {
                         const parsed = new URL(redisUrl);
+                        const password = parsed.password || explicitPassword || undefined;
                         return {
                             redis: {
-                                host: parsed.hostname,
+                                host: parsed.hostname || 'localhost',
                                 port: parseInt(parsed.port || '6379', 10),
                                 username: parsed.username || undefined,
-                                password: parsed.password || undefined,
+                                password,
                             },
                         };
                     }
@@ -43,6 +49,7 @@ exports.WorkerModule = WorkerModule = __decorate([
                             redis: {
                                 host: 'localhost',
                                 port: 6379,
+                                password: explicitPassword,
                             },
                         };
                     }

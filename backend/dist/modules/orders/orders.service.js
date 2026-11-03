@@ -431,7 +431,12 @@ let OrdersService = OrdersService_1 = class OrdersService {
                 }
             }
         }
-        await this.orderExpirationQueue.add('expire-order', { orderId: order.id }, { delay: expirationDelay });
+        try {
+            await this.orderExpirationQueue.add('expire-order', { orderId: order.id }, { delay: expirationDelay });
+        }
+        catch (err) {
+            this.logger.warn(`[OrderExpiration] Gagal menambahkan job expire-order ke Redis Queue (${err.message}). Status order akan diperbarui melalui sinkronisasi terjadwal.`);
+        }
         return order;
     }
     async rollbackOrder(orderId, dto) {
@@ -568,25 +573,41 @@ let OrdersService = OrdersService_1 = class OrdersService {
             throw new common_1.UnauthorizedException('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.');
         }
         const queueId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        await this.checkoutQueue.add('process-checkout', {
-            queueId,
-            dto,
-            authenticatedUserId,
-            idempotencyKey,
-        }, {
-            jobId: queueId,
-            attempts: 1,
-            removeOnComplete: 1000,
-            removeOnFail: 1000,
-        });
-        const waitingCount = await this.checkoutQueue.getWaitingCount();
-        return {
-            status: 'QUEUED',
-            queueId,
-            position: Math.max(1, waitingCount),
-            estimatedWaitSeconds: Math.max(2, Math.ceil(waitingCount / 25)),
-            message: 'Pesanan Anda berhasil masuk ke antrean ruang tunggu resmi TAQtix.',
-        };
+        try {
+            await this.checkoutQueue.add('process-checkout', {
+                queueId,
+                dto,
+                authenticatedUserId,
+                idempotencyKey,
+            }, {
+                jobId: queueId,
+                attempts: 1,
+                removeOnComplete: 1000,
+                removeOnFail: 1000,
+            });
+            const waitingCount = await this.checkoutQueue.getWaitingCount();
+            return {
+                status: 'QUEUED',
+                queueId,
+                position: Math.max(1, waitingCount),
+                estimatedWaitSeconds: Math.max(2, Math.ceil(waitingCount / 25)),
+                message: 'Pesanan Anda berhasil masuk ke antrean ruang tunggu resmi TAQtix.',
+            };
+        }
+        catch (queueErr) {
+            this.logger.warn(`[VirtualQueue] Gagal memasukkan antrean ke Redis (${queueErr.message}). Melakukan fallback ke proses reservasi tiket langsung.`);
+            const order = await this.create(dto, authenticatedUserId, idempotencyKey);
+            return {
+                status: 'COMPLETED',
+                queueId: 'direct-fallback',
+                position: 0,
+                data: {
+                    orderId: order.id,
+                    paymentUrl: order.paymentUrl || null,
+                    totalAmount: order.totalAmount,
+                },
+            };
+        }
     }
     async getQueueStatus(queueId) {
         const job = await this.checkoutQueue.getJob(queueId);

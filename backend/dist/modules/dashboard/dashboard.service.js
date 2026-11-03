@@ -27,9 +27,21 @@ let DashboardService = class DashboardService {
         this.configService = configService;
     }
     onModuleInit() {
-        const redisUrl = this.configService.get('REDIS_URL') || 'redis://localhost:6379';
+        const redisUrl = this.configService.get('REDIS_URL') ||
+            process.env.REDIS_URL ||
+            'redis://localhost:6379';
+        const explicitPassword = this.configService.get('REDIS_PASSWORD') ||
+            process.env.REDIS_PASSWORD;
+        let passwordOption = explicitPassword;
+        try {
+            const parsed = new URL(redisUrl);
+            if (parsed.password)
+                passwordOption = parsed.password;
+        }
+        catch { }
         try {
             this.redis = new ioredis_1.default(redisUrl, {
+                password: passwordOption || undefined,
                 maxRetriesPerRequest: null,
                 enableReadyCheck: false,
             });

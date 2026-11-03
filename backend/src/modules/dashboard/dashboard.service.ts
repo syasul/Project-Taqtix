@@ -21,9 +21,22 @@ export class DashboardService implements OnModuleInit {
 
   onModuleInit() {
     const redisUrl =
-      this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
+      this.configService.get<string>('REDIS_URL') ||
+      process.env.REDIS_URL ||
+      'redis://localhost:6379';
+    const explicitPassword =
+      this.configService.get<string>('REDIS_PASSWORD') ||
+      process.env.REDIS_PASSWORD;
+
+    let passwordOption = explicitPassword;
+    try {
+      const parsed = new URL(redisUrl);
+      if (parsed.password) passwordOption = parsed.password;
+    } catch {}
+
     try {
       this.redis = new Redis(redisUrl, {
+        password: passwordOption || undefined,
         maxRetriesPerRequest: null,
         enableReadyCheck: false,
       });

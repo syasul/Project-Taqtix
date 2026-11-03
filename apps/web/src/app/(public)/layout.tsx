@@ -151,7 +151,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   </li>
                   <li>
                     <Link href="/help" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
-                      Pusat Bantuan (FAQ)
+                      Help Center (Pusat Bantuan)
                     </Link>
                   </li>
                   <li>

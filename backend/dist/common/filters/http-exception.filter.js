@@ -33,14 +33,14 @@ let HttpExceptionFilter = class HttpExceptionFilter {
                         code = 'BAD_REQUEST';
                         if (Array.isArray(resObj.message)) {
                             code = 'VALIDATION_ERROR';
-                            message = 'Validasi input gagal';
+                            message = resObj.message.join(', ');
                             details = resObj.message;
                         }
                     }
                     else if (status === common_1.HttpStatus.UNPROCESSABLE_ENTITY) {
                         code = 'VALIDATION_ERROR';
                         if (Array.isArray(resObj.message)) {
-                            message = 'Validasi input gagal';
+                            message = resObj.message.join(', ');
                             details = resObj.message;
                         }
                     }

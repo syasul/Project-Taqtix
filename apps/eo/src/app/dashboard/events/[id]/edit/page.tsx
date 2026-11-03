@@ -281,7 +281,7 @@ export default function EditEventPage() {
 
   // Mutation Edit Event
   const updateMutation = useMutation({
-    mutationFn: async (values: EventFormValues) => {
+    mutationFn: async (values: any) => {
       const res = await apiClient.patch(`/organizer/events/${eventId}`, values);
       return res.data;
     },
@@ -291,7 +291,14 @@ export default function EditEventPage() {
       router.push('/dashboard/events');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.error?.message || 'Gagal memperbarui event.');
+      const details = error.response?.data?.error?.details;
+      const detailMsg = Array.isArray(details) ? details.join(', ') : '';
+      const errMsg =
+        detailMsg ||
+        error.response?.data?.error?.message ||
+        error.response?.data?.message ||
+        'Gagal memperbarui event.';
+      toast.error(errMsg);
     },
   });
 
@@ -312,7 +319,16 @@ export default function EditEventPage() {
   });
 
   const onSubmit = (values: EventFormValues) => {
-    updateMutation.mutate(values);
+    const payload = {
+      ...values,
+      startDate: values.isDateTba || !values.startDate?.trim() ? undefined : values.startDate,
+      endDate: values.isDateTba || !values.endDate?.trim() ? undefined : values.endDate,
+      seoTitle: values.seoTitle?.trim() || undefined,
+      seoDescription: values.seoDescription?.trim() || undefined,
+      seoKeywords: values.seoKeywords?.trim() || undefined,
+      bannerUrl: values.bannerUrl?.trim() || undefined,
+    };
+    updateMutation.mutate(payload);
   };
 
   const handlePublish = () => {

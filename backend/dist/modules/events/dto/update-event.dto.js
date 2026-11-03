@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateEventDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
 class UpdateEventDto {
     title;
@@ -30,12 +31,14 @@ class UpdateEventDto {
 exports.UpdateEventDto = UpdateEventDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Taqwa Movement Concert 2026', required: false }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "title", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Event dakwah islam modern', required: false }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -45,6 +48,7 @@ __decorate([
         example: 'Jakarta Convention Center, Senayan',
         required: false,
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -57,12 +61,14 @@ __decorate([
 ], UpdateEventDto.prototype, "isDateTba", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2026-09-12T13:00:00Z', required: false }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal mulai tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "startDate", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2026-09-12T22:00:00Z', required: false }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal selesai tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -72,6 +78,7 @@ __decorate([
         example: 'https://images.taqtix.id/banners/event1.jpg',
         required: false,
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -91,6 +98,7 @@ __decorate([
         example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi',
         required: false,
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -100,6 +108,7 @@ __decorate([
         example: 'Dapatkan tiket resmi Konser Akbar Taqwa Movement 2026',
         required: false,
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -109,6 +118,7 @@ __decorate([
         example: 'konser musik, festival islam 2026',
         required: false,
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -118,12 +128,14 @@ __decorate([
         example: 'Taqtix Official, Tiket Resmi Jakarta',
         required: false,
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "adminSeoKeywords", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'NORMAL', required: false }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

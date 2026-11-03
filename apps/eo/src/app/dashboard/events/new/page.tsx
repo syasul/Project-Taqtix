@@ -194,7 +194,7 @@ export default function CreateEventPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (values: EventFormValues) => {
+    mutationFn: async (values: any) => {
       const res = await apiClient.post('/organizer/events', values);
       return res.data;
     },
@@ -204,12 +204,28 @@ export default function CreateEventPage() {
       router.refresh();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.error?.message || 'Gagal membuat event baru.');
+      const details = error.response?.data?.error?.details;
+      const detailMsg = Array.isArray(details) ? details.join(', ') : '';
+      const errMsg =
+        detailMsg ||
+        error.response?.data?.error?.message ||
+        error.response?.data?.message ||
+        'Gagal membuat event baru.';
+      toast.error(errMsg);
     },
   });
 
   const onSubmit = (values: EventFormValues) => {
-    mutation.mutate(values);
+    const payload = {
+      ...values,
+      startDate: values.isDateTba || !values.startDate?.trim() ? undefined : values.startDate,
+      endDate: values.isDateTba || !values.endDate?.trim() ? undefined : values.endDate,
+      seoTitle: values.seoTitle?.trim() || undefined,
+      seoDescription: values.seoDescription?.trim() || undefined,
+      seoKeywords: values.seoKeywords?.trim() || undefined,
+      bannerUrl: values.bannerUrl?.trim() || undefined,
+    };
+    mutation.mutate(payload);
   };
 
   const breadcrumbs = [

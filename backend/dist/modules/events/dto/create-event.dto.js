@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateEventDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
 class CreateEventDto {
     title;
@@ -43,6 +44,7 @@ __decorate([
         required: false,
         description: 'Deskripsi lengkap acara',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -72,6 +74,7 @@ __decorate([
         required: false,
         description: 'Waktu mulai acara (opsional jika TBA)',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal mulai tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -82,6 +85,7 @@ __decorate([
         required: false,
         description: 'Waktu selesai acara (opsional jika TBA)',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsDateString)({}, { message: 'Tanggal selesai tidak valid' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -92,6 +96,7 @@ __decorate([
         required: false,
         description: 'URL banner event',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -112,6 +117,7 @@ __decorate([
         required: false,
         description: 'Custom SEO Meta Title',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -122,6 +128,7 @@ __decorate([
         required: false,
         description: 'Custom SEO Meta Description',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -132,6 +139,7 @@ __decorate([
         required: false,
         description: 'SEO Keywords dari EO (koma terpisah)',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -142,6 +150,7 @@ __decorate([
         required: false,
         description: 'Platform SEO Booster Keywords dari Main Admin',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -152,6 +161,7 @@ __decorate([
         required: false,
         description: 'Prioritas SEO Platform (NORMAL / HIGH / MAX_BOOST)',
     }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

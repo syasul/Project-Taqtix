@@ -5,6 +5,7 @@ import {
   IsDateString,
   IsBoolean,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEventDto {
@@ -21,6 +22,7 @@ export class CreateEventDto {
     required: false,
     description: 'Deskripsi lengkap acara',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   description?: string;
@@ -47,6 +49,7 @@ export class CreateEventDto {
     required: false,
     description: 'Waktu mulai acara (opsional jika TBA)',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsDateString({}, { message: 'Tanggal mulai tidak valid' })
   @IsOptional()
   startDate?: string;
@@ -56,6 +59,7 @@ export class CreateEventDto {
     required: false,
     description: 'Waktu selesai acara (opsional jika TBA)',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsDateString({}, { message: 'Tanggal selesai tidak valid' })
   @IsOptional()
   endDate?: string;
@@ -65,6 +69,7 @@ export class CreateEventDto {
     required: false,
     description: 'URL banner event',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   bannerUrl?: string;
@@ -83,6 +88,7 @@ export class CreateEventDto {
     required: false,
     description: 'Custom SEO Meta Title',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   seoTitle?: string;
@@ -93,6 +99,7 @@ export class CreateEventDto {
     required: false,
     description: 'Custom SEO Meta Description',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   seoDescription?: string;
@@ -102,6 +109,7 @@ export class CreateEventDto {
     required: false,
     description: 'SEO Keywords dari EO (koma terpisah)',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   seoKeywords?: string;
@@ -111,6 +119,7 @@ export class CreateEventDto {
     required: false,
     description: 'Platform SEO Booster Keywords dari Main Admin',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   adminSeoKeywords?: string;
@@ -120,6 +129,7 @@ export class CreateEventDto {
     required: false,
     description: 'Prioritas SEO Platform (NORMAL / HIGH / MAX_BOOST)',
   })
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsString()
   @IsOptional()
   seoPriority?: string;

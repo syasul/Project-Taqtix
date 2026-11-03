@@ -49,8 +49,8 @@ let PermissionGuard = class PermissionGuard {
         if (user.role === 'admin') {
             return true;
         }
-        let organizerId = request.params.organizerId || request.body.organizerId;
-        const eventId = request.params.eventId || request.params.id || request.body.eventId;
+        let organizerId = request.params?.organizerId || request.body?.organizerId;
+        const eventId = request.params?.eventId || request.params?.id || request.body?.eventId;
         if (!organizerId && eventId) {
             const event = await this.prisma.event.findUnique({
                 where: { id: eventId },
@@ -82,6 +82,16 @@ let PermissionGuard = class PermissionGuard {
             });
             if (member) {
                 role = member.role;
+                organizerId = member.organizerId;
+            }
+        }
+        if (!role) {
+            const org = await this.prisma.organizer.findUnique({
+                where: { userId: user.id },
+            });
+            if (org) {
+                role = 'owner';
+                organizerId = org.id;
             }
         }
         if (!role && user.role === 'organizer') {

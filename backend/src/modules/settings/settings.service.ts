@@ -17,10 +17,27 @@ export class SettingsService {
 
     const org = await this.prisma.organizer.findUnique({
       where: { userId },
+      include: { user: { select: { email: true } } },
     });
     if (!org) {
       throw new ForbiddenException('Profil organizer tidak ditemukan');
     }
+
+    // Auto-create missing owner member record
+    try {
+      await this.prisma.organizerMember.create({
+        data: {
+          organizerId: org.id,
+          userId,
+          email: org.user?.email || org.contactEmail || '',
+          role: 'owner',
+          status: 'active',
+          invitedBy: userId,
+          joinedAt: new Date(),
+        },
+      });
+    } catch {}
+
     return org.id;
   }
 

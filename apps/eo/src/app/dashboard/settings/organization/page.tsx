@@ -64,8 +64,8 @@ export default function OrganizationSettingsPage() {
     try {
       setLoading(true);
       const res = await apiClient.get('/organizer/settings/organization');
-      if (res.data?.success && res.data?.data) {
-        const data = res.data.data;
+      const data = res.data?.data || res.data;
+      if (data) {
         setForm({
           name: data.name || '',
           slug: data.slug || '',

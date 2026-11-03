@@ -55,10 +55,10 @@ export class PermissionGuard implements CanActivate {
       return true;
     }
 
-    // Resolve organizerId or eventId from route params or body
-    let organizerId = request.params.organizerId || request.body.organizerId;
+    // Resolve organizerId or eventId from route params or body safely
+    let organizerId = request.params?.organizerId || request.body?.organizerId;
     const eventId =
-      request.params.eventId || request.params.id || request.body.eventId;
+      request.params?.eventId || request.params?.id || request.body?.eventId;
 
     if (!organizerId && eventId) {
       const event = await this.prisma.event.findUnique({
@@ -96,6 +96,18 @@ export class PermissionGuard implements CanActivate {
       });
       if (member) {
         role = member.role;
+        organizerId = member.organizerId;
+      }
+    }
+
+    // Fallback: Check if the user is direct owner in organizer table
+    if (!role) {
+      const org = await this.prisma.organizer.findUnique({
+        where: { userId: user.id },
+      });
+      if (org) {
+        role = 'owner';
+        organizerId = org.id;
       }
     }
 

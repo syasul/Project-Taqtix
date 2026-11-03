@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import { LogOut, LayoutDashboard, Menu, Building2, ShieldCheck, Ticket, Sparkles, ArrowRight } from 'lucide-react';
+import { LogOut, LayoutDashboard, Menu, Building2, ShieldCheck, Ticket, Sparkles, ArrowRight, Calendar } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -66,6 +66,13 @@ export default function Header() {
             className="px-4 py-2 rounded-full transition-all duration-200 hover:text-[#08ADAE] hover:bg-black/[0.03] active:scale-95"
           >
             Discovery
+          </Link>
+          <Link
+            href="/events"
+            className="px-4 py-2 rounded-full transition-all duration-200 hover:text-[#08ADAE] hover:bg-black/[0.03] active:scale-95 flex items-center gap-1.5"
+          >
+            <Calendar className="w-3.5 h-3.5 text-[#08ADAE]" />
+            <span>Semua Event</span>
           </Link>
           <Link
             href="/about"
@@ -179,6 +186,13 @@ export default function Header() {
                   className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-[#08ADAE]/10 hover:text-[#08ADAE] transition"
                 >
                   Discovery
+                </Link>
+                <Link
+                  href="/events"
+                  className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-[#08ADAE]/10 hover:text-[#08ADAE] transition flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-[#08ADAE]" />
+                  <span>Semua Event</span>
                 </Link>
                 <Link
                   href="/about"

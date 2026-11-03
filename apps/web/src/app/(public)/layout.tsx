@@ -61,7 +61,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Jelajahi Event</h4>
                 <ul className="space-y-2 text-sm">
                   <li>
-                    <Link href="/" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/events" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
                       Semua Event
                     </Link>
                   </li>

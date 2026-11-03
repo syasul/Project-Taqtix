@@ -29,12 +29,12 @@ interface DashboardData {
   }[];
 }
 
-const formatRupiah = (value: number) => {
+const formatRupiah = (value?: number | null) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
-  }).format(value);
+  }).format(value || 0);
 };
 
 export default function DashboardPage() {
@@ -81,7 +81,7 @@ export default function DashboardPage() {
   const cardList = [
     {
       title: 'Organizer Aktif',
-      value: metrics.activeOrganizers,
+      value: metrics.activeOrganizers ?? 0,
       desc: 'Penyelenggara terverifikasi',
       icon: Users,
       accentClass: 'border-l-4 border-l-[#08B4B5]',
@@ -89,7 +89,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Event Berlangsung',
-      value: metrics.publishedEvents,
+      value: metrics.publishedEvents ?? 0,
       desc: 'Event aktif dipublikasikan',
       icon: Calendar,
       accentClass: 'border-l-4 border-l-emerald-600',

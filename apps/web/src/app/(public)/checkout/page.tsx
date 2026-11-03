@@ -32,6 +32,7 @@ import {
   Check,
   Download,
   RefreshCw,
+  ExternalLink,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { apiClient } from '@/lib/api-client';
@@ -199,15 +200,15 @@ function CheckoutContent() {
   // STATE METODE PEMBAYARAN KUSTOM (FULL IN-HOUSE TAQTIX)
   // -------------------------------------------------------------
   const queryMethod = searchParams?.get('method');
-  const isVaQuery = queryMethod ? queryMethod.startsWith('VIRTUAL_ACCOUNT') : false;
-  const [paymentTab, setPaymentTab] = useState<'qris' | 'va'>(isVaQuery ? 'va' : 'qris');
+  const isVaQuery = queryMethod ? queryMethod.startsWith('VIRTUAL_ACCOUNT') : true;
+  const [paymentTab, setPaymentTab] = useState<'qris' | 'va'>('va');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
-    queryMethod || 'QRIS'
+    queryMethod || 'VIRTUAL_ACCOUNT_BNI'
   );
   const [activeInstructionBank, setActiveInstructionBank] = useState<string>(
     queryMethod && queryMethod.startsWith('VIRTUAL_ACCOUNT_')
       ? queryMethod.replace('VIRTUAL_ACCOUNT_', '').replace('BANK_', '')
-      : 'BCA'
+      : 'BNI'
   );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeAccordion, setActiveAccordion] = useState<'mbanking' | 'atm' | 'ibanking'>('mbanking');
@@ -1314,21 +1315,8 @@ function CheckoutContent() {
           </Button>
         </div>
 
-        {/* Segmented Control: QRIS vs Virtual Account */}
+        {/* Segmented Control: Virtual Account (Utama) vs QRIS (Aktivasi) */}
         <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200">
-          <button
-            type="button"
-            onClick={() => setPaymentTab('qris')}
-            className={cn(
-              'flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer',
-              paymentTab === 'qris'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
-                : 'text-slate-600 hover:text-slate-900'
-            )}
-          >
-            <QrCode className="w-4 h-4 text-[#08ADAE]" />
-            <span>QRIS Instan</span>
-          </button>
           <button
             type="button"
             onClick={() => setPaymentTab('va')}
@@ -1340,189 +1328,121 @@ function CheckoutContent() {
             )}
           >
             <Building2 className="w-4 h-4 text-[#08ADAE]" />
-            <span>Virtual Account</span>
+            <div className="flex items-center gap-1.5">
+              <span>Virtual Account Bank</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentTab('qris')}
+            className={cn(
+              'flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer',
+              paymentTab === 'qris'
+                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            )}
+          >
+            <QrCode className="w-4 h-4 text-amber-500" />
+            <div className="flex items-center gap-1.5">
+              <span>QRIS</span>
+              <span className="text-[10px] text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded font-semibold border border-amber-300">
+                Proses Aktivasi
+              </span>
+            </div>
           </button>
         </div>
 
         {/* ======================================================== */}
-        {/* TAB 1: KONTEN PEMBAYARAN QRIS */}
+        {/* TAB 1: KONTEN PEMBAYARAN QRIS (STATUS UPDATING DI DOKU)  */}
         {/* ======================================================== */}
         {paymentTab === 'qris' && (
           <div className="space-y-6">
-            <Card className="bg-white border border-slate-200/90 rounded-3xl shadow-sm overflow-hidden text-center">
-              {/* Header QRIS Resmi Standar Nasional */}
-              <div className="bg-[#E1251B] text-white px-6 py-3.5 flex items-center justify-between text-xs font-bold">
-                <div className="flex items-center gap-2">
-                  <span className="tracking-widest font-black text-sm">QRIS</span>
-                  <span className="text-[10px] font-medium opacity-90 border-l border-white/40 pl-2">
-                    Pembayaran Standar Nasional
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono opacity-80">NMID: ID1020089900000303UMI</span>
+            <Card className="bg-white border border-amber-200 rounded-3xl shadow-sm p-8 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-amber-100 border-4 border-amber-300/40 flex items-center justify-center text-amber-600 mx-auto">
+                <Clock className="w-8 h-8" />
+              </div>
+              <div className="space-y-2 max-w-md mx-auto">
+                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
+                  Status DOKU: Updating (Sedang Diajukan)
+                </span>
+                <h3 className="text-lg font-bold text-slate-900 mt-2">
+                  Layanan QRIS Sedang Dalam Proses Aktivasi
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Layanan QRIS pada akun DOKU merchant TAQtix saat ini berstatus <strong>UPDATING</strong> (sedang verifikasi dan pendaftaran NMID nasional oleh Bank Indonesia).
+                </p>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Agar transaksi berhasil dan tidak ditolak oleh aplikasi m-Banking/e-wallet Anda, silakan gunakan <strong>Virtual Account Bank (BNI, BRI, Mandiri, Permata, BSI)</strong> yang sudah resmi aktif.
+                </p>
               </div>
 
-              <CardContent className="p-6 sm:p-8 space-y-6 flex flex-col items-center">
-                <div className="space-y-1">
-                  <h3 className="font-bold text-slate-800 text-sm sm:text-base">
-                    TAQtix • {orderDetails.event?.title || 'Event Organizer'}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Scan menggunakan aplikasi GoPay, OVO, Dana, ShopeePay, BCA, Livin&apos;, atau m-Banking lainnya
-                  </p>
-                </div>
-
-                {/* Barcode SVG Container */}
-                <div className="bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-sm flex flex-col items-center">
-                  <QRCodeSVG
-                    id="qris-svg"
-                    value={getQrisString(pollingOrderId, orderDetails.totalAmount, orderDetails.event?.title)}
-                    size={220}
-                    level="M"
-                    includeMargin={true}
-                  />
-                  <div className="mt-3 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                    <span className="text-[11px] font-semibold text-slate-500">QR Code Aktif & Dinamis</span>
-                  </div>
-                </div>
-
-                {/* Tombol Aksi QRIS */}
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={downloadQris}
-                    className="border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl h-10 px-4 cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 mr-1.5" />
-                    Unduh QR Code
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleManualCheckStatus}
-                    disabled={isManualChecking}
-                    className="border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl h-10 px-4 cursor-pointer"
-                  >
-                    <RefreshCw className={cn('w-4 h-4 mr-1.5', isManualChecking && 'animate-spin')} />
-                    Perbarui Status
-                  </Button>
-                </div>
-
-                {/* E-Wallet & Bank Support Badges */}
-                <div className="pt-4 border-t border-slate-100 w-full">
-                  <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2.5">
-                    Mendukung Semua Dompet Digital & Mobile Banking
-                  </p>
-                  <div className="flex flex-wrap justify-center items-center gap-2 text-[11px] font-bold text-slate-600">
-                    {['GoPay', 'OVO', 'Dana', 'ShopeePay', 'LinkAja', 'BCA Mobile', 'Livin Mandiri', 'BRImo', 'BNI Mobile'].map(
-                      (wallet) => (
-                        <span key={wallet} className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200">
-                          {wallet}
-                        </span>
-                      )
-                    )}
-                  </div>
-                </div>
-              </CardContent>
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  onClick={() => setPaymentTab('va')}
+                  className="bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold text-xs rounded-xl h-11 px-6 cursor-pointer border-0 shadow-sm"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Gunakan Virtual Account Bank (Aktif)
+                </Button>
+              </div>
             </Card>
-
-            {/* Panduan Pembayaran QRIS */}
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm space-y-3 text-xs sm:text-sm">
-              <h4 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
-                <Sparkles className="w-4 h-4 text-[#08ADAE]" />
-                Cara Membayar dengan QRIS:
-              </h4>
-              <ol className="space-y-2 text-slate-600 list-decimal pl-5 leading-relaxed">
-                <li>Buka aplikasi m-Banking atau E-Wallet pilihan Anda (GoPay, OVO, Dana, BCA Mobile, dll).</li>
-                <li>Pilih menu <strong>Scan</strong> atau <strong>Bayar dengan QRIS</strong>.</li>
-                <li>Arahkan kamera smartphone ke kode QR di atas atau pilih gambar QR yang telah diunduh.</li>
-                <li>Periksa detail pembayaran: pastikan nama merchant adalah <strong>TAQtix</strong> dan nominal sesuai tagihan.</li>
-                <li>Konfirmasi transaksi dan masukkan PIN keamanan Anda. Pembayaran akan terverifikasi otomatis.</li>
-              </ol>
-            </div>
           </div>
         )}
 
         {/* ======================================================== */}
-        {/* TAB 2: KONTEN PEMBAYARAN VIRTUAL ACCOUNT */}
+        {/* TAB 2: KONTEN PEMBAYARAN VIRTUAL ACCOUNT (RESMI AKTIF DOKU)*/}
         {/* ======================================================== */}
         {paymentTab === 'va' && (
           <div className="space-y-6">
-            {/* Pilihan Bank VA */}
+            {/* Pilihan Bank VA Aktif DOKU */}
             <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm space-y-4">
-              <div>
-                <h3 className="font-bold text-slate-800 text-sm sm:text-base">Pilih Bank Virtual Account</h3>
-                <p className="text-xs text-slate-500">Nomor Virtual Account akan disesuaikan dengan bank pilihan Anda</p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {bankOptions.map((bank) => {
-                  const isSelected = activeInstructionBank === bank.id;
-                  return (
-                    <button
-                      key={bank.id}
-                      type="button"
-                      onClick={() => setActiveInstructionBank(bank.id)}
-                      className={cn(
-                        'p-3.5 rounded-2xl border text-left flex flex-col justify-between transition cursor-pointer',
-                        isSelected
-                          ? 'border-[#08ADAE] bg-teal-50/50 text-[#08ADAE] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
-                      )}
-                    >
-                      <span className="text-xs font-bold">{bank.name}</span>
-                      <span className="text-[10px] text-slate-400 mt-1">Verifikasi Otomatis</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Rincian Virtual Account Aktif */}
-              <div className="mt-4 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Nomor Virtual Account {activeInstructionBank}
-                    </span>
-                    <div className="text-xl sm:text-2xl font-mono font-black text-slate-900 tracking-wider mt-1">
-                      {currentVaNumber}
-                    </div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Metode Aktif DOKU</span>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={() => handleCopy(currentVaNumber, 'va')}
-                    className="bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold text-xs rounded-xl h-10 px-4 cursor-pointer shrink-0 border-0"
+                  <h3 className="font-bold text-slate-900 text-base mt-0.5">Virtual Account Bank (Verifikasi Instan)</h3>
+                  <p className="text-xs text-slate-500">Pilih bank Anda untuk mendapatkan nomor rekening Virtual Account resmi dari DOKU</p>
+                </div>
+                {orderDetails?.payment?.snapToken && (
+                  <a
+                    href={orderDetails.payment.snapToken}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#08ADAE] hover:text-[#07999A] hover:underline shrink-0 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 transition"
                   >
-                    {copiedKey === 'va' ? (
-                      <>
-                        <Check className="w-4 h-4 mr-1.5" />
-                        Tersalin
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 mr-1.5" />
-                        Salin Nomor VA
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div className="pt-3 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600">
-                  <div>
-                    Nama Akun Tujuan: <strong className="text-slate-800">TAQtix / {orderDetails.buyer?.name || 'Tiket'}</strong>
-                  </div>
-                  <div>
-                    Batas Waktu: <strong className="text-amber-700">10 Menit</strong>
-                  </div>
-                </div>
+                    <span>Buka Halaman DOKU Penuh</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
               </div>
+
+              {/* Seamless Embedded DOKU Container */}
+              {orderDetails?.payment?.snapToken ? (
+                <div className="w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative min-h-[520px]">
+                  <iframe
+                    src={`${orderDetails.payment.snapToken}${
+                      orderDetails.payment.snapToken.includes('?') ? '&' : '?'
+                    }view=iframe`}
+                    className="w-full h-[560px] border-0"
+                    title="DOKU Payment Portal"
+                    allow="payment *"
+                  />
+                </div>
+              ) : (
+                <div className="p-8 text-center text-xs text-slate-500">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#08ADAE] mb-2" />
+                  Memuat sesi pembayaran DOKU...
+                </div>
+              )}
             </div>
 
-            {/* Petunjuk Transfer Accordion */}
+            {/* Petunjuk Transfer BNI, BRI, Mandiri, Permata */}
             <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm space-y-4">
-              <h4 className="font-bold text-slate-800 text-sm">Petunjuk Transfer Bank {activeInstructionBank}:</h4>
-
+              <h4 className="font-bold text-slate-800 text-sm">Petunjuk Pembayaran Virtual Account:</h4>
               <div className="flex gap-2 border-b border-slate-200 pb-2">
                 {(['mbanking', 'atm', 'ibanking'] as const).map((method) => {
                   const labelMap = {
@@ -1550,39 +1470,31 @@ function CheckoutContent() {
 
               {activeAccordion === 'mbanking' && (
                 <ol className="text-xs sm:text-sm text-slate-600 list-decimal pl-5 space-y-2 leading-relaxed">
-                  <li>Buka dan login ke aplikasi Mobile Banking {activeInstructionBank} Anda.</li>
-                  <li>Pilih menu <strong>Transfer</strong> &gt; <strong>Virtual Account</strong>.</li>
-                  <li>
-                    Masukkan nomor Virtual Account:{' '}
-                    <strong className="font-mono text-slate-800">{currentVaNumber}</strong>.
-                  </li>
-                  <li>Pastikan rincian nama merchant adalah <strong>TAQtix</strong> dan nominal telah sesuai.</li>
-                  <li>Masukkan PIN m-Banking Anda untuk memproses transaksi.</li>
+                  <li>Pilih bank (BNI, BRI, Mandiri, Permata) pada portal DOKU di atas.</li>
+                  <li>Salin <strong>Nomor Virtual Account</strong> resmi yang ditampilkan.</li>
+                  <li>Buka aplikasi m-Banking Anda (BCA, Livin&apos; Mandiri, BRImo, BNI Mobile, dll).</li>
+                  <li>Pilih menu <strong>Transfer</strong> &gt; <strong>Virtual Account</strong> (atau Transfer Antar Bank jika beda bank).</li>
+                  <li>Masukkan nomor Virtual Account dan pastikan nominal sesuai tagihan.</li>
+                  <li>Konfirmasi PIN m-Banking Anda. Halaman ini akan otomatis beralih saat pembayaran terverifikasi.</li>
                 </ol>
               )}
 
               {activeAccordion === 'atm' && (
                 <ol className="text-xs sm:text-sm text-slate-600 list-decimal pl-5 space-y-2 leading-relaxed">
-                  <li>Masukkan kartu ATM dan 6 digit PIN Anda di mesin ATM {activeInstructionBank}.</li>
+                  <li>Pilih bank tujuan pada portal DOKU di atas dan catat nomor Virtual Account-nya.</li>
+                  <li>Masukkan kartu ATM dan PIN Anda di mesin ATM.</li>
                   <li>Pilih menu <strong>Transaksi Lainnya</strong> &gt; <strong>Transfer</strong> &gt; <strong>Ke Rekening Virtual Account</strong>.</li>
-                  <li>
-                    Masukkan nomor Virtual Account:{' '}
-                    <strong className="font-mono text-slate-800">{currentVaNumber}</strong>.
-                  </li>
-                  <li>Periksa nama akun dan nominal tagihan pada layar konfirmasi.</li>
-                  <li>Pilih <strong>Benar / Lanjutkan</strong> untuk menyelesaikan pembayaran dan simpan struk Anda.</li>
+                  <li>Masukkan nomor Virtual Account resmi dari DOKU.</li>
+                  <li>Periksa nama penerima dan nominal tagihan, lalu selesaikan transaksi.</li>
                 </ol>
               )}
 
               {activeAccordion === 'ibanking' && (
                 <ol className="text-xs sm:text-sm text-slate-600 list-decimal pl-5 space-y-2 leading-relaxed">
-                  <li>Login ke portal Internet Banking {activeInstructionBank} Anda.</li>
-                  <li>Pilih menu <strong>Pembayaran Tagihan / Virtual Account</strong>.</li>
-                  <li>
-                    Masukkan nomor Virtual Account:{' '}
-                    <strong className="font-mono text-slate-800">{currentVaNumber}</strong>.
-                  </li>
-                  <li>Verifikasi rincian pembayaran menggunakan token atau App Authentication Anda.</li>
+                  <li>Pilih bank pada portal pembayaran DOKU di atas.</li>
+                  <li>Login ke portal Internet Banking bank Anda.</li>
+                  <li>Pilih menu <strong>Pembayaran / Transfer Virtual Account</strong>.</li>
+                  <li>Masukkan nomor Virtual Account resmi dan otorisasi transaksi.</li>
                 </ol>
               )}
             </div>
@@ -2298,60 +2210,63 @@ function CheckoutContent() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              {/* Option 1: QRIS */}
+              {/* Option 1: BNI Virtual Account (SNAP - ACTIVE) */}
               <button
                 type="button"
-                onClick={() => setSelectedPaymentMethod('QRIS')}
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BNI')}
                 className={cn(
                   'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'QRIS'
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BNI'
                     ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 )}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs">
-                      <QrCode className="w-4 h-4" />
+                    <div className="w-8 h-8 rounded-lg bg-orange-600 text-white flex items-center justify-center font-bold text-xs">
+                      BNI
                     </div>
                     <div>
-                      <span className="font-bold text-slate-900 text-xs block">QRIS (Semua Bank & E-Wallet)</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">BCA, GoPay, OVO, Dana, ShopeePay, Livin</span>
+                      <span className="font-bold text-slate-900 text-xs block">BNI Virtual Account (SNAP)</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">BNI Mobile, ATM, Transfer Antar Bank</span>
                     </div>
                   </div>
                   <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                    Populer
+                    Aktif
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-[#08ADAE] font-semibold">
-                  <span>Scan langsung di layar pop-up tanpa pindah web</span>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
                 </div>
               </button>
 
-              {/* Option 2: BCA Virtual Account */}
+              {/* Option 2: BRI Virtual Account / BRIVA (SNAP - ACTIVE) */}
               <button
                 type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BCA')}
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BRI')}
                 className={cn(
                   'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BCA'
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BRI'
                     ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 )}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-blue-700 text-white flex items-center justify-center font-bold text-xs">
-                      BCA
+                    <div className="w-8 h-8 rounded-lg bg-blue-800 text-white flex items-center justify-center font-bold text-xs">
+                      BRI
                     </div>
                     <div>
-                      <span className="font-bold text-slate-900 text-xs block">BCA Virtual Account</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">m-BCA, KlikBCA, myBCA, ATM</span>
+                      <span className="font-bold text-slate-900 text-xs block">BRI Virtual Account (BRIVA)</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">BRImo, ATM BRI, Transfer Antar Bank</span>
                     </div>
                   </div>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    Aktif
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis 24 Jam</span>
+                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
                 </div>
               </button>
 
@@ -2376,67 +2291,46 @@ function CheckoutContent() {
                       <span className="text-[10px] text-slate-500 font-medium block">Livin&apos; by Mandiri, ATM Mandiri</span>
                     </div>
                   </div>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    Aktif
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis 24 Jam</span>
+                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
                 </div>
               </button>
 
-              {/* Option 4: BNI Virtual Account */}
+              {/* Option 4: Permata / BCA / BSI VA */}
               <button
                 type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BNI')}
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BCA')}
                 className={cn(
                   'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BNI'
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BCA'
                     ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
                     : 'border-slate-200 hover:border-slate-300 bg-white'
                 )}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-orange-600 text-white flex items-center justify-center font-bold text-xs">
-                      BNI
+                    <div className="w-8 h-8 rounded-lg bg-blue-700 text-white flex items-center justify-center font-bold text-xs">
+                      BCA
                     </div>
                     <div>
-                      <span className="font-bold text-slate-900 text-xs block">BNI Virtual Account</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">BNI Mobile Banking, ATM BNI</span>
+                      <span className="font-bold text-slate-900 text-xs block">BCA / Permata / BSI VA</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">m-BCA, PermataNet, BSI Mobile</span>
                     </div>
                   </div>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    Aktif
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis 24 Jam</span>
+                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
                 </div>
               </button>
 
-              {/* Option 5: BRI Virtual Account */}
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BRI')}
-                className={cn(
-                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BRI'
-                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-blue-800 text-white flex items-center justify-center font-bold text-xs">
-                      BRI
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-900 text-xs block">BRI Virtual Account (BRIVA)</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">BRImo, ATM BRI</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis 24 Jam</span>
-                </div>
-              </button>
-
-              {/* Option 6: Semua Metode (Otomatis) */}
+              {/* Option 5: Minimarket & Metode Lainnya */}
               <button
                 type="button"
                 onClick={() => setSelectedPaymentMethod('')}
@@ -2453,15 +2347,42 @@ function CheckoutContent() {
                       <Wallet className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="font-bold text-slate-900 text-xs block">Pilih di Layar Popup</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">Permata VA, Alfamart, Indomaret, Kartu</span>
+                      <span className="font-bold text-slate-900 text-xs block">Semua Metode Resmi DOKU</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">Indomaret, Alfamart, Akulaku PayLater</span>
                     </div>
                   </div>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    Aktif
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Pilih channel di dalam modal popup</span>
+                  <span>Pilih channel pembayaran aktif DOKU</span>
                 </div>
               </button>
+
+              {/* Option 6: QRIS (DISABLED - UPDATING DI DOKU) */}
+              <div
+                className="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-left relative flex flex-col justify-between gap-3 opacity-60 cursor-not-allowed select-none"
+                title="Layanan QRIS sedang dalam proses aktivasi oleh DOKU & Bank Indonesia"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-slate-300 text-slate-600 flex items-center justify-center font-bold text-xs">
+                      <QrCode className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-600 text-xs block">QRIS (Bank &amp; E-Wallet)</span>
+                      <span className="text-[10px] text-slate-400 font-medium block">GoPay, OVO, Dana, ShopeePay, BCA</span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">
+                    Proses Aktivasi
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-amber-700 font-medium">
+                  <span>Status DOKU: Updating (Segera Hadir)</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

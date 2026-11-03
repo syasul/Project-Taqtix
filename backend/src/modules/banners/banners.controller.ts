@@ -65,3 +65,4 @@ export class BannersController {
     return { success: true, data: result };
   }
 }
+

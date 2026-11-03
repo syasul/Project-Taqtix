@@ -38,3 +38,4 @@ export class CreateBannerDto {
   @IsOptional()
   isActive?: boolean;
 }
+

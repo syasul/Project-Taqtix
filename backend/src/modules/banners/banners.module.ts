@@ -10,3 +10,4 @@ import { BannersController } from './banners.controller';
   exports: [BannersService],
 })
 export class BannersModule {}
+

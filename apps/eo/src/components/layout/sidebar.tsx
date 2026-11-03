@@ -288,8 +288,8 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
                 priority
               />
             </Link>
-            <span className="text-[9px] text-[#08B4B5] font-mono tracking-widest font-bold uppercase text-center">
-              Organizer Platform
+            <span className="text-[10px] text-teal-800 font-mono tracking-wider font-extrabold uppercase bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
+              🟢 EVENT ORGANIZER (EO)
             </span>
           </div>
           {onItemClick && (

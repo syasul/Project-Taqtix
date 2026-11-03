@@ -62,22 +62,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Jika token ada tapi profile belum di-decode atau bukan organizer
   if (user && user.role !== 'organizer' && user.role !== 'organizer_member') {
+    const isAdmin = user.role === 'admin';
     return (
       <div className="h-screen w-screen bg-slate-50 flex flex-col items-center justify-center space-y-4 p-4 text-center">
         <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl">
           <ShieldAlert className="h-10 w-10 text-rose-500 mx-auto" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900">Akses Ditolak</h2>
-        <p className="text-slate-500 text-xs max-w-sm">Halaman ini hanya dapat diakses oleh akun Event Organizer terdaftar.</p>
-        <button
-          onClick={() => {
-            logout();
-            router.push('/login');
-          }}
-          className="px-5 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer"
-        >
-          Logout & Login Kembali
-        </button>
+        <h2 className="text-xl font-bold text-slate-900">
+          {isAdmin ? 'Akun Superadmin Terdeteksi' : 'Akses Ditolak'}
+        </h2>
+        <p className="text-slate-500 text-xs max-w-sm">
+          {isAdmin
+            ? 'Akun Anda adalah Main Admin TAQtix. Dashboard ini khusus untuk Event Organizer (partner.taqtix.id). Silakan masuk ke Portal Superadmin.'
+            : 'Halaman ini hanya dapat diakses oleh akun Event Organizer terdaftar.'}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
+          {isAdmin && (
+            <a
+              href="https://core.taqtix.id"
+              className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs text-center"
+            >
+              Buka Portal Main Admin (core.taqtix.id) &rarr;
+            </a>
+          )}
+          <button
+            onClick={() => {
+              logout();
+              router.push('/login');
+            }}
+            className="px-5 py-2.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer"
+          >
+            Logout & Login Akun EO
+          </button>
+        </div>
       </div>
     );
   }
@@ -134,8 +151,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             {/* Desktop Context Badge */}
-            <div className="hidden md:inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-[#08B4B5]/10 border border-[#08B4B5]/30 text-[#08B4B5] uppercase tracking-widest">
-              <span>Organizer Console</span>
+            <div className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] font-mono font-bold bg-teal-50 border border-teal-200 text-teal-800 tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>ORGANIZER WORKSPACE (partner.taqtix.id)</span>
             </div>
           </div>
 

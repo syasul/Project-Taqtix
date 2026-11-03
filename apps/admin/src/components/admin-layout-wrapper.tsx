@@ -39,18 +39,18 @@ export default function AdminLayoutWrapper({
     <>
       <div>
         {/* Logo / Branding */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between relative">
-          <div className="w-full flex flex-col items-center justify-center text-center gap-1">
+        <div className="p-5 border-b border-slate-200 flex items-center justify-between relative bg-slate-900 text-white">
+          <div className="w-full flex flex-col items-center justify-center text-center gap-1.5">
             <Image
               src="/logo.png"
               alt="TAQtix Logo"
               width={120}
               height={34}
-              className="h-7 w-auto object-contain mx-auto"
+              className="h-7 w-auto object-contain mx-auto brightness-0 invert"
               priority
             />
-            <span className="text-[9px] text-[#08B4B5] font-mono tracking-widest font-bold uppercase text-center">
-              Admin Platform
+            <span className="text-[10px] text-rose-300 font-mono tracking-wider font-extrabold uppercase bg-rose-950/80 border border-rose-800/80 px-2.5 py-0.5 rounded-full shadow-xs">
+              🔴 MAIN ADMIN (SUPERADMIN)
             </span>
           </div>
           {isMobile && (
@@ -137,19 +137,20 @@ export default function AdminLayoutWrapper({
                 className="h-6 w-auto object-contain"
                 priority
               />
-              <span className="text-[9px] text-[#08B4B5] font-mono tracking-wider font-bold uppercase bg-[#08B4B5]/10 px-1.5 py-0.5 rounded border border-[#08B4B5]/20">
-                Admin
+              <span className="text-[9px] text-rose-700 font-mono tracking-wider font-extrabold uppercase bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+                🔴 Superadmin
               </span>
             </div>
 
-            <div className="hidden md:inline-flex px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#08B4B5]/10 border border-[#08B4B5]/30 text-[#08B4B5] uppercase tracking-widest">
-              Secured Console
+            <div className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] font-mono font-bold bg-rose-50 border border-rose-200 text-rose-700 uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              <span>MAIN ADMIN CONSOLE (core.taqtix.id)</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="md:hidden px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 uppercase">
-              Online
+            <div className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-slate-900 text-white uppercase tracking-wider border border-slate-700">
+              Superadmin Mode
             </div>
           </div>
         </header>

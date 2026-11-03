@@ -39,7 +39,8 @@ export default function LoginPage() {
 
       const payload = parseJwt(res.accessToken);
       if (!payload || payload.role !== 'admin') {
-        setError('Akses Ditolak: Kredensial tidak terdaftar sebagai Administrator.');
+        const roleName = payload?.role === 'organizer' ? 'Event Organizer (EO)' : (payload?.role || 'user');
+        setError(`Akses Ditolak: Kredensial ini terdaftar sebagai ${roleName}. Untuk login Penyelenggara Event, silakan buka portal EO di partner.taqtix.id.`);
         setLoading(false);
         return;
       }
@@ -93,13 +94,22 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#08B4B5]/30 bg-[#08B4B5]/10 text-[10px] font-mono tracking-wider text-[#08B4B5] font-bold uppercase mb-2 shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#08B4B5]" />
-            Admin Platform Gateway
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-300 bg-rose-50 text-[11px] font-mono tracking-wider text-rose-700 font-extrabold uppercase mb-2 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+            MAIN ADMIN CONSOLE (SUPERADMIN)
           </div>
-          <p className="text-xs text-slate-500 font-medium max-w-xs mx-auto">
-            Gunakan otentikasi kredensial internal & enkripsi MFA untuk mengakses konsol.
+          <p className="text-xs text-slate-500 font-semibold max-w-xs mx-auto">
+            Portal Khusus Administrator Pusat TAQtix (core.taqtix.id)
           </p>
+          <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-[11px] leading-relaxed">
+            Anda Penyelenggara Event (EO)?{' '}
+            <a
+              href="https://partner.taqtix.id/login"
+              className="text-[#08B4B5] font-bold underline hover:text-[#079b9c] inline-block"
+            >
+              Masuk ke Portal EO di partner.taqtix.id &rarr;
+            </a>
+          </div>
         </div>
 
         {error && (

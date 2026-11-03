@@ -52,6 +52,17 @@ function LoginForm() {
       const { accessToken, refreshToken } = resData;
 
       setAuth(accessToken, refreshToken);
+
+      // Jika yang login adalah role admin, arahkan ke core.taqtix.id
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(accessToken.split('.')[1]))));
+        if (decoded?.role === 'admin') {
+          toast.info('Akun Main Admin terdeteksi. Mengarahkan ke core.taqtix.id...');
+          window.location.href = 'https://core.taqtix.id';
+          return;
+        }
+      } catch {}
+
       toast.success('Login berhasil! Selamat datang kembali.');
 
       router.push(redirectPath);
@@ -84,16 +95,25 @@ function LoginForm() {
             priority
           />
         </div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#08B4B5]/30 bg-[#08B4B5]/10 text-[10px] font-mono tracking-wider text-[#08B4B5] font-bold uppercase mb-2 shadow-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#08B4B5]" />
-          Partner & Organizer Portal
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-teal-300 bg-teal-50 text-[11px] font-mono tracking-wider text-teal-800 font-extrabold uppercase mb-2 shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          PORTAL EVENT ORGANIZER (EO)
         </div>
         <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
-          Masuk ke Akun Anda
+          Masuk Akun Penyelenggara Event
         </h1>
         <p className="text-xs text-slate-500 mt-1 font-medium">
-          Kelola event, pantau penjualan tiket, dan kembangkan audience Anda.
+          Workspace Resmi EO TAQtix (partner.taqtix.id)
         </p>
+        <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-[11px] leading-relaxed">
+          Anda Main Admin / Superadmin?{' '}
+          <a
+            href="https://core.taqtix.id/login"
+            className="text-rose-600 font-bold underline hover:text-rose-700 inline-block"
+          >
+            Masuk ke Portal Superadmin di core.taqtix.id &rarr;
+          </a>
+        </div>
       </div>
 
       {/* Form */}

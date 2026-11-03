@@ -634,7 +634,7 @@ function DashboardContent() {
                   <div className="p-2.5 rounded-xl bg-teal-50 text-[#08B4B5] group-hover:bg-[#08B4B5] group-hover:text-white transition">
                     <Mic2 className="h-4 w-4" />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Talent Acara</span>
+                  <span className="text-xs font-bold text-slate-800">Line Up Acara</span>
                 </Link>
 
                 <Link

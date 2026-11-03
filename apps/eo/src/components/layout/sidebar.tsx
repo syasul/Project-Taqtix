@@ -144,7 +144,7 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
             },
             {
               href: `/dashboard/events/${eventId}/lineup`,
-              label: 'Talent & Pengisi Acara',
+              label: 'Line Up & Bintang Tamu',
               icon: Mic2,
               resource: 'create_edit_event',
             },

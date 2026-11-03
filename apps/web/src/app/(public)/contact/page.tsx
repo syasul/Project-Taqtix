@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Mail, Phone, MapPin, Send } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { ArrowLeft, Mail, Phone, MapPin, Send, HelpCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
@@ -17,7 +17,7 @@ export default function ContactPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-[#00F0FF] transition cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-[#08B4B5] transition cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -26,10 +26,10 @@ export default function ContactPage() {
 
       {/* Header Section */}
       <div className="space-y-3 text-center max-w-2xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
           Hubungi Kami
         </h1>
-        <p className="text-slate-400 text-sm">
+        <p className="text-slate-500 text-sm">
           Punya pertanyaan tentang pembelian tiket, pendaftaran event, atau kemitraan afiliasi? Hubungi tim support kami.
         </p>
       </div>
@@ -37,35 +37,35 @@ export default function ContactPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
         {/* Contact Info */}
         <div className="space-y-6 lg:col-span-1">
-          <div className="astro-card rounded-2xl p-6 space-y-6 border border-white/10 bg-slate-900/60 shadow-xl">
-            <h3 className="font-bold text-white text-lg">Informasi Kontak</h3>
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 space-y-6">
+            <h3 className="font-bold text-slate-800 text-lg">Informasi Kontak</h3>
             
-            <div className="space-y-4 text-xs sm:text-sm text-slate-300">
+            <div className="space-y-4 text-xs sm:text-sm text-slate-600">
               <div className="flex items-start space-x-3">
-                <Mail className="h-5 w-5 text-[#00F0FF] shrink-0 mt-0.5" />
+                <Mail className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-white">Email Support</p>
-                  <a href="mailto:halo@taqtix.id" className="hover:underline text-[#00F0FF]">
+                  <p className="font-semibold text-slate-800">Email Support</p>
+                  <a href="mailto:halo@taqtix.id" className="hover:underline text-[#08B4B5]">
                     halo@taqtix.id
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
-                <Phone className="h-5 w-5 text-[#00F0FF] shrink-0 mt-0.5" />
+                <Phone className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-white">WhatsApp Hotline</p>
-                  <a href="https://wa.me/628158006658" target="_blank" rel="noreferrer" className="hover:underline text-[#00F0FF]">
+                  <p className="font-semibold text-slate-800">WhatsApp Hotline</p>
+                  <a href="https://wa.me/628158006658" target="_blank" rel="noreferrer" className="hover:underline text-[#08B4B5]">
                     +62 815-800-6658
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-[#00F0FF] shrink-0 mt-0.5" />
+                <MapPin className="h-5 w-5 text-[#08B4B5] shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-white">Kantor Pusat</p>
-                  <p className="text-slate-400 text-xs leading-relaxed">
+                  <p className="font-semibold text-slate-800">Kantor Pusat</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">
                     JL.DR CIPTO VII/34, RT/RW: 006/010,<br />
                     Desa/Kelurahan Bedali, Kecamatan Lawang,<br />
                     Kabupaten Malang, Provinsi Jawa Timur
@@ -74,76 +74,81 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-white/10 space-y-2">
-              <p className="font-bold text-white text-xs">Jam Layanan Support</p>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Senin - Jum&apos;at: 09:00 - 18:00 WIB<br />
+            <div className="pt-4 border-t border-slate-100 space-y-2">
+              <p className="font-bold text-slate-800 text-xs">Jam Layanan Support</p>
+              <p className="text-slate-500 text-[11px] leading-relaxed">
+                Senin - Jum'at: 09:00 - 18:00 WIB<br />
                 Sabtu - Minggu: 10:00 - 15:00 WIB (Hanya Chat)
               </p>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Contact Form */}
         <div className="lg:col-span-2">
-          <div className="astro-card rounded-2xl p-6 sm:p-8 space-y-6 border border-white/10 bg-slate-900/60 shadow-xl">
-            <h3 className="font-bold text-white text-lg">Kirim Pesan</h3>
+          <Card className="bg-white border-slate-200 shadow-sm rounded-2xl p-6 sm:p-8 space-y-6">
+            <h3 className="font-bold text-slate-800 text-lg">Kirim Pesan</h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label htmlFor="name" className="text-xs font-semibold text-slate-300">Nama Lengkap</label>
+                  <label htmlFor="name" className="text-xs font-semibold text-slate-700">Nama Lengkap</label>
                   <input
                     id="name"
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-slate-950/60 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] transition-colors text-xs"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs"
                     placeholder="Contoh: Ahmad Fauzi"
                     required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label htmlFor="email" className="text-xs font-semibold text-slate-300">Email</label>
+                  <label htmlFor="email" className="text-xs font-semibold text-slate-700">Alamat Email</label>
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-slate-950/60 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] transition-colors text-xs"
-                    placeholder="Contoh: ahmad@example.com"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs"
+                    placeholder="Contoh: fauzi@email.com"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="subject" className="text-xs font-semibold text-slate-300">Subjek</label>
-                <input
+                <label htmlFor="subject" className="text-xs font-semibold text-slate-700">Subjek Kategori</label>
+                <select
                   id="subject"
-                  type="text"
-                  className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-slate-950/60 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] transition-colors text-xs"
-                  placeholder="Contoh: Pertanyaan Pembayaran Tiket"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs cursor-pointer"
                   required
-                />
+                >
+                  <option value="tiket">Masalah Pembelian Tiket & Pembayaran</option>
+                  <option value="organizer">Pendaftaran Event Organizer Baru</option>
+                  <option value="afiliasi">Kemitraan Afiliasi / Komisi Partner</option>
+                  <option value="lainnya">Pertanyaan Umum Lainnya</option>
+                </select>
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="message" className="text-xs font-semibold text-slate-300">Pesan</label>
+                <label htmlFor="message" className="text-xs font-semibold text-slate-700">Isi Pesan Anda</label>
                 <textarea
                   id="message"
-                  rows={4}
-                  className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-slate-950/60 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] transition-colors text-xs resize-none"
-                  placeholder="Tuliskan pertanyaan atau kebutuhan Anda secara detail..."
+                  rows={5}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition-colors text-xs"
+                  placeholder="Tuliskan keluhan atau pertanyaan Anda secara lengkap di sini..."
                   required
-                />
+                ></textarea>
               </div>
 
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-6 py-3 rounded-full bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 text-slate-950 text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(8,173,174,0.4)] active:scale-95"
-              >
-                <span>Kirim Pesan</span>
-                <Send className="h-3.5 w-3.5" />
-              </button>
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm border-0 active:scale-95"
+                >
+                  <span>Kirim Pesan</span>
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
             </form>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

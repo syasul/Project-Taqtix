@@ -278,7 +278,7 @@ const faqs = [
   },
   {
     q: 'Bagaimana proses validasi tiket di lokasi acara (venue)?',
-    a: 'Cukup tunjukkan barcode atau QR code langsung dari pesan WhatsApp Anda ke kru di pintu masuk. Scanner kru kami memproses validasi tiket dalam <0.3 detik tanpa hambatan antrean.',
+    a: 'Cukup tunjukkan barcode atau QR code langsung dari pesan WhatsApp Anda ke kru di pintu masuk. Scanner kru kami memproses validasi tiket dalam <0.4 detik tanpa hambatan antrean.',
   },
   {
     q: 'Bagaimana jika saya ingin menyelenggarakan acara sendiri di TAQtix?',
@@ -335,7 +335,7 @@ function MarketplaceContent() {
 
   const events: Event[] = eventsResponse?.data || [];
 
-  // Filter based on Search and Category
+  // Filter based on Search and Category (Requirement 13)
   const filteredEvents = events.filter((e) => {
     const matchesSearch =
       e.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -419,18 +419,18 @@ function MarketplaceContent() {
   const currentBanner = heroBanners[activeBannerIdx];
 
   return (
-    <div className="space-y-20 pb-28">
+    <div className="space-y-16 pb-20">
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (ASTRO OBSIDIAN COSMIC HERO & DOCK)                       */}
+      {/* 1. HERO SECTION (LIQUID GLASS CAPSULE & FROSTED PANELS)                  */}
       {/* ========================================================================= */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative pt-4 sm:pt-10">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto pt-4 sm:pt-8 space-y-6">
           {recentOrder && (
             <Link
               href="/tickets"
-              className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#08ADAE]/15 border border-[#08ADAE]/40 text-[#00F0FF] hover:bg-[#08ADAE]/25 transition flex items-center gap-2 shadow-[0_0_20px_rgba(8,173,174,0.25)] group"
+              className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#08ADAE]/10 border border-[#08ADAE]/30 text-[#08ADAE] hover:bg-[#08ADAE]/20 transition flex items-center gap-2 shadow-xs group"
             >
-              <Ticket className="w-3.5 h-3.5 text-[#00F0FF]" />
+              <Ticket className="w-3.5 h-3.5" />
               <span>Kamu memiliki transaksi tiket di perangkat ini</span>
               <span className="underline group-hover:translate-x-0.5 transition-transform flex items-center">
                 Lihat Semua Tiket
@@ -439,44 +439,44 @@ function MarketplaceContent() {
             </Link>
           )}
 
-          {/* Astro Glass Status Badge */}
-          <div className="astro-glass-pill px-4 py-1.5 rounded-full inline-flex items-center gap-2.5 text-xs font-semibold text-slate-300 border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-            <span className="h-2 w-2 rounded-full bg-[#00F0FF] animate-pulse ring-4 ring-[#08ADAE]/30" />
-            <span>Platform Tiket Resmi Berbasis Cloud & WhatsApp</span>
+          {/* Liquid Glass Badge */}
+          <div className="liquid-glass-pill px-4 py-1.5 rounded-full inline-flex items-center gap-2.5 text-xs font-semibold text-slate-700 shadow-xs">
+            <span className="h-2 w-2 rounded-full bg-[#08ADAE] ring-4 ring-[#08ADAE]/20" />
+            <span>Temukan event seru di sekitarmu</span>
           </div>
 
-          {/* Main Headline (Astro Neon Gradient) */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.12]">
+          {/* Main Headline (Solid Colors) */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.12]">
             Temukan Acara Favorit.{' '}
-            <span className="astro-neon-text">Beli Tiket Resmi</span> Tanpa Ribet.
+            <span className="text-[#08ADAE]">Beli Tiket Resmi</span> Tanpa Ribet.
           </h1>
 
           {/* Subtitle */}
-          <p className="text-slate-400 text-base sm:text-lg max-w-2xl leading-relaxed">
-            Cari konser musik, festival, workshop, turnamen olahraga, dan pertunjukan seni terbaik. Terverifikasi 100% resmi langsung dari penyelenggara terpercaya.
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+            Cari konser, festival, workshop, olahraga, pertunjukan seni, dan berbagai pengalaman menarik lainnya. Temukan event favoritmu dan pesan tiketnya dengan mudah di TAQtix.
           </p>
 
-          {/* Astro Floating Glass Unified Search Dock */}
-          <div className="w-full max-w-3xl mt-4 p-2.5 astro-glass-pill rounded-2xl sm:rounded-full shadow-2xl flex flex-col sm:flex-row items-center gap-2 transition-all hover:border-[#08ADAE]/45 border border-white/15">
+          {/* Liquid Glass Unified Search Dock */}
+          <div className="w-full max-w-3xl mt-2 p-2 liquid-glass-pill rounded-2xl sm:rounded-full shadow-lg flex flex-col sm:flex-row items-center gap-2 transition-all hover:shadow-xl">
             <div className="flex items-center gap-3 px-4 py-2 w-full sm:w-auto flex-1">
-              <Search className="h-4 w-4 text-[#00F0FF] shrink-0" />
+              <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
                 type="text"
                 placeholder="Cari konser, festival, workshop, olahraga, seni..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full text-sm text-white placeholder:text-slate-500 focus:outline-none bg-transparent"
+                className="w-full text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
               />
             </div>
 
-            <div className="h-5 w-px bg-white/10 hidden sm:block" />
+            <div className="h-5 w-px bg-slate-200/80 hidden sm:block" />
 
-            <div className="flex items-center gap-2 px-3 py-2 w-full sm:w-44 border-t sm:border-t-0 border-white/10">
+            <div className="flex items-center gap-2 px-3 py-2 w-full sm:w-44 border-t sm:border-t-0 border-slate-100">
               <MapPin className="h-4 w-4 text-[#08ADAE] shrink-0" />
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full text-xs font-semibold text-slate-300 bg-transparent focus:outline-none cursor-pointer [&>option]:bg-slate-900 [&>option]:text-white"
+                className="w-full text-xs font-semibold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
               >
                 {cities.map((city) => (
                   <option key={city} value={city}>
@@ -491,24 +491,24 @@ function MarketplaceContent() {
                 const el = document.getElementById('discovery-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="w-full sm:w-auto px-6 py-3 rounded-full bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 text-slate-950 text-xs font-black transition flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-[0_0_24px_rgba(8,173,174,0.45)] active:scale-95"
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#08ADAE] hover:bg-[#07999A] text-white text-xs font-bold transition flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-[0_4px_14px_rgba(8,173,174,0.35),inset_0_1px_1px_rgba(255,255,255,0.4)] active:scale-95"
             >
               <span>Cari Event</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 
-          {/* Quick Category Pills with Astro Bento Feel */}
-          <div className="flex flex-wrap justify-center gap-2 pt-2">
+          {/* Quick Category Pills with Liquid Glass Feel */}
+          <div className="flex flex-wrap justify-center gap-2 pt-1">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={cn(
-                  'px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border',
+                  'px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer',
                   selectedCategory === cat
-                    ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-bold border-transparent shadow-[0_0_20px_rgba(0,240,255,0.35)]'
-                    : 'bg-slate-900/60 hover:bg-slate-800/80 text-slate-400 hover:text-white border-white/10 hover:border-white/20'
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'liquid-glass-card text-slate-700 hover:text-slate-900 hover:bg-white/90'
                 )}
               >
                 {cat}
@@ -517,24 +517,24 @@ function MarketplaceContent() {
           </div>
         </div>
 
-        {/* AUTHENTIC ASTRO BENTO TICKET & CAPABILITIES PANEL */}
-        <div className="mt-14 max-w-5xl mx-auto rounded-3xl astro-glass p-6 sm:p-9 shadow-2xl relative overflow-hidden border border-white/10">
-          {/* Subtle Top Specular Gradient Line */}
-          <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+        {/* AUTHENTIC LIQUID GLASS TICKET & CAPABILITIES PANEL */}
+        <div className="mt-12 max-w-5xl mx-auto rounded-3xl liquid-glass p-6 sm:p-9 shadow-xl relative overflow-hidden">
+          {/* Subtle Top Specular Glass Reflection Highlight */}
+          <div className="absolute inset-x-0 top-0 h-[1px] bg-white/90" />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left: Authentic Dark Obsidian Glass Ticket Pass */}
+            {/* Left: Authentic Liquid Glass Ticket Pass */}
             <div className="lg:col-span-6 flex justify-center">
-              <div className="w-full max-w-sm rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/95 p-5.5 relative overflow-hidden border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-                {/* Status Bar */}
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="w-full max-w-sm rounded-2xl liquid-glass-card p-5.5 relative overflow-hidden border border-white/90 shadow-lg">
+                {/* Glass Notch Perforation Effect */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse ring-4 ring-emerald-500/20" />
-                    <span className="text-[11px] font-bold text-slate-200 uppercase tracking-wider">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
                       Tiket Terkonfirmasi
                     </span>
                   </div>
-                  <span className="text-[10px] font-extrabold text-[#00F0FF] bg-[#00F0FF]/10 px-2.5 py-0.5 rounded-full border border-[#00F0FF]/30">
+                  <span className="text-[10px] font-extrabold text-[#08ADAE] bg-[#08ADAE]/10 px-2.5 py-0.5 rounded-full border border-[#08ADAE]/20">
                     VIP ACCESS
                   </span>
                 </div>
@@ -542,116 +542,116 @@ function MarketplaceContent() {
                 {/* Event Details */}
                 <div className="py-4 space-y-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                    TAQtix Official Partner
+                    TAQtix Event Partner
                   </span>
-                  <h4 className="text-base font-bold text-white leading-snug">
+                  <h4 className="text-base font-bold text-slate-900 leading-snug">
                     Nusantara Live Music Festival 2026
                   </h4>
-                  <div className="flex items-center gap-4 text-xs text-slate-300 pt-1">
+                  <div className="flex items-center gap-4 text-xs text-slate-600 pt-1">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-[#00F0FF]" />
+                      <Calendar className="w-3.5 h-3.5 text-[#08ADAE]" />
                       12 Sep 2026
                     </span>
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#00F0FF]" />
+                      <MapPin className="w-3.5 h-3.5 text-[#08ADAE]" />
                       JCC Senayan
                     </span>
                   </div>
                 </div>
 
-                {/* Perforation Line with Side Notches (Blended with Cosmic Background) */}
+                {/* Perforation Line with Side Notches */}
                 <div className="relative my-2">
-                  <div className="border-t border-dashed border-white/20" />
-                  <div className="absolute -left-8 -top-2.5 h-5 w-5 rounded-full bg-[#060913] border-r border-white/15" />
-                  <div className="absolute -right-8 -top-2.5 h-5 w-5 rounded-full bg-[#060913] border-l border-white/15" />
+                  <div className="border-t border-dashed border-slate-300" />
+                  <div className="absolute -left-8 -top-2.5 h-5 w-5 rounded-full bg-slate-50 border-r border-slate-200" />
+                  <div className="absolute -right-8 -top-2.5 h-5 w-5 rounded-full bg-slate-50 border-l border-slate-200" />
                 </div>
 
                 {/* Barcode / QR Section */}
                 <div className="pt-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white rounded-xl shadow-xs">
-                      <QrCode className="w-11 h-11 text-slate-950" />
+                    <div className="p-1.5 bg-white/90 border border-white rounded-xl shadow-xs">
+                      <QrCode className="w-12 h-12 text-slate-800" />
                     </div>
                     <div className="space-y-0.5">
-                      <p className="text-[11px] font-mono font-bold text-white">
+                      <p className="text-[11px] font-mono font-bold text-slate-800">
                         TQTX-2026-X8921
                       </p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-slate-500">
                         Scan di Gate 3A (Kru Scanner)
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-slate-400 block font-medium">Total Bayar</span>
-                    <span className="text-xs font-black text-[#F0B829] font-mono">Rp 250.000</span>
+                    <span className="text-xs font-black text-slate-900">Rp 250.000</span>
                   </div>
                 </div>
 
                 {/* WhatsApp badge footer */}
-                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-                  <span className="flex items-center gap-1.5 text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="flex items-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50/80 px-2 py-0.5 rounded-full border border-emerald-200/50">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     Terkirim ke WhatsApp
                   </span>
-                  <span className="font-mono text-[10px] text-[#00F0FF]">STATUS: PAID</span>
+                  <span className="font-mono text-[10px] text-slate-400">STATUS: PAID</span>
                 </div>
               </div>
             </div>
 
-            {/* Right: Technical Capabilities (Astro Bento Tiles) */}
+            {/* Right: Technical Capabilities (Frosted Glass Tiles) */}
             <div className="lg:col-span-6 space-y-4 text-left">
               <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#00F0FF] mb-1">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#08ADAE] mb-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Infrastruktur Ticketing Andal
                 </div>
-                <h3 className="text-2xl font-extrabold text-white tracking-tight">
+                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                   Pengalaman Transaksi Bebas Masalah
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">
-                  TAQtix dirancang untuk memastikan setiap detik proses pembelian hingga gate check-in berjalan lancar, terenkripsi, dan aman.
+                <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                  TAQtix dirancang untuk memastikan setiap detik proses pembelian hingga gate check-in berjalan lancar dan aman.
                 </p>
               </div>
 
               <div className="space-y-3 pt-1">
-                <div className="flex items-start gap-3 p-3.5 rounded-2xl astro-card border border-white/10 hover:border-[#08ADAE]/50">
-                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] shrink-0">
+                <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
+                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold text-white">
+                    <h5 className="text-xs font-bold text-slate-900">
                       Tiket Resmi, Lebih Tenang
                     </h5>
-                    <p className="text-[11px] text-slate-400 leading-normal mt-0.5">
-                      Beli tiket melalui kanal resmi event yang terverifikasi langsung di TAQtix.
+                    <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
+                      Beli tiket melalui kanal resmi event yang tersedia di TAQtix.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3.5 rounded-2xl astro-card border border-white/10 hover:border-[#08ADAE]/50">
-                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] shrink-0">
+                <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
+                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
                     <Ticket className="w-4 h-4" />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold text-white">
+                    <h5 className="text-xs font-bold text-slate-900">
                       Tiket Digital, Praktis Diakses
                     </h5>
-                    <p className="text-[11px] text-slate-400 leading-normal mt-0.5">
-                      Temukan tiket dan informasi akses seketika setelah pembayaran terverifikasi.
+                    <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
+                      Temukan tiket dan informasi akses setelah transaksi berhasil.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3.5 rounded-2xl astro-card border border-white/10 hover:border-[#08ADAE]/50">
-                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] shrink-0">
+                <div className="flex items-start gap-3 p-3.5 rounded-2xl liquid-glass-card">
+                  <div className="h-8 w-8 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
                     <QrCode className="w-4 h-4" />
                   </div>
                   <div>
-                    <h5 className="text-xs font-bold text-white">
-                      Check-in Kurang dari 0.3 Detik
+                    <h5 className="text-xs font-bold text-slate-900">
+                      Check-in Lebih Praktis
                     </h5>
-                    <p className="text-[11px] text-slate-400 leading-normal mt-0.5">
-                      Scanner kru resmi gate check-in bekerja instan via kamera HP tanpa antrean panjang.
+                    <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
+                      Proses masuk event dengan sistem pemindaian tiket, jika fitur tersebut digunakan oleh penyelenggara.
                     </p>
                   </div>
                 </div>
@@ -660,14 +660,14 @@ function MarketplaceContent() {
           </div>
         </div>
 
-        {/* ORGANIZER & PARTNER ASTRO GLASS STRIP */}
-        <div className="mt-12 py-5 px-6 rounded-2xl astro-glass border border-white/10 shadow-xl">
-          <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-3.5">
+        {/* ORGANIZER & PARTNER LIQUID GLASS STRIP */}
+        <div className="mt-12 py-5 px-6 rounded-2xl liquid-glass border border-white/80">
+          <p className="text-center text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3.5">
             Dipercaya oleh Penyelenggara Event & Festival Terkemuka
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2.5 text-xs sm:text-sm font-semibold text-slate-300">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2.5 text-xs sm:text-sm font-bold text-slate-600">
             {trustedPartners.map((p, i) => (
-              <span key={i} className="hover:text-[#00F0FF] transition-colors cursor-default">
+              <span key={i} className="hover:text-[#08ADAE] transition-colors cursor-default">
                 {p}
               </span>
             ))}
@@ -676,18 +676,18 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. CARA MUDAH MENDAPATKAN TIKET (4-STEP HOW IT WORKS - ASTRO BENTO)       */}
+      {/* 2. CARA MUDAH MENDAPATKAN TIKET (4-STEP HOW IT WORKS)                     */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="astro-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5 border border-white/10">
-            <Zap className="w-3.5 h-3.5 text-[#00F0FF]" />
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#08ADAE]" />
             Alur Pemesanan Cepat
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Cara Mudah Mendapatkan Tiket di TAQtix
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm">
+          <p className="text-slate-500 text-xs sm:text-sm">
             Proses pemesanan tiket resmi tanpa ribet, terverifikasi otomatis, dan langsung masuk ke WhatsApp Anda.
           </p>
         </div>
@@ -698,22 +698,22 @@ function MarketplaceContent() {
             return (
               <div
                 key={idx}
-                className="astro-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between group border border-white/10 hover:border-[#08ADAE]/50 bg-slate-900/60 hover:bg-slate-900/90 transition-all duration-300"
+                className="liquid-glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between group hover:shadow-lg transition-all"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className="h-11 w-11 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] group-hover:bg-[#00F0FF] group-hover:text-slate-950 transition-colors duration-300">
+                  <div className="h-11 w-11 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] group-hover:bg-[#08ADAE] group-hover:text-white transition-colors duration-300">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-3xl font-black text-white/20 group-hover:text-[#00F0FF]/50 transition-colors font-mono">
+                  <span className="text-2xl font-black text-slate-200 group-hover:text-[#08ADAE]/40 transition-colors font-mono">
                     {item.step}
                   </span>
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="text-sm font-bold text-white leading-snug">
+                  <h3 className="text-sm font-bold text-slate-900 leading-snug">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-500 leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
@@ -724,23 +724,23 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 3. PROMOTIONAL HERO BANNER CAROUSEL (ASTRO OBSIDIAN GLASS)                */}
+      {/* 3. PROMOTIONAL HERO BANNER CAROUSEL (SMOKED OBSIDIAN GLASS)               */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="relative astro-glass rounded-3xl overflow-hidden shadow-2xl text-white min-h-[380px] sm:min-h-[420px] flex flex-col justify-between border border-white/15">
-          {/* Background Image with Deep Space Gradient Overlay */}
+        <div className="relative liquid-glass-dark rounded-3xl overflow-hidden shadow-2xl text-white min-h-[380px] sm:min-h-[420px] flex flex-col justify-between border border-white/15">
+          {/* Background Image with Solid Overlay */}
           <div className="absolute inset-0 z-0">
             <img
               src={currentBanner.imageUrl}
               alt={currentBanner.title}
               className="w-full h-full object-cover opacity-35 filter brightness-90 transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40" />
+            <div className="absolute inset-0 bg-slate-950/60" />
           </div>
 
           {/* Top Tag & Controls */}
           <div className="relative z-10 p-6 md:p-8 flex items-center justify-between">
-            <span className="px-4 py-1.5 bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 rounded-full text-xs font-black tracking-wider uppercase shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+            <span className="px-4 py-1.5 bg-[#08ADAE] text-white rounded-full text-xs font-extrabold tracking-wider uppercase shadow-[0_2px_10px_rgba(8,173,174,0.4),inset_0_1px_1px_rgba(255,255,255,0.4)]">
               {currentBanner.tag}
             </span>
 
@@ -749,7 +749,7 @@ function MarketplaceContent() {
                 onClick={() =>
                   setActiveBannerIdx((prev) => (prev === 0 ? heroBanners.length - 1 : prev - 1))
                 }
-                className="p-2 rounded-full bg-slate-900/60 hover:bg-slate-800 text-white border border-white/20 backdrop-blur-md transition cursor-pointer"
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md transition cursor-pointer"
                 aria-label="Previous banner"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -758,7 +758,7 @@ function MarketplaceContent() {
                 onClick={() =>
                   setActiveBannerIdx((prev) => (prev + 1) % heroBanners.length)
                 }
-                className="p-2 rounded-full bg-slate-900/60 hover:bg-slate-800 text-white border border-white/20 backdrop-blur-md transition cursor-pointer"
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md transition cursor-pointer"
                 aria-label="Next banner"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -769,7 +769,7 @@ function MarketplaceContent() {
           {/* Banner Details */}
           <div className="relative z-10 p-6 md:p-10 space-y-4 max-w-3xl">
             <div className="space-y-2">
-              <h2 className="text-2xl sm:text-4xl font-extrabold leading-tight tracking-tight text-white">
+              <h2 className="text-2xl sm:text-4xl font-extrabold leading-tight tracking-tight">
                 {currentBanner.title}
               </h2>
               <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl">
@@ -778,15 +778,15 @@ function MarketplaceContent() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 font-medium pt-1">
-              <div className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full text-slate-200">
-                <Calendar className="w-3.5 h-3.5 text-[#00F0FF]" />
+              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
+                <Calendar className="w-3.5 h-3.5 text-[#08ADAE]" />
                 <span>{currentBanner.date}</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full text-slate-200">
-                <MapPin className="w-3.5 h-3.5 text-[#00F0FF]" />
+              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full">
+                <MapPin className="w-3.5 h-3.5 text-[#08ADAE]" />
                 <span>{currentBanner.location}</span>
               </div>
-              <span className="text-[#F0B829] font-bold font-mono text-sm sm:text-base px-3 py-1 rounded-full bg-slate-900/60 border border-white/15">
+              <span className="text-[#F0B829] font-bold font-mono text-sm sm:text-base px-3 py-1 rounded-full bg-white/10 border border-white/15">
                 {currentBanner.price}
               </span>
             </div>
@@ -794,7 +794,7 @@ function MarketplaceContent() {
             <div className="pt-2">
               <Link
                 href={currentBanner.targetUrl}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 text-slate-950 rounded-full text-xs sm:text-sm font-black transition shadow-[0_0_25px_rgba(8,173,174,0.45)] cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#08ADAE] hover:bg-[#07999A] text-white rounded-full text-xs sm:text-sm font-bold transition shadow-[0_4px_14px_rgba(8,173,174,0.35),inset_0_1px_1px_rgba(255,255,255,0.4)] cursor-pointer active:scale-95"
               >
                 <span>Lihat Detail & Beli Tiket</span>
                 <ArrowRight className="w-4 h-4" />
@@ -809,7 +809,7 @@ function MarketplaceContent() {
                 key={idx}
                 onClick={() => setActiveBannerIdx(idx)}
                 className={`h-2 rounded-full transition-all cursor-pointer ${
-                  activeBannerIdx === idx ? 'w-8 bg-[#00F0FF] shadow-[0_0_12px_rgba(0,240,255,0.6)]' : 'w-2 bg-white/30 hover:bg-white/60'
+                  activeBannerIdx === idx ? 'w-8 bg-[#08ADAE]' : 'w-2 bg-white/40 hover:bg-white/70'
                 }`}
                 aria-label={`Slide ${idx + 1}`}
               />
@@ -819,18 +819,18 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 4. SLIDER EVENT PER KOTA / OFFICIAL EVENTS                                */}
+      {/* 3. SLIDER EVENT PER KOTA / OFFICIAL EVENTS                                */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-[#00F0FF]" />
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <Building2 className="w-5 h-5 text-[#08ADAE]" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                 Official Event
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Event resmi yang bisa dibeli tiketnya langsung lewat TAQtix.
             </p>
           </div>
@@ -842,10 +842,10 @@ function MarketplaceContent() {
                 key={city}
                 onClick={() => setSelectedCity(city)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer border',
+                  'px-4 py-2 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer',
                   selectedCity === city
-                    ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-bold border-transparent shadow-[0_0_20px_rgba(0,240,255,0.35)]'
-                    : 'astro-glass text-slate-300 hover:text-white hover:border-white/25 border-white/10'
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'liquid-glass-card text-slate-700 hover:bg-white/90 hover:text-slate-900'
                 )}
               >
                 {city}
@@ -856,8 +856,8 @@ function MarketplaceContent() {
 
         {/* Horizontal Event Slider */}
         {cityEvents.length === 0 ? (
-          <div className="p-8 text-center astro-glass rounded-2xl text-xs sm:text-sm text-slate-400 border border-white/10">
-            Belum ada jadwal event di kota <span className="font-semibold text-white">{selectedCity}</span>. Coba pilih kota lain atau &quot;Semua Kota&quot;.
+          <div className="p-8 text-center liquid-glass rounded-2xl text-xs sm:text-sm text-slate-500">
+            Belum ada jadwal event di kota <span className="font-semibold text-slate-700">{selectedCity}</span>. Coba pilih kota lain atau &quot;Semua Kota&quot;.
           </div>
         ) : (
           <div className="flex gap-5 overflow-x-auto pb-4 pt-1 scrollbar-none snap-x">
@@ -887,44 +887,44 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. STAT COUNTER STRIP (ASTRO GLASS CAPSULE)                               */}
+      {/* 4. STAT COUNTER STRIP (LIQUID GLASS CAPSULE)                               */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="astro-glass rounded-2xl py-6 px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center border border-white/10 shadow-2xl">
+        <div className="liquid-glass rounded-2xl py-6 px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center shadow-sm">
           <div className="space-y-1">
-            <p className="text-3xl font-black text-white">10k+</p>
+            <p className="text-3xl font-black text-slate-900">10k+</p>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tiket Terjual</p>
           </div>
-          <div className="space-y-1 border-l border-white/10">
-            <p className="text-3xl font-black text-[#00F0FF]">50+</p>
+          <div className="space-y-1 border-l border-slate-200/80">
+            <p className="text-3xl font-black text-[#08ADAE]">50+</p>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Event Sukses</p>
           </div>
-          <div className="space-y-1 border-l border-white/10">
-            <p className="text-3xl font-black text-[#C084FC]">2.5k+</p>
+          <div className="space-y-1 border-l border-slate-200/80">
+            <p className="text-3xl font-black text-slate-900">2.5k+</p>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Partner Afiliasi</p>
           </div>
-          <div className="space-y-1 border-l border-white/10">
-            <p className="text-3xl font-black text-emerald-400">99.9%</p>
+          <div className="space-y-1 border-l border-slate-200/80">
+            <p className="text-3xl font-black text-emerald-600">99.9%</p>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sistem Uptime</p>
           </div>
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. DISCOVERY & EVENT GRID (ASTRO BENTO CATALOG)                           */}
+      {/* 5. DISCOVERY & EVENT GRID (SEARCH + PILLS + FROSTED CARDS)                */}
       {/* ========================================================================= */}
       <section id="discovery-section" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#00F0FF] mb-1">
+            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#08ADAE] mb-1">
               <Ticket className="w-3.5 h-3.5" />
               Katalog Acara
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               Semua Event Unggulan
             </h2>
           </div>
-          <span className="text-xs font-semibold text-slate-300 astro-glass-pill px-3.5 py-1.5 rounded-full border border-white/10">
+          <span className="text-xs font-semibold text-slate-600 liquid-glass-pill px-3.5 py-1.5 rounded-full shadow-xs">
             Menampilkan {filteredEvents.length} Event
           </span>
         </div>
@@ -933,21 +933,21 @@ function MarketplaceContent() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-slate-900/60 border border-white/10 overflow-hidden rounded-3xl p-3.5 space-y-3">
-                <Skeleton className="aspect-[16/9] w-full rounded-2xl bg-slate-800/80" />
+              <Card key={i} className="bg-white border border-slate-200 overflow-hidden shadow-xs rounded-3xl p-3.5 space-y-3">
+                <Skeleton className="aspect-[16/9] w-full rounded-2xl bg-slate-200/60" />
                 <div className="p-2 space-y-3">
-                  <Skeleton className="h-5 w-3/4 bg-slate-800/80" />
-                  <Skeleton className="h-4 w-1/2 bg-slate-800/80" />
-                  <Skeleton className="h-4 w-2/3 bg-slate-800/80" />
+                  <Skeleton className="h-5 w-3/4 bg-slate-200/60" />
+                  <Skeleton className="h-4 w-1/2 bg-slate-200/60" />
+                  <Skeleton className="h-4 w-2/3 bg-slate-200/60" />
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-16 astro-glass rounded-2xl border border-white/10">
-            <Ticket className="mx-auto h-10 w-10 text-slate-500 mb-3" />
-            <h3 className="text-base font-bold text-white">Tidak ada event ditemukan</h3>
-            <p className="text-slate-400 text-xs mt-1">
+          <div className="text-center py-16 liquid-glass rounded-2xl shadow-xs">
+            <Ticket className="mx-auto h-10 w-10 text-slate-300 mb-3" />
+            <h3 className="text-base font-bold text-slate-800">Tidak ada event ditemukan</h3>
+            <p className="text-slate-500 text-xs mt-1">
               Coba cari dengan kata kunci lain atau ubah pilihan filter kategori/kota.
             </p>
           </div>
@@ -978,18 +978,18 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. KEAMANAN & KEANDALAN TEKNOLOGI (SECURITY PILLARS - ASTRO BENTO)        */}
+      {/* 7. KEAMANAN & KEANDALAN TEKNOLOGI (SECURITY & RELIABILITY PILLARS)        */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="astro-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5 border border-white/10">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#00F0FF]" />
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#08ADAE]" />
             Keamanan Tingkat Enterprise
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Standar Keamanan & Keandalan TAQtix
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm">
+          <p className="text-slate-500 text-xs sm:text-sm">
             Dibangun dengan infrastruktur modern untuk memastikan transaksi Anda 100% aman, bebas calo, dan bebas dari server crash.
           </p>
         </div>
@@ -1000,21 +1000,21 @@ function MarketplaceContent() {
             return (
               <div
                 key={idx}
-                className="astro-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between group border border-white/10 hover:border-[#00F0FF]/40 bg-slate-900/60 hover:bg-slate-900/90 transition-all duration-300"
+                className="liquid-glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between group hover:shadow-lg transition-all"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-11 w-11 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF]">
+                    <div className="h-11 w-11 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE]">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-bold text-[#00F0FF] bg-[#00F0FF]/10 px-2.5 py-1 rounded-full border border-[#00F0FF]/30">
+                    <span className="text-[10px] font-bold text-[#08ADAE] bg-[#08ADAE]/10 px-2.5 py-1 rounded-full border border-[#08ADAE]/20">
                       {item.tag}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-white leading-snug mb-2">
+                  <h3 className="text-sm font-bold text-slate-900 leading-snug mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-500 leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
@@ -1025,20 +1025,20 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 8. SOLUSI PENYELENGGARA ACARA (ORGANIZER HUB - ASTRO BENTO)               */}
+      {/* 8. SOLUSI PENYELENGGARA ACARA (EVENT ORGANIZER & PROMOTER HUB)             */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="rounded-3xl astro-glass p-8 sm:p-12 border border-white/15 shadow-2xl relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-950/90 to-[#060913]">
+        <div className="rounded-3xl liquid-glass p-8 sm:p-12 border border-slate-200/80 shadow-md">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-5 space-y-4">
-              <div className="astro-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5 border border-white/10">
-                <Building2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+              <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-[#08ADAE]" />
                 Solusi Event Organizer
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 Kelola Penjualan Tiket Event Anda dengan Skalabilitas Tinggi
               </h2>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
                 Platform ticketing terintegrasi untuk promotor musik, festival, workshop, dan seminar. Mulai dari manajemen kategori tiket, integrasi QRIS/VA otomatis, hingga scanner kru gate lapangan.
               </p>
               <div className="pt-2 flex flex-wrap gap-3">
@@ -1046,14 +1046,14 @@ function MarketplaceContent() {
                   href={process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/register'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 transition shadow-[0_0_24px_rgba(8,173,174,0.45)] cursor-pointer active:scale-95"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold text-white bg-[#08ADAE] hover:bg-[#07999A] transition shadow-[0_4px_14px_rgba(8,173,174,0.35)] cursor-pointer active:scale-95"
                 >
                   <span>Mulai Bikin Event</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </a>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-white astro-glass hover:bg-white/10 border border-white/15 transition cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition cursor-pointer shadow-2xs"
                 >
                   <span>Konsultasi Kemitraan</span>
                 </Link>
@@ -1066,15 +1066,15 @@ function MarketplaceContent() {
                 return (
                   <div
                     key={idx}
-                    className="p-5 rounded-2xl astro-card border border-white/10 hover:border-[#08ADAE]/50 bg-slate-900/70 space-y-2.5"
+                    className="p-5 rounded-2xl liquid-glass-card border border-white/90 shadow-2xs space-y-2.5"
                   >
-                    <div className="h-9 w-9 rounded-xl bg-[#08ADAE]/20 border border-[#08ADAE]/30 text-[#00F0FF] flex items-center justify-center">
-                      <Icon className="w-4 h-4" />
+                    <div className="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                      <Icon className="w-4 h-4 text-[#08ADAE]" />
                     </div>
-                    <h3 className="text-xs sm:text-sm font-bold text-white">
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900">
                       {item.title}
                     </h3>
-                    <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -1090,14 +1090,14 @@ function MarketplaceContent() {
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="astro-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5 border border-white/10">
-            <Clock className="w-3.5 h-3.5 text-[#00F0FF]" />
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-[#08ADAE]" />
             Panduan Menonton Acara
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Checklist Hari-H Menghadiri Acara
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm">
+          <p className="text-slate-500 text-xs sm:text-sm">
             Pastikan pengalaman Anda menyaksikan acara impian berjalan lancar dan nyaman dengan tips berikut.
           </p>
         </div>
@@ -1106,19 +1106,19 @@ function MarketplaceContent() {
           {eventDayChecklist.map((item, idx) => (
             <div
               key={idx}
-              className="astro-card rounded-2xl p-6 space-y-3 relative overflow-hidden flex flex-col justify-between border border-white/10 hover:border-[#00F0FF]/40 bg-slate-900/60"
+              className="liquid-glass-card rounded-2xl p-6 space-y-3 relative overflow-hidden flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-[#00F0FF]">
+                <div className="flex items-center gap-2 text-[#08ADAE]">
                   <Check className="w-4 h-4" />
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     Tips #{idx + 1}
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-white leading-snug">
+                <h3 className="text-sm font-bold text-slate-900 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -1128,18 +1128,18 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 10. TESTIMONI & ULASAN PENGGUNA (ASTRO BENTO SOCIAL PROOF)                 */}
+      {/* 10. TESTIMONI & ULASAN PENGGUNA (SOCIAL PROOF)                             */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="astro-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5 border border-white/10">
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-flex items-center gap-1.5">
             <Star className="w-3.5 h-3.5 text-[#F0B829]" />
             Testimoni Nyata
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Pengalaman Mereka Bersama TAQtix
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm">
+          <p className="text-slate-500 text-xs sm:text-sm">
             Dengarkan apa kata para penonton dan penyelenggara event yang telah merasakan kemudahan sistem TAQtix.
           </p>
         </div>
@@ -1148,7 +1148,7 @@ function MarketplaceContent() {
           {userReviews.map((rev, idx) => (
             <div
               key={idx}
-              className="astro-card rounded-2xl p-6 flex flex-col justify-between space-y-4 border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all shadow-xl"
+              className="liquid-glass-card rounded-2xl p-6 flex flex-col justify-between space-y-4 shadow-2xs hover:shadow-md transition-shadow"
             >
               <div className="space-y-3">
                 <div className="flex items-center gap-1 text-[#F0B829]">
@@ -1156,15 +1156,15 @@ function MarketplaceContent() {
                     <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic">
-                  &quot;{rev.comment}&quot;
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
+                  "{rev.comment}"
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-white/10">
-                <h4 className="text-xs font-bold text-white">{rev.name}</h4>
-                <p className="text-[11px] text-slate-400">{rev.role}</p>
-                <span className="text-[10px] font-semibold text-[#00F0FF] mt-0.5 block">
+              <div className="pt-3 border-t border-slate-200/60">
+                <h4 className="text-xs font-bold text-slate-900">{rev.name}</h4>
+                <p className="text-[11px] text-slate-500">{rev.role}</p>
+                <span className="text-[10px] font-semibold text-[#08ADAE] mt-0.5 block">
                   Event: {rev.event}
                 </span>
               </div>
@@ -1174,17 +1174,17 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 11. FAQS ACCORDION (ASTRO OBSIDIAN ROWS)                                  */}
+      {/* 11. FAQS ACCORDION (FROSTED LIQUID GLASS ROWS)                            */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto space-y-6">
         <div className="text-center space-y-2">
-          <div className="astro-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 inline-block border border-white/10">
+          <div className="liquid-glass-pill px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-700 inline-block">
             Pusat Bantuan
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
             Pertanyaan yang Sering Diajukan
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm">
+          <p className="text-slate-500 text-xs sm:text-sm">
             Informasi lengkap seputar pemesanan dan verifikasi tiket di TAQtix.
           </p>
         </div>
@@ -1195,27 +1195,27 @@ function MarketplaceContent() {
             return (
               <div
                 key={idx}
-                className="astro-card rounded-2xl overflow-hidden border border-white/10 bg-slate-900/60 hover:border-white/20 transition"
+                className="liquid-glass-card rounded-2xl overflow-hidden shadow-xs transition"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
-                  className="w-full flex items-center justify-between p-4 sm:p-5 text-left cursor-pointer hover:bg-white/[0.04] transition-colors"
+                  className="w-full flex items-center justify-between p-4 sm:p-5 text-left cursor-pointer hover:bg-white/90 transition-colors"
                 >
-                  <span className="text-sm sm:text-base font-semibold text-white pr-4">
+                  <span className="text-sm sm:text-base font-semibold text-slate-900 pr-4">
                     {faq.q}
                   </span>
                   <div
                     className={cn(
                       'p-1.5 rounded-full transition-colors shrink-0',
-                      isOpen ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950' : 'bg-white/10 text-slate-300'
+                      isOpen ? 'bg-[#08ADAE] text-white' : 'bg-slate-100 text-slate-600'
                     )}
                   >
                     {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                   </div>
                 </button>
                 {isOpen && (
-                  <div className="px-4 sm:px-5 pb-5 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/10 pt-3">
+                  <div className="px-4 sm:px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-200/70 pt-3">
                     {faq.a}
                   </div>
                 )}
@@ -1226,21 +1226,19 @@ function MarketplaceContent() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 12. CALL TO ACTION (ASTRO COSMIC AURORA BANNER)                           */}
+      {/* 12. CALL TO ACTION (SMOKED LIQUID GLASS CONTAINER)                        */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="rounded-3xl astro-glass text-white p-8 sm:p-14 text-center border border-white/15 shadow-2xl relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-950/95 to-[#060913]">
-          {/* Cosmic Aurora Glow */}
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#08ADAE]/25 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+        <div className="rounded-3xl liquid-glass-dark text-white p-8 sm:p-14 text-center border border-white/15 shadow-2xl relative overflow-hidden">
+          {/* Subtle Top Specular Glass Reflection */}
+          <div className="absolute inset-x-0 top-0 h-[1px] bg-white/25" />
 
           <div className="max-w-2xl mx-auto space-y-5 relative z-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-[#00F0FF] border border-white/15 backdrop-blur-md">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-[#08ADAE] border border-white/15 backdrop-blur-md">
               <ShieldCheck className="w-3.5 h-3.5" />
               Sistem Ticketing Resmi
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight text-white">
+            <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight">
               Siap Menghadiri Acara Impian Anda?
             </h2>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
@@ -1250,7 +1248,7 @@ function MarketplaceContent() {
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <a
                 href="#discovery-section"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-bold text-slate-950 bg-white hover:bg-slate-200 transition shadow-lg active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-bold text-slate-900 bg-white hover:bg-slate-100 transition shadow-lg active:scale-95"
               >
                 <span>Cari & Beli Tiket</span>
                 <ArrowRight className="w-4 h-4 text-[#08ADAE]" />
@@ -1259,7 +1257,7 @@ function MarketplaceContent() {
                 href={process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/register'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 transition shadow-[0_0_24px_rgba(8,173,174,0.45)] active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-bold text-white bg-[#08ADAE] hover:bg-[#07999A] transition shadow-[0_4px_14px_rgba(8,173,174,0.4),inset_0_1px_1px_rgba(255,255,255,0.4)] active:scale-95"
               >
                 <span>Daftar Sebagai EO</span>
                 <ArrowUpRight className="w-4 h-4" />

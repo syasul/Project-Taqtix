@@ -190,22 +190,22 @@ function EventsPageContent() {
       {/* ========================================================================= */}
       <section className="relative pt-12 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-[#00F0FF] text-xs font-bold uppercase tracking-wider shadow-xs">
-            <Compass className="w-4 h-4 text-[#00F0FF]" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#08ADAE]/10 border border-[#08ADAE]/20 text-[#08ADAE] text-xs font-bold uppercase tracking-wider shadow-xs">
+            <Compass className="w-4 h-4" />
             <span>Katalog Event Resmi TAQtix</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Semua Event Pilihan di <span className="astro-neon-text">TAQtix</span>
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+            Semua Event Pilihan di <span className="text-[#08ADAE]">TAQtix</span>
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
             Temukan konser musik, festival, seminar, workshop, hingga agenda komunitas favorit Anda. Seluruh tiket 100% resmi langsung dari penyelenggara terverifikasi dengan verifikasi e-ticket instan.
           </p>
         </div>
 
         {/* Search Bar & City Selector */}
-        <div className="max-w-4xl mx-auto mt-8 bg-slate-900/80 backdrop-blur-xl p-3 sm:p-4 rounded-3xl border border-white/15 shadow-2xl">
+        <div className="max-w-4xl mx-auto mt-8 bg-white/90 backdrop-blur-xl p-3 sm:p-4 rounded-3xl border border-slate-200/90 shadow-sm">
           <div className="flex flex-col sm:flex-row items-center gap-3">
             {/* Input Kata Kunci */}
             <div className="relative w-full flex-1">
@@ -215,12 +215,12 @@ function EventsPageContent() {
                 placeholder="Cari nama event, artis, lokasi, atau deskripsi..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-slate-950/90 hover:bg-slate-950 focus:bg-slate-950 rounded-2xl border border-white/10 text-xs sm:text-sm font-medium text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition"
+                className="w-full pl-11 pr-4 py-3 bg-slate-50 hover:bg-slate-100/70 focus:bg-white rounded-2xl border border-slate-200 text-xs sm:text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#08ADAE] focus:ring-1 focus:ring-[#08ADAE] transition"
               />
               {search && (
                 <button
                   onClick={() => setSearch('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/60"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -229,14 +229,14 @@ function EventsPageContent() {
 
             {/* Selector Kota */}
             <div className="relative w-full sm:w-56 shrink-0">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00F0FF]" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#08ADAE]" />
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full pl-11 pr-8 py-3 bg-slate-950/90 hover:bg-slate-950 focus:bg-slate-950 rounded-2xl border border-white/10 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition appearance-none cursor-pointer"
+                className="w-full pl-11 pr-8 py-3 bg-slate-50 hover:bg-slate-100/70 focus:bg-white rounded-2xl border border-slate-200 text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:border-[#08ADAE] focus:ring-1 focus:ring-[#08ADAE] transition appearance-none cursor-pointer"
               >
                 {cities.map((city) => (
-                  <option key={city} value={city} className="bg-slate-950 text-white">
+                  <option key={city} value={city}>
                     {city}
                   </option>
                 ))}
@@ -255,8 +255,8 @@ function EventsPageContent() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-extrabold shadow-md scale-100'
-                    : 'bg-slate-900/70 hover:bg-slate-800 text-slate-300 border border-white/10 hover:border-white/20'
+                    ? 'bg-[#08ADAE] text-white shadow-xs scale-100'
+                    : 'bg-white hover:bg-slate-100/80 text-slate-600 border border-slate-200/80'
                 }`}
               >
                 {cat}
@@ -270,12 +270,12 @@ function EventsPageContent() {
       {/* 2. EVENT CATALOG GRID                                                     */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/70 pb-4">
           <div className="flex items-center gap-2.5">
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Daftar Event Tersedia
             </h2>
-            <span className="px-3 py-1 rounded-full bg-slate-800 border border-white/10 text-slate-300 text-xs font-bold font-mono">
+            <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
               {filteredEvents.length} Event
             </span>
           </div>
@@ -285,7 +285,7 @@ function EventsPageContent() {
               variant="ghost"
               size="sm"
               onClick={handleResetFilter}
-              className="text-xs font-bold text-[#00F0FF] hover:bg-teal-500/10 h-8 px-3 rounded-xl flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+              className="text-xs font-bold text-[#08ADAE] hover:bg-[#08ADAE]/10 h-8 px-3 rounded-xl flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
               <span>Reset Filter</span>
@@ -299,29 +299,29 @@ function EventsPageContent() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Card
                 key={i}
-                className="bg-slate-900/80 border border-white/10 overflow-hidden shadow-xs rounded-3xl p-3.5 space-y-3"
+                className="bg-white border border-slate-200 overflow-hidden shadow-xs rounded-3xl p-3.5 space-y-3"
               >
-                <Skeleton className="aspect-[16/9] w-full rounded-2xl bg-slate-800" />
+                <Skeleton className="aspect-[16/9] w-full rounded-2xl bg-slate-200/60" />
                 <div className="p-2 space-y-3">
-                  <Skeleton className="h-5 w-3/4 bg-slate-800" />
-                  <Skeleton className="h-4 w-1/2 bg-slate-800" />
-                  <Skeleton className="h-4 w-2/3 bg-slate-800" />
+                  <Skeleton className="h-5 w-3/4 bg-slate-200/60" />
+                  <Skeleton className="h-4 w-1/2 bg-slate-200/60" />
+                  <Skeleton className="h-4 w-2/3 bg-slate-200/60" />
                 </div>
               </Card>
             ))}
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-20 bg-slate-900/70 rounded-3xl border border-white/10 p-8 shadow-xl max-w-xl mx-auto space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
-              <Ticket className="w-8 h-8 text-[#00F0FF]" />
+          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200/80 p-8 shadow-xs max-w-xl mx-auto space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <Ticket className="w-8 h-8" />
             </div>
-            <h3 className="text-base font-bold text-white">Tidak ada event yang sesuai</h3>
-            <p className="text-slate-400 text-xs leading-relaxed max-w-sm mx-auto">
+            <h3 className="text-base font-bold text-slate-900">Tidak ada event yang sesuai</h3>
+            <p className="text-slate-500 text-xs leading-relaxed max-w-sm mx-auto">
               Tidak ditemukan event untuk kata kunci atau kombinasi filter yang Anda pilih. Silakan reset filter untuk melihat seluruh katalog.
             </p>
             <Button
               onClick={handleResetFilter}
-              className="bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 rounded-xl text-xs font-extrabold shadow-md px-5"
+              className="bg-[#08ADAE] hover:bg-[#07999a] text-white rounded-xl text-xs font-bold shadow-xs px-5"
             >
               Tampilkan Semua Event
             </Button>
@@ -356,11 +356,10 @@ function EventsPageContent() {
       {/* 3. VALUE PROPOSITION BANNER                                               */}
       {/* ========================================================================= */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-8">
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl border border-white/15">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(8,173,174,0.18),transparent_60%)]" />
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-lg border border-slate-700/50">
           <div className="relative z-10 max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 text-[#00F0FF] text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-teal-500/30">
-              <ShieldCheck className="w-4 h-4 text-[#00F0FF]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#08ADAE] text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-white/10">
+              <ShieldCheck className="w-4 h-4" />
               <span>Infrastruktur Ticketing Resmi</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug">
@@ -374,7 +373,7 @@ function EventsPageContent() {
                 href={process.env.NEXT_PUBLIC_EO_URL || 'https://partner.taqtix.id'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 text-xs font-extrabold shadow-lg transition-all active:scale-95"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#08ADAE] hover:bg-[#07999a] text-white text-xs font-bold shadow-md transition-all active:scale-95"
               >
                 <span>Buka Portal Partner (EO)</span>
                 <ArrowRight className="w-4 h-4" />

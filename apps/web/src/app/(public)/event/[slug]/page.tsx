@@ -520,7 +520,7 @@ export default function EventDetailPage() {
         <Button
           onClick={() => router.push('/')}
           variant="ghost"
-          className="text-slate-600 hover:text-[#08ADAE] hover:bg-slate-50 rounded-xl -ml-2 gap-2 cursor-pointer text-xs font-semibold"
+          className="text-slate-400 hover:text-[#00F0FF] hover:bg-white/[0.06] rounded-xl -ml-2 gap-2 cursor-pointer text-xs font-semibold"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -531,16 +531,16 @@ export default function EventDetailPage() {
             onClick={handleShareWhatsApp}
             variant="outline"
             size="sm"
-            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 cursor-pointer active:scale-95"
+            className="rounded-xl text-xs font-semibold gap-1.5 border-white/10 text-slate-300 hover:bg-emerald-950/40 hover:text-emerald-400 hover:border-emerald-500/40 cursor-pointer active:scale-95 astro-glass"
           >
-            <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+            <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
             <span className="hidden sm:inline">Bagikan</span> WhatsApp
           </Button>
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Ayo hadiri ${event.title}! Dapatkan tiket resminya di TAQtix:`)}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition active:scale-95"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 text-slate-300 text-xs font-semibold hover:bg-white/[0.06] transition active:scale-95 astro-glass"
           >
             <TwitterIcon />
             <span>Bagikan X</span>
@@ -549,9 +549,9 @@ export default function EventDetailPage() {
             onClick={handleCopyLink}
             variant="outline"
             size="sm"
-            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95"
+            className="rounded-xl text-xs font-semibold gap-1.5 border-white/10 text-slate-300 hover:bg-white/[0.06] cursor-pointer active:scale-95 astro-glass"
           >
-            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
             <span>{copiedLink ? 'Tersalin' : 'Salin Tautan'}</span>
           </Button>
         </div>
@@ -630,45 +630,45 @@ export default function EventDetailPage() {
           </div>
 
           {/* Main Info Card */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+          <div className="astro-card rounded-3xl p-6 sm:p-8 space-y-6 border border-white/10 bg-slate-900/70 shadow-2xl">
             <div className="space-y-4">
               {/* Category & Status Badges */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200/60 shadow-2xs">
-                  <Music className="w-3.5 h-3.5 text-blue-600" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#00F0FF]/10 text-[#00F0FF] border border-[#00F0FF]/25 shadow-2xs">
+                  <Music className="w-3.5 h-3.5 text-[#00F0FF]" />
                   <span>{primaryCategory}</span>
                 </span>
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-950/40 text-emerald-400 border border-emerald-500/30">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   <span>Pendaftaran Dibuka</span>
                 </span>
                 {event.isDateTba && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                    <Clock className="w-3 h-3 text-amber-600" />
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-950/40 text-amber-400 border border-amber-500/30">
+                    <Clock className="w-3 h-3 text-amber-400" />
                     <span>Jadwal TBA</span>
                   </span>
                 )}
                 {minPrice > 0 && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
-                    <Ticket className="w-3 h-3 text-[#08ADAE]" />
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-teal-950/40 text-teal-300 border border-teal-500/30">
+                    <Ticket className="w-3 h-3 text-[#00F0FF]" />
                     <span>Mulai {minPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</span>
                   </span>
                 )}
               </div>
 
               {/* Event Title */}
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
                 {event.title}
               </h1>
 
               {/* Penyelenggara & Media Sosial Section (Matches Mockup) */}
-              <div className="pt-2 space-y-4 border-t border-slate-100">
+              <div className="pt-2 space-y-4 border-t border-white/10">
                 {/* Penyelenggara */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-medium text-slate-500 block">Penyelenggara</span>
+                  <span className="text-xs font-medium text-slate-400 block">Penyelenggara</span>
                   <div className="flex items-center gap-2.5">
                     {event.organizer.logoUrl ? (
-                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0 shadow-2xs">
+                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg border border-white/10 overflow-hidden bg-slate-800 shrink-0 shadow-2xs">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={event.organizer.logoUrl}
@@ -677,11 +677,11 @@ export default function EventDetailPage() {
                         />
                       </div>
                     ) : (
-                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-slate-800 border border-white/10 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                         {event.organizer.name.substring(0, 2).toUpperCase()}
                       </div>
                     )}
-                    <span className="font-bold text-slate-900 text-sm sm:text-base">
+                    <span className="font-bold text-white text-sm sm:text-base">
                       {event.organizer.name}
                     </span>
                   </div>
@@ -689,7 +689,7 @@ export default function EventDetailPage() {
 
                 {/* Media Sosial */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-medium text-slate-500 block">Media Sosial</span>
+                  <span className="text-xs font-medium text-slate-400 block">Media Sosial</span>
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Instagram */}
                     <a
@@ -702,9 +702,9 @@ export default function EventDetailPage() {
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100/80 border border-blue-200/80 text-blue-600 text-xs font-semibold transition active:scale-95 shadow-2xs"
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-950/40 hover:bg-pink-900/60 border border-pink-500/30 text-pink-300 text-xs font-semibold transition active:scale-95 shadow-2xs"
                     >
-                      <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-[10px]">
+                      <span className="w-4 h-4 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0 text-[10px]">
                         <InstagramIcon className="w-2.5 h-2.5" />
                       </span>
                       <span>Instagram</span>
@@ -722,9 +722,9 @@ export default function EventDetailPage() {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100/80 border border-blue-200/80 text-blue-600 text-xs font-semibold transition active:scale-95 shadow-2xs"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200 text-xs font-semibold transition active:scale-95 shadow-2xs"
                       >
-                        <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-[10px]">
+                        <span className="w-4 h-4 rounded-full bg-slate-700 text-white flex items-center justify-center shrink-0 text-[10px]">
                           <TikTokIcon className="w-2.5 h-2.5 fill-white" />
                         </span>
                         <span>TikTok</span>
@@ -741,7 +741,7 @@ export default function EventDetailPage() {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 hover:bg-red-100/80 border border-red-200/80 text-red-600 text-xs font-semibold transition active:scale-95 shadow-2xs"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-300 text-xs font-semibold transition active:scale-95 shadow-2xs"
                       >
                         <span className="w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0 text-[10px]">
                           <YoutubeIcon className="w-2.5 h-2.5 fill-white" />
@@ -760,7 +760,7 @@ export default function EventDetailPage() {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 text-xs font-semibold transition active:scale-95 shadow-2xs"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200 text-xs font-semibold transition active:scale-95 shadow-2xs"
                       >
                         <span className="w-4 h-4 rounded-full bg-slate-700 text-white flex items-center justify-center shrink-0 text-[10px]">
                           <Globe className="w-2.5 h-2.5 text-white" />
@@ -774,41 +774,41 @@ export default function EventDetailPage() {
             </div>
 
             {/* Date, Time & Venue Key Highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-slate-100 py-4 text-xs sm:text-sm text-slate-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-white/10 py-4 text-xs sm:text-sm text-slate-300">
               <div className="flex items-start space-x-3.5">
                 <div
                   className={cn(
                     'h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border',
                     event.isDateTba
-                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-500'
-                      : 'bg-[#08ADAE]/10 border-[#08ADAE]/20 text-[#08ADAE]'
+                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                      : 'bg-[#08ADAE]/15 border-[#08ADAE]/30 text-[#00F0FF]'
                   )}
                 >
                   <Calendar className="h-5 w-5" />
                 </div>
                 <div>
                   <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Tanggal & Waktu Acara</h4>
-                  <p className={cn('mt-0.5', event.isDateTba ? 'text-amber-600 font-bold' : 'text-slate-800 font-semibold')}>
+                  <p className={cn('mt-0.5', event.isDateTba ? 'text-amber-400 font-bold' : 'text-white font-semibold')}>
                     {formattedDateRange}
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     {event.isDateTba ? 'Akan diumumkan lebih lanjut oleh penyelenggara' : 'Waktu Indonesia Barat (WIB)'}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3.5">
-                <div className="h-10 w-10 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0">
+                <div className="h-10 w-10 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] shrink-0">
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
                   <h4 className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Lokasi Penyelenggaraan</h4>
-                  <p className="text-slate-800 font-semibold mt-0.5">{event.location}</p>
+                  <p className="text-white font-semibold mt-0.5">{event.location}</p>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] text-[#08ADAE] font-semibold hover:underline mt-0.5"
+                    className="inline-flex items-center gap-1 text-[11px] text-[#00F0FF] font-semibold hover:underline mt-0.5"
                   >
                     <span>Petunjuk Arah Google Maps</span>
                     <ExternalLink className="w-2.5 h-2.5" />
@@ -819,11 +819,11 @@ export default function EventDetailPage() {
 
             {/* Event Description */}
             <div className="space-y-3">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#08ADAE]" />
+              <h3 className="font-bold text-white text-sm flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#00F0FF]" />
                 <span>Deskripsi Lengkap Acara</span>
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
                 {event.description ||
                   'Acara ini diselenggarakan secara profesional dengan fasilitas lengkap dan pengalaman berharga bagi setiap peserta yang hadir.'}
               </p>
@@ -831,9 +831,9 @@ export default function EventDetailPage() {
 
             {/* Double Engagement Search & Category Tags */}
             {(event.seoKeywords || event.adminSeoKeywords) && (
-              <div className="pt-4 border-t border-slate-100 space-y-2.5">
-                <h4 className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-[#08ADAE]" />
+              <div className="pt-4 border-t border-white/10 space-y-2.5">
+                <h4 className="font-bold text-white text-xs flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-[#00F0FF]" />
                   <span>Kategori & Topik Terkait</span>
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
@@ -844,7 +844,7 @@ export default function EventDetailPage() {
                       return (
                         <span
                           key={`eo-${i}`}
-                          className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium hover:bg-slate-200 transition"
+                          className="px-2.5 py-1 rounded-lg bg-slate-800 border border-white/10 text-slate-300 text-[11px] font-medium hover:border-white/20 transition"
                         >
                           #{trimmed}
                         </span>
@@ -857,9 +857,9 @@ export default function EventDetailPage() {
                       return (
                         <span
                           key={`admin-${i}`}
-                          className="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200/80 text-[11px] font-semibold flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-lg bg-teal-950/40 text-teal-300 border border-teal-500/30 text-[11px] font-semibold flex items-center gap-1"
                         >
-                          <Zap className="w-3 h-3 text-[#08ADAE]" />
+                          <Zap className="w-3 h-3 text-[#00F0FF]" />
                           <span>#{trimmed}</span>
                         </span>
                       );
@@ -874,18 +874,18 @@ export default function EventDetailPage() {
             const displayLineup = getEventLineup(event);
             if (!displayLineup || displayLineup.length === 0) return null;
             return (
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+              <div className="astro-card rounded-3xl p-6 sm:p-8 space-y-5 border border-white/10 bg-slate-900/70 shadow-2xl">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-[#00F0FF] uppercase tracking-wider">
                       Guest Stars, Asatidz & Performers
                     </span>
-                    <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                      <Mic2 className="w-5 h-5 text-[#08ADAE]" />
+                    <h3 className="font-bold text-white text-base sm:text-lg flex items-center gap-2">
+                      <Mic2 className="w-5 h-5 text-[#00F0FF]" />
                       <span>Talent Bintang Tamu & Pengisi Acara</span>
                     </h3>
                   </div>
-                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                  <span className="text-[11px] font-semibold text-slate-300 bg-slate-800 border border-white/10 px-3 py-1 rounded-full">
                     {displayLineup.length} Pengisi Acara
                   </span>
                 </div>
@@ -898,7 +898,7 @@ export default function EventDetailPage() {
                     return (
                       <div
                         key={artist.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all duration-150 group"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-slate-950/60 border border-white/10 shadow-xl hover:border-white/20 transition-all duration-150 group"
                       >
                         {/* Left: Avatar + Details */}
                         <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -909,10 +909,10 @@ export default function EventDetailPage() {
                               <img
                                 src={photoUrl}
                                 alt={artist.name}
-                                className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl object-cover border border-slate-200 shadow-2xs"
+                                className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl object-cover border border-white/10 shadow-2xs"
                               />
                             ) : (
-                              <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl bg-[#08ADAE]/10 border border-[#08ADAE]/25 flex items-center justify-center text-[#08ADAE] font-black text-xl shadow-xs">
+                              <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] font-black text-xl shadow-xs">
                                 {artist.name.substring(0, 2).toUpperCase()}
                               </div>
                             )}
@@ -921,25 +921,25 @@ export default function EventDetailPage() {
                           {/* Info: Role Tag, Full Name, Time & Stage */}
                           <div className="space-y-1.5 min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#08ADAE]/10 text-[#08ADAE] border border-[#08ADAE]/20">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#00F0FF]/10 text-[#00F0FF] border border-[#00F0FF]/25">
                                 Pemateri
                               </span>
                             </div>
 
-                            <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                            <h4 className="text-sm sm:text-base font-bold text-white leading-snug">
                               {artist.name}
                             </h4>
 
                             <div className="flex flex-wrap items-center gap-2 pt-0.5 text-xs">
                               {artist.performTime && (
-                                <span className="inline-flex items-center gap-1.5 font-mono font-medium text-slate-700 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
-                                  <Clock className="w-3.5 h-3.5 text-[#08ADAE] shrink-0" />
+                                <span className="inline-flex items-center gap-1.5 font-mono font-medium text-slate-300 bg-slate-900 border border-white/10 px-2.5 py-1 rounded-lg">
+                                  <Clock className="w-3.5 h-3.5 text-[#00F0FF] shrink-0" />
                                   <span>{artist.performTime}</span>
                                 </span>
                               )}
                               {artist.stage && (
-                                <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
-                                  <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                <span className="inline-flex items-center gap-1.5 text-slate-300 font-medium bg-slate-900 border border-white/10 px-2.5 py-1 rounded-lg">
+                                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                                   <span>{artist.stage}</span>
                                 </span>
                               )}
@@ -948,19 +948,17 @@ export default function EventDetailPage() {
                         </div>
 
                         {/* Right: Social Media Action Button */}
-                        <div className="shrink-0 flex sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        <div className="shrink-0 flex sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
                           <a
                             href={social.href}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 ${
                               social.type === 'instagram'
-                                ? 'bg-pink-50 border border-pink-200 text-pink-700 hover:bg-pink-100 hover:border-pink-300'
+                                ? 'bg-pink-950/40 border border-pink-500/30 text-pink-300 hover:bg-pink-900/60'
                                 : social.type === 'youtube'
-                                ? 'bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300'
-                                : social.type === 'twitter'
-                                ? 'bg-slate-100 border border-slate-200 text-slate-800 hover:bg-slate-200'
-                                : 'bg-[#08ADAE]/10 border border-[#08ADAE]/25 text-[#08ADAE] hover:bg-[#08ADAE]/20'
+                                ? 'bg-red-950/40 border border-red-500/30 text-red-300 hover:bg-red-900/60'
+                                : 'bg-slate-800 border border-white/10 text-slate-200 hover:bg-slate-700'
                             }`}
                           >
                             {social.type === 'instagram' && <InstagramIcon />}
@@ -982,53 +980,53 @@ export default function EventDetailPage() {
           })()}
 
           {/* FASILITAS & MANFAAT PESERTA (BENEFITS & FACILITIES) */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="astro-card rounded-3xl p-6 sm:p-8 space-y-4 border border-white/10 bg-slate-900/70 shadow-2xl">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[#00F0FF] uppercase tracking-wider">
                 Keuntungan & Fasilitas
               </span>
-              <h3 className="font-bold text-slate-900 text-base sm:text-lg">
+              <h3 className="font-bold text-white text-base sm:text-lg">
                 Fasilitas yang Anda Dapatkan
               </h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-xs sm:text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-[#08ADAE]" />
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 space-y-1.5">
+                <div className="flex items-center gap-2 text-white font-bold text-xs sm:text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-[#00F0FF]" />
                   <span>Akses Gate Cepat & Praktis</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-normal pl-6">
+                <p className="text-[11px] text-slate-400 leading-normal pl-6">
                   Pemindaian tiket berlangsung kurang dari 0.3 detik per orang dengan aplikasi scanner resmi petugas di pintu masuk venue.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-xs sm:text-sm">
-                  <Smartphone className="w-4 h-4 text-[#08ADAE]" />
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 space-y-1.5">
+                <div className="flex items-center gap-2 text-white font-bold text-xs sm:text-sm">
+                  <Smartphone className="w-4 h-4 text-[#00F0FF]" />
                   <span>E-Ticket Resmi via WhatsApp</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-normal pl-6">
+                <p className="text-[11px] text-slate-400 leading-normal pl-6">
                   Tidak perlu mencetak tiket fisik. QR Code resmi dikirim langsung ke nomor WhatsApp dan tersimpan aman di akun Anda.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-xs sm:text-sm">
-                  <ShieldCheck className="w-4 h-4 text-[#08ADAE]" />
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 space-y-1.5">
+                <div className="flex items-center gap-2 text-white font-bold text-xs sm:text-sm">
+                  <ShieldCheck className="w-4 h-4 text-[#00F0FF]" />
                   <span>Garansi Anti-Double Booking</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-normal pl-6">
+                <p className="text-[11px] text-slate-400 leading-normal pl-6">
                   Sistem concurrency locking menjamin kuota tiket yang Anda pilih terkunci saat pembayaran, aman dari perebutan pihak lain.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-xs sm:text-sm">
-                  <CreditCard className="w-4 h-4 text-[#08ADAE]" />
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 space-y-1.5">
+                <div className="flex items-center gap-2 text-white font-bold text-xs sm:text-sm">
+                  <CreditCard className="w-4 h-4 text-[#00F0FF]" />
                   <span>Bukti Pembayaran & Faktur Sah</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-normal pl-6">
+                <p className="text-[11px] text-slate-400 leading-normal pl-6">
                   Invoice dan bukti transaksi terbit secara otomatis lengkap dengan kode referensi pembayaran untuk keamanan maksimal.
                 </p>
               </div>
@@ -1037,18 +1035,18 @@ export default function EventDetailPage() {
 
           {/* RUNDOWN & JADWAL ACARA (TIMELINE) */}
           {event.rundown && event.rundown.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="astro-card rounded-3xl p-6 sm:p-8 space-y-5 border border-white/10 bg-slate-900/70 shadow-2xl">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-[#00F0FF] uppercase tracking-wider">
                     Rangkaian Agenda
                   </span>
-                  <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-[#08ADAE]" />
+                  <h3 className="font-bold text-white text-base sm:text-lg flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#00F0FF]" />
                     <span>Estimasi Rundown Acara</span>
                   </h3>
                 </div>
-                <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
+                <span className="text-[11px] font-semibold text-slate-300 bg-slate-800 border border-white/10 px-3 py-1 rounded-full">
                   Jadwal Tentatif
                 </span>
               </div>
@@ -1059,23 +1057,23 @@ export default function EventDetailPage() {
                     key={item.id}
                     className={`flex items-start gap-4 p-3.5 rounded-2xl border ${
                       item.isHighlight
-                        ? 'bg-[#08ADAE]/5 border-[#08ADAE]/20 ring-1 ring-[#08ADAE]/10'
-                        : 'bg-slate-50 border border-slate-200/70'
+                        ? 'bg-[#08ADAE]/15 border-[#08ADAE]/35 ring-1 ring-[#08ADAE]/20'
+                        : 'bg-slate-950/60 border-white/10'
                     }`}
                   >
                     <div
                       className={`px-2.5 py-1 rounded-xl font-mono text-xs font-bold shrink-0 ${
                         item.isHighlight
-                          ? 'bg-[#08ADAE] text-white'
-                          : 'bg-white border border-slate-200 text-slate-800'
+                          ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950'
+                          : 'bg-slate-900 border border-white/10 text-white'
                       }`}
                     >
                       {item.timeRange}
                     </div>
                     <div className="space-y-0.5">
-                      <h4 className="text-xs sm:text-sm font-bold text-slate-900">{item.title}</h4>
+                      <h4 className="text-xs sm:text-sm font-bold text-white">{item.title}</h4>
                       {item.description && (
-                        <p className={`text-[11px] leading-normal ${item.isHighlight ? 'text-slate-600' : 'text-slate-500'}`}>
+                        <p className={`text-[11px] leading-normal ${item.isHighlight ? 'text-slate-300' : 'text-slate-400'}`}>
                           {item.description}
                         </p>
                       )}
@@ -1087,29 +1085,29 @@ export default function EventDetailPage() {
           )}
 
           {/* SYARAT, KETENTUAN & PANDUAN MASUK */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="astro-card rounded-3xl p-6 sm:p-8 space-y-4 border border-white/10 bg-slate-900/70 shadow-2xl">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[#00F0FF] uppercase tracking-wider">
                 Tata Tertib Venue
               </span>
-              <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                <Info className="w-4 h-4 text-[#08ADAE]" />
+              <h3 className="font-bold text-white text-base sm:text-lg flex items-center gap-2">
+                <Info className="w-4 h-4 text-[#00F0FF]" />
                 <span>Syarat & Ketentuan Menghadiri Acara</span>
               </h3>
             </div>
 
-            <div className="space-y-2.5 text-xs text-slate-600 leading-relaxed pt-1">
+            <div className="space-y-2.5 text-xs text-slate-300 leading-relaxed pt-1">
               <div className="flex items-start gap-2.5">
-                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                <span className="h-5 w-5 rounded-full bg-white/10 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 border border-white/10">
                   1
                 </span>
                 <p>
-                  Pengunjung wajib menunjukkan <strong>QR Code E-Ticket</strong> resmi TAQtix dari pesan WhatsApp atau menu Tiket Saya di pintu masuk gerbang.
+                  Pengunjung wajib menunjukkan <strong className="text-white">QR Code E-Ticket</strong> resmi TAQtix dari pesan WhatsApp atau menu Tiket Saya di pintu masuk gerbang.
                 </p>
               </div>
 
               <div className="flex items-start gap-2.5">
-                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                <span className="h-5 w-5 rounded-full bg-white/10 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 border border-white/10">
                   2
                 </span>
                 <p>
@@ -1118,7 +1116,7 @@ export default function EventDetailPage() {
               </div>
 
               <div className="flex items-start gap-2.5">
-                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                <span className="h-5 w-5 rounded-full bg-white/10 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 border border-white/10">
                   3
                 </span>
                 <p>
@@ -1127,7 +1125,7 @@ export default function EventDetailPage() {
               </div>
 
               <div className="flex items-start gap-2.5">
-                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                <span className="h-5 w-5 rounded-full bg-white/10 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 border border-white/10">
                   4
                 </span>
                 <p>
@@ -1138,27 +1136,27 @@ export default function EventDetailPage() {
           </div>
 
           {/* LOKASI VENUE & PETUNJUK MAPS */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="astro-card rounded-3xl p-6 sm:p-8 space-y-4 border border-white/10 bg-slate-900/70 shadow-2xl">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-[#00F0FF] uppercase tracking-wider">
                   Peta Lokasi
                 </span>
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                  <Navigation className="w-4 h-4 text-[#08ADAE]" />
+                <h3 className="font-bold text-white text-base sm:text-lg flex items-center gap-2">
+                  <Navigation className="w-4 h-4 text-[#00F0FF]" />
                   <span>Lokasi Venue Acara</span>
                 </h3>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 space-y-0">
+            <div className="rounded-2xl border border-white/10 overflow-hidden bg-slate-950 space-y-0">
               {/* INTERACTIVE EMBEDDED GOOGLE MAP */}
-              <div className="w-full h-64 sm:h-80 bg-slate-100 relative overflow-hidden">
+              <div className="w-full h-64 sm:h-80 bg-slate-950 relative overflow-hidden">
                 <iframe
                   title="Peta Lokasi Acara"
                   width="100%"
                   height="100%"
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0 filter invert-[0.9] hue-rotate-180 brightness-90"
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
@@ -1169,25 +1167,25 @@ export default function EventDetailPage() {
               </div>
 
               {/* Venue details and actions below map */}
-              <div className="p-4 sm:p-5 space-y-3 bg-white">
+              <div className="p-4 sm:p-5 space-y-3 bg-slate-950/70 border-t border-white/10">
                 <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0 mt-0.5">
+                  <div className="h-9 w-9 rounded-xl bg-[#08ADAE]/15 border border-[#08ADAE]/30 flex items-center justify-center text-[#00F0FF] shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div className="space-y-0.5 flex-1">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">{event.location}</h4>
-                    <p className="text-[11px] text-slate-500">
+                    <h4 className="text-xs sm:text-sm font-bold text-white">{event.location}</h4>
+                    <p className="text-[11px] text-slate-400">
                       Pastikan tiba di lokasi minimal 30-60 menit sebelum sesi acara dimulai.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-white/10">
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#08ADAE] text-white text-xs font-bold hover:bg-[#07999A] transition shadow-xs cursor-pointer active:scale-95"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 text-xs font-bold hover:brightness-110 transition shadow-[0_0_15px_rgba(8,173,174,0.4)] cursor-pointer active:scale-95"
                   >
                     <Navigation className="w-3.5 h-3.5" />
                     <span>Buka Rute di Google Maps</span>
@@ -1199,7 +1197,7 @@ export default function EventDetailPage() {
                     }}
                     variant="outline"
                     size="sm"
-                    className="rounded-xl text-xs font-semibold border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    className="rounded-xl text-xs font-semibold border-white/10 astro-glass text-slate-300 hover:text-white cursor-pointer"
                   >
                     <Copy className="w-3.5 h-3.5" />
                     <span>Salin Alamat</span>
@@ -1214,11 +1212,11 @@ export default function EventDetailPage() {
         {/* RIGHT COLUMN: STICKY TICKET SELECTION & CHECKOUT SIDEBAR                   */}
         {/* ========================================================================= */}
         <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
-          <Card className="bg-white border-slate-200 shadow-sm rounded-3xl overflow-hidden">
-            <CardHeader className="border-b border-slate-100 pb-4 bg-slate-50/50">
-              <CardTitle className="text-base font-bold text-slate-900 flex items-center justify-between">
+          <Card className="astro-card bg-slate-900/80 border border-white/15 shadow-2xl rounded-3xl overflow-hidden">
+            <CardHeader className="border-b border-white/10 pb-4 bg-slate-950/50">
+              <CardTitle className="text-base font-bold text-white flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  <Ticket className="h-4 w-4 text-[#08ADAE]" />
+                  <Ticket className="h-4 w-4 text-[#00F0FF]" />
                   <span>Pilih Kategori Tiket</span>
                 </span>
                 <span className="text-[11px] font-semibold text-slate-400">
@@ -1229,11 +1227,11 @@ export default function EventDetailPage() {
 
             <CardContent className="p-5 sm:p-6 space-y-6">
               {event.requireLogin && (
-                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2.5">
-                  <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2.5">
+                  <Lock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold block text-amber-950">Wajib Masuk Akun</span>
-                    <span className="text-[11px] text-amber-800 leading-tight">
+                    <span className="font-bold block text-amber-200">Wajib Masuk Akun</span>
+                    <span className="text-[11px] text-amber-300/80 leading-tight">
                       Pemesanan tiket event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.
                     </span>
                   </div>
@@ -1254,14 +1252,14 @@ export default function EventDetailPage() {
                         key={category.id}
                         className={`flex flex-col justify-between p-4 border rounded-2xl space-y-3 transition-colors ${
                           selected > 0
-                            ? 'border-[#08ADAE] bg-[#08ADAE]/5'
-                            : 'border-slate-200 hover:border-slate-300 bg-white'
+                            ? 'border-[#00F0FF] bg-[#00F0FF]/10'
+                            : 'border-white/10 hover:border-white/20 bg-slate-950/60'
                         }`}
                       >
                         <div className="flex justify-between items-start gap-2">
                           <div className="space-y-0.5">
-                            <h4 className="text-xs sm:text-sm font-bold text-slate-900">{category.name}</h4>
-                            <span className="text-[#08ADAE] text-xs sm:text-sm font-black block">
+                            <h4 className="text-xs sm:text-sm font-bold text-white">{category.name}</h4>
+                            <span className="text-[#00F0FF] text-xs sm:text-sm font-black block font-mono">
                               {category.price.toLocaleString('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
@@ -1270,18 +1268,18 @@ export default function EventDetailPage() {
                             </span>
                           </div>
                           {isSoldOut ? (
-                            <span className="text-[9px] font-bold text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            <span className="text-[9px] font-bold text-rose-400 bg-rose-950/40 border border-rose-500/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                               Habis Terjual
                             </span>
                           ) : (
-                            <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                               Tersedia
                             </span>
                           )}
                         </div>
 
                         {!isSoldOut && (
-                          <div className="flex justify-between items-center pt-1 border-t border-slate-100">
+                          <div className="flex justify-between items-center pt-1 border-t border-white/10">
                             <span className="text-[10px] text-slate-400 font-medium">
                               Maks. {category.maxPerOrder} tiket
                             </span>
@@ -1290,12 +1288,12 @@ export default function EventDetailPage() {
                                 type="button"
                                 onClick={() => handleQtyChange(category.id, -1, category.maxPerOrder)}
                                 disabled={selected === 0}
-                                className="h-7 w-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-white transition cursor-pointer"
+                                className="h-7 w-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-white/20 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-slate-900 transition cursor-pointer text-white"
                                 aria-label="Kurangi tiket"
                               >
-                                <Minus className="h-3.5 w-3.5 text-slate-600" />
+                                <Minus className="h-3.5 w-3.5 text-slate-300" />
                               </button>
-                              <span className="w-5 text-center font-bold text-xs sm:text-sm text-slate-900 font-mono">
+                              <span className="w-5 text-center font-bold text-xs sm:text-sm text-white font-mono">
                                 {selected}
                               </span>
                               <button
@@ -1304,10 +1302,10 @@ export default function EventDetailPage() {
                                   handleQtyChange(category.id, 1, Math.min(remaining, category.maxPerOrder))
                                 }
                                 disabled={selected >= Math.min(remaining, category.maxPerOrder)}
-                                className="h-7 w-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-white transition cursor-pointer"
+                                className="h-7 w-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-white/20 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-slate-900 transition cursor-pointer text-white"
                                 aria-label="Tambah tiket"
                               >
-                                <Plus className="h-3.5 w-3.5 text-slate-600" />
+                                <Plus className="h-3.5 w-3.5 text-slate-300" />
                               </button>
                             </div>
                           </div>
@@ -1319,7 +1317,7 @@ export default function EventDetailPage() {
               )}
 
               {/* ALWAYS-VISIBLE SUMMARY & CHECKOUT CALL-TO-ACTION */}
-              <div className="border-t border-slate-200/80 pt-4 space-y-4">
+              <div className="border-t border-white/10 pt-4 space-y-4">
                 {totalSelectedQty > 0 ? (
                   <div className="space-y-3">
                     <div className="space-y-1.5 text-xs">
@@ -1327,11 +1325,11 @@ export default function EventDetailPage() {
                         const cat = event.ticketCategories.find((c) => c.id === item.categoryId);
                         if (!cat) return null;
                         return (
-                          <div key={item.categoryId} className="flex justify-between text-slate-600">
+                          <div key={item.categoryId} className="flex justify-between text-slate-300">
                             <span>
                               {item.qty}x {cat.name}
                             </span>
-                            <span className="font-semibold text-slate-900">
+                            <span className="font-semibold text-white font-mono">
                               {(cat.price * item.qty).toLocaleString('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
@@ -1343,10 +1341,10 @@ export default function EventDetailPage() {
                       })}
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
                       <div>
                         <span className="text-[11px] text-slate-400 block font-medium">Total Pembayaran</span>
-                        <span className="text-lg font-black text-slate-900">
+                        <span className="text-lg font-black text-[#F0B829] font-mono">
                           {totalCost.toLocaleString('id-ID', {
                             style: 'currency',
                             currency: 'IDR',
@@ -1354,14 +1352,14 @@ export default function EventDetailPage() {
                           })}
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-[#08ADAE] bg-[#08ADAE]/10 px-2.5 py-1 rounded-full">
+                      <span className="text-xs font-bold text-[#00F0FF] bg-[#00F0FF]/10 px-2.5 py-1 rounded-full border border-[#00F0FF]/25">
                         {totalSelectedQty} Tiket
                       </span>
                     </div>
 
                     <Button
                       onClick={handleCheckout}
-                      className="w-full bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold py-3.5 px-4 rounded-xl transition duration-150 shadow-sm cursor-pointer active:scale-[0.98] border-0 text-xs flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 text-slate-950 font-black py-3.5 px-4 rounded-xl transition duration-150 shadow-[0_0_24px_rgba(8,173,174,0.45)] cursor-pointer active:scale-[0.98] border-0 text-xs flex items-center justify-center gap-2"
                     >
                       <span>Lanjutkan ke Checkout</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1375,7 +1373,7 @@ export default function EventDetailPage() {
                     </div>
                     <Button
                       disabled
-                      className="w-full bg-slate-100 text-slate-400 font-bold py-3.5 px-4 rounded-xl text-xs cursor-not-allowed border-0"
+                      className="w-full bg-slate-800 text-slate-500 font-bold py-3.5 px-4 rounded-xl text-xs cursor-not-allowed border-0"
                     >
                       Pilih Minimal 1 Tiket
                     </Button>
@@ -1387,21 +1385,21 @@ export default function EventDetailPage() {
               </div>
 
               {/* JAMINAN TRANSAKSI AMAN */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2.5 text-xs">
-                <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider block">
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 space-y-2.5 text-xs">
+                <span className="font-bold text-slate-200 text-[11px] uppercase tracking-wider block">
                   Jaminan Transaksi TAQtix
                 </span>
-                <div className="space-y-2 text-[11px] text-slate-600">
+                <div className="space-y-2 text-[11px] text-slate-300">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>100% Tiket Resmi & Terverifikasi</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <Smartphone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>E-Ticket Langsung Masuk WhatsApp</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Zap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>Kuota Terkunci saat Checkout</span>
                   </div>
                 </div>
@@ -1409,22 +1407,22 @@ export default function EventDetailPage() {
 
               {/* METODE PEMBAYARAN RESMI */}
               <div className="space-y-2 text-xs">
-                <span className="font-bold text-slate-700 text-[11px] uppercase tracking-wider block">
+                <span className="font-bold text-slate-200 text-[11px] uppercase tracking-wider block">
                   Metode Pembayaran
                 </span>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Mendukung Virtual Account resmi (BNI, BRI BRIVA, Mandiri, Permata) serta Gerai Retail (Indomaret, Alfamart) dengan verifikasi otomatis 24 jam.
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Mendukung QRIS instan, Virtual Account resmi (BNI, BRI BRIVA, Mandiri, Permata) serta Gerai Retail dengan verifikasi otomatis 24 jam.
                 </p>
               </div>
 
               {/* BANTUAN PELANGGAN */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
                 <span>Butuh bantuan pemesanan?</span>
                 <a
                   href="https://wa.me/628158006658"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-bold text-[#08ADAE] hover:underline flex items-center gap-1"
+                  className="font-bold text-[#00F0FF] hover:underline flex items-center gap-1"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
                   <span>CS WhatsApp</span>

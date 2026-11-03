@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, MessageSquare, Ticket, CreditCard, UserCheck, ChevronDown, ChevronUp } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface FAQItem {
@@ -82,7 +81,7 @@ export default function HelpPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-[#08B4B5] transition cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-[#00F0FF] transition cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Kembali ke Beranda</span>
@@ -91,18 +90,19 @@ export default function HelpPage() {
 
       {/* Header Section */}
       <div className="space-y-3 text-center max-w-2xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
           Pusat Bantuan & FAQ
         </h1>
-        <p className="text-slate-500 text-sm">
+        <p className="text-slate-400 text-sm">
           Temukan jawaban atas pertanyaan umum seputar pemesanan tiket, metode pembayaran, program afiliasi, dan kendala lapangan.
         </p>
       </div>
 
-      {/* Categories Tabs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Categories Tab */}
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {categories.map((cat) => {
-          const IconComponent = cat.icon;
+          const Icon = cat.icon;
+          const isActive = activeCategory === cat.name;
           return (
             <button
               key={cat.name}
@@ -111,63 +111,65 @@ export default function HelpPage() {
                 setOpenIndexes([]);
               }}
               className={cn(
-                "p-4 rounded-2xl border text-center flex flex-col items-center justify-center space-y-2.5 transition cursor-pointer",
-                activeCategory === cat.name
-                  ? "bg-[#08B4B5] border-[#08B4B5] text-white shadow-sm"
-                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                'flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer border',
+                isActive
+                  ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-bold border-transparent shadow-[0_0_20px_rgba(0,240,255,0.35)]'
+                  : 'astro-glass text-slate-300 hover:text-white hover:border-white/25 border-white/10'
               )}
             >
-              <IconComponent className="h-5 w-5" />
-              <span className="text-xs font-bold leading-tight">{cat.name}</span>
+              <Icon className="h-4 w-4" />
+              <span>{cat.name}</span>
             </button>
           );
         })}
       </div>
 
-      {/* FAQs List */}
+      {/* FAQ Accordion */}
       <div className="space-y-3">
-        {filteredFaqs.map((faq, i) => {
-          const isOpen = openIndexes.includes(i);
+        {filteredFaqs.map((faq, index) => {
+          const isOpen = openIndexes.includes(index);
           return (
-            <Card
-              key={i}
-              className="bg-white border-slate-200 shadow-sm rounded-xl overflow-hidden"
+            <div
+              key={index}
+              className="astro-card rounded-2xl overflow-hidden border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all shadow-md"
             >
               <button
-                onClick={() => toggleFAQ(i)}
-                className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50/50 transition cursor-pointer"
+                onClick={() => toggleFAQ(index)}
+                className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer hover:bg-white/[0.04] transition-colors"
               >
-                <span className="text-xs sm:text-sm font-bold text-slate-800 pr-4">
+                <span className="font-semibold text-white text-sm sm:text-base">
                   {faq.question}
                 </span>
-                {isOpen ? (
-                  <ChevronUp className="h-4 w-4 text-slate-500 shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
-                )}
+                <span className="p-1 rounded-full bg-white/10 text-slate-300 shrink-0">
+                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </span>
               </button>
+
               {isOpen && (
-                <div className="px-6 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                <div className="px-5 pb-5 pt-1 text-slate-300 text-xs sm:text-sm leading-relaxed border-t border-white/10">
                   {faq.answer}
                 </div>
               )}
-            </Card>
+            </div>
           );
         })}
       </div>
 
-      {/* Still Need Help */}
-      <div className="text-center pt-8 border-t border-slate-200 space-y-4">
-        <h3 className="text-lg font-bold text-slate-900">Masih Butuh Bantuan?</h3>
-        <p className="text-slate-500 text-xs max-w-sm mx-auto leading-relaxed">
-          Jika Anda tidak menemukan solusi yang Anda cari, jangan ragu untuk langsung berkonsultasi dengan tim dukungan support kami.
+      {/* Contact Support Banner */}
+      <div className="astro-glass rounded-2xl p-6 sm:p-8 text-center space-y-4 border border-white/10 shadow-2xl bg-gradient-to-br from-slate-900/90 via-slate-950/95 to-[#060913]">
+        <h3 className="font-bold text-white text-lg sm:text-xl">
+          Masih Belum Menemukan Jawaban?
+        </h3>
+        <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
+          Tim Customer Support kami siap membantu kendala transaksi atau pertanyaan teknis Anda setiap hari.
         </p>
-        <div className="flex justify-center gap-4">
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white font-bold px-6 py-2.5 rounded-xl transition shadow-sm text-xs cursor-pointer border-0"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-black text-slate-950 bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 transition shadow-[0_0_20px_rgba(8,173,174,0.4)] cursor-pointer"
           >
-            Hubungi Customer Service
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>Hubungi Customer Support</span>
           </Link>
         </div>
       </div>

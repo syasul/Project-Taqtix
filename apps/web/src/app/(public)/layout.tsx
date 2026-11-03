@@ -6,16 +6,19 @@ import { Ticket, ShieldCheck, Mail, ArrowUpRight } from 'lucide-react';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col min-h-screen bg-liquid-canvas text-slate-900 relative selection:bg-[#08ADAE]/20 selection:text-[#08ADAE]">
+    <div className="flex flex-col min-h-screen bg-astro-canvas text-slate-100 relative selection:bg-[#08ADAE]/30 selection:text-[#00F0FF]">
       <Header />
       <main className="flex-1 w-full pt-24 sm:pt-28">
         {children}
       </main>
 
-      {/* Modern Liquid Glass Style Footer */}
-      <footer className="border-t border-white/80 bg-white/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-slate-100">
+      {/* Astro Cosmic Dark Style Footer */}
+      <footer className="border-t border-white/10 bg-slate-950/85 backdrop-blur-2xl relative overflow-hidden">
+        {/* Glowing top line */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#08ADAE]/50 to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-white/10">
             {/* Brand column */}
             <div className="md:col-span-4 space-y-4">
               <Link href="/" className="flex items-center gap-2">
@@ -24,22 +27,22 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   alt="TAQtix Logo"
                   width={120}
                   height={34}
-                  className="h-8 w-auto object-contain"
+                  className="h-8 w-auto object-contain drop-shadow-[0_0_12px_rgba(8,173,174,0.35)]"
                 />
               </Link>
-              <p className="text-sm text-slate-500 leading-relaxed max-w-sm">
+              <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
                 Cari konser, festival, workshop, olahraga, pertunjukan seni, dan berbagai pengalaman menarik lainnya. Temukan event favoritmu dan pesan tiketnya dengan mudah di TAQtix.
               </p>
-              <div className="text-xs text-slate-500 space-y-1.5 pt-1">
+              <div className="text-xs text-slate-400 space-y-1.5 pt-1">
                 <p>
-                  <span className="font-semibold text-slate-700">Email:</span>{' '}
-                  <a href="mailto:halo@taqtix.id" className="hover:text-[#08ADAE] transition-colors">
+                  <span className="font-semibold text-slate-300">Email:</span>{' '}
+                  <a href="mailto:halo@taqtix.id" className="hover:text-[#00F0FF] transition-colors">
                     halo@taqtix.id
                   </a>
                 </p>
                 <p>
-                  <span className="font-semibold text-slate-700">WhatsApp:</span>{' '}
-                  <a href="https://wa.me/628158006658" target="_blank" rel="noopener noreferrer" className="hover:text-[#08ADAE] transition-colors">
+                  <span className="font-semibold text-slate-300">WhatsApp:</span>{' '}
+                  <a href="https://wa.me/628158006658" target="_blank" rel="noopener noreferrer" className="hover:text-[#00F0FF] transition-colors">
                     +62 815-800-6658
                   </a>
                 </p>
@@ -48,8 +51,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 </p>
               </div>
               <div className="flex items-center gap-2 pt-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                   Sistem Aktif & Terlindungi
                 </span>
               </div>
@@ -61,42 +64,42 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Jelajahi Event</h4>
                 <ul className="space-y-2 text-sm">
                   <li>
-                    <Link href="/events" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/events" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Semua Event
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Konser%20%26%20Festival%20Musik" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Konser%20%26%20Festival%20Musik" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Konser & Festival Musik
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Workshop%2C%20Seminar%20%26%20Konferensi" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Workshop%2C%20Seminar%20%26%20Konferensi" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Workshop, Seminar & Konferensi
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Sport" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Sport" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Sport
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Pertunjukan%20Seni%20%26%20Budaya" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Pertunjukan%20Seni%20%26%20Budaya" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Pertunjukan Seni & Budaya
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Event%20Komunitas%20%26%20Gathering" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Event%20Komunitas%20%26%20Gathering" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Event Komunitas & Gathering
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Event%20Religi%20%26%20Sosial" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Event%20Religi%20%26%20Sosial" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Event Religi & Sosial
                     </Link>
                   </li>
                   <li>
-                    <Link href="/?category=Pameran" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/?category=Pameran" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Pameran
                     </Link>
                   </li>
@@ -111,7 +114,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                       href={process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/register'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-slate-600 hover:text-[#08ADAE] transition-colors"
+                      className="inline-flex items-center gap-1 text-slate-400 hover:text-[#00F0FF] transition-colors"
                     >
                       <span>Bikin Event (EO)</span>
                       <ArrowUpRight className="h-3.5 w-3.5 text-slate-400" />
@@ -122,13 +125,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                       href={process.env.NEXT_PUBLIC_EO_URL || 'http://localhost:3003/login'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-slate-600 hover:text-[#08ADAE] transition-colors"
+                      className="text-slate-400 hover:text-[#00F0FF] transition-colors"
                     >
                       Portal Masuk EO
                     </a>
                   </li>
                   <li>
-                    <Link href="/help" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/help" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Panduan Kru & Scanner
                     </Link>
                   </li>
@@ -139,23 +142,23 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Bantuan & Info</h4>
                 <ul className="space-y-2 text-sm">
                   <li>
-                    <Link href="/check-ticket" className="text-[#08ADAE] font-semibold hover:underline transition-colors flex items-center gap-1.5">
+                    <Link href="/check-ticket" className="text-[#00F0FF] font-semibold hover:underline transition-colors flex items-center gap-1.5">
                       <span>Cek & Cari Tiket</span>
-                      <span className="text-[10px] bg-[#08ADAE]/10 px-1.5 py-0.5 rounded-full font-bold">GUEST</span>
+                      <span className="text-[10px] bg-teal-500/10 border border-teal-500/30 px-1.5 py-0.5 rounded-full font-bold">GUEST</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/about" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/about" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Tentang TAQtix
                     </Link>
                   </li>
                   <li>
-                    <Link href="/help" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/help" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Help Center (Pusat Bantuan)
                     </Link>
                   </li>
                   <li>
-                    <Link href="/contact" className="text-slate-600 hover:text-[#08ADAE] transition-colors">
+                    <Link href="/contact" className="text-slate-400 hover:text-[#00F0FF] transition-colors">
                       Hubungi Tim Kami
                     </Link>
                   </li>
@@ -165,13 +168,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <p>© {new Date().getFullYear()} TAQtix Inc. Hak Cipta Dilindungi Undang-Undang.</p>
             <div className="flex items-center gap-6">
-              <Link href="/help" className="hover:text-[#08ADAE] transition">Syarat & Ketentuan</Link>
-              <Link href="/help" className="hover:text-[#08ADAE] transition">Kebijakan Privasi</Link>
-              <span className="text-slate-300">•</span>
-              <span className="text-[#08ADAE] font-semibold">TAQtix Ticketing Suite</span>
+              <Link href="/help" className="hover:text-[#00F0FF] transition">Syarat & Ketentuan</Link>
+              <Link href="/help" className="hover:text-[#00F0FF] transition">Kebijakan Privasi</Link>
+              <span className="text-slate-600">•</span>
+              <span className="text-[#00F0FF] font-semibold">TAQtix Ticketing Suite</span>
             </div>
           </div>
         </div>

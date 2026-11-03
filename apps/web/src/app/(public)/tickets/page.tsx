@@ -208,11 +208,12 @@ export default function AllTicketsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-      {/* Header Banner (Solid Professional Dark) */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-10 text-white shadow-xl">
+      {/* Header Banner (Astro Cosmic Glass) */}
+      <div className="relative overflow-hidden rounded-3xl astro-glass border border-white/10 p-6 sm:p-10 text-white shadow-2xl bg-gradient-to-br from-slate-900/90 via-slate-950/95 to-[#060913]">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#08ADAE]/20 rounded-full blur-[100px] pointer-events-none" />
         <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#08ADAE] bg-[#08ADAE]/10 border border-[#08ADAE]/30">
-            <Ticket className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#00F0FF] bg-[#08ADAE]/15 border border-[#08ADAE]/30 astro-glass-pill">
+            <Ticket className="w-3.5 h-3.5 text-[#00F0FF]" />
             <span>Pusat Tiket Resmi TAQtix</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
@@ -233,13 +234,13 @@ export default function AllTicketsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari via No WhatsApp (08...), Email, atau Order ID..."
-                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-0 focus:border-[#08ADAE] transition"
+                className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-950/60 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#00F0FF] transition"
               />
             </div>
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-[#08ADAE] hover:bg-[#07999a] text-slate-950 font-bold px-6 py-3 rounded-2xl shrink-0 cursor-pointer shadow-md transition"
+              className="bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#08ADAE] hover:brightness-110 text-slate-950 font-black px-6 py-3 rounded-xl shrink-0 cursor-pointer shadow-[0_0_20px_rgba(8,173,174,0.4)] transition"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -263,7 +264,7 @@ export default function AllTicketsPage() {
                   setSearchedKeyword('');
                   setSearchQuery('');
                 }}
-                className="text-[#08ADAE] hover:underline cursor-pointer ml-1"
+                className="text-[#00F0FF] hover:underline cursor-pointer ml-1"
               >
                 Reset
               </button>
@@ -273,15 +274,15 @@ export default function AllTicketsPage() {
       </div>
 
       {/* Tabs & Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div className="flex items-center gap-1.5 astro-glass p-1 rounded-2xl border border-white/10 shadow-xs">
           <button
             type="button"
             onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer border ${
               activeFilter === 'all'
-                ? 'bg-[#08ADAE] text-slate-950 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-bold border-transparent shadow-[0_0_15px_rgba(0,240,255,0.35)]'
+                : 'text-slate-300 hover:text-white border-transparent'
             }`}
           >
             Semua ({tickets.length})
@@ -289,10 +290,10 @@ export default function AllTicketsPage() {
           <button
             type="button"
             onClick={() => setActiveFilter('upcoming')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer border ${
               activeFilter === 'upcoming'
-                ? 'bg-[#08ADAE] text-slate-950 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-bold border-transparent shadow-[0_0_15px_rgba(0,240,255,0.35)]'
+                : 'text-slate-300 hover:text-white border-transparent'
             }`}
           >
             Mendatang
@@ -300,10 +301,10 @@ export default function AllTicketsPage() {
           <button
             type="button"
             onClick={() => setActiveFilter('past')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer border ${
               activeFilter === 'past'
-                ? 'bg-[#08ADAE] text-slate-950 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] text-slate-950 font-bold border-transparent shadow-[0_0_15px_rgba(0,240,255,0.35)]'
+                : 'text-slate-300 hover:text-white border-transparent'
             }`}
           >
             Selesai / Digunakan
@@ -311,11 +312,11 @@ export default function AllTicketsPage() {
         </div>
 
         {!user && (
-          <div className="text-xs text-slate-500 flex items-center gap-1.5">
+          <div className="text-xs text-slate-400 flex items-center gap-1.5">
             <span>Punya akun TAQtix?</span>
             <Link
               href="/login?redirect=/tickets"
-              className="text-[#08ADAE] font-bold hover:underline"
+              className="text-[#00F0FF] font-bold hover:underline"
             >
               Masuk untuk sinkronisasi otomatis &rarr;
             </Link>
@@ -329,12 +330,12 @@ export default function AllTicketsPage() {
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs animate-pulse space-y-4"
+              className="astro-card rounded-3xl p-6 border border-white/10 shadow-xs animate-pulse space-y-4 bg-slate-900/60"
             >
-              <div className="h-6 bg-slate-200 rounded-md w-3/4" />
-              <div className="h-4 bg-slate-100 rounded-md w-1/2" />
-              <div className="h-24 bg-slate-100 rounded-2xl" />
-              <div className="h-10 bg-slate-200 rounded-xl" />
+              <div className="h-6 bg-slate-800 rounded-md w-3/4" />
+              <div className="h-4 bg-slate-800/60 rounded-md w-1/2" />
+              <div className="h-24 bg-slate-800/60 rounded-2xl" />
+              <div className="h-10 bg-slate-800 rounded-xl" />
             </div>
           ))}
         </div>
@@ -342,25 +343,25 @@ export default function AllTicketsPage() {
 
       {/* Empty State */}
       {!isLoading && filteredTickets.length === 0 && (
-        <div className="text-center py-16 px-4 bg-white rounded-3xl border border-slate-200 shadow-xs max-w-lg mx-auto space-y-5">
-          <div className="w-16 h-16 rounded-2xl bg-[#08ADAE]/10 text-[#08ADAE] mx-auto flex items-center justify-center">
+        <div className="text-center py-16 px-4 astro-glass rounded-3xl border border-white/10 shadow-2xl max-w-lg mx-auto space-y-5 bg-slate-900/60">
+          <div className="w-16 h-16 rounded-2xl bg-[#08ADAE]/15 text-[#00F0FF] border border-[#08ADAE]/30 mx-auto flex items-center justify-center">
             <Ticket className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-bold text-slate-900">Belum Ada Tiket yang Ditampilkan</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <h3 className="text-xl font-bold text-white">Belum Ada Tiket yang Ditampilkan</h3>
+            <p className="text-sm text-slate-400 leading-relaxed">
               Jika Anda baru saja memesan tiket, silakan cari menggunakan <strong>Nomor WhatsApp</strong> atau <strong>Email</strong> yang Anda gunakan saat checkout pada kolom pencarian di atas.
             </p>
           </div>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/" className="w-full sm:w-auto">
-              <Button className="w-full bg-[#08ADAE] hover:bg-[#07999a] text-slate-950 font-bold rounded-xl cursor-pointer">
+              <Button className="w-full bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] hover:brightness-110 text-slate-950 font-bold rounded-xl cursor-pointer">
                 Jelajahi Event Seru
               </Button>
             </Link>
             {!user && (
               <Link href="/login?redirect=/tickets" className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full border-slate-200 rounded-xl cursor-pointer">
+                <Button variant="outline" className="w-full border-white/10 astro-glass text-white rounded-xl cursor-pointer">
                   Masuk ke Akun
                 </Button>
               </Link>
@@ -379,19 +380,19 @@ export default function AllTicketsPage() {
             return (
               <div
                 key={ticket.ticketId}
-                className="group relative bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group relative astro-card rounded-3xl border border-white/10 bg-slate-900/70 shadow-xl hover:border-[#00F0FF]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 {/* Perforated Decorative Line on Top */}
-                <div className="h-2 w-full bg-linear-to-r from-[#08ADAE] via-teal-400 to-emerald-400" />
+                <div className="h-1.5 w-full bg-gradient-to-r from-[#08ADAE] via-[#00F0FF] to-[#A855F7]" />
 
                 <div className="p-6 space-y-5">
                   {/* Event & Category Header */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#08ADAE]/10 text-[#08ADAE] border border-[#08ADAE]/20">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#00F0FF]/10 text-[#00F0FF] border border-[#00F0FF]/25">
                         {ticket.ticketCategory}
                       </span>
-                      <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 group-hover:text-[#08ADAE] transition-colors leading-snug line-clamp-2">
+                      <h3 className="text-lg sm:text-xl font-extrabold text-white group-hover:text-[#00F0FF] transition-colors leading-snug line-clamp-2">
                         {ticket.eventTitle}
                       </h3>
                       {ticket.organizerName && (
@@ -402,17 +403,17 @@ export default function AllTicketsPage() {
                     {/* Status Badge */}
                     <div className="shrink-0">
                       {isTicketValid ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-950/40 text-emerald-400 border border-emerald-500/30">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Siap Digunakan
                         </span>
                       ) : isTicketCheckedIn ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-blue-950/40 text-blue-400 border border-blue-500/30">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Sudah Check-In
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-950/40 text-rose-400 border border-rose-500/30">
                           <AlertCircle className="w-3.5 h-3.5" />
                           {ticket.ticketStatus}
                         </span>
@@ -421,10 +422,10 @@ export default function AllTicketsPage() {
                   </div>
 
                   {/* Event Metadata */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300 bg-slate-950/60 p-4 rounded-2xl border border-white/10">
                     <div className="flex items-center gap-2">
-                      <Calendar className={cn('w-4 h-4 shrink-0', ticket.isDateTba ? 'text-amber-500' : 'text-[#08ADAE]')} />
-                      <span className={cn('truncate', ticket.isDateTba && 'text-amber-600 font-semibold')}>
+                      <Calendar className={cn('w-4 h-4 shrink-0', ticket.isDateTba ? 'text-amber-400' : 'text-[#00F0FF]')} />
+                      <span className={cn('truncate', ticket.isDateTba && 'text-amber-400 font-semibold')}>
                         {ticket.isDateTba
                           ? 'Waktu & Tanggal TBA'
                           : ticket.eventStartDate
@@ -433,20 +434,20 @@ export default function AllTicketsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-[#08ADAE] shrink-0" />
+                      <MapPin className="w-4 h-4 text-[#00F0FF] shrink-0" />
                       <span className="truncate" title={ticket.eventLocation}>
                         {ticket.eventLocation || 'Lokasi TBA'}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-slate-400 shrink-0" />
-                      <span className="truncate font-semibold text-slate-800">
+                      <span className="truncate font-semibold text-white">
                         {ticket.buyerName}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Ticket className="w-4 h-4 text-slate-400 shrink-0" />
-                      <span className="font-mono text-slate-600 truncate">
+                      <span className="font-mono text-slate-400 truncate">
                         ID: {ticket.ticketId.slice(0, 10)}...
                       </span>
                     </div>
@@ -455,19 +456,19 @@ export default function AllTicketsPage() {
 
                 {/* Perforated Coupon Cut Divider */}
                 <div className="relative flex items-center px-4">
-                  <div className="absolute left-0 -translate-x-1/2 w-5 h-5 rounded-full bg-slate-100 border-r border-slate-200 shadow-inner" />
-                  <div className="w-full border-t-2 border-dashed border-slate-200" />
-                  <div className="absolute right-0 translate-x-1/2 w-5 h-5 rounded-full bg-slate-100 border-l border-slate-200 shadow-inner" />
+                  <div className="absolute left-0 -translate-x-1/2 w-5 h-5 rounded-full bg-[#060913] border-r border-white/10" />
+                  <div className="w-full border-t-2 border-dashed border-white/10" />
+                  <div className="absolute right-0 translate-x-1/2 w-5 h-5 rounded-full bg-[#060913] border-l border-white/10" />
                 </div>
 
                 {/* Bottom Actions Bar */}
-                <div className="p-4 sm:p-6 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+                <div className="p-4 sm:p-6 bg-slate-950/40 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     {/* Tombol QR Code Pop-up */}
                     <Button
                       type="button"
                       onClick={() => setSelectedQrTicket(ticket)}
-                      className="bg-[#08ADAE] hover:bg-[#07999a] text-slate-950 font-bold rounded-xl text-xs px-3.5 py-2 cursor-pointer flex items-center gap-1.5 shadow-xs"
+                      className="bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] hover:brightness-110 text-slate-950 font-bold rounded-xl text-xs px-3.5 py-2 cursor-pointer flex items-center gap-1.5 shadow-[0_0_15px_rgba(8,173,174,0.35)]"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       <span>Buka QR Scan</span>
@@ -478,7 +479,7 @@ export default function AllTicketsPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="border-slate-200 hover:bg-white text-slate-700 font-semibold rounded-xl text-xs px-3 py-2 cursor-pointer flex items-center gap-1"
+                        className="border-white/10 astro-glass hover:bg-white/10 text-slate-200 font-semibold rounded-xl text-xs px-3 py-2 cursor-pointer flex items-center gap-1"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>Detail</span>
@@ -493,10 +494,10 @@ export default function AllTicketsPage() {
                       title="Kirim ulang tiket ke WhatsApp & Email"
                       disabled={resendingId === ticket.ticketId}
                       onClick={() => handleResend(ticket.ticketId)}
-                      className="p-2 text-slate-500 hover:text-[#08ADAE] hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition cursor-pointer"
+                      className="p-2 text-slate-400 hover:text-[#00F0FF] hover:bg-white/10 rounded-xl border border-transparent hover:border-white/10 transition cursor-pointer"
                     >
                       {resendingId === ticket.ticketId ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-[#08ADAE]" />
+                        <Loader2 className="w-4 h-4 animate-spin text-[#00F0FF]" />
                       ) : (
                         <Send className="w-4 h-4" />
                       )}
@@ -507,7 +508,7 @@ export default function AllTicketsPage() {
                       type="button"
                       title="Salin tautan tiket"
                       onClick={() => handleCopyLink(ticket.ticketId)}
-                      className="p-2 text-slate-500 hover:text-slate-900 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition cursor-pointer"
+                      className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl border border-transparent hover:border-white/10 transition cursor-pointer"
                     >
                       <Copy className="w-4 h-4" />
                     </button>
@@ -521,29 +522,29 @@ export default function AllTicketsPage() {
 
       {/* MODAL INTERAKTIF: POPUP QR CODE UNTUK GATE SCAN */}
       {selectedQrTicket && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="relative w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-6 text-center animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm astro-glass rounded-3xl p-6 shadow-2xl border border-white/15 space-y-6 text-center animate-in zoom-in-95 duration-200 bg-slate-950/95">
             {/* Close Button */}
             <button
               type="button"
               onClick={() => setSelectedQrTicket(null)}
-              className="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition cursor-pointer"
+              className="absolute right-4 top-4 p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="space-y-1 pt-2">
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#08ADAE]/10 text-[#08ADAE]">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#00F0FF]/15 text-[#00F0FF] border border-[#00F0FF]/30">
                 {selectedQrTicket.ticketCategory}
               </span>
-              <h3 className="text-lg font-black text-slate-900 leading-tight">
+              <h3 className="text-lg font-black text-white leading-tight">
                 {selectedQrTicket.eventTitle}
               </h3>
-              <p className="text-xs text-slate-500">Nama: {selectedQrTicket.buyerName}</p>
+              <p className="text-xs text-slate-400">Nama: {selectedQrTicket.buyerName}</p>
             </div>
 
             {/* QR Code Container with Frame */}
-            <div className="relative p-6 bg-slate-50 rounded-2xl border border-slate-200/80 inline-block mx-auto shadow-inner">
+            <div className="relative p-6 bg-white rounded-2xl border border-white/20 inline-block mx-auto shadow-2xl">
               <QRCodeSVG
                 value={selectedQrTicket.signedQrPayload || selectedQrTicket.ticketId}
                 size={220}
@@ -551,26 +552,26 @@ export default function AllTicketsPage() {
                 includeMargin={false}
                 className="w-48 h-48 sm:w-52 sm:h-52 mx-auto"
               />
-              <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-600">
+              <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-700">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>QR Resmi Anti-Pemalsuan</span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed px-2">
+            <p className="text-xs text-slate-400 leading-relaxed px-2">
               Tunjukkan QR Code ini di gerbang tiket (gate check-in) untuk di-scan oleh petugas resmi acara.
             </p>
 
             <div className="flex items-center gap-2 pt-2">
               <Link href={`/e-ticket/${selectedQrTicket.ticketId}`} className="flex-1">
-                <Button className="w-full bg-[#08ADAE] hover:bg-[#07999a] text-slate-950 font-bold rounded-xl cursor-pointer text-xs py-2.5">
+                <Button className="w-full bg-gradient-to-r from-[#08ADAE] to-[#00F0FF] hover:brightness-110 text-slate-950 font-black rounded-xl cursor-pointer text-xs py-2.5">
                   Buka E-Ticket Lengkap
                 </Button>
               </Link>
               <Button
                 variant="outline"
                 onClick={() => handleCopyLink(selectedQrTicket.ticketId)}
-                className="border-slate-200 text-slate-700 rounded-xl cursor-pointer text-xs py-2.5"
+                className="border-white/15 astro-glass text-slate-200 rounded-xl cursor-pointer text-xs py-2.5"
               >
                 Salin Link
               </Button>

@@ -41,6 +41,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EventCard } from '@/components/event/event-card';
+import { HeroBannerCarousel, DEFAULT_HOME_BANNERS, type BannerItem } from '@/components/home/hero-banner-carousel';
 
 interface Event {
   id: string;
@@ -85,41 +86,6 @@ const cities = [
   'Semarang',
 ];
 
-// Banner Item Interface & Default Fallbacks (managed by Main Admin)
-interface BannerItem {
-  id: string;
-  title: string;
-  subtitle?: string | null;
-  imageUrl: string;
-  targetUrl?: string | null;
-  position?: string;
-  order?: number;
-  isActive?: boolean;
-}
-
-const DEFAULT_HOME_BANNERS: BannerItem[] = [
-  {
-    id: 'bnr-1',
-    title: 'Jakarta Live Fest 2026',
-    subtitle: 'Simfoni Musik Akbar & Kolaborasi Musisi Terkemuka Indonesia',
-    imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80',
-    targetUrl: '/events',
-  },
-  {
-    id: 'bnr-2',
-    title: 'Indonesia Creative & Culinary Expo 2026',
-    subtitle: 'Eksibisi Lifestyle & Kuliner Terbesar Se-Indonesia',
-    imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80',
-    targetUrl: '/events',
-  },
-  {
-    id: 'bnr-3',
-    title: 'Jakarta Creative Workshop & Art Expo',
-    subtitle: 'Eksplorasi Kaligrafi Modern, Fotografi & Desain Visual',
-    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1400&q=80',
-    targetUrl: '/events',
-  },
-];
 
 // Partner & Organizer ticker items
 const trustedPartners = [
@@ -292,7 +258,6 @@ function MarketplaceContent() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'Semua Event');
   const [selectedCity, setSelectedCity] = useState('Semua Kota');
-  const [activeBannerIdx, setActiveBannerIdx] = useState(0);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
   const [recentOrder, setRecentOrder] = useState<{ orderId: string; timestamp: number } | null>(null);
 
@@ -336,14 +301,6 @@ function MarketplaceContent() {
     return DEFAULT_HOME_BANNERS;
   }, [bannersResponse]);
 
-  // Auto slide hero banner
-  useEffect(() => {
-    if (bannerList.length <= 1) return;
-    const timer = setInterval(() => {
-      setActiveBannerIdx((prev) => (prev + 1) % bannerList.length);
-    }, 5500);
-    return () => clearInterval(timer);
-  }, [bannerList.length]);
 
   const { data: eventsResponse, isLoading } = useQuery({
     queryKey: ['public-events'],
@@ -436,7 +393,6 @@ function MarketplaceContent() {
     return e.location.toLowerCase().includes(selectedCity.toLowerCase());
   });
 
-  const currentBanner = bannerList[activeBannerIdx % bannerList.length] || bannerList[0];
 
   return (
     <div className="space-y-16 pb-20">
@@ -537,94 +493,9 @@ function MarketplaceContent() {
           </div>
         </div>
 
-        {/* DYNAMIC BANNER SLIDER CARD (DIATUR OLEH MAIN ADMIN) */}
-        <div className="mt-8 max-w-6xl mx-auto">
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/90 bg-slate-950 min-h-[340px] sm:min-h-[400px] md:min-h-[460px] flex flex-col justify-between text-white group">
-            {/* Background Image Slide with Smooth Transition */}
-            <div className="absolute inset-0 z-0 overflow-hidden">
-              <img
-                src={currentBanner.imageUrl}
-                alt={currentBanner.title}
-                className="w-full h-full object-cover object-center filter brightness-[0.80] contrast-105 group-hover:scale-105 transition-all duration-700 ease-out"
-              />
-              {/* Gradient Vignette Overlay to ensure text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/30" />
-            </div>
-
-            {/* Top Bar: Promotion Badge & Prev/Next Navigation Controls */}
-            <div className="relative z-10 p-5 sm:p-7 flex items-center justify-between">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-[#08ADAE]" />
-                <span>Promo Unggulan TAQtix</span>
-              </div>
-
-              {bannerList.length > 1 && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setActiveBannerIdx((prev) => (prev === 0 ? bannerList.length - 1 : prev - 1))
-                    }
-                    className="p-2.5 rounded-full bg-black/35 hover:bg-[#08ADAE] text-white border border-white/20 backdrop-blur-md transition-all duration-200 cursor-pointer active:scale-95 shadow-md"
-                    aria-label="Banner sebelumnya"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      setActiveBannerIdx((prev) => (prev + 1) % bannerList.length)
-                    }
-                    className="p-2.5 rounded-full bg-black/35 hover:bg-[#08ADAE] text-white border border-white/20 backdrop-blur-md transition-all duration-200 cursor-pointer active:scale-95 shadow-md"
-                    aria-label="Banner berikutnya"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Content: Title, Subtitle, CTA Button & Indicators */}
-            <div className="relative z-10 p-5 sm:p-8 md:p-10 space-y-4 max-w-3xl">
-              <div className="space-y-2">
-                <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-snug drop-shadow-sm">
-                  {currentBanner.title}
-                </h2>
-                {currentBanner.subtitle && (
-                  <p className="text-xs sm:text-sm md:text-base text-slate-200/90 font-medium leading-relaxed max-w-2xl drop-shadow-xs">
-                    {currentBanner.subtitle}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 pt-1">
-                <Link
-                  href={currentBanner.targetUrl || '/events'}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#08ADAE] hover:bg-[#079b9c] text-white rounded-full text-xs sm:text-sm font-bold shadow-lg shadow-[#08ADAE]/25 transition-all active:scale-95 cursor-pointer"
-                >
-                  <span>Lihat Detail & Beli Tiket</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-
-                {/* Dots indicator */}
-                {bannerList.length > 1 && (
-                  <div className="flex items-center gap-1.5 py-1">
-                    {bannerList.map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setActiveBannerIdx(idx)}
-                        className={cn(
-                          'h-2 rounded-full transition-all duration-300 cursor-pointer',
-                          activeBannerIdx === idx
-                            ? 'w-7 bg-[#08ADAE]'
-                            : 'w-2 bg-white/40 hover:bg-white/70'
-                        )}
-                        aria-label={`Pindah ke banner ${idx + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* DYNAMIC 3D COVERFLOW HERO BANNER CAROUSEL (ARTATIX STYLE) */}
+        <div className="mt-6 sm:mt-8 w-full">
+          <HeroBannerCarousel banners={bannerList} />
         </div>
 
         {/* ORGANIZER & PARTNER LIQUID GLASS STRIP */}

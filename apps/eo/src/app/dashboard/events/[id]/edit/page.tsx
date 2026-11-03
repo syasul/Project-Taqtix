@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import EventTabs from '@/components/layout/event-tabs';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
@@ -371,8 +370,6 @@ export default function EditEventPage() {
       {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbs} />
 
-      {/* Event Sub-Navigation Tabs */}
-      <EventTabs eventId={eventId as string} />
 
       {/* 3-Step Setup Workflow Indicator */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

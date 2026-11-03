@@ -32,7 +32,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import EventTabs from '@/components/layout/event-tabs';
 import { cn } from '@/lib/utils';
 import { 
   LineChart, 
@@ -91,7 +90,6 @@ export default function EventOverviewWorkspacePage() {
   return (
     <div className="space-y-6 max-w-6xl">
       <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
 
       {isLoading ? (
         <div className="space-y-6">

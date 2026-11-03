@@ -26,7 +26,6 @@ import {
 } from 'recharts';
 import { apiClient } from '@/lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import EventTabs from '@/components/layout/event-tabs';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 interface DashboardStats {
@@ -123,7 +122,6 @@ export default function SalesDashboardPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
 
       {isLoading ? (
         <div className="flex justify-center items-center py-24">

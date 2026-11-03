@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import EventTabs from '@/components/layout/event-tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { 
@@ -71,7 +70,6 @@ export default function WorkforcePicViewPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
 
       {/* Back button */}
       <div>

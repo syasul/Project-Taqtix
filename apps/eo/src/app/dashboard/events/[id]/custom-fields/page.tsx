@@ -35,7 +35,6 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import EventTabs from '@/components/layout/event-tabs';
 import { toast } from 'sonner';
 
 interface CustomFieldItem {
@@ -284,7 +283,6 @@ export default function CustomFieldsPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
 
       {/* 3-Step Setup Workflow Indicator */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -16,7 +16,6 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import EventTabs from '@/components/layout/event-tabs';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -176,8 +175,6 @@ export default function TicketCategoriesPage() {
       {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbs} />
 
-      {/* Event Sub-Navigation Tabs */}
-      <EventTabs eventId={eventId as string} />
 
       {/* 3-Step Setup Workflow Indicator */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

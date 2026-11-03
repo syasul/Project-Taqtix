@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import EventTabs from '@/components/layout/event-tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { toast } from 'sonner';
@@ -138,7 +137,6 @@ export default function WorkforcePage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

@@ -25,7 +25,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import EventTabs from '@/components/layout/event-tabs';
 
 interface AttendanceBreakdown {
   ticketCategoryId: string;
@@ -88,7 +87,6 @@ export default function LiveAttendanceOverviewPage() {
     <div className="space-y-6 max-w-5xl">
       {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbs} />
-      <EventTabs eventId={eventId} />
 
       {/* Top Nav */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

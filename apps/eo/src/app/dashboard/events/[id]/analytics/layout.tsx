@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
-import EventTabs from '@/components/layout/event-tabs';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { 
   TrendingUp, 
@@ -62,7 +61,6 @@ export default function AnalyticsLayout({
           { label: 'Analitik & Pelaporan' },
         ]}
       />
-      <EventTabs eventId={eventId} />
 
       {/* Sub-Tabs Navigation for 4 Analytics Sub-Dashboards */}
       <div className="bg-slate-100/80 p-1.5 rounded-2xl flex items-center gap-1 border border-slate-200/80 overflow-x-auto scrollbar-none">

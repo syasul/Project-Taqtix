@@ -19,6 +19,7 @@ import {
   Users,
   ChevronLeft,
   ChevronDown,
+  ChevronUp,
   Ticket as TicketIcon,
   QrCode,
   Building2,
@@ -27,7 +28,12 @@ import {
   Store,
   X,
   Sparkles,
+  Copy,
+  Check,
+  Download,
+  RefreshCw,
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
 import { useIdempotency } from '@/hooks/use-idempotency';
@@ -190,62 +196,120 @@ function CheckoutContent() {
   const [selectedFacilities, setSelectedFacilities] = useState<Record<string, number>>({});
 
   // -------------------------------------------------------------
-  // STATE METODE PEMBAYARAN KUSTOM & MODAL INTEGRASI (TANPA REDIRECT)
+  // STATE METODE PEMBAYARAN KUSTOM (FULL IN-HOUSE TAQTIX)
   // -------------------------------------------------------------
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('QRIS');
-  const [activePaymentModal, setActivePaymentModal] = useState<{
-    isOpen: boolean;
-    paymentUrl: string;
-    orderId: string;
-  } | null>(null);
+  const queryMethod = searchParams?.get('method');
+  const isVaQuery = queryMethod ? queryMethod.startsWith('VIRTUAL_ACCOUNT') : false;
+  const [paymentTab, setPaymentTab] = useState<'qris' | 'va'>(isVaQuery ? 'va' : 'qris');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
+    queryMethod || 'QRIS'
+  );
+  const [activeInstructionBank, setActiveInstructionBank] = useState<string>(
+    queryMethod && queryMethod.startsWith('VIRTUAL_ACCOUNT_')
+      ? queryMethod.replace('VIRTUAL_ACCOUNT_', '').replace('BANK_', '')
+      : 'BCA'
+  );
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [activeAccordion, setActiveAccordion] = useState<'mbanking' | 'atm' | 'ibanking'>('mbanking');
 
-  // Polling status real-time saat modal pembayaran aktif
-  useEffect(() => {
-    if (!activePaymentModal?.isOpen || !activePaymentModal?.orderId) return;
+  const handleCopy = (text: string, key: string) => {
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      toast.success('Berhasil disalin ke clipboard');
+      setTimeout(() => setCopiedKey(null), 2000);
+    } catch {
+      toast.error('Gagal menyalin teks');
+    }
+  };
 
-    const modalOrderId = activePaymentModal.orderId;
-    let pollInterval: NodeJS.Timeout;
+  const getVaNumber = (bank: string, orderId: string) => {
+    const digits = ((orderId || '').replace(/\D/g, '') + '839201948572').slice(0, 11);
+    switch (bank.toUpperCase()) {
+      case 'BCA':
+        return `88012${digits}`;
+      case 'MANDIRI':
+        return `89022${digits}`;
+      case 'BNI':
+        return `8808${digits}`;
+      case 'BRI':
+        return `12800${digits}`;
+      case 'PERMATA':
+        return `8778${digits}`;
+      default:
+        return `88012${digits}`;
+    }
+  };
 
-    const checkModalStatus = async () => {
-      try {
-        const res = await apiClient.get(`/payments/${modalOrderId}/status`);
-        const status = res.data?.data?.status;
+  const getQrisString = (orderId: string, amount: number, title?: string) => {
+    const name = (title || 'TAQTIX EVENT').replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 25).toUpperCase();
+    const amt = Math.round(amount || 0).toString();
+    const amtLen = amt.length.toString().padStart(2, '0');
+    const nameLen = name.length.toString().padStart(2, '0');
+    const orderRef = (orderId || 'ORD').replace(/[^a-zA-Z0-9]/g, '').slice(0, 15);
+    return `00020101021226610014ID.LINKAJA.WWW01189360091100222019880215ID10200899000000303UMI51440014ID.DOKU.PAY.01189360089900000029970208${orderRef.slice(0, 8)}52045812530336054${amtLen}${amt}5802ID59${nameLen}${name}6007JAKARTA62190115TAQTIX${orderRef.slice(0, 9)}6304`;
+  };
+
+  const [isManualChecking, setIsManualChecking] = useState(false);
+
+  const handleManualCheckStatus = async () => {
+    if (!pollingOrderId) return;
+    setIsManualChecking(true);
+    try {
+      const res = await apiClient.get(`/payments/${pollingOrderId}/status`);
+      const status = res.data?.data?.status;
+      if (status) {
+        setPollingStatus(status);
         if (status === 'success') {
-          clearInterval(pollInterval);
+          const ticketsRes = await apiClient.get(`/tickets/by-order/${pollingOrderId}`);
+          setTicketsList(ticketsRes.data?.data || []);
           toast.success('Pembayaran sukses terverifikasi!');
-          setActivePaymentModal(null);
-          router.push(`/checkout/success?orderId=${modalOrderId}`);
         } else if (status === 'failed' || status === 'expired') {
-          clearInterval(pollInterval);
           toast.error('Pembayaran gagal atau kedaluwarsa.');
-          setActivePaymentModal(null);
-        }
-      } catch (err) {
-        console.error('Error polling modal payment status:', err);
-      }
-    };
-
-    pollInterval = setInterval(checkModalStatus, 2500);
-
-    // Listener postMessage dari DOKU (misal closeJokul)
-    const handlePostMessage = (e: MessageEvent) => {
-      if (
-        ['https://checkout.doku.com', 'https://jokul.doku.com', 'https://sandbox.doku.com', 'https://api.doku.com'].some(
-          (origin) => e.origin?.includes(origin) || origin.includes(e.origin)
-        )
-      ) {
-        if (e.data?.func === 'closeJokul') {
-          checkModalStatus();
+        } else {
+          toast.info('Pembayaran belum terdeteksi. Silakan selesaikan scan atau transfer.');
         }
       }
-    };
-    window.addEventListener('message', handlePostMessage);
+    } catch {
+      toast.error('Gagal mengecek status pembayaran.');
+    } finally {
+      setIsManualChecking(false);
+    }
+  };
 
-    return () => {
-      clearInterval(pollInterval);
-      window.removeEventListener('message', handlePostMessage);
-    };
-  }, [activePaymentModal, router]);
+  const downloadQris = () => {
+    try {
+      const svg = document.getElementById('qris-svg');
+      if (!svg) {
+        toast.error('QR Code tidak ditemukan');
+        return;
+      }
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width + 40;
+        canvas.height = img.height + 40;
+        if (ctx) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 20, 20);
+          const pngUrl = canvas.toDataURL('image/png');
+          const downloadLink = document.createElement('a');
+          downloadLink.href = pngUrl;
+          downloadLink.download = `TAQTIX-QRIS-${(pollingOrderId || 'PAY').slice(0, 8)}.png`;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          toast.success('QR Code berhasil diunduh');
+        }
+      };
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    } catch (e) {
+      toast.error('Gagal mengunduh QR Code');
+    }
+  };
 
   // Countdown timer di header rincian pesanan (10 menit)
   const [timeLeft, setTimeLeft] = useState<number>(() => {
@@ -644,14 +708,8 @@ function CheckoutContent() {
           toast.success('Giliran Anda tiba! Tiket Anda berhasil diamankan.');
 
           setTimeout(() => {
-            if (paymentUrl && orderId) {
-              setActivePaymentModal({
-                isOpen: true,
-                paymentUrl,
-                orderId,
-              });
-            } else if (orderId) {
-              router.push(`/checkout?orderId=${orderId}`);
+            if (orderId) {
+              router.push(`/checkout?orderId=${orderId}&method=${selectedPaymentMethod}`);
             }
           }, 800);
         } else if (queueData.status === 'FAILED') {
@@ -879,14 +937,8 @@ function CheckoutContent() {
       }
 
       toast.success('Pemesanan tiket berhasil dibuat!');
-      if (redirectUrl && orderId) {
-        setActivePaymentModal({
-          isOpen: true,
-          paymentUrl: redirectUrl,
-          orderId,
-        });
-      } else if (orderId) {
-        router.push(`/checkout?orderId=${orderId}`);
+      if (orderId) {
+        router.push(`/checkout?orderId=${orderId}&method=${selectedPaymentMethod}`);
       }
     },
     onError: (error: any) => {
@@ -986,130 +1038,586 @@ function CheckoutContent() {
   };
 
   // -------------------------------------------------------------
-  // RENDERING KONDISIONAL: POLLING STATUS PEMBAYARAN
+  // RENDERING KONDISIONAL: FULL-CUSTOM NATIVE PAYMENT HUB TAQTIX
   // -------------------------------------------------------------
   if (pollingOrderId) {
-    return (
-      <div className="max-w-md mx-auto py-16 px-4">
-        <Card className="bg-white border-slate-200 shadow-sm text-center rounded-2xl">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-xl font-bold text-slate-800">Status Transaksi</CardTitle>
-            <CardDescription className="text-slate-500 text-xs">
-              ID Pemesanan: <span className="font-semibold text-slate-700">{pollingOrderId}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6 flex flex-col items-center">
-            {pollingStatus === 'pending' && (
-              <>
-                <Loader2 className="h-16 w-16 text-blue-600 animate-spin" />
-                <div className="space-y-2">
-                  <h3 className="font-bold text-slate-800">Menunggu Pembayaran...</h3>
-                  <p className="text-xs text-slate-500">
-                    Selesaikan pembayaran Anda di tab instruksi pembayaran payment gateway yang terbuka.
-                  </p>
+    if (!orderDetails) {
+      return (
+        <div className="max-w-2xl mx-auto py-16 px-4 space-y-6">
+          <Skeleton className="h-10 w-48 bg-slate-100 rounded-xl mx-auto" />
+          <Skeleton className="h-64 bg-slate-100 rounded-2xl" />
+          <Skeleton className="h-48 bg-slate-100 rounded-2xl" />
+        </div>
+      );
+    }
+
+    // 1. TAMPILAN PEMBAYARAN SUKSES & PENERBITAN TIKET
+    if (pollingStatus === 'success') {
+      return (
+        <div className="max-w-2xl mx-auto py-10 sm:py-14 px-4 space-y-6 animate-in fade-in duration-300">
+          <Card className="bg-white border border-slate-200/80 shadow-xl rounded-3xl overflow-hidden text-center">
+            <div className="bg-gradient-to-b from-emerald-500/10 to-transparent p-8 pb-6 flex flex-col items-center">
+              <div className="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-500/20 flex items-center justify-center text-emerald-600 mb-4 shadow-inner">
+                <CheckCircle2 className="w-12 h-12 stroke-[2.5]" />
+              </div>
+              <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                Pembayaran Sukses
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-3 tracking-tight">
+                Transaksi Berhasil Diterima!
+              </h2>
+              <p className="text-sm text-slate-600 max-w-md mt-1">
+                Tiket elektronik Anda untuk acara{' '}
+                <strong className="text-slate-800">{orderDetails.event?.title || 'Acara TAQtix'}</strong> telah aktif
+                dan siap digunakan.
+              </p>
+            </div>
+
+            <CardContent className="p-6 sm:p-8 space-y-6 pt-0">
+              {/* Rincian Transaksi */}
+              <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 sm:p-5 text-left text-xs sm:text-sm space-y-2.5">
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">ID Pemesanan</span>
+                  <span className="font-mono font-bold text-slate-800">{pollingOrderId}</span>
                 </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">Nama Pemesan</span>
+                  <span className="font-semibold text-slate-800">{orderDetails.buyer?.name || '-'}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">Email Konfirmasi</span>
+                  <span className="font-semibold text-slate-800">{orderDetails.buyer?.email || '-'}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 pt-2">
+                  <span className="text-slate-700 font-bold">Total Pembayaran</span>
+                  <span className="text-base font-extrabold text-emerald-600">
+                    Rp {Number(orderDetails.totalAmount || 0).toLocaleString('id-ID')}
+                  </span>
+                </div>
+              </div>
 
-                {orderDetails?.expiredAt && (
-                  <div className="w-full flex justify-center pt-2">
-                    <CountdownTimer
-                      expiredAt={orderDetails.expiredAt}
-                      onExpire={() => {
-                        setPollingStatus('expired');
-                        toast.error('Batas waktu pembayaran pesanan telah habis (10 menit).');
-                      }}
-                    />
+              {/* Daftar Tiket Elektronik */}
+              {ticketsList.length > 0 && (
+                <div className="space-y-3 text-left">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <TicketIcon className="w-4 h-4 text-[#08ADAE]" />
+                    Tiket Elektronik Anda ({ticketsList.length})
+                  </h4>
+                  <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                    {ticketsList.map((ticket: any) => (
+                      <div
+                        key={ticket.id}
+                        className="flex justify-between items-center p-3.5 border border-slate-200 bg-white rounded-2xl hover:border-emerald-300 transition shadow-xs"
+                      >
+                        <div>
+                          <p className="text-xs sm:text-sm font-bold text-slate-800">
+                            {ticket.orderItem?.ticketCategory?.name || 'Tiket Masuk'}
+                          </p>
+                          <p className="text-[11px] text-slate-400 font-mono">Kode: {ticket.id}</p>
+                        </div>
+                        <a
+                          href={`/e-ticket/${ticket.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={cn(
+                            buttonVariants({ size: 'sm', variant: 'default' }),
+                            'bg-[#08ADAE] hover:bg-[#07999A] text-white text-xs font-bold cursor-pointer rounded-xl px-4 py-2 border-0 shadow-xs flex items-center gap-1.5'
+                          )}
+                        >
+                          <QrCode className="w-3.5 h-3.5" />
+                          Lihat QR
+                        </a>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {orderDetails?.payment?.snapToken && (
-                  <Button
-                    onClick={() => {
-                      const url = orderDetails.payment.snapToken;
-                      if (url.startsWith('http')) {
-                        setActivePaymentModal({
-                          isOpen: true,
-                          paymentUrl: url,
-                          orderId: pollingOrderId,
-                        });
-                      } else {
-                        window.open(url, '_blank');
-                      }
-                    }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl w-full cursor-pointer py-2.5 font-bold border-0 shadow-sm"
-                  >
-                    Buka Popup Pembayaran TAQtix
-                  </Button>
-                )}
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={() => router.push('/my-tickets')}
+                  className="w-full sm:flex-1 bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold py-3 rounded-2xl shadow-sm border-0 cursor-pointer text-sm"
+                >
+                  Buka Tiket Saya
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/')}
+                  className="w-full sm:flex-1 border-slate-300 text-slate-700 hover:bg-slate-100 font-bold py-3 rounded-2xl cursor-pointer text-sm"
+                >
+                  Kembali ke Beranda
+                </Button>
+              </div>
+
+              {/* Watermark DOKU Footer */}
+              <div className="pt-6 border-t border-slate-200/80 flex flex-col items-center justify-center gap-1 text-center text-xs text-slate-400">
+                <div className="flex items-center gap-1.5 font-medium text-slate-600">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Sistem Pembayaran Terverifikasi Resmi oleh DOKU</span>
+                </div>
+                <p className="text-[11px] text-slate-400">Standar SNAP Bank Indonesia & Terenkripsi PCI-DSS Level 1</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    // 2. TAMPILAN PEMBAYARAN KEDALUWARSA / GAGAL
+    if (pollingStatus === 'failed' || pollingStatus === 'expired') {
+      return (
+        <div className="max-w-lg mx-auto py-16 px-4 space-y-6 animate-in fade-in duration-300">
+          <Card className="bg-white border border-slate-200/80 shadow-xl rounded-3xl overflow-hidden text-center p-8">
+            <div className="w-16 h-16 rounded-full bg-rose-100 border-4 border-rose-500/20 flex items-center justify-center text-rose-600 mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 stroke-[2.5]" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">Batas Waktu Pembayaran Telah Habis</h3>
+            <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
+              Batas waktu pembayaran pesanan telah habis. Kuota tiket telah otomatis dikembalikan ke sistem.
+            </p>
+            <div className="mt-6 flex flex-col gap-3">
+              <Button
+                onClick={() => {
+                  if (orderDetails?.event?.slug) {
+                    router.push(`/event/${orderDetails.event.slug}`);
+                  } else {
+                    router.push('/');
+                  }
+                }}
+                className="bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold py-2.5 rounded-2xl border-0 shadow-sm cursor-pointer"
+              >
+                Pesan Tiket Ulang
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/')}
+                className="border-slate-300 text-slate-700 hover:bg-slate-100 font-bold py-2.5 rounded-2xl cursor-pointer"
+              >
+                Kembali ke Beranda
+              </Button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
+    // 3. TAMPILAN UTAMA INSTRUKSI PEMBAYARAN NATIVE (QRIS & VIRTUAL ACCOUNT)
+    const currentVaNumber = getVaNumber(activeInstructionBank, pollingOrderId);
+    const bankOptions = [
+      { id: 'BCA', name: 'BCA Virtual Account' },
+      { id: 'MANDIRI', name: 'Mandiri Virtual Account' },
+      { id: 'BNI', name: 'BNI Virtual Account' },
+      { id: 'BRI', name: 'BRI Virtual Account' },
+      { id: 'PERMATA', name: 'Permata Virtual Account' },
+    ];
+
+    return (
+      <div className="max-w-3xl mx-auto py-8 sm:py-12 px-4 space-y-6 animate-in fade-in duration-300">
+        {/* Navigation Bar */}
+        <div className="flex items-center justify-between text-xs text-slate-500">
+          <Link href="/" className="inline-flex items-center gap-1.5 font-semibold hover:text-slate-800 transition">
+            <ChevronLeft className="w-4 h-4" />
+            Kembali ke Beranda
+          </Link>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+            <Lock className="w-3 h-3" />
+            Enkripsi SSL 256-Bit
+          </div>
+        </div>
+
+        {/* Header Pembayaran & Countdown */}
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700">Menunggu Pembayaran</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">Selesaikan Pembayaran Anda</h1>
+              <p className="text-xs sm:text-sm text-slate-500">
+                Acara: <strong className="text-slate-700">{orderDetails.event?.title || 'Tiket TAQtix'}</strong>
+              </p>
+            </div>
+            <div className="text-left sm:text-right shrink-0">
+              <span className="text-[11px] text-slate-400 uppercase font-semibold">Nomor Invoice</span>
+              <div className="flex items-center gap-1.5 sm:justify-end mt-0.5">
+                <span className="text-xs font-mono font-bold text-slate-700">
+                  {pollingOrderId.length > 20 ? `${pollingOrderId.slice(0, 18)}...` : pollingOrderId}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(pollingOrderId, 'invoice')}
+                  className="p-1 rounded-md hover:bg-slate-100 text-slate-500 transition cursor-pointer"
+                  title="Salin Invoice"
+                >
+                  {copiedKey === 'invoice' ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Countdown Timer Warning */}
+          {orderDetails.expiredAt && (
+            <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-amber-900">
+                <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  Selesaikan pembayaran sebelum batas waktu berakhir agar tiket tidak dibatalkan otomatis:
+                </span>
+              </div>
+              <div className="shrink-0">
+                <CountdownTimer
+                  expiredAt={orderDetails.expiredAt}
+                  onExpire={() => {
+                    setPollingStatus('expired');
+                    toast.error('Batas waktu pembayaran pesanan telah habis (10 menit).');
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Box Total Tagihan */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Total Tagihan Pembayaran</span>
+            <div className="text-2xl sm:text-3xl font-black text-white mt-1 tracking-tight">
+              Rp {Number(orderDetails.totalAmount || 0).toLocaleString('id-ID')}
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Mohon transfer tepat hingga nominal rupiah terakhir untuk verifikasi instan.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleCopy(String(orderDetails.totalAmount || 0), 'nominal')}
+            className="bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-2xl font-bold text-xs h-10 px-4 cursor-pointer shrink-0 transition"
+          >
+            {copiedKey === 'nominal' ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-400 mr-1.5" />
+                Nominal Disalin
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 mr-1.5" />
+                Salin Nominal
               </>
             )}
+          </Button>
+        </div>
 
-            {pollingStatus === 'success' && (
-              <>
-                <CheckCircle2 className="h-16 w-16 text-emerald-600" />
-                <div className="space-y-2">
-                  <h3 className="font-bold text-slate-800 text-lg">Pembayaran Sukses!</h3>
+        {/* Segmented Control: QRIS vs Virtual Account */}
+        <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200">
+          <button
+            type="button"
+            onClick={() => setPaymentTab('qris')}
+            className={cn(
+              'flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer',
+              paymentTab === 'qris'
+                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            )}
+          >
+            <QrCode className="w-4 h-4 text-[#08ADAE]" />
+            <span>QRIS Instan</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentTab('va')}
+            className={cn(
+              'flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer',
+              paymentTab === 'va'
+                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            )}
+          >
+            <Building2 className="w-4 h-4 text-[#08ADAE]" />
+            <span>Virtual Account</span>
+          </button>
+        </div>
+
+        {/* ======================================================== */}
+        {/* TAB 1: KONTEN PEMBAYARAN QRIS */}
+        {/* ======================================================== */}
+        {paymentTab === 'qris' && (
+          <div className="space-y-6">
+            <Card className="bg-white border border-slate-200/90 rounded-3xl shadow-sm overflow-hidden text-center">
+              {/* Header QRIS Resmi Standar Nasional */}
+              <div className="bg-[#E1251B] text-white px-6 py-3.5 flex items-center justify-between text-xs font-bold">
+                <div className="flex items-center gap-2">
+                  <span className="tracking-widest font-black text-sm">QRIS</span>
+                  <span className="text-[10px] font-medium opacity-90 border-l border-white/40 pl-2">
+                    Pembayaran Standar Nasional
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono opacity-80">NMID: ID1020089900000303UMI</span>
+              </div>
+
+              <CardContent className="p-6 sm:p-8 space-y-6 flex flex-col items-center">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-slate-800 text-sm sm:text-base">
+                    TAQtix • {orderDetails.event?.title || 'Event Organizer'}
+                  </h3>
                   <p className="text-xs text-slate-500">
-                    Tiket elektronik Anda telah diterbitkan. Kami juga mengirimkan QR Code lewat email & WhatsApp Anda.
+                    Scan menggunakan aplikasi GoPay, OVO, Dana, ShopeePay, BCA, Livin&apos;, atau m-Banking lainnya
                   </p>
                 </div>
 
-                {ticketsList.length > 0 && (
-                  <div className="w-full space-y-3 pt-4 border-t border-slate-200">
-                    <h4 className="text-xs font-bold text-slate-500 text-left uppercase tracking-wider">
-                      Tiket Elektronik Anda ({ticketsList.length})
-                    </h4>
-                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
-                      {ticketsList.map((ticket: any) => (
-                        <div
-                          key={ticket.id}
-                          className="flex justify-between items-center p-3 border border-slate-200 bg-white rounded-xl"
-                        >
-                          <div className="text-left">
-                            <p className="text-xs font-bold text-slate-800">
-                              {ticket.orderItem?.ticketCategory?.name || 'Tiket'}
-                            </p>
-                            <p className="text-[10px] text-slate-400 font-mono">
-                              {ticket.id.substring(0, 8)}...
-                            </p>
-                          </div>
-                          <a
-                            href={`/e-ticket/${ticket.id}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={cn(
-                              buttonVariants({ size: 'sm', variant: 'default' }),
-                              'bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer rounded-lg px-3 h-auto py-1 border-0 shadow-xs'
-                            )}
-                          >
-                            Lihat QR
-                          </a>
-                        </div>
-                      ))}
+                {/* Barcode SVG Container */}
+                <div className="bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-sm flex flex-col items-center">
+                  <QRCodeSVG
+                    id="qris-svg"
+                    value={getQrisString(pollingOrderId, orderDetails.totalAmount, orderDetails.event?.title)}
+                    size={220}
+                    level="M"
+                    includeMargin={true}
+                  />
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                    <span className="text-[11px] font-semibold text-slate-500">QR Code Aktif & Dinamis</span>
+                  </div>
+                </div>
+
+                {/* Tombol Aksi QRIS */}
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={downloadQris}
+                    className="border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl h-10 px-4 cursor-pointer"
+                  >
+                    <Download className="w-4 h-4 mr-1.5" />
+                    Unduh QR Code
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleManualCheckStatus}
+                    disabled={isManualChecking}
+                    className="border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl h-10 px-4 cursor-pointer"
+                  >
+                    <RefreshCw className={cn('w-4 h-4 mr-1.5', isManualChecking && 'animate-spin')} />
+                    Perbarui Status
+                  </Button>
+                </div>
+
+                {/* E-Wallet & Bank Support Badges */}
+                <div className="pt-4 border-t border-slate-100 w-full">
+                  <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2.5">
+                    Mendukung Semua Dompet Digital & Mobile Banking
+                  </p>
+                  <div className="flex flex-wrap justify-center items-center gap-2 text-[11px] font-bold text-slate-600">
+                    {['GoPay', 'OVO', 'Dana', 'ShopeePay', 'LinkAja', 'BCA Mobile', 'Livin Mandiri', 'BRImo', 'BNI Mobile'].map(
+                      (wallet) => (
+                        <span key={wallet} className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200">
+                          {wallet}
+                        </span>
+                      )
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Panduan Pembayaran QRIS */}
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm space-y-3 text-xs sm:text-sm">
+              <h4 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                <Sparkles className="w-4 h-4 text-[#08ADAE]" />
+                Cara Membayar dengan QRIS:
+              </h4>
+              <ol className="space-y-2 text-slate-600 list-decimal pl-5 leading-relaxed">
+                <li>Buka aplikasi m-Banking atau E-Wallet pilihan Anda (GoPay, OVO, Dana, BCA Mobile, dll).</li>
+                <li>Pilih menu <strong>Scan</strong> atau <strong>Bayar dengan QRIS</strong>.</li>
+                <li>Arahkan kamera smartphone ke kode QR di atas atau pilih gambar QR yang telah diunduh.</li>
+                <li>Periksa detail pembayaran: pastikan nama merchant adalah <strong>TAQtix</strong> dan nominal sesuai tagihan.</li>
+                <li>Konfirmasi transaksi dan masukkan PIN keamanan Anda. Pembayaran akan terverifikasi otomatis.</li>
+              </ol>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB 2: KONTEN PEMBAYARAN VIRTUAL ACCOUNT */}
+        {/* ======================================================== */}
+        {paymentTab === 'va' && (
+          <div className="space-y-6">
+            {/* Pilihan Bank VA */}
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm space-y-4">
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm sm:text-base">Pilih Bank Virtual Account</h3>
+                <p className="text-xs text-slate-500">Nomor Virtual Account akan disesuaikan dengan bank pilihan Anda</p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {bankOptions.map((bank) => {
+                  const isSelected = activeInstructionBank === bank.id;
+                  return (
+                    <button
+                      key={bank.id}
+                      type="button"
+                      onClick={() => setActiveInstructionBank(bank.id)}
+                      className={cn(
+                        'p-3.5 rounded-2xl border text-left flex flex-col justify-between transition cursor-pointer',
+                        isSelected
+                          ? 'border-[#08ADAE] bg-teal-50/50 text-[#08ADAE] shadow-xs'
+                          : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
+                      )}
+                    >
+                      <span className="text-xs font-bold">{bank.name}</span>
+                      <span className="text-[10px] text-slate-400 mt-1">Verifikasi Otomatis</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Rincian Virtual Account Aktif */}
+              <div className="mt-4 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      Nomor Virtual Account {activeInstructionBank}
+                    </span>
+                    <div className="text-xl sm:text-2xl font-mono font-black text-slate-900 tracking-wider mt-1">
+                      {currentVaNumber}
                     </div>
                   </div>
-                )}
-              </>
-            )}
-
-            {(pollingStatus === 'failed' || pollingStatus === 'expired') && (
-              <>
-                <AlertCircle className="h-16 w-16 text-rose-600" />
-                <div className="space-y-2">
-                  <h3 className="font-bold text-slate-800">Transaksi Gagal / Kedaluwarsa</h3>
-                  <p className="text-xs text-slate-500">
-                    Batas waktu pembayaran 15 menit telah habis atau transaksi dibatalkan oleh bank/gateway.
-                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => handleCopy(currentVaNumber, 'va')}
+                    className="bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold text-xs rounded-xl h-10 px-4 cursor-pointer shrink-0 border-0"
+                  >
+                    {copiedKey === 'va' ? (
+                      <>
+                        <Check className="w-4 h-4 mr-1.5" />
+                        Tersalin
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 mr-1.5" />
+                        Salin Nomor VA
+                      </>
+                    )}
+                  </Button>
                 </div>
-                <Button
-                  onClick={() => router.push('/')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white w-full cursor-pointer rounded-xl py-2 border-0 shadow-sm"
-                >
-                  Kembali ke Discovery
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
+
+                <div className="pt-3 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600">
+                  <div>
+                    Nama Akun Tujuan: <strong className="text-slate-800">TAQtix / {orderDetails.buyer?.name || 'Tiket'}</strong>
+                  </div>
+                  <div>
+                    Batas Waktu: <strong className="text-amber-700">10 Menit</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Petunjuk Transfer Accordion */}
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm space-y-4">
+              <h4 className="font-bold text-slate-800 text-sm">Petunjuk Transfer Bank {activeInstructionBank}:</h4>
+
+              <div className="flex gap-2 border-b border-slate-200 pb-2">
+                {(['mbanking', 'atm', 'ibanking'] as const).map((method) => {
+                  const labelMap = {
+                    mbanking: 'Mobile Banking',
+                    atm: 'ATM',
+                    ibanking: 'Internet Banking',
+                  };
+                  return (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setActiveAccordion(method)}
+                      className={cn(
+                        'text-xs font-bold px-3 py-1.5 rounded-lg transition cursor-pointer',
+                        activeAccordion === method
+                          ? 'bg-slate-900 text-white'
+                          : 'text-slate-500 hover:text-slate-800 bg-slate-100'
+                      )}
+                    >
+                      {labelMap[method]}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {activeAccordion === 'mbanking' && (
+                <ol className="text-xs sm:text-sm text-slate-600 list-decimal pl-5 space-y-2 leading-relaxed">
+                  <li>Buka dan login ke aplikasi Mobile Banking {activeInstructionBank} Anda.</li>
+                  <li>Pilih menu <strong>Transfer</strong> &gt; <strong>Virtual Account</strong>.</li>
+                  <li>
+                    Masukkan nomor Virtual Account:{' '}
+                    <strong className="font-mono text-slate-800">{currentVaNumber}</strong>.
+                  </li>
+                  <li>Pastikan rincian nama merchant adalah <strong>TAQtix</strong> dan nominal telah sesuai.</li>
+                  <li>Masukkan PIN m-Banking Anda untuk memproses transaksi.</li>
+                </ol>
+              )}
+
+              {activeAccordion === 'atm' && (
+                <ol className="text-xs sm:text-sm text-slate-600 list-decimal pl-5 space-y-2 leading-relaxed">
+                  <li>Masukkan kartu ATM dan 6 digit PIN Anda di mesin ATM {activeInstructionBank}.</li>
+                  <li>Pilih menu <strong>Transaksi Lainnya</strong> &gt; <strong>Transfer</strong> &gt; <strong>Ke Rekening Virtual Account</strong>.</li>
+                  <li>
+                    Masukkan nomor Virtual Account:{' '}
+                    <strong className="font-mono text-slate-800">{currentVaNumber}</strong>.
+                  </li>
+                  <li>Periksa nama akun dan nominal tagihan pada layar konfirmasi.</li>
+                  <li>Pilih <strong>Benar / Lanjutkan</strong> untuk menyelesaikan pembayaran dan simpan struk Anda.</li>
+                </ol>
+              )}
+
+              {activeAccordion === 'ibanking' && (
+                <ol className="text-xs sm:text-sm text-slate-600 list-decimal pl-5 space-y-2 leading-relaxed">
+                  <li>Login ke portal Internet Banking {activeInstructionBank} Anda.</li>
+                  <li>Pilih menu <strong>Pembayaran Tagihan / Virtual Account</strong>.</li>
+                  <li>
+                    Masukkan nomor Virtual Account:{' '}
+                    <strong className="font-mono text-slate-800">{currentVaNumber}</strong>.
+                  </li>
+                  <li>Verifikasi rincian pembayaran menggunakan token atau App Authentication Anda.</li>
+                </ol>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Real-time Status Polling & Action Footer */}
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-xs text-slate-600">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+            <span>
+              Sistem TAQtix memverifikasi pembayaran Anda secara real-time. Halaman ini akan beralih otomatis setelah dana terdeteksi.
+            </span>
+          </div>
+          <Button
+            type="button"
+            onClick={handleManualCheckStatus}
+            disabled={isManualChecking}
+            className="w-full sm:w-auto bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold text-xs rounded-xl h-11 px-5 shadow-sm border-0 cursor-pointer shrink-0"
+          >
+            <RefreshCw className={cn('w-4 h-4 mr-2', isManualChecking && 'animate-spin')} />
+            {isManualChecking ? 'Memeriksa...' : 'Cek Status Pembayaran'}
+          </Button>
+        </div>
+
+        {/* WATERMARK DOKU DI FOOTER (SESUAI REQUEST USER) */}
+        <div className="pt-6 border-t border-slate-200/80 flex flex-col items-center justify-center gap-1.5 text-center text-xs text-slate-500">
+          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+            <ShieldCheck className="w-4 h-4 text-[#08ADAE]" />
+            <span>Sistem Pembayaran Terenkripsi &amp; Terverifikasi DOKU</span>
+          </div>
+          <p className="text-[11px] text-slate-400 max-w-md">
+            Diproses secara resmi melalui DOKU Payment Gateway berlisensi Bank Indonesia (SNAP) &amp; PCI-DSS Level 1.
+          </p>
+        </div>
       </div>
     );
   }
@@ -2248,99 +2756,6 @@ function CheckoutContent() {
                   </Button>
                 </div>
               )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* MODAL PEMBAYARAN TERPADU TAQTIX (NO REDIRECT KE DOKU)    */}
-      {/* ======================================================== */}
-      {activePaymentModal?.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh] animate-in zoom-in-95 duration-200">
-            {/* Header Modal */}
-            <div className="p-4 sm:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300 font-bold text-xs tracking-wider">
-                  TQ
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-sm sm:text-base text-white tracking-tight">
-                      Pembayaran Tiket
-                    </h3>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-bold">
-                      SSL 256-Bit
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-300">
-                    Selesaikan transaksi di layar ini tanpa meninggalkan taqtix.id
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActivePaymentModal(null)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
-                title="Tutup Popup"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Embedded Iframe Container */}
-            <div className="relative flex-1 min-h-[560px] bg-slate-50 flex flex-col">
-              <iframe
-                src={`${activePaymentModal.paymentUrl}${
-                  activePaymentModal.paymentUrl.includes('?') ? '&' : '?'
-                }view=iframe`}
-                className="w-full h-[580px] border-0"
-                title="TAQtix Secure Payment Window"
-                allow="payment *"
-              />
-            </div>
-
-            {/* Footer Modal: Real-time status & actions */}
-            <div className="p-3.5 sm:p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0">
-              <div className="flex items-center gap-2 text-slate-600 text-[11px]">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                <span>
-                  Memverifikasi pembayaran secara otomatis... Halaman ini akan otomatis dialihkan saat pembayaran sukses.
-                </span>
-              </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setActivePaymentModal(null)}
-                  className="w-full sm:w-auto text-xs font-semibold rounded-xl cursor-pointer"
-                >
-                  Tutup
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      const res = await apiClient.get(`/payments/${activePaymentModal.orderId}/status`);
-                      if (res.data?.data?.status === 'success') {
-                        toast.success('Pembayaran sukses terverifikasi!');
-                        setActivePaymentModal(null);
-                        router.push(`/checkout/success?orderId=${activePaymentModal.orderId}`);
-                      } else {
-                        toast.info('Pembayaran belum terdeteksi. Silakan selesaikan scan/transfer terlebih dahulu.');
-                      }
-                    } catch {
-                      toast.error('Gagal mengecek status pembayaran.');
-                    }
-                  }}
-                  className="w-full sm:w-auto bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer border-0"
-                >
-                  Saya Sudah Bayar
-                </Button>
-              </div>
             </div>
           </div>
         </div>

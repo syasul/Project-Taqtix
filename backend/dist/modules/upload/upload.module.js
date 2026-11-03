@@ -9,13 +9,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadModule = void 0;
 const common_1 = require("@nestjs/common");
 const upload_controller_1 = require("./upload.controller");
+const uploads_serve_controller_1 = require("./uploads-serve.controller");
 const upload_service_1 = require("./upload.service");
 let UploadModule = class UploadModule {
 };
 exports.UploadModule = UploadModule;
 exports.UploadModule = UploadModule = __decorate([
     (0, common_1.Module)({
-        controllers: [upload_controller_1.UploadController],
+        controllers: [upload_controller_1.UploadController, uploads_serve_controller_1.UploadsServeController],
         providers: [upload_service_1.UploadService],
         exports: [upload_service_1.UploadService],
     })

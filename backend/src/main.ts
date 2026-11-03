@@ -61,9 +61,14 @@ async function bootstrap() {
     next();
   });
 
-  // 2. Terapkan prefix routing global (kecualikan webhook payments agar dapat diakses langsung)
+  // 2. Terapkan prefix routing global (kecualikan webhook payments & public uploads agar dapat diakses langsung)
   app.setGlobalPrefix('v1', {
-    exclude: ['payments/webhook/(.*)', 'payments/webhook'],
+    exclude: [
+      'payments/webhook/(.*)',
+      'payments/webhook',
+      'uploads/(.*)',
+      'uploads',
+    ],
   });
 
   // 3. Keamanan: Aktifkan Helmet & CORS (izinkan cross-origin untuk aset gambar static)

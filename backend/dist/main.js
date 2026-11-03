@@ -90,7 +90,12 @@ async function bootstrap() {
         next();
     });
     app.setGlobalPrefix('v1', {
-        exclude: ['payments/webhook/(.*)', 'payments/webhook'],
+        exclude: [
+            'payments/webhook/(.*)',
+            'payments/webhook',
+            'uploads/(.*)',
+            'uploads',
+        ],
     });
     app.use((0, helmet_1.default)({
         crossOriginResourcePolicy: { policy: 'cross-origin' },

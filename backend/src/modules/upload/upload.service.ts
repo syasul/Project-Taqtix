@@ -126,6 +126,23 @@ export class UploadService {
           fs.mkdirSync(targetDir, { recursive: true, mode: 0o777 });
         }
         await fs.promises.writeFile(destinationPath, file.buffer);
+
+        // Sinkronisasi duplikat ke direktori upload alternatif untuk mencegah perbedaan path root/backend
+        const secondaryDirs = [
+          path.resolve(process.cwd(), 'uploads'),
+          path.resolve(process.cwd(), '../uploads'),
+          path.join(os.tmpdir(), 'taqtix-uploads'),
+        ];
+        for (const sDir of secondaryDirs) {
+          if (sDir !== targetDir) {
+            try {
+              if (!fs.existsSync(sDir)) {
+                fs.mkdirSync(sDir, { recursive: true, mode: 0o777 });
+              }
+              await fs.promises.writeFile(path.join(sDir, filename), file.buffer);
+            } catch {}
+          }
+        }
       } catch (writeErr) {
         this.logger.error(
           `Gagal menulis file ke ${destinationPath}:`,

@@ -50,6 +50,11 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Redirect /dashboard to /
+  if (pathname === '/dashboard') {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
   // Redirect logic
   if (!isAuthenticated || !isAdmin) {
     if (!isPublicRoute) {

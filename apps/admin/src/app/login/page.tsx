@@ -65,7 +65,8 @@ export default function LoginPage() {
     }
 
     if (tempToken) {
-      document.cookie = `admin_access_token=${tempToken}; path=/; max-age=${60 * 30}; SameSite=Strict; Secure`;
+      const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+      document.cookie = `admin_access_token=${tempToken}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax${isHttps ? '; Secure' : ''}`;
       router.push('/');
     } else {
       setError('Sesi autentikasi kedaluwarsa. Silakan login kembali.');

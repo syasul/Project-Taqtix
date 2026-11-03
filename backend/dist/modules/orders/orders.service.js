@@ -377,7 +377,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
         let expirationDelay = 10 * 60 * 1000;
         if (dokuConfig.clientId && dokuConfig.secretKey) {
             try {
-                const result = await this.dokuService.createPayment(fullOrder, payment);
+                const result = await this.dokuService.createPayment(fullOrder, payment, undefined, dto.paymentMethod);
                 paymentUrl = result.paymentUrl;
                 await this.prisma.payment.update({
                     where: { id: payment.id },

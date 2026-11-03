@@ -19,7 +19,7 @@ export declare class DokuService {
     private readonly logger;
     constructor(configService: ConfigService);
     getConfig(): DokuConfig;
-    createPayment(order: any, payment: any, customFrontendUrl?: string): Promise<CreatePaymentResult>;
+    createPayment(order: any, payment: any, customFrontendUrl?: string, paymentMethodType?: string): Promise<CreatePaymentResult>;
     verifyWebhookSignature(headers: Record<string, string>, rawBody?: Buffer | string, requestPath?: string): boolean;
     checkStatus(invoiceNumber: string): Promise<DokuCheckStatusResult>;
 }

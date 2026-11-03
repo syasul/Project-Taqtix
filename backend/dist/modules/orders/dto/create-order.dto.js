@@ -148,6 +148,7 @@ class CreateOrderDto {
     utmSource;
     utmMedium;
     utmCampaign;
+    paymentMethod;
 }
 exports.CreateOrderDto = CreateOrderDto;
 __decorate([
@@ -273,4 +274,13 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "utmCampaign", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'QRIS',
+        description: 'Metode pembayaran yang dipilih (QRIS, VIRTUAL_ACCOUNT_BCA, dll)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "paymentMethod", void 0);
 //# sourceMappingURL=create-order.dto.js.map

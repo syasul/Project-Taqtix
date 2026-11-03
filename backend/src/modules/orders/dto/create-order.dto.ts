@@ -214,4 +214,12 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   utmCampaign?: string;
+
+  @ApiPropertyOptional({
+    example: 'QRIS',
+    description: 'Metode pembayaran yang dipilih (QRIS, VIRTUAL_ACCOUNT_BCA, dll)',
+  })
+  @IsString()
+  @IsOptional()
+  paymentMethod?: string;
 }

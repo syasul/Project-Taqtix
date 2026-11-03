@@ -20,6 +20,13 @@ import {
   ChevronLeft,
   ChevronDown,
   Ticket as TicketIcon,
+  QrCode,
+  Building2,
+  CreditCard,
+  Wallet,
+  Store,
+  X,
+  Sparkles,
 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
@@ -181,6 +188,64 @@ function CheckoutContent() {
   const [promoChecking, setPromoChecking] = useState<boolean>(false);
   const [appliedPromo, setAppliedPromo] = useState<string>('');
   const [selectedFacilities, setSelectedFacilities] = useState<Record<string, number>>({});
+
+  // -------------------------------------------------------------
+  // STATE METODE PEMBAYARAN KUSTOM & MODAL INTEGRASI (TANPA REDIRECT)
+  // -------------------------------------------------------------
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('QRIS');
+  const [activePaymentModal, setActivePaymentModal] = useState<{
+    isOpen: boolean;
+    paymentUrl: string;
+    orderId: string;
+  } | null>(null);
+
+  // Polling status real-time saat modal pembayaran aktif
+  useEffect(() => {
+    if (!activePaymentModal?.isOpen || !activePaymentModal?.orderId) return;
+
+    const modalOrderId = activePaymentModal.orderId;
+    let pollInterval: NodeJS.Timeout;
+
+    const checkModalStatus = async () => {
+      try {
+        const res = await apiClient.get(`/payments/${modalOrderId}/status`);
+        const status = res.data?.data?.status;
+        if (status === 'success') {
+          clearInterval(pollInterval);
+          toast.success('Pembayaran sukses terverifikasi!');
+          setActivePaymentModal(null);
+          router.push(`/checkout/success?orderId=${modalOrderId}`);
+        } else if (status === 'failed' || status === 'expired') {
+          clearInterval(pollInterval);
+          toast.error('Pembayaran gagal atau kedaluwarsa.');
+          setActivePaymentModal(null);
+        }
+      } catch (err) {
+        console.error('Error polling modal payment status:', err);
+      }
+    };
+
+    pollInterval = setInterval(checkModalStatus, 2500);
+
+    // Listener postMessage dari DOKU (misal closeJokul)
+    const handlePostMessage = (e: MessageEvent) => {
+      if (
+        ['https://checkout.doku.com', 'https://jokul.doku.com', 'https://sandbox.doku.com', 'https://api.doku.com'].some(
+          (origin) => e.origin?.includes(origin) || origin.includes(e.origin)
+        )
+      ) {
+        if (e.data?.func === 'closeJokul') {
+          checkModalStatus();
+        }
+      }
+    };
+    window.addEventListener('message', handlePostMessage);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('message', handlePostMessage);
+    };
+  }, [activePaymentModal, router]);
 
   // Countdown timer di header rincian pesanan (10 menit)
   const [timeLeft, setTimeLeft] = useState<number>(() => {
@@ -579,12 +644,16 @@ function CheckoutContent() {
           toast.success('Giliran Anda tiba! Tiket Anda berhasil diamankan.');
 
           setTimeout(() => {
-            if (paymentUrl) {
-              window.location.href = paymentUrl;
+            if (paymentUrl && orderId) {
+              setActivePaymentModal({
+                isOpen: true,
+                paymentUrl,
+                orderId,
+              });
             } else if (orderId) {
               router.push(`/checkout?orderId=${orderId}`);
             }
-          }, 1200);
+          }, 800);
         } else if (queueData.status === 'FAILED') {
           setWaitingRoom((prev) =>
             prev
@@ -753,6 +822,7 @@ function CheckoutContent() {
         affiliateCode: storedAff || undefined,
         facilities: activeFacilities.length > 0 ? activeFacilities : undefined,
         items: itemsPayload,
+        paymentMethod: selectedPaymentMethod || undefined,
       };
 
       let orderRes;
@@ -809,8 +879,12 @@ function CheckoutContent() {
       }
 
       toast.success('Pemesanan tiket berhasil dibuat!');
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
+      if (redirectUrl && orderId) {
+        setActivePaymentModal({
+          isOpen: true,
+          paymentUrl: redirectUrl,
+          orderId,
+        });
       } else if (orderId) {
         router.push(`/checkout?orderId=${orderId}`);
       }
@@ -950,15 +1024,20 @@ function CheckoutContent() {
                 {orderDetails?.payment?.snapToken && (
                   <Button
                     onClick={() => {
-                      const token = orderDetails.payment.snapToken;
-                      const url = token.startsWith('http')
-                        ? token
-                        : `https://app.sandbox.midtrans.com/snap/v2/vtweb/${token}`;
-                      window.open(url, '_blank');
+                      const url = orderDetails.payment.snapToken;
+                      if (url.startsWith('http')) {
+                        setActivePaymentModal({
+                          isOpen: true,
+                          paymentUrl: url,
+                          orderId: pollingOrderId,
+                        });
+                      } else {
+                        window.open(url, '_blank');
+                      }
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl w-full cursor-pointer py-2.5 font-bold border-0 shadow-sm"
                   >
-                    Buka Ulang Halaman Bayar
+                    Buka Popup Pembayaran TAQtix
                   </Button>
                 )}
               </>
@@ -1690,6 +1769,193 @@ function CheckoutContent() {
               </div>
             </div>
           )}
+
+          {/* Card: Pilihan Metode Pembayaran Kustom TAQtix */}
+          <div className="bg-white p-5 sm:p-7 border border-slate-200/80 rounded-3xl shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-teal-50 border border-[#08B4B5]/20 flex items-center justify-center text-[#08B4B5]">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm tracking-tight">Metode Pembayaran</h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Pilih metode bayar langsung tanpa diarahkan keluar dari TAQtix
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                Instan & Terverifikasi
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {/* Option 1: QRIS */}
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentMethod('QRIS')}
+                className={cn(
+                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
+                  selectedPaymentMethod === 'QRIS'
+                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs">
+                      <QrCode className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">QRIS (Semua Bank & E-Wallet)</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">BCA, GoPay, OVO, Dana, ShopeePay, Livin</span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    Populer
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-[#08ADAE] font-semibold">
+                  <span>Scan langsung di layar pop-up tanpa pindah web</span>
+                </div>
+              </button>
+
+              {/* Option 2: BCA Virtual Account */}
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BCA')}
+                className={cn(
+                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BCA'
+                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-blue-700 text-white flex items-center justify-center font-bold text-xs">
+                      BCA
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">BCA Virtual Account</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">m-BCA, KlikBCA, myBCA, ATM</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                  <span>Verifikasi instan otomatis 24 Jam</span>
+                </div>
+              </button>
+
+              {/* Option 3: Mandiri Virtual Account */}
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BANK_MANDIRI')}
+                className={cn(
+                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BANK_MANDIRI'
+                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-yellow-600 text-white flex items-center justify-center font-bold text-xs">
+                      MDR
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">Mandiri Virtual Account</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">Livin&apos; by Mandiri, ATM Mandiri</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                  <span>Verifikasi instan otomatis 24 Jam</span>
+                </div>
+              </button>
+
+              {/* Option 4: BNI Virtual Account */}
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BNI')}
+                className={cn(
+                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BNI'
+                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-orange-600 text-white flex items-center justify-center font-bold text-xs">
+                      BNI
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">BNI Virtual Account</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">BNI Mobile Banking, ATM BNI</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                  <span>Verifikasi instan otomatis 24 Jam</span>
+                </div>
+              </button>
+
+              {/* Option 5: BRI Virtual Account */}
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BRI')}
+                className={cn(
+                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
+                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BRI'
+                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-blue-800 text-white flex items-center justify-center font-bold text-xs">
+                      BRI
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">BRI Virtual Account (BRIVA)</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">BRImo, ATM BRI</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                  <span>Verifikasi instan otomatis 24 Jam</span>
+                </div>
+              </button>
+
+              {/* Option 6: Semua Metode (Otomatis) */}
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentMethod('')}
+                className={cn(
+                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
+                  selectedPaymentMethod === ''
+                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-slate-800 text-white flex items-center justify-center font-bold text-xs">
+                      <Wallet className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">Pilih di Layar Popup</span>
+                      <span className="text-[10px] text-slate-500 font-medium block">Permata VA, Alfamart, Indomaret, Kartu</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
+                  <span>Pilih channel di dalam modal popup</span>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* ======================================================== */}
@@ -1982,6 +2248,99 @@ function CheckoutContent() {
                   </Button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL PEMBAYARAN TERPADU TAQTIX (NO REDIRECT KE DOKU)    */}
+      {/* ======================================================== */}
+      {activePaymentModal?.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh] animate-in zoom-in-95 duration-200">
+            {/* Header Modal */}
+            <div className="p-4 sm:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300 font-bold text-xs tracking-wider">
+                  TQ
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm sm:text-base text-white tracking-tight">
+                      Pembayaran Tiket
+                    </h3>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-bold">
+                      SSL 256-Bit
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300">
+                    Selesaikan transaksi di layar ini tanpa meninggalkan taqtix.id
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActivePaymentModal(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+                title="Tutup Popup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Embedded Iframe Container */}
+            <div className="relative flex-1 min-h-[560px] bg-slate-50 flex flex-col">
+              <iframe
+                src={`${activePaymentModal.paymentUrl}${
+                  activePaymentModal.paymentUrl.includes('?') ? '&' : '?'
+                }view=iframe`}
+                className="w-full h-[580px] border-0"
+                title="TAQtix Secure Payment Window"
+                allow="payment *"
+              />
+            </div>
+
+            {/* Footer Modal: Real-time status & actions */}
+            <div className="p-3.5 sm:p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0">
+              <div className="flex items-center gap-2 text-slate-600 text-[11px]">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                <span>
+                  Memverifikasi pembayaran secara otomatis... Halaman ini akan otomatis dialihkan saat pembayaran sukses.
+                </span>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setActivePaymentModal(null)}
+                  className="w-full sm:w-auto text-xs font-semibold rounded-xl cursor-pointer"
+                >
+                  Tutup
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      const res = await apiClient.get(`/payments/${activePaymentModal.orderId}/status`);
+                      if (res.data?.data?.status === 'success') {
+                        toast.success('Pembayaran sukses terverifikasi!');
+                        setActivePaymentModal(null);
+                        router.push(`/checkout/success?orderId=${activePaymentModal.orderId}`);
+                      } else {
+                        toast.info('Pembayaran belum terdeteksi. Silakan selesaikan scan/transfer terlebih dahulu.');
+                      }
+                    } catch {
+                      toast.error('Gagal mengecek status pembayaran.');
+                    }
+                  }}
+                  className="w-full sm:w-auto bg-[#08ADAE] hover:bg-[#07999A] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer border-0"
+                >
+                  Saya Sudah Bayar
+                </Button>
+              </div>
             </div>
           </div>
         </div>

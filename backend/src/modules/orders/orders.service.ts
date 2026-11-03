@@ -490,7 +490,12 @@ export class OrdersService {
 
     if (dokuConfig.clientId && dokuConfig.secretKey) {
       try {
-        const result = await this.dokuService.createPayment(fullOrder, payment);
+        const result = await this.dokuService.createPayment(
+          fullOrder,
+          payment,
+          undefined,
+          dto.paymentMethod,
+        );
         paymentUrl = result.paymentUrl;
 
         // Simpan response.payment.token_id ke Payment.externalId (dan snapToken = paymentUrl)

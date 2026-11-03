@@ -43,12 +43,15 @@ export class DokuService {
   }
 
   /**
-   * Memanggil API DOKU Checkout untuk membuat link pembayaran (Hosted Checkout).
+   * Memanggil API DOKU Checkout untuk membuat link pembayaran (Hosted/Modal Checkout).
+   * Mendukung direct-channel filtering (paymentMethodType) agar customer langsung melihat
+   * metode bayar spesifik (misal QRIS atau VA BCA) tanpa layar pilihan metode DOKU.
    */
   async createPayment(
     order: any,
     payment: any,
     customFrontendUrl?: string,
+    paymentMethodType?: string,
   ): Promise<CreatePaymentResult> {
     const { clientId, secretKey, baseUrl } = this.getConfig();
 
@@ -83,7 +86,15 @@ export class DokuService {
 
     const invoiceNumber = `TAQTIX-ORD-${order.id}`;
 
-    const payload = {
+    const paymentConfig: any = {
+      payment_due_date: 10, // 10 menit
+    };
+
+    if (paymentMethodType && paymentMethodType.trim()) {
+      paymentConfig.payment_method_types = [paymentMethodType.trim()];
+    }
+
+    const buildPayload = (pConfig: any) => ({
       order: {
         amount: Math.round(order.totalAmount),
         invoice_number: invoiceNumber,
@@ -97,9 +108,7 @@ export class DokuService {
             quantity: item.qty,
           })) || [],
       },
-      payment: {
-        payment_due_date: 10, // 10 menit
-      },
+      payment: pConfig,
       customer: {
         id: order.buyerId || order.buyer?.id || order.id,
         name: buyerName,
@@ -107,11 +116,11 @@ export class DokuService {
         phone: formattedPhone || undefined,
         country: 'ID',
       },
-    };
+    });
 
-    // Serialize SEKALI untuk konsistensi Digest dan Body HTTP
-    const bodyString = JSON.stringify(payload);
-    const signature = generateSignature({
+    let currentPayload = buildPayload(paymentConfig);
+    let bodyString = JSON.stringify(currentPayload);
+    let signature = generateSignature({
       secretKey,
       clientId,
       requestId,
@@ -121,7 +130,7 @@ export class DokuService {
     });
 
     try {
-      const response = await fetch(`${baseUrl}${requestTarget}`, {
+      let response = await fetch(`${baseUrl}${requestTarget}`, {
         method: 'POST',
         headers: {
           'Client-Id': clientId,
@@ -133,7 +142,39 @@ export class DokuService {
         body: bodyString,
       });
 
-      const data = await response.json();
+      let data = await response.json();
+
+      // Jika DOKU menolak karena payment_method_types tertentu belum aktif di dashboard merchant,
+      // fallback otomatis tanpa payment_method_types agar transaksi tetap berhasil
+      if (!response.ok && paymentConfig.payment_method_types) {
+        this.logger.warn(
+          `DOKU Create Payment dengan metode ${paymentMethodType} tidak aktif (${JSON.stringify(data)}). Mencoba fallback ke semua channel aktif.`,
+        );
+        delete paymentConfig.payment_method_types;
+        currentPayload = buildPayload(paymentConfig);
+        bodyString = JSON.stringify(currentPayload);
+        signature = generateSignature({
+          secretKey,
+          clientId,
+          requestId,
+          timestamp: requestTimestamp,
+          requestTarget,
+          bodyString,
+        });
+
+        response = await fetch(`${baseUrl}${requestTarget}`, {
+          method: 'POST',
+          headers: {
+            'Client-Id': clientId,
+            'Request-Id': requestId,
+            'Request-Timestamp': requestTimestamp,
+            Signature: signature,
+            'Content-Type': 'application/json',
+          },
+          body: bodyString,
+        });
+        data = await response.json();
+      }
 
       if (!response.ok) {
         this.logger.error(

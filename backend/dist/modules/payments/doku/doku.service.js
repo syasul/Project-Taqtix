@@ -58,7 +58,7 @@ let DokuService = DokuService_1 = class DokuService {
     getConfig() {
         return (0, doku_config_1.getDokuConfig)(this.configService);
     }
-    async createPayment(order, payment, customFrontendUrl) {
+    async createPayment(order, payment, customFrontendUrl, paymentMethodType) {
         const { clientId, secretKey, baseUrl } = this.getConfig();
         if (!clientId || !secretKey) {
             throw new common_1.BadRequestException('Kredensial DOKU (DOKU_CLIENT_ID / DOKU_SECRET_KEY) belum dikonfigurasi');
@@ -82,7 +82,13 @@ let DokuService = DokuService_1 = class DokuService {
             this.configService.get('TAQTIX_WEB_URL') ||
             'https://taqtix.id';
         const invoiceNumber = `TAQTIX-ORD-${order.id}`;
-        const payload = {
+        const paymentConfig = {
+            payment_due_date: 10,
+        };
+        if (paymentMethodType && paymentMethodType.trim()) {
+            paymentConfig.payment_method_types = [paymentMethodType.trim()];
+        }
+        const buildPayload = (pConfig) => ({
             order: {
                 amount: Math.round(order.totalAmount),
                 invoice_number: invoiceNumber,
@@ -95,9 +101,7 @@ let DokuService = DokuService_1 = class DokuService {
                     quantity: item.qty,
                 })) || [],
             },
-            payment: {
-                payment_due_date: 10,
-            },
+            payment: pConfig,
             customer: {
                 id: order.buyerId || order.buyer?.id || order.id,
                 name: buyerName,
@@ -105,9 +109,10 @@ let DokuService = DokuService_1 = class DokuService {
                 phone: formattedPhone || undefined,
                 country: 'ID',
             },
-        };
-        const bodyString = JSON.stringify(payload);
-        const signature = (0, doku_signature_util_1.generateSignature)({
+        });
+        let currentPayload = buildPayload(paymentConfig);
+        let bodyString = JSON.stringify(currentPayload);
+        let signature = (0, doku_signature_util_1.generateSignature)({
             secretKey,
             clientId,
             requestId,
@@ -116,7 +121,7 @@ let DokuService = DokuService_1 = class DokuService {
             bodyString,
         });
         try {
-            const response = await fetch(`${baseUrl}${requestTarget}`, {
+            let response = await fetch(`${baseUrl}${requestTarget}`, {
                 method: 'POST',
                 headers: {
                     'Client-Id': clientId,
@@ -127,7 +132,33 @@ let DokuService = DokuService_1 = class DokuService {
                 },
                 body: bodyString,
             });
-            const data = await response.json();
+            let data = await response.json();
+            if (!response.ok && paymentConfig.payment_method_types) {
+                this.logger.warn(`DOKU Create Payment dengan metode ${paymentMethodType} tidak aktif (${JSON.stringify(data)}). Mencoba fallback ke semua channel aktif.`);
+                delete paymentConfig.payment_method_types;
+                currentPayload = buildPayload(paymentConfig);
+                bodyString = JSON.stringify(currentPayload);
+                signature = (0, doku_signature_util_1.generateSignature)({
+                    secretKey,
+                    clientId,
+                    requestId,
+                    timestamp: requestTimestamp,
+                    requestTarget,
+                    bodyString,
+                });
+                response = await fetch(`${baseUrl}${requestTarget}`, {
+                    method: 'POST',
+                    headers: {
+                        'Client-Id': clientId,
+                        'Request-Id': requestId,
+                        'Request-Timestamp': requestTimestamp,
+                        Signature: signature,
+                        'Content-Type': 'application/json',
+                    },
+                    body: bodyString,
+                });
+                data = await response.json();
+            }
             if (!response.ok) {
                 this.logger.error(`DOKU Create Payment Error response from ${baseUrl}${requestTarget}:`, data);
                 let errorMsg = data?.message ||

@@ -30,4 +30,5 @@ export declare class CreateOrderDto {
     utmSource?: string;
     utmMedium?: string;
     utmCampaign?: string;
+    paymentMethod?: string;
 }

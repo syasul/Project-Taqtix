@@ -880,7 +880,7 @@ export default function EventDetailPage() {
                     </span>
                     <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
                       <Mic2 className="w-5 h-5 text-[#08ADAE]" />
-                      <span>Line Up Bintang Tamu & Pengisi Acara</span>
+                      <span>Talent Bintang Tamu & Pengisi Acara</span>
                     </h3>
                   </div>
                   <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">

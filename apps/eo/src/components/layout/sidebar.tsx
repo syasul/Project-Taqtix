@@ -131,7 +131,7 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
             },
             {
               href: `/dashboard/events/${eventId}/lineup`,
-              label: 'Line Up Pengisi Acara',
+              label: 'Talent & Pengisi Acara',
               icon: Mic2,
               resource: 'create_edit_event',
             },

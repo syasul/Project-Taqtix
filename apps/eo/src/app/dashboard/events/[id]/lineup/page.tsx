@@ -173,7 +173,7 @@ export default function LineupPage() {
 
   const breadcrumbs = [
     { label: 'Daftar Event', href: '/dashboard/events' },
-    { label: 'Line Up Performer' },
+    { label: 'Talent & Performer' },
   ];
 
   return (
@@ -186,7 +186,7 @@ export default function LineupPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5 tracking-tight">
             <Mic2 className="h-6 w-6 text-[#08ADAE]" />
-            Line Up Performer & Jadwal Panggung
+            Talent & Jadwal Panggung
           </h1>
           <p className="text-slate-500 text-xs mt-1">
             Susun daftar artis, musisi, atau pembicara yang tampil beserta foto, jadwal, panggung, dan tautan sosial media.
@@ -197,13 +197,13 @@ export default function LineupPage() {
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#08ADAE] hover:bg-[#07999A] text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer border-0">
               <Plus className="h-4 w-4" />
-              <span>Tambah Performer Baru</span>
+              <span>Tambah Talent Baru</span>
             </DialogTrigger>
             <DialogContent className="bg-white border-slate-200 text-slate-900 max-w-md rounded-2xl shadow-xl">
               <DialogHeader>
                 <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <Mic2 className="h-5 w-5 text-[#08ADAE]" />
-                  Tambah Pengisi Acara
+                  Tambah Talent & Pengisi Acara
                 </DialogTitle>
               </DialogHeader>
 
@@ -386,7 +386,7 @@ export default function LineupPage() {
       ) : lineup.length === 0 ? (
         <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl shadow-sm">
           <Mic2 className="h-10 w-10 text-slate-400 mx-auto mb-3" />
-          <h3 className="text-slate-800 font-bold text-sm">Belum Ada Line Up Performer</h3>
+          <h3 className="text-slate-800 font-bold text-sm">Belum Ada Talent / Pengisi Acara</h3>
           <p className="text-slate-400 text-xs mt-1">
             Tambahkan artis atau pembicara yang akan tampil untuk melengkapi informasi acara Anda.
           </p>

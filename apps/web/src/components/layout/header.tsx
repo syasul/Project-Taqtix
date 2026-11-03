@@ -139,18 +139,12 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center">
               <Link
                 href="/login"
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-[#08ADAE] rounded-full transition-colors"
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/register"
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-bold text-white bg-[#08ADAE] hover:bg-[#07999A] shadow-[0_4px_14px_rgba(8,173,174,0.3),inset_0_1px_1px_rgba(255,255,255,0.4)] transition-all active:scale-[0.98]"
               >
-                <span>Daftar</span>
+                <span>Masuk</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -228,15 +222,9 @@ export default function Header() {
                   <div className="flex flex-col gap-2 pt-4 border-t border-slate-100">
                     <Link
                       href="/login"
-                      className="w-full text-center py-2.5 text-xs font-semibold text-slate-700 border border-slate-200 rounded-full hover:bg-slate-50 transition"
-                    >
-                      Masuk
-                    </Link>
-                    <Link
-                      href="/register"
                       className="w-full text-center py-2.5 text-xs font-bold text-white bg-[#08ADAE] hover:bg-[#079b9c] rounded-full shadow-sm transition"
                     >
-                      Daftar Akun Baru
+                      Masuk
                     </Link>
                   </div>
                 )}

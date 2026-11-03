@@ -113,7 +113,10 @@ let DashboardService = class DashboardService {
             pendingTransactions: pendingOrdersCount,
         };
     }
-    async getOverview(userId) {
+    async getOverview(userId, eventId) {
+        if (eventId) {
+            return this.calculateEventOverview(userId, eventId);
+        }
         const cacheKey = `dashboard:overview:${userId}`;
         if (this.redis) {
             try {
@@ -136,6 +139,132 @@ let DashboardService = class DashboardService {
             }
         }
         return result;
+    }
+    async calculateEventOverview(userId, eventId) {
+        const organizerId = await this.getOrganizerId(userId);
+        const event = await this.prisma.event.findFirst({
+            where: { id: eventId, organizerId },
+            include: {
+                ticketCategories: true,
+            },
+        });
+        if (!event) {
+            throw new common_1.ForbiddenException('Event tidak ditemukan atau bukan milik organisasi Anda');
+        }
+        const paidOrders = await this.prisma.order.findMany({
+            where: {
+                eventId,
+                status: client_1.OrderStatus.PAID,
+            },
+            include: {
+                orderItems: {
+                    include: {
+                        ticketCategory: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        const pendingOrdersCount = await this.prisma.order.count({
+            where: { eventId, status: client_1.OrderStatus.PENDING },
+        });
+        const totalRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+        const ticketsSold = paidOrders.reduce((sum, o) => sum + o.orderItems.reduce((acc, item) => acc + item.qty, 0), 0);
+        const totalQuota = event.ticketCategories.reduce((sum, c) => sum + c.quota, 0);
+        const remainingQuota = Math.max(0, totalQuota - ticketsSold);
+        const checkInCount = await this.prisma.ticket.count({
+            where: {
+                eventId,
+                OR: [
+                    { status: client_1.TicketStatus.CHECKED_IN },
+                    { checkedInAt: { not: null } },
+                ],
+            },
+        });
+        const workforcePresent = await this.prisma.workforceMember.count({
+            where: {
+                eventId,
+                status: 'present',
+            },
+        });
+        const totalWorkforce = await this.prisma.workforceMember.count({
+            where: { eventId },
+        });
+        const categoryStats = event.ticketCategories.map((cat) => {
+            const catItems = paidOrders.flatMap((o) => o.orderItems.filter((item) => item.ticketCategoryId === cat.id));
+            const sold = catItems.reduce((acc, item) => acc + item.qty, 0);
+            const revenue = catItems.reduce((acc, item) => acc + item.qty * item.unitPrice, 0);
+            return {
+                id: cat.id,
+                name: cat.name,
+                price: cat.price,
+                quota: cat.quota,
+                sold,
+                remaining: Math.max(0, cat.quota - sold),
+                revenue,
+            };
+        });
+        const monthlyTrends = {};
+        const months = [];
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const label = d.toLocaleString('id-ID', {
+                month: 'short',
+                year: '2-digit',
+            });
+            months.push(label);
+            monthlyTrends[label] = 0;
+        }
+        for (const order of paidOrders) {
+            const orderMonth = order.createdAt.toLocaleString('id-ID', {
+                month: 'short',
+                year: '2-digit',
+            });
+            if (monthlyTrends[orderMonth] !== undefined) {
+                monthlyTrends[orderMonth] += order.totalAmount;
+            }
+        }
+        const trends = months.map((month) => ({
+            month,
+            revenue: monthlyTrends[month],
+        }));
+        return {
+            isEventSpecific: true,
+            event: {
+                id: event.id,
+                title: event.title,
+                slug: event.slug,
+                status: event.status,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                location: event.location,
+                bannerUrl: event.bannerUrl,
+            },
+            totalRevenue,
+            ticketsSold,
+            totalQuota,
+            remainingQuota,
+            completedTransactions: paidOrders.length,
+            pendingTransactions: pendingOrdersCount,
+            checkInCount,
+            workforcePresent,
+            totalWorkforce,
+            ticketCategories: categoryStats,
+            trends,
+            recentTransactions: paidOrders.slice(0, 5).map((o) => {
+                const firstItem = o.orderItems[0];
+                return {
+                    id: o.id,
+                    orderNumber: o.id.slice(0, 8).toUpperCase(),
+                    customerName: firstItem?.attendeeName || 'Tamu',
+                    customerEmail: firstItem?.attendeeEmail || '-',
+                    totalAmount: o.totalAmount,
+                    createdAt: o.createdAt,
+                    ticketsCount: o.orderItems.reduce((sum, item) => sum + item.qty, 0),
+                };
+            }),
+        };
     }
     async calculateOverview(userId) {
         const organizerId = await this.getOrganizerId(userId);
@@ -161,6 +290,12 @@ let DashboardService = class DashboardService {
                 status: client_1.EventStatus.PUBLISHED,
                 startDate: { lte: now },
                 endDate: { gte: now },
+            },
+        });
+        const workforcePresent = await this.prisma.workforceMember.count({
+            where: {
+                eventId: { in: eventIds },
+                status: 'present',
             },
         });
         const monthlyTrends = {};
@@ -192,6 +327,7 @@ let DashboardService = class DashboardService {
             totalRevenue,
             ticketsSold,
             activeEvents: runningEventsCount,
+            workforcePresent,
             trends,
         };
     }

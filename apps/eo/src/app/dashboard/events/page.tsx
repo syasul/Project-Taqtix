@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { PlusCircle, Calendar, MapPin, Edit3, Ticket, TrendingUp, Users, HeartHandshake, Eye, Loader2 } from 'lucide-react';
+import { PlusCircle, Calendar, MapPin, Edit3, Ticket, TrendingUp, Users, HeartHandshake, Eye, Loader2, LayoutDashboard } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { apiClient } from '@/lib/api-client';
@@ -110,7 +110,9 @@ export default function OrganizerEventsPage() {
 
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <h3 className="text-base font-bold text-slate-900 leading-snug">{event.title}</h3>
+                      <Link href={`/dashboard/events/${event.id}`} className="hover:text-[#08B4B5] transition">
+                        <h3 className="text-base font-bold text-slate-900 leading-snug">{event.title}</h3>
+                      </Link>
                       {statusUpper === 'DRAFT' && (
                         <Badge className="bg-amber-50 text-amber-700 border-amber-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
                           Draft
@@ -148,6 +150,17 @@ export default function OrganizerEventsPage() {
 
                 {/* Event Actions Grid */}
                 <div className="flex flex-wrap gap-1.5">
+                  <Link
+                    href={`/dashboard/events/${event.id}`}
+                    className={cn(
+                      buttonVariants({ size: 'sm', variant: 'default' }),
+                      'bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer h-auto py-1.5 px-3 flex items-center gap-1.5 border-0 shadow-xs'
+                    )}
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    <span>Overview</span>
+                  </Link>
+
                   <Link
                     href={`/dashboard/events/${event.id}/edit`}
                     className={cn(

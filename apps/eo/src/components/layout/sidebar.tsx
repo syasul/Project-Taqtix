@@ -101,6 +101,18 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const eventLinkGroups: EventLinkGroup[] = eventId
     ? [
         {
+          groupTitle: 'Overview & Ringkasan',
+          isHighlighted: false,
+          links: [
+            {
+              href: `/dashboard/events/${eventId}`,
+              label: 'Overview Event',
+              icon: LayoutDashboard,
+              resource: 'view_sales_revenue',
+            },
+          ],
+        },
+        {
           groupTitle: 'Setup & Syarat Event',
           groupBadge: 'Utama',
           isHighlighted: true,

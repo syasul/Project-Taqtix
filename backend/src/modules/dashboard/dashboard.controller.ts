@@ -30,10 +30,13 @@ export class DashboardController {
   @ApiBearerAuth()
   @Permissions('view_sales_revenue')
   @ApiOperation({
-    summary: 'Mendapatkan rangkuman eksekutif multi-event organizer (Cached)',
+    summary: 'Mendapatkan rangkuman eksekutif multi-event organizer (Cached) atau per-event',
   })
-  async getOverview(@CurrentUser('id') userId: string) {
-    const result = await this.dashboardService.getOverview(userId);
+  async getOverview(
+    @CurrentUser('id') userId: string,
+    @Query('eventId') eventId?: string,
+  ) {
+    const result = await this.dashboardService.getOverview(userId, eventId);
     return { success: true, data: result };
   }
 

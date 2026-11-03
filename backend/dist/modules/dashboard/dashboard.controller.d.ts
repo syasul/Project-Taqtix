@@ -4,7 +4,7 @@ import type { Response } from 'express';
 export declare class DashboardController {
     private readonly dashboardService;
     constructor(dashboardService: DashboardService);
-    getOverview(userId: string): Promise<{
+    getOverview(userId: string, eventId?: string): Promise<{
         success: boolean;
         data: any;
     }>;

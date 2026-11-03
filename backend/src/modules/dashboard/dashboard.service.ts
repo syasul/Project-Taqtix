@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { OrderStatus, EventStatus } from '@prisma/client';
+import { OrderStatus, EventStatus, TicketStatus } from '@prisma/client';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -138,9 +138,13 @@ export class DashboardService implements OnModuleInit {
   }
 
   /**
-   * Executive Dashboard Overview untuk Multi-Event (cached 5 menit).
+   * Executive Dashboard Overview untuk Multi-Event (cached 5 menit) atau per-event jika eventId diberikan.
    */
-  async getOverview(userId: string) {
+  async getOverview(userId: string, eventId?: string) {
+    if (eventId) {
+      return this.calculateEventOverview(userId, eventId);
+    }
+
     const cacheKey = `dashboard:overview:${userId}`;
     if (this.redis) {
       try {
@@ -164,6 +168,154 @@ export class DashboardService implements OnModuleInit {
     }
 
     return result;
+  }
+
+  private async calculateEventOverview(userId: string, eventId: string) {
+    const organizerId = await this.getOrganizerId(userId);
+
+    const event = await this.prisma.event.findFirst({
+      where: { id: eventId, organizerId },
+      include: {
+        ticketCategories: true,
+      },
+    });
+
+    if (!event) {
+      throw new ForbiddenException('Event tidak ditemukan atau bukan milik organisasi Anda');
+    }
+
+    const paidOrders = await this.prisma.order.findMany({
+      where: {
+        eventId,
+        status: OrderStatus.PAID,
+      },
+      include: {
+        orderItems: {
+          include: {
+            ticketCategory: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const pendingOrdersCount = await this.prisma.order.count({
+      where: { eventId, status: OrderStatus.PENDING },
+    });
+
+    const totalRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const ticketsSold = paidOrders.reduce(
+      (sum, o) => sum + o.orderItems.reduce((acc, item) => acc + item.qty, 0),
+      0,
+    );
+
+    const totalQuota = event.ticketCategories.reduce((sum, c) => sum + c.quota, 0);
+    const remainingQuota = Math.max(0, totalQuota - ticketsSold);
+
+    const checkInCount = await this.prisma.ticket.count({
+      where: {
+        eventId,
+        OR: [
+          { status: TicketStatus.CHECKED_IN },
+          { checkedInAt: { not: null } },
+        ],
+      },
+    });
+
+    const workforcePresent = await this.prisma.workforceMember.count({
+      where: {
+        eventId,
+        status: 'present',
+      },
+    });
+
+    const totalWorkforce = await this.prisma.workforceMember.count({
+      where: { eventId },
+    });
+
+    // Breakdown performa per kategori tiket
+    const categoryStats = event.ticketCategories.map((cat) => {
+      const catItems = paidOrders.flatMap((o) =>
+        o.orderItems.filter((item) => item.ticketCategoryId === cat.id),
+      );
+      const sold = catItems.reduce((acc, item) => acc + item.qty, 0);
+      const revenue = catItems.reduce((acc, item) => acc + item.qty * item.unitPrice, 0);
+      return {
+        id: cat.id,
+        name: cat.name,
+        price: cat.price,
+        quota: cat.quota,
+        sold,
+        remaining: Math.max(0, cat.quota - sold),
+        revenue,
+      };
+    });
+
+    // Hitung trends bulanan (6 bulan terakhir) untuk event ini
+    const monthlyTrends: Record<string, number> = {};
+    const months: string[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const label = d.toLocaleString('id-ID', {
+        month: 'short',
+        year: '2-digit',
+      });
+      months.push(label);
+      monthlyTrends[label] = 0;
+    }
+
+    for (const order of paidOrders) {
+      const orderMonth = order.createdAt.toLocaleString('id-ID', {
+        month: 'short',
+        year: '2-digit',
+      });
+      if (monthlyTrends[orderMonth] !== undefined) {
+        monthlyTrends[orderMonth] += order.totalAmount;
+      }
+    }
+
+    const trends = months.map((month) => ({
+      month,
+      revenue: monthlyTrends[month],
+    }));
+
+    return {
+      isEventSpecific: true,
+      event: {
+        id: event.id,
+        title: event.title,
+        slug: event.slug,
+        status: event.status,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        location: event.location,
+        bannerUrl: event.bannerUrl,
+      },
+      totalRevenue,
+      ticketsSold,
+      totalQuota,
+      remainingQuota,
+      completedTransactions: paidOrders.length,
+      pendingTransactions: pendingOrdersCount,
+      checkInCount,
+      workforcePresent,
+      totalWorkforce,
+      ticketCategories: categoryStats,
+      trends,
+      recentTransactions: paidOrders.slice(0, 5).map((o) => {
+        const firstItem = o.orderItems[0];
+        return {
+          id: o.id,
+          orderNumber: o.id.slice(0, 8).toUpperCase(),
+          customerName: firstItem?.attendeeName || 'Tamu',
+          customerEmail: firstItem?.attendeeEmail || '-',
+          totalAmount: o.totalAmount,
+          createdAt: o.createdAt,
+          ticketsCount: o.orderItems.reduce((sum, item) => sum + item.qty, 0),
+        };
+      }),
+    };
   }
 
   private async calculateOverview(userId: string) {
@@ -202,6 +354,13 @@ export class DashboardService implements OnModuleInit {
       },
     });
 
+    const workforcePresent = await this.prisma.workforceMember.count({
+      where: {
+        eventId: { in: eventIds },
+        status: 'present',
+      },
+    });
+
     // Hitung trends pendapatan per bulan (6 bulan terakhir)
     const monthlyTrends: Record<string, number> = {};
     const months: string[] = [];
@@ -235,6 +394,7 @@ export class DashboardService implements OnModuleInit {
       totalRevenue,
       ticketsSold,
       activeEvents: runningEventsCount,
+      workforcePresent,
       trends,
     };
   }

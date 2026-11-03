@@ -25,8 +25,8 @@ let DashboardController = class DashboardController {
     constructor(dashboardService) {
         this.dashboardService = dashboardService;
     }
-    async getOverview(userId) {
-        const result = await this.dashboardService.getOverview(userId);
+    async getOverview(userId, eventId) {
+        const result = await this.dashboardService.getOverview(userId, eventId);
         return { success: true, data: result };
     }
     async getEventDashboard(eventId, userId) {
@@ -86,11 +86,12 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, permissions_decorator_1.Permissions)('view_sales_revenue'),
     (0, swagger_1.ApiOperation)({
-        summary: 'Mendapatkan rangkuman eksekutif multi-event organizer (Cached)',
+        summary: 'Mendapatkan rangkuman eksekutif multi-event organizer (Cached) atau per-event',
     }),
     __param(0, (0, current_user_decorator_1.CurrentUser)('id')),
+    __param(1, (0, common_1.Query)('eventId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getOverview", null);
 __decorate([

@@ -16,7 +16,8 @@ export declare class DashboardService implements OnModuleInit {
         completedTransactions: number;
         pendingTransactions: number;
     }>;
-    getOverview(userId: string): Promise<any>;
+    getOverview(userId: string, eventId?: string): Promise<any>;
+    private calculateEventOverview;
     private calculateOverview;
     getBuyers(eventId: string, organizerUserId: string): Promise<{
         orderId: string;

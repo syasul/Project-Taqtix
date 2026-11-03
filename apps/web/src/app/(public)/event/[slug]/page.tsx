@@ -489,10 +489,6 @@ export default function EventDetailPage() {
       ? Math.min(...event.ticketCategories.map((c) => c.price))
       : 0;
 
-  const totalRemainingQuota = event.ticketCategories.reduce(
-    (sum, c) => sum + Math.max(0, c.quota - c.sold),
-    0
-  );
 
   const primaryCategory = (() => {
     if (event.seoKeywords) {
@@ -642,10 +638,6 @@ export default function EventDetailPage() {
                     <span>Jadwal TBA</span>
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                  <Users className="w-3 h-3 text-[#08ADAE]" />
-                  <span>Sisa {totalRemainingQuota.toLocaleString('id-ID')} Kuota</span>
-                </span>
                 {minPrice > 0 && (
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
                     <Ticket className="w-3 h-3 text-[#08ADAE]" />
@@ -1410,8 +1402,8 @@ export default function EventDetailPage() {
                               Habis Terjual
                             </span>
                           ) : (
-                            <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                              Sisa {remaining}
+                            <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
+                              Tersedia
                             </span>
                           )}
                         </div>

@@ -217,6 +217,11 @@ let EventsService = class EventsService {
                         order: 'asc',
                     },
                 },
+                rundown: {
+                    orderBy: {
+                        order: 'asc',
+                    },
+                },
             },
         });
         if (!event || event.status !== client_1.EventStatus.PUBLISHED) {

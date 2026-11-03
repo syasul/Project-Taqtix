@@ -34,6 +34,7 @@ const tokens_module_1 = require("./modules/tokens/tokens.module");
 const custom_fields_module_1 = require("./modules/custom-fields/custom-fields.module");
 const facilities_module_1 = require("./modules/facilities/facilities.module");
 const lineup_module_1 = require("./modules/lineup/lineup.module");
+const rundown_module_1 = require("./modules/rundown/rundown.module");
 const transfers_module_1 = require("./modules/transfers/transfers.module");
 const pos_module_1 = require("./modules/pos/pos.module");
 const doorprize_module_1 = require("./modules/doorprize/doorprize.module");
@@ -128,6 +129,7 @@ exports.AppModule = AppModule = __decorate([
             custom_fields_module_1.CustomFieldsModule,
             facilities_module_1.FacilitiesModule,
             lineup_module_1.LineupModule,
+            rundown_module_1.RundownModule,
             transfers_module_1.TransfersModule,
             pos_module_1.PosModule,
             doorprize_module_1.DoorprizeModule,

@@ -25,6 +25,7 @@ import { TokensModule } from './modules/tokens/tokens.module';
 import { CustomFieldsModule } from './modules/custom-fields/custom-fields.module';
 import { FacilitiesModule } from './modules/facilities/facilities.module';
 import { LineupModule } from './modules/lineup/lineup.module';
+import { RundownModule } from './modules/rundown/rundown.module';
 import { TransfersModule } from './modules/transfers/transfers.module';
 import { PosModule } from './modules/pos/pos.module';
 import { DoorprizeModule } from './modules/doorprize/doorprize.module';
@@ -122,6 +123,7 @@ import { IdempotencyInterceptor } from './common/interceptors/idempotency.interc
     CustomFieldsModule,
     FacilitiesModule,
     LineupModule,
+    RundownModule,
     TransfersModule,
     PosModule,
     DoorprizeModule,

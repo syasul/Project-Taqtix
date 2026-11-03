@@ -249,6 +249,11 @@ export class EventsService {
             order: 'asc',
           },
         },
+        rundown: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 

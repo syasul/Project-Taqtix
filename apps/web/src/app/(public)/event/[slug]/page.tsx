@@ -290,6 +290,15 @@ function parseSocialLink(url?: string | null, fallbackName?: string) {
   };
 }
 
+interface EventRundownItem {
+  id: string;
+  timeRange: string;
+  title: string;
+  description: string | null;
+  isHighlight: boolean;
+  order: number;
+}
+
 interface EventDetail {
   id: string;
   title: string;
@@ -318,6 +327,7 @@ interface EventDetail {
   };
   ticketCategories: TicketCategory[];
   lineup?: LineUpItem[];
+  rundown?: EventRundownItem[];
 }
 
 export default function EventDetailPage() {
@@ -1026,72 +1036,55 @@ export default function EventDetailPage() {
           </div>
 
           {/* RUNDOWN & JADWAL ACARA (TIMELINE) */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
-                  Rangkaian Agenda
+          {event.rundown && event.rundown.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xs">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                    Rangkaian Agenda
+                  </span>
+                  <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#08ADAE]" />
+                    <span>Estimasi Rundown Acara</span>
+                  </h3>
+                </div>
+                <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
+                  Jadwal Tentatif
                 </span>
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#08ADAE]" />
-                  <span>Estimasi Rundown Acara</span>
-                </h3>
-              </div>
-              <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
-                Jadwal Tentatif
-              </span>
-            </div>
-
-            <div className="space-y-3 pt-1">
-              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <div className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 font-mono text-xs font-bold text-slate-800 shrink-0">
-                  08:00 - 09:00
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900">Open Gate & Registrasi Kehadiran</h4>
-                  <p className="text-[11px] text-slate-500 leading-normal">
-                    Pemeriksaan barang bawaan dan pemindaian barcode e-ticket di pintu masuk venue oleh panitia.
-                  </p>
-                </div>
               </div>
 
-              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <div className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 font-mono text-xs font-bold text-slate-800 shrink-0">
-                  09:00 - 09:30
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900">Pembukaan & Sambutan Resmi</h4>
-                  <p className="text-[11px] text-slate-500 leading-normal">
-                    Pengondisian ruangan dan sambutan resmi dari pihak panitia penyelenggara acara.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-[#08ADAE]/5 border border-[#08ADAE]/20">
-                <div className="px-2.5 py-1 rounded-xl bg-[#08ADAE] text-white font-mono text-xs font-bold shrink-0">
-                  09:30 - 11:30
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900">Sesi Utama Acara & Pemaparan</h4>
-                  <p className="text-[11px] text-slate-600 leading-normal">
-                    Rangkaian agenda utama, pemaparan materi inti, dan penampilan pembicara/pengisi acara.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <div className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 font-mono text-xs font-bold text-slate-800 shrink-0">
-                  11:30 - 12:00
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900">Tanya Jawab, Doa & Penutup</h4>
-                  <p className="text-[11px] text-slate-500 leading-normal">
-                    Sesi interaktif tanya jawab, ramah tamah antar peserta, dan doa penutup rangkaian acara.
-                  </p>
-                </div>
+              <div className="space-y-3 pt-1">
+                {event.rundown.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-start gap-4 p-3.5 rounded-2xl border ${
+                      item.isHighlight
+                        ? 'bg-[#08ADAE]/5 border-[#08ADAE]/20 ring-1 ring-[#08ADAE]/10'
+                        : 'bg-slate-50 border border-slate-200/70'
+                    }`}
+                  >
+                    <div
+                      className={`px-2.5 py-1 rounded-xl font-mono text-xs font-bold shrink-0 ${
+                        item.isHighlight
+                          ? 'bg-[#08ADAE] text-white'
+                          : 'bg-white border border-slate-200 text-slate-800'
+                      }`}
+                    >
+                      {item.timeRange}
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900">{item.title}</h4>
+                      {item.description && (
+                        <p className={`text-[11px] leading-normal ${item.isHighlight ? 'text-slate-600' : 'text-slate-500'}`}>
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
 
           {/* SYARAT, KETENTUAN & PANDUAN MASUK */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">

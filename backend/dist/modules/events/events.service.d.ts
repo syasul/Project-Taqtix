@@ -185,6 +185,17 @@ export declare class EventsService {
             stage: string | null;
             socialUrl: string | null;
         }[];
+        rundown: {
+            description: string | null;
+            order: number;
+            title: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            eventId: string;
+            timeRange: string;
+            isHighlight: boolean;
+        }[];
         description: string | null;
         title: string;
         id: string;

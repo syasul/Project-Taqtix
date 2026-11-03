@@ -93,9 +93,25 @@ export class AdminService {
         userId: user.id,
         name: dto.name,
         slug,
+        phone: dto.phone || null,
         segment: dto.segment || 'event_builder',
         plan: dto.plan || 'starter',
         bankAccount: dto.bankAccount || '',
+        status: 'active',
+        approvedAt: new Date(),
+        approvedBy: 'mainadmin',
+      },
+    });
+
+    await this.prisma.organizerMember.create({
+      data: {
+        organizerId: organizer.id,
+        userId: user.id,
+        email: user.email,
+        role: 'owner',
+        status: 'active',
+        invitedBy: user.id,
+        joinedAt: new Date(),
       },
     });
 
@@ -103,11 +119,12 @@ export class AdminService {
       id: organizer.id,
       name: organizer.name,
       email: user.email,
+      phone: organizer.phone || '08123456789',
       slug: organizer.slug,
       plan: organizer.plan,
       segment: organizer.segment,
       bankAccount: organizer.bankAccount,
-      status: 'active',
+      status: organizer.status,
       createdAt: organizer.createdAt.toISOString(),
       eventCount: 0,
     };

@@ -1131,53 +1131,77 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
   throw new ApiError('Not found', 'NOT_FOUND', 404);
 }
 
+function getAdminToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)admin_access_token=([^;]+)/);
+  if (match) return decodeURIComponent(match[1]);
+  try {
+    return localStorage.getItem('admin_access_token');
+  } catch {
+    return null;
+  }
+}
+
 // ==========================================
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  // Check if this is an admin path. If so, intercept with mock data
-  if (path.startsWith('/admin')) {
-    let bodyObj = null;
-    if (options.body) {
-      try {
-        bodyObj = JSON.parse(options.body as string);
-      } catch (e) {}
-    }
-    const mockRes = handleMockRequest(options.method || 'GET', path, bodyObj);
-    return mockRes.data as T;
-  }
-
   const url = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
   const headers = new Headers(options.headers);
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: options.credentials || 'include',
-  });
+  const token = getAdminToken();
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
-  let payload: ApiResponse<T>;
   try {
-    payload = await response.json();
-  } catch (err) {
-    throw new ApiError(
-      `Failed to parse response: ${response.statusText}`,
-      'PARSE_ERROR',
-      response.status
-    );
-  }
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: options.credentials || 'include',
+    });
 
-  if (!response.ok || !payload.success) {
-    const errorDetails = payload.error || {
-      code: 'UNKNOWN_ERROR',
-      message: 'An unexpected error occurred.',
-    };
-    throw new ApiError(errorDetails.message, errorDetails.code, response.status);
-  }
+    let payload: any;
+    try {
+      payload = await response.json();
+    } catch (err) {
+      throw new ApiError(
+        `Failed to parse response: ${response.statusText}`,
+        'PARSE_ERROR',
+        response.status
+      );
+    }
 
-  return payload.data as T;
+    if (!response.ok || (payload && payload.success === false)) {
+      const errorDetails = payload?.error || {
+        code: 'UNKNOWN_ERROR',
+        message: payload?.message || 'An unexpected error occurred.',
+      };
+      const msg = typeof errorDetails === 'string' ? errorDetails : (errorDetails.message || 'An unexpected error occurred.');
+      throw new ApiError(msg, errorDetails.code || 'API_ERROR', response.status);
+    }
+
+    return (payload?.data !== undefined ? payload.data : payload) as T;
+  } catch (err: any) {
+    // If endpoint is not found on backend (404) or network fails and mock is available, fallback to mock
+    if (path.startsWith('/admin') && (err?.status === 404 || err?.status === 502 || !err?.status)) {
+      let bodyObj = null;
+      if (options.body) {
+        try {
+          bodyObj = JSON.parse(options.body as string);
+        } catch (e) {}
+      }
+      try {
+        const mockRes = handleMockRequest(options.method || 'GET', path, bodyObj);
+        return mockRes.data as T;
+      } catch {
+        throw err;
+      }
+    }
+    throw err;
+  }
 }
 
 export const api = {

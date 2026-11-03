@@ -161,6 +161,7 @@ export declare class AdminController {
             id: string;
             name: string;
             email: string;
+            phone: string;
             slug: string;
             plan: string;
             segment: string | null;

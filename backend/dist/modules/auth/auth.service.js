@@ -76,12 +76,23 @@ let AuthService = class AuthService {
             });
             if (dto.role === 'organizer') {
                 const slug = cleanEmail.split('@')[0] + '-' + Math.floor(Math.random() * 1000);
-                await tx.organizer.create({
+                const org = await tx.organizer.create({
                     data: {
                         userId: user.id,
                         name: 'Penyelenggara Baru',
                         slug,
                         status: 'pending',
+                    },
+                });
+                await tx.organizerMember.create({
+                    data: {
+                        organizerId: org.id,
+                        userId: user.id,
+                        email: cleanEmail,
+                        role: 'owner',
+                        status: 'active',
+                        invitedBy: user.id,
+                        joinedAt: new Date(),
                     },
                 });
             }

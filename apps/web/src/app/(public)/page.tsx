@@ -41,7 +41,6 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EventCard } from '@/components/event/event-card';
-import { HeroBannerCarousel, DEFAULT_HOME_BANNERS, type BannerItem } from '@/components/home/hero-banner-carousel';
 
 interface Event {
   id: string;
@@ -281,25 +280,6 @@ function MarketplaceContent() {
     }
   }, [categoryParam]);
 
-  // Fetch dynamic banners managed by Main Admin (GET /v1/banners?position=home_hero)
-  const { data: bannersResponse } = useQuery({
-    queryKey: ['public-hero-banners'],
-    queryFn: async () => {
-      const res = await apiClient.get('/banners?position=home_hero');
-      return res.data;
-    },
-    staleTime: 60 * 1000,
-  });
-
-  const bannerList: BannerItem[] = useMemo(() => {
-    if (Array.isArray(bannersResponse?.data) && bannersResponse.data.length > 0) {
-      return bannersResponse.data;
-    }
-    if (Array.isArray(bannersResponse) && bannersResponse.length > 0) {
-      return bannersResponse;
-    }
-    return DEFAULT_HOME_BANNERS;
-  }, [bannersResponse]);
 
 
   const { data: eventsResponse, isLoading } = useQuery({
@@ -397,11 +377,11 @@ function MarketplaceContent() {
   return (
     <div className="space-y-16 pb-20">
       {/* ========================================================================= */}
-      {/* 1. JUMBOTRON WIDESCREEN PANORAMA BANNER (TAQTIX BESPOKE IDENTITY)        */}
+      {/* 1. HERO SECTION (HEADLINE, SEARCH & DISCOVERY)                            */}
       {/* ========================================================================= */}
-      <section className="px-2 sm:px-4 lg:px-6 max-w-[1440px] mx-auto relative pt-1 sm:pt-2">
-        {recentOrder && (
-          <div className="flex justify-center mb-4">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto pt-2 sm:pt-6 space-y-6">
+          {recentOrder && (
             <Link
               href="/tickets"
               className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#08ADAE]/10 border border-[#08ADAE]/30 text-[#08ADAE] hover:bg-[#08ADAE]/20 transition flex items-center gap-2 shadow-xs group"
@@ -413,20 +393,8 @@ function MarketplaceContent() {
                 <ArrowRight className="w-3 h-3 ml-0.5 inline" />
               </span>
             </Link>
-          </div>
-        )}
+          )}
 
-        {/* Jumbotron 3D Coverflow Banner Slider */}
-        <div className="w-full">
-          <HeroBannerCarousel banners={bannerList} />
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 2. SEARCH DOCK, HEADLINE & CATEGORIES (DISCOVERY SECTION)                  */}
-      {/* ========================================================================= */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
           {/* Liquid Glass Badge */}
           <div className="liquid-glass-pill px-4 py-1.5 rounded-full inline-flex items-center gap-2.5 text-xs font-semibold text-slate-700 shadow-xs">
             <span className="h-2 w-2 rounded-full bg-[#08ADAE] ring-4 ring-[#08ADAE]/20" />
@@ -434,13 +402,13 @@ function MarketplaceContent() {
           </div>
 
           {/* Main Headline (Solid Colors) */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.12]">
             Temukan Acara Favorit.{' '}
             <span className="text-[#08ADAE]">Beli Tiket Resmi</span> Tanpa Ribet.
           </h1>
 
           {/* Subtitle */}
-          <p className="text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed">
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
             Cari konser, festival, workshop, olahraga, pertunjukan seni, dan berbagai pengalaman menarik lainnya. Temukan event favoritmu dan pesan tiketnya dengan mudah di TAQtix.
           </p>
 

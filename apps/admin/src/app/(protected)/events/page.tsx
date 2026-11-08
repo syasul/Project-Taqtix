@@ -50,6 +50,7 @@ interface EventItem {
   endDate: string;
   ticketsSold: number;
   quota: number;
+  allowTicketTransfer?: boolean;
   category?: string;
   description?: string;
   priceRange?: string;
@@ -206,6 +207,28 @@ export default function EventsApprovalPage() {
     },
   });
 
+  // Toggle Ticket Resell / Transfer Mutation
+  const toggleTransferMutation = useMutation({
+    mutationFn: ({ id, allowTicketTransfer }: { id: string; allowTicketTransfer: boolean }) =>
+      api.patch(`/admin/events/${id}/transfer-toggle`, { allowTicketTransfer }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      toast.success(
+        variables.allowTicketTransfer
+          ? 'Fitur Resell & Transfer Tiket diaktifkan untuk event ini'
+          : 'Fitur Resell & Transfer Tiket dinonaktifkan untuk event ini'
+      );
+      if (detailEvent && detailEvent.id === variables.id) {
+        setDetailEvent((prev) =>
+          prev ? { ...prev, allowTicketTransfer: variables.allowTicketTransfer } : null
+        );
+      }
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui izin resell tiket');
+    },
+  });
+
   // Filter logic
   const filteredEvents = events.filter((evt) => {
     const matchesSearch =
@@ -347,6 +370,7 @@ export default function EventsApprovalPage() {
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4">Double SEO Engagement</th>
                   <th className="py-3.5 px-4">Internet Fee</th>
+                  <th className="py-3.5 px-4">Izin Resell</th>
                   <th className="py-3.5 px-4 text-right">Aksi Moderasi</th>
                 </tr>
               </thead>
@@ -457,6 +481,35 @@ export default function EventsApprovalPage() {
                             ? `EO: Rp ${evt.organizerInternetFee.toLocaleString('id-ID')}`
                             : 'Set Fee'}
                         </span>
+                      </button>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          toggleTransferMutation.mutate({
+                            id: evt.id,
+                            allowTicketTransfer: evt.allowTicketTransfer === false,
+                          })
+                        }
+                        disabled={toggleTransferMutation.isPending}
+                        title={
+                          evt.allowTicketTransfer !== false
+                            ? 'Resell diizinkan (Klik untuk menonaktifkan)'
+                            : 'Resell dilarang (Klik untuk mengaktifkan)'
+                        }
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-2xs ${
+                          evt.allowTicketTransfer !== false
+                            ? 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                            : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
+                        }`}
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            evt.allowTicketTransfer !== false ? 'bg-emerald-500' : 'bg-rose-500'
+                          }`}
+                        />
+                        <span>{evt.allowTicketTransfer !== false ? 'Resell Aktif' : 'Resell Off'}</span>
                       </button>
                     </td>
                     <td className="py-3.5 px-4 text-right">
@@ -590,6 +643,38 @@ export default function EventsApprovalPage() {
                     <span>{detailEvent.adminSeoKeywords || 'Belum di-boost oleh Admin'}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Izin Resell & Transfer Tiket Setting */}
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs gap-3">
+                <div className="space-y-0.5">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+                    <Ticket className="w-3.5 h-3.5 text-[#08B4B5]" />
+                    <span>Fitur Resell & Transfer Tiket</span>
+                  </span>
+                  <p className="text-[11px] text-slate-500 leading-tight">
+                    {detailEvent.allowTicketTransfer !== false
+                      ? 'Pengunjung dapat mentransfer atau menjual kembali tiket yang sah secara aman.'
+                      : 'Fitur pemindahtanganan/resell tiket sedang dinonaktifkan untuk event ini.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    toggleTransferMutation.mutate({
+                      id: detailEvent.id,
+                      allowTicketTransfer: detailEvent.allowTicketTransfer === false,
+                    })
+                  }
+                  disabled={toggleTransferMutation.isPending}
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer shrink-0 shadow-2xs ${
+                    detailEvent.allowTicketTransfer !== false
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                      : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
+                  }`}
+                >
+                  {detailEvent.allowTicketTransfer !== false ? 'Aktif (On)' : 'Nonaktif (Off)'}
+                </button>
               </div>
             </div>
 

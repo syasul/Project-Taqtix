@@ -100,9 +100,6 @@ let TransfersService = class TransfersService {
         if (ticket.checkedInAt) {
             throw new common_1.BadRequestException('Tiket sudah digunakan untuk check-in dan tidak dapat ditransfer.');
         }
-        if (ticket.transferCount >= 1) {
-            throw new common_1.ForbiddenException('Tiket ini sudah pernah dipindahtangankan (resell). Sesuai kebijakan keamanan, setiap tiket hanya dapat ditransfer maksimal 1 kali.');
-        }
         if (authUser) {
             const isOwner = (ticket.ownerId && ticket.ownerId === authUser.id) ||
                 ticket.orderItem.order?.buyerId === authUser.id ||
@@ -251,9 +248,6 @@ let TransfersService = class TransfersService {
         }
         if (transfer.ticket.checkedInAt) {
             throw new common_1.BadRequestException('Tiket sudah digunakan untuk check-in dan tidak dapat ditransfer.');
-        }
-        if (transfer.ticket.transferCount >= 1) {
-            throw new common_1.ForbiddenException('Tiket ini telah mencapai batas maksimal transfer (maksimal 1x resell).');
         }
         const newQrPayload = await this.generateQrPayload(transfer.ticket.id, transfer.ticket.eventId);
         return this.prisma.$transaction(async (tx) => {

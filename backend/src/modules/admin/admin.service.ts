@@ -460,6 +460,7 @@ export class AdminService {
       endDate: e.endDate.toISOString(),
       ticketsSold: e.ticketCategories.reduce((s, tc) => s + tc.sold, 0),
       quota: e.ticketCategories.reduce((s, tc) => s + tc.quota, 0),
+      allowTicketTransfer: e.allowTicketTransfer ?? true,
       internetFee: e.internetFee ?? 0,
       organizerInternetFee: e.organizer.internetFee ?? 0,
       ticketCategories: e.ticketCategories.map((tc) => ({
@@ -859,6 +860,35 @@ export class AdminService {
       where: { id: eventId },
       include: { ticketCategories: true },
     });
+  }
+
+  /**
+   * Mengaktifkan atau menonaktifkan izin resell/transfer tiket per event (Main Admin)
+   */
+  async toggleEventTransfer(
+    eventId: string,
+    allowTicketTransfer: boolean,
+    adminId?: string,
+  ) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
+    if (!event) throw new NotFoundException('Event tidak ditemukan');
+
+    const updated = await this.prisma.event.update({
+      where: { id: eventId },
+      data: { allowTicketTransfer },
+    });
+
+    await this.recordAuditLog(
+      adminId || 'admin',
+      'toggle_event_transfer',
+      eventId,
+      'event',
+      { allowTicketTransfer },
+    );
+
+    return updated;
   }
 
   /**

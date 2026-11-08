@@ -128,6 +128,10 @@ let AdminController = class AdminController {
         const result = await this.adminService.updateEventInternetFee(id, dto, adminId);
         return { success: true, data: result };
     }
+    async toggleEventTransfer(id, allowTicketTransfer, adminId) {
+        const result = await this.adminService.toggleEventTransfer(id, allowTicketTransfer, adminId);
+        return { success: true, data: result };
+    }
     async searchOrders(q) {
         const result = await this.adminService.searchOrders(q);
         return { success: true, data: result };
@@ -415,6 +419,20 @@ __decorate([
     __metadata("design:paramtypes", [String, update_event_fee_dto_1.UpdateEventFeeDto, String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "updateEventInternetFee", null);
+__decorate([
+    (0, common_1.Patch)('admin/events/:id/transfer-toggle'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengaktifkan / menonaktifkan fitur resell & transfer tiket event (Admin Only)',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('allowTicketTransfer')),
+    __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Boolean, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "toggleEventTransfer", null);
 __decorate([
     (0, common_1.Get)('admin/orders'),
     (0, roles_decorator_1.Roles)('admin'),

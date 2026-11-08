@@ -89,13 +89,6 @@ export class TransfersService {
       );
     }
 
-    // CEK BATAS MAKSIMAL RESELL: Maksimal 1x transfer demi mencegah percaloan berulang
-    if (ticket.transferCount >= 1) {
-      throw new ForbiddenException(
-        'Tiket ini sudah pernah dipindahtangankan (resell). Sesuai kebijakan keamanan, setiap tiket hanya dapat ditransfer maksimal 1 kali.',
-      );
-    }
-
     // Verifikasi kepemilikan akun jika user terotentikasi
     if (authUser) {
       const isOwner =
@@ -288,7 +281,10 @@ export class TransfersService {
       );
     }
 
-    if (transfer.fromEmail.toLowerCase() === receiverUser.email.toLowerCase()) {
+    if (
+      transfer.fromEmail &&
+      transfer.fromEmail.toLowerCase() === receiverUser.email.toLowerCase()
+    ) {
       throw new BadRequestException(
         'Akun penerima tidak boleh sama dengan akun pemilik tiket.',
       );
@@ -297,12 +293,6 @@ export class TransfersService {
     if (transfer.ticket.checkedInAt) {
       throw new BadRequestException(
         'Tiket sudah digunakan untuk check-in dan tidak dapat ditransfer.',
-      );
-    }
-
-    if (transfer.ticket.transferCount >= 1) {
-      throw new ForbiddenException(
-        'Tiket ini telah mencapai batas maksimal transfer (maksimal 1x resell).',
       );
     }
 

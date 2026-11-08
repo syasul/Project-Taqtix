@@ -288,7 +288,7 @@ export default function ClaimTransferPage() {
                     <strong>Penerbitan QR Code baru:</strong> QR Code baru hanya akan diterbitkan langsung ke akun Anda setelah konfirmasi.
                   </li>
                   <li>
-                    <strong>Batas 1x Transfer:</strong> Setelah diklaim, tiket tidak dapat dipindahtangankan lagi untuk mencegah percaloan berulang.
+                    <strong>Otentikasi Akun Resmi:</strong> Tiket terikat aman pada akun penerima sah dan dapat dipindahtangankan kembali jika sewaktu-waktu berhalangan hadir (apabila diizinkan oleh kebijakan event).
                   </li>
                 </ul>
               </div>

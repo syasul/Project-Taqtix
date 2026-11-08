@@ -372,6 +372,7 @@ let AdminService = class AdminService {
             endDate: e.endDate.toISOString(),
             ticketsSold: e.ticketCategories.reduce((s, tc) => s + tc.sold, 0),
             quota: e.ticketCategories.reduce((s, tc) => s + tc.quota, 0),
+            allowTicketTransfer: e.allowTicketTransfer ?? true,
             internetFee: e.internetFee ?? 0,
             organizerInternetFee: e.organizer.internetFee ?? 0,
             ticketCategories: e.ticketCategories.map((tc) => ({
@@ -655,6 +656,19 @@ let AdminService = class AdminService {
             where: { id: eventId },
             include: { ticketCategories: true },
         });
+    }
+    async toggleEventTransfer(eventId, allowTicketTransfer, adminId) {
+        const event = await this.prisma.event.findUnique({
+            where: { id: eventId },
+        });
+        if (!event)
+            throw new common_1.NotFoundException('Event tidak ditemukan');
+        const updated = await this.prisma.event.update({
+            where: { id: eventId },
+            data: { allowTicketTransfer },
+        });
+        await this.recordAuditLog(adminId || 'admin', 'toggle_event_transfer', eventId, 'event', { allowTicketTransfer });
+        return updated;
     }
     async recordAuditLog(adminId, action, targetId, targetType, details) {
         try {

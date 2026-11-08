@@ -229,24 +229,35 @@ export default function ETicketPage() {
               </div>
             )}
 
-            {ticket.transferCount && ticket.transferCount >= 1 ? (
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-500 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            {/* Resell / Transfer Status & Action */}
+            {ticket.allowTicketTransfer === false ? (
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-500 flex items-center gap-2.5">
+                <Lock className="w-4 h-4 text-slate-400 shrink-0" />
                 <span className="text-[11px] leading-tight">
-                  Tiket ini telah dipindahtangankan (Batas resell 1x tercapai demi mencegah percaloan berulang).
+                  Fitur transfer & resell tiket dinonaktifkan oleh platform/penyelenggara untuk event ini.
                 </span>
               </div>
             ) : (
-              ticket.ticketStatus === 'VALID' &&
-              ticket.allowTicketTransfer !== false && (
-                <div className="pt-3 border-t border-slate-100">
-                  <TransferModal
-                    ticketId={ticket.ticketId}
-                    eventTitle={ticket.eventTitle}
-                    currentEmail={ticket.buyerEmail}
-                  />
-                </div>
-              )
+              <>
+                {ticket.transferCount && ticket.transferCount > 0 ? (
+                  <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl text-xs text-emerald-800 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="text-[11px] leading-tight font-medium">
+                      Tiket Terverifikasi Resmi — Pernah dipindahtangankan {ticket.transferCount}x dengan QR baru berotentikasi.
+                    </span>
+                  </div>
+                ) : null}
+
+                {ticket.ticketStatus === 'VALID' && (
+                  <div className="pt-3 border-t border-slate-100 w-full">
+                    <TransferModal
+                      ticketId={ticket.ticketId}
+                      eventTitle={ticket.eventTitle}
+                      currentEmail={ticket.buyerEmail}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </CardContent>
@@ -408,7 +419,7 @@ function TransferModal({
                     <span>Perlindungan Keamanan TAQtix:</span>
                   </span>
                   <p className="leading-relaxed">
-                    Sistem akan menonaktifkan QR Code lama dan menerbitkan QR Code baru setelah penerima mengonfirmasi klaim. Setiap tiket hanya dapat ditransfer maksimal 1 kali.
+                    Sistem akan segera menonaktifkan QR Code lama Anda dan menerbitkan QR Code baru kriptografis untuk akun penerima setelah klaim dikonfirmasi. Menjamin tiket sah dan tidak dapat digandakan.
                   </p>
                 </div>
 

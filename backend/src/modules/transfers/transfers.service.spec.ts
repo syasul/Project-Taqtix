@@ -74,8 +74,9 @@ describe('TransfersService', () => {
         toPhone: '08123456789',
       });
 
-      expect(result.ticketId).toBe('ticket-1');
-      expect(result.status).toBe('pending');
+      expect(result.success).toBe(true);
+      expect(result.transfer.ticketId).toBe('ticket-1');
+      expect(result.transfer.status).toBe('pending');
       expect(mockPrisma.ticket.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'ticket-1' },
@@ -113,6 +114,8 @@ describe('TransfersService', () => {
         requestToken: 'tok-abc',
         status: 'pending',
         expiresAt: new Date(Date.now() + 100000),
+        fromEmail: 'old@test.com',
+        fromUserId: 'user-sender-1',
         toName: 'Confirmed Person',
         toEmail: 'confirmed@test.com',
         toPhone: '081111111',
@@ -129,7 +132,18 @@ describe('TransfersService', () => {
         qrPayload: 'signed-qr-token-123',
       });
 
-      const result = await service.confirmTransfer('tok-abc');
+      mockPrisma.ticketTransfer.update.mockResolvedValue({
+        id: 'transfer-1',
+        status: 'completed',
+      });
+
+      const receiverUser = {
+        id: 'user-rec-1',
+        email: 'confirmed@test.com',
+        name: 'Confirmed Person',
+      };
+
+      const result = await service.confirmTransfer('tok-abc', receiverUser);
 
       expect(result.success).toBe(true);
       expect(mockPrisma.orderItem.update).toHaveBeenCalledWith({

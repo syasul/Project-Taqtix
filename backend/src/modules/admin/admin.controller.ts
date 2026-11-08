@@ -299,6 +299,25 @@ export class AdminController {
     return { success: true, data: result };
   }
 
+  @Patch('admin/events/:id/transfer-toggle')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Mengaktifkan / menonaktifkan fitur resell & transfer tiket event (Admin Only)',
+  })
+  async toggleEventTransfer(
+    @Param('id') id: string,
+    @Body('allowTicketTransfer') allowTicketTransfer: boolean,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.toggleEventTransfer(
+      id,
+      allowTicketTransfer,
+      adminId,
+    );
+    return { success: true, data: result };
+  }
+
   @Get('admin/orders')
   @Roles('admin')
   @ApiBearerAuth()

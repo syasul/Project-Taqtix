@@ -262,6 +262,7 @@ export declare class AdminService {
         endDate: string;
         ticketsSold: number;
         quota: number;
+        allowTicketTransfer: boolean;
         internetFee: number;
         organizerInternetFee: number;
         ticketCategories: {
@@ -601,6 +602,32 @@ export declare class AdminService {
         geofenceRadius: number | null;
         allowTicketTransfer: boolean;
     }) | null>;
+    toggleEventTransfer(eventId: string, allowTicketTransfer: boolean, adminId?: string): Promise<{
+        description: string | null;
+        title: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        slug: string;
+        status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
+        organizerId: string;
+        location: string;
+        isDateTba: boolean;
+        startDate: Date;
+        endDate: Date;
+        bannerUrl: string;
+        requireLogin: boolean;
+        seoTitle: string | null;
+        seoDescription: string | null;
+        seoKeywords: string | null;
+        adminSeoKeywords: string | null;
+        seoPriority: string | null;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
+    }>;
     recordAuditLog(adminId: string, action: string, targetId: string, targetType: string, details?: any): Promise<{
         id: string;
         timestamp: Date;

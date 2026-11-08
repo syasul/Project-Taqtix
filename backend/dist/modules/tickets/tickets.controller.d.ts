@@ -26,6 +26,7 @@ export declare class TicketsController {
         isDateTba: boolean;
         organizerName: string;
         signedQrPayload: string;
+        transferCount: number;
     }[]>;
     resendTicketNotification(ticketId: string): Promise<{
         message: string;
@@ -170,6 +171,9 @@ export declare class TicketsController {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        transferCount: number;
+        ownerId: string | null;
+        transferredAt: Date | null;
     })[]>;
     getTicket(ticketId: string): Promise<{
         ticketId: string;
@@ -186,6 +190,8 @@ export declare class TicketsController {
         isDateTba: boolean;
         organizerName: string;
         signedQrPayload: string;
+        transferCount: number;
+        allowTicketTransfer: boolean;
     }>;
     getTicketsByOrder(orderId: string): Promise<{
         ticketId: string;
@@ -218,6 +224,9 @@ export declare class TicketsController {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        transferCount: number;
+        ownerId: string | null;
+        transferredAt: Date | null;
     }>;
     unblockTicket(ticketId: string, userId: string): Promise<{
         id: string;
@@ -239,6 +248,9 @@ export declare class TicketsController {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        transferCount: number;
+        ownerId: string | null;
+        transferredAt: Date | null;
     }>;
     getBlockedVisitors(eventId: string, userId: string): Promise<({
         orderItem: {
@@ -292,6 +304,9 @@ export declare class TicketsController {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        transferCount: number;
+        ownerId: string | null;
+        transferredAt: Date | null;
     })[]>;
     generateWristbandCodes(eventId: string, userId: string): Promise<{
         success: boolean;

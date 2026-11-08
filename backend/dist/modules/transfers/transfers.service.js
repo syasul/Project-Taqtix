@@ -69,12 +69,20 @@ let TransfersService = class TransfersService {
             nonce: crypto.randomBytes(8).toString('hex'),
         }, { secret: qrSecret });
     }
-    async requestTransfer(ticketId, dto) {
+    async requestTransfer(ticketId, dto, authUser) {
         const ticket = await this.prisma.ticket.findUnique({
             where: { id: ticketId },
             include: {
                 event: true,
-                orderItem: true,
+                orderItem: {
+                    include: {
+                        order: {
+                            include: {
+                                buyer: true,
+                            },
+                        },
+                    },
+                },
             },
         });
         if (!ticket) {
@@ -88,6 +96,26 @@ let TransfersService = class TransfersService {
         }
         if (ticket.isBlocked) {
             throw new common_1.ForbiddenException('Tiket telah diblokir dan tidak dapat ditransfer.');
+        }
+        if (ticket.checkedInAt) {
+            throw new common_1.BadRequestException('Tiket sudah digunakan untuk check-in dan tidak dapat ditransfer.');
+        }
+        if (ticket.transferCount >= 1) {
+            throw new common_1.ForbiddenException('Tiket ini sudah pernah dipindahtangankan (resell). Sesuai kebijakan keamanan, setiap tiket hanya dapat ditransfer maksimal 1 kali.');
+        }
+        if (authUser) {
+            const isOwner = (ticket.ownerId && ticket.ownerId === authUser.id) ||
+                ticket.orderItem.order?.buyerId === authUser.id ||
+                ticket.orderItem.attendeeEmail.toLowerCase() === authUser.email.toLowerCase() ||
+                ticket.orderItem.order?.buyer?.email.toLowerCase() === authUser.email.toLowerCase();
+            if (!isOwner) {
+                throw new common_1.ForbiddenException('Anda bukan pemilik sah dari tiket ini sehingga tidak dapat melakukan transfer.');
+            }
+        }
+        const currentOwnerEmail = ticket.orderItem.attendeeEmail.toLowerCase();
+        if (dto.toEmail.trim().toLowerCase() === currentOwnerEmail ||
+            (authUser && dto.toEmail.trim().toLowerCase() === authUser.email.toLowerCase())) {
+            throw new common_1.BadRequestException('Email penerima tidak boleh sama dengan email pemilik tiket saat ini.');
         }
         const existingPending = await this.prisma.ticketTransfer.findFirst({
             where: {
@@ -110,21 +138,87 @@ let TransfersService = class TransfersService {
                     status: 'TRANSFER_PENDING',
                 },
             });
-            return tx.ticketTransfer.create({
+            const transfer = await tx.ticketTransfer.create({
                 data: {
                     ticketId,
                     fromEmail: ticket.orderItem.attendeeEmail,
-                    toName: dto.toName,
-                    toEmail: dto.toEmail,
-                    toPhone: dto.toPhone,
+                    fromUserId: authUser?.id || ticket.ownerId || ticket.orderItem.order?.buyerId || null,
+                    toName: dto.toName.trim(),
+                    toEmail: dto.toEmail.trim().toLowerCase(),
+                    toPhone: dto.toPhone.trim(),
                     requestToken,
                     expiresAt,
                     status: 'pending',
                 },
             });
+            return {
+                success: true,
+                message: 'Permintaan transfer tiket berhasil dibuat.',
+                transfer,
+                requestToken,
+            };
         });
     }
-    async confirmTransfer(requestToken) {
+    async getTransferDetails(requestToken) {
+        const transfer = await this.prisma.ticketTransfer.findUnique({
+            where: { requestToken },
+            include: {
+                ticket: {
+                    include: {
+                        event: {
+                            include: {
+                                organizer: {
+                                    select: { name: true },
+                                },
+                            },
+                        },
+                        orderItem: {
+                            include: {
+                                ticketCategory: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        if (!transfer) {
+            throw new common_1.NotFoundException('Permintaan transfer tidak ditemukan');
+        }
+        const isExpired = new Date() > transfer.expiresAt;
+        const effectiveStatus = transfer.status === 'pending' && isExpired ? 'expired' : transfer.status;
+        return {
+            id: transfer.id,
+            requestToken: transfer.requestToken,
+            status: effectiveStatus,
+            expiresAt: transfer.expiresAt,
+            fromEmailMasked: transfer.fromEmail.replace(/(?<=.{2}).(?=[^@]*?@)/g, '*'),
+            toName: transfer.toName,
+            toEmail: transfer.toEmail,
+            toPhone: transfer.toPhone,
+            fromUserId: transfer.fromUserId,
+            event: {
+                id: transfer.ticket.event.id,
+                title: transfer.ticket.event.title,
+                bannerUrl: transfer.ticket.event.bannerUrl,
+                location: transfer.ticket.event.location,
+                startDate: transfer.ticket.event.startDate,
+                endDate: transfer.ticket.event.endDate,
+                isDateTba: transfer.ticket.event.isDateTba,
+                organizerName: transfer.ticket.event.organizer.name,
+            },
+            ticketCategory: {
+                id: transfer.ticket.orderItem.ticketCategory.id,
+                name: transfer.ticket.orderItem.ticketCategory.name,
+                price: transfer.ticket.orderItem.ticketCategory.price,
+            },
+            ticketId: transfer.ticket.id,
+            transferCount: transfer.ticket.transferCount,
+        };
+    }
+    async confirmTransfer(requestToken, receiverUser) {
+        if (!receiverUser || !receiverUser.id) {
+            throw new common_1.UnauthorizedException('Anda wajib masuk (login) ke akun TAQtix terlebih dahulu untuk mengklaim dan menyimpan e-tiket ini.');
+        }
         const transfer = await this.prisma.ticketTransfer.findUnique({
             where: { requestToken },
             include: {
@@ -140,7 +234,7 @@ let TransfersService = class TransfersService {
             throw new common_1.NotFoundException('Permintaan transfer tidak ditemukan');
         }
         if (transfer.status !== 'pending') {
-            throw new common_1.BadRequestException(`Transfer sudah berstatus ${transfer.status}`);
+            throw new common_1.BadRequestException(`Transfer sudah tidak aktif (status: ${transfer.status})`);
         }
         if (new Date() > transfer.expiresAt) {
             await this.prisma.ticketTransfer.update({
@@ -149,6 +243,18 @@ let TransfersService = class TransfersService {
             });
             throw new common_1.BadRequestException('Permintaan transfer sudah kedaluwarsa');
         }
+        if (transfer.fromUserId && transfer.fromUserId === receiverUser.id) {
+            throw new common_1.BadRequestException('Anda tidak dapat mentransfer tiket ke akun Anda sendiri.');
+        }
+        if (transfer.fromEmail.toLowerCase() === receiverUser.email.toLowerCase()) {
+            throw new common_1.BadRequestException('Akun penerima tidak boleh sama dengan akun pemilik tiket.');
+        }
+        if (transfer.ticket.checkedInAt) {
+            throw new common_1.BadRequestException('Tiket sudah digunakan untuk check-in dan tidak dapat ditransfer.');
+        }
+        if (transfer.ticket.transferCount >= 1) {
+            throw new common_1.ForbiddenException('Tiket ini telah mencapai batas maksimal transfer (maksimal 1x resell).');
+        }
         const newQrPayload = await this.generateQrPayload(transfer.ticket.id, transfer.ticket.eventId);
         return this.prisma.$transaction(async (tx) => {
             const updatedTicket = await tx.ticket.update({
@@ -156,13 +262,17 @@ let TransfersService = class TransfersService {
                 data: {
                     qrPayload: newQrPayload,
                     status: 'VALID',
+                    ownerId: receiverUser.id,
+                    attendeeName: transfer.toName || receiverUser.name || 'Pengunjung',
+                    transferredAt: new Date(),
+                    transferCount: { increment: 1 },
                 },
             });
             await tx.orderItem.update({
                 where: { id: transfer.ticket.orderItemId },
                 data: {
-                    attendeeName: transfer.toName,
-                    attendeeEmail: transfer.toEmail,
+                    attendeeName: transfer.toName || receiverUser.name || 'Pengunjung',
+                    attendeeEmail: receiverUser.email,
                     attendeePhone: transfer.toPhone,
                 },
             });
@@ -170,12 +280,14 @@ let TransfersService = class TransfersService {
                 where: { id: transfer.id },
                 data: {
                     status: 'completed',
+                    toUserId: receiverUser.id,
+                    toEmail: receiverUser.email,
                     completedAt: new Date(),
                 },
             });
             return {
                 success: true,
-                message: 'Transfer tiket berhasil diselesaikan',
+                message: 'Transfer tiket berhasil diselesaikan! E-tiket baru telah diterbitkan ke akun Anda.',
                 transfer: completedTransfer,
                 ticket: updatedTicket,
             };

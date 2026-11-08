@@ -250,6 +250,9 @@ model Ticket {
   blockedReason      String?
   blockedBy          String?
   blockedAt          DateTime?
+  transferCount      Int             @default(0) // Jumlah kali tiket ditransfer/resell (maks 1x)
+  ownerId            String?         // User ID pemilik akun saat ini
+  transferredAt      DateTime?       // Waktu terakhir kali tiket ditransfer
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 
@@ -607,9 +610,11 @@ model TicketTransfer {
   id           String    @id @default(uuid())
   ticketId     String
   fromEmail    String
+  fromUserId   String?   // User ID akun penjual / pengirim
   toName       String
   toEmail      String
   toPhone      String
+  toUserId     String?   // User ID akun pembeli / penerima klaim
   status       String    @default("pending") // "pending" | "completed" | "cancelled" | "expired"
   requestToken String    @unique
   requestedAt  DateTime  @default(now())

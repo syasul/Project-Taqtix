@@ -84,6 +84,9 @@ export declare class DoorprizeController {
             blockedReason: string | null;
             blockedBy: string | null;
             blockedAt: Date | null;
+            transferCount: number;
+            ownerId: string | null;
+            transferredAt: Date | null;
         };
         doorprizeItem: {
             id: string;

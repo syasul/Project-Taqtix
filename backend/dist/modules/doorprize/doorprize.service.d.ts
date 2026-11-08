@@ -86,6 +86,9 @@ export declare class DoorprizeService {
             blockedReason: string | null;
             blockedBy: string | null;
             blockedAt: Date | null;
+            transferCount: number;
+            ownerId: string | null;
+            transferredAt: Date | null;
         };
         doorprizeItem: {
             id: string;

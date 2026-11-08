@@ -8,21 +8,10 @@ export declare class TransfersService {
     private readonly jwtService;
     constructor(prisma: PrismaService, configService: ConfigService, jwtService: JwtService);
     private generateQrPayload;
-    requestTransfer(ticketId: string, dto: RequestTransferDto): Promise<{
+    requestTransfer(ticketId: string, dto: RequestTransferDto, authUser?: {
         id: string;
-        createdAt: Date;
-        status: string;
-        ticketId: string;
-        expiresAt: Date;
-        toName: string;
-        toEmail: string;
-        toPhone: string;
-        fromEmail: string;
-        requestToken: string;
-        requestedAt: Date;
-        completedAt: Date | null;
-    }>;
-    confirmTransfer(requestToken: string): Promise<{
+        email: string;
+    }): Promise<{
         success: boolean;
         message: string;
         transfer: {
@@ -35,6 +24,61 @@ export declare class TransfersService {
             toEmail: string;
             toPhone: string;
             fromEmail: string;
+            fromUserId: string | null;
+            toUserId: string | null;
+            requestToken: string;
+            requestedAt: Date;
+            completedAt: Date | null;
+        };
+        requestToken: string;
+    }>;
+    getTransferDetails(requestToken: string): Promise<{
+        id: string;
+        requestToken: string;
+        status: string;
+        expiresAt: Date;
+        fromEmailMasked: string;
+        toName: string;
+        toEmail: string;
+        toPhone: string;
+        fromUserId: string | null;
+        event: {
+            id: string;
+            title: string;
+            bannerUrl: string;
+            location: string;
+            startDate: Date;
+            endDate: Date;
+            isDateTba: boolean;
+            organizerName: string;
+        };
+        ticketCategory: {
+            id: string;
+            name: string;
+            price: number;
+        };
+        ticketId: string;
+        transferCount: number;
+    }>;
+    confirmTransfer(requestToken: string, receiverUser?: {
+        id: string;
+        email: string;
+        name?: string;
+    }): Promise<{
+        success: boolean;
+        message: string;
+        transfer: {
+            id: string;
+            createdAt: Date;
+            status: string;
+            ticketId: string;
+            expiresAt: Date;
+            toName: string;
+            toEmail: string;
+            toPhone: string;
+            fromEmail: string;
+            fromUserId: string | null;
+            toUserId: string | null;
             requestToken: string;
             requestedAt: Date;
             completedAt: Date | null;
@@ -59,6 +103,9 @@ export declare class TransfersService {
             blockedReason: string | null;
             blockedBy: string | null;
             blockedAt: Date | null;
+            transferCount: number;
+            ownerId: string | null;
+            transferredAt: Date | null;
         };
     }>;
     declineTransfer(requestToken: string): Promise<{
@@ -71,6 +118,8 @@ export declare class TransfersService {
         toEmail: string;
         toPhone: string;
         fromEmail: string;
+        fromUserId: string | null;
+        toUserId: string | null;
         requestToken: string;
         requestedAt: Date;
         completedAt: Date | null;
@@ -131,6 +180,9 @@ export declare class TransfersService {
             blockedReason: string | null;
             blockedBy: string | null;
             blockedAt: Date | null;
+            transferCount: number;
+            ownerId: string | null;
+            transferredAt: Date | null;
         };
     } & {
         id: string;
@@ -142,6 +194,8 @@ export declare class TransfersService {
         toEmail: string;
         toPhone: string;
         fromEmail: string;
+        fromUserId: string | null;
+        toUserId: string | null;
         requestToken: string;
         requestedAt: Date;
         completedAt: Date | null;

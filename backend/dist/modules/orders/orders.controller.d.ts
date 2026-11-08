@@ -112,6 +112,9 @@ export declare class OrdersController {
                 blockedReason: string | null;
                 blockedBy: string | null;
                 blockedAt: Date | null;
+                transferCount: number;
+                ownerId: string | null;
+                transferredAt: Date | null;
             }[];
         } & {
             id: string;

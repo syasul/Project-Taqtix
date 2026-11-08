@@ -4,10 +4,27 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
-import { Calendar, MapPin, Ticket, ShieldAlert, ArrowLeft, Download, User, Share2 } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  Ticket,
+  ShieldAlert,
+  ArrowLeft,
+  Download,
+  User,
+  Share2,
+  Copy,
+  Check,
+  Lock,
+  ShieldCheck,
+  AlertCircle,
+  ExternalLink,
+  MessageCircle,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { apiClient } from '@/lib/api-client';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +32,7 @@ import { toast } from 'sonner';
 
 interface TicketDetails {
   ticketId: string;
-  ticketStatus: 'VALID' | 'CHECKED_IN' | 'CANCELLED';
+  ticketStatus: 'VALID' | 'CHECKED_IN' | 'CANCELLED' | 'TRANSFER_PENDING';
   ticketCategory: string;
   buyerName: string;
   buyerEmail: string;
@@ -25,6 +42,8 @@ interface TicketDetails {
   eventEndDate: string;
   organizerName: string;
   signedQrPayload: string;
+  transferCount?: number;
+  allowTicketTransfer?: boolean;
 }
 
 export default function ETicketPage() {
@@ -197,11 +216,37 @@ export default function ETicketPage() {
               </div>
             </div>
 
-            {/* Transfer Ticket Action */}
-            {ticket.ticketStatus === 'VALID' && (
-              <div className="pt-3 border-t border-slate-100">
-                <TransferModal ticketId={ticket.ticketId} currentEmail={ticket.buyerEmail} />
+            {/* Transfer Ticket Status & Action */}
+            {ticket.ticketStatus === 'TRANSFER_PENDING' && (
+              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs space-y-1">
+                <span className="font-bold text-amber-900 flex items-center gap-1.5">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Transfer Sedang Berjalan</span>
+                </span>
+                <p className="text-[11px] text-amber-800 leading-normal">
+                  QR Code lama Anda telah dinonaktifkan sementara. Tiket akan berpindah akun setelah penerima melakukan konfirmasi klaim.
+                </p>
               </div>
+            )}
+
+            {ticket.transferCount && ticket.transferCount >= 1 ? (
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-500 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="text-[11px] leading-tight">
+                  Tiket ini telah dipindahtangankan (Batas resell 1x tercapai demi mencegah percaloan berulang).
+                </span>
+              </div>
+            ) : (
+              ticket.ticketStatus === 'VALID' &&
+              ticket.allowTicketTransfer !== false && (
+                <div className="pt-3 border-t border-slate-100">
+                  <TransferModal
+                    ticketId={ticket.ticketId}
+                    eventTitle={ticket.eventTitle}
+                    currentEmail={ticket.buyerEmail}
+                  />
+                </div>
+              )
             )}
           </div>
         </CardContent>
@@ -210,25 +255,56 @@ export default function ETicketPage() {
   );
 }
 
-function TransferModal({ ticketId, currentEmail }: { ticketId: string; currentEmail: string }) {
+function TransferModal({
+  ticketId,
+  eventTitle,
+  currentEmail,
+}: {
+  ticketId: string;
+  eventTitle: string;
+  currentEmail: string;
+}) {
+  const { user } = useAuth();
+  const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [toName, setToName] = React.useState('');
   const [toEmail, setToEmail] = React.useState('');
   const [toPhone, setToPhone] = React.useState('');
-  const [transferSuccess, setTransferSuccess] = React.useState(false);
+  const [transferData, setTransferData] = React.useState<{ requestToken: string } | null>(null);
+  const [copied, setCopied] = React.useState(false);
+
+  const handleOpenModal = () => {
+    if (!user) {
+      toast.info('Silakan masuk (login) ke akun Anda terlebih dahulu untuk memproses transfer tiket.');
+      router.push(`/login?redirect=${encodeURIComponent(`/e-ticket/${ticketId}`)}`);
+      return;
+    }
+    setIsOpen(true);
+  };
 
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error('Anda harus masuk (login) ke akun TAQtix untuk mentransfer tiket.');
+      router.push(`/login?redirect=${encodeURIComponent(`/e-ticket/${ticketId}`)}`);
+      return;
+    }
+
     try {
       setSubmitting(true);
-      await apiClient.post(`/tickets/${ticketId}/transfer`, {
+      const res = await apiClient.post(`/tickets/${ticketId}/transfer`, {
         toName: toName.trim(),
         toEmail: toEmail.trim(),
         toPhone: toPhone.trim(),
       });
-      setTransferSuccess(true);
-      toast.success('Permintaan transfer tiket telah dibuat!');
+      const token =
+        res.data?.requestToken ||
+        res.data?.data?.requestToken ||
+        res.data?.transfer?.requestToken ||
+        res.data?.data?.transfer?.requestToken;
+      setTransferData({ requestToken: token });
+      toast.success('Permintaan transfer tiket berhasil dibuat!');
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Gagal mengajukan transfer tiket');
     } finally {
@@ -236,46 +312,105 @@ function TransferModal({ ticketId, currentEmail }: { ticketId: string; currentEm
     }
   };
 
+  const claimUrl =
+    typeof window !== 'undefined' && transferData?.requestToken
+      ? `${window.location.origin}/tickets/transfer/${transferData.requestToken}`
+      : '';
+
+  const handleCopy = () => {
+    if (claimUrl) {
+      navigator.clipboard.writeText(claimUrl);
+      setCopied(true);
+      toast.success('Tautan klaim tiket berhasil disalin!');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <>
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpenModal}
         variant="outline"
         className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-semibold gap-2 cursor-pointer"
       >
         <Share2 className="h-3.5 w-3.5 text-[#08B4B5]" />
-        <span>Transfer Kepemilikan Tiket Ini</span>
+        <span>Transfer Kepemilikan Tiket Ini (Resell/Pindah Nama)</span>
       </Button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 text-slate-900 space-y-4 shadow-xl">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 text-slate-900 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Share2 className="h-4 w-4 text-[#08B4B5]" />
-              Transfer Tiket ke Orang Lain
+              Transfer / Resell Kepemilikan Tiket
             </h3>
 
-            {transferSuccess ? (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-2 text-xs">
-                <p className="font-bold text-emerald-700">Permintaan Transfer Dikirim!</p>
-                <p className="text-slate-600">
-                  QR Code lama Anda sementara dinonaktifkan hingga penerima mengonfirmasi transfer.
-                </p>
-                <Button
-                  onClick={() => {
-                    setIsOpen(false);
-                    window.location.reload();
-                  }}
-                  className="mt-3 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold w-full border-0"
-                >
-                  Tutup
-                </Button>
+            {transferData ? (
+              <div className="space-y-4 text-xs">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2">
+                  <ShieldCheck className="w-8 h-8 text-emerald-600 mx-auto" />
+                  <p className="font-bold text-emerald-800 text-sm">Permintaan Transfer Siap Diklaim!</p>
+                  <p className="text-slate-600 leading-relaxed text-[11px]">
+                    QR Code lama Anda telah dinonaktifkan. Kirim tautan di bawah ini ke calon penerima untuk mengklaim tiket ke akun miliknya.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 block text-[11px]">Tautan Klaim Penerima:</label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="text"
+                      readOnly
+                      value={claimUrl}
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-700 select-all"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleCopy}
+                      size="sm"
+                      className="bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold shrink-0 border-0"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-2">
+                  <a
+                    href={`https://wa.me/${toPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                      `Halo ${toName}, berikut tautan resmi untuk mengklaim e-tiket acara "${eventTitle}" di TAQtix: ${claimUrl}\n\n*Catatan: Anda wajib masuk (login) ke akun TAQtix untuk mengklaim tiket ini.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-center flex items-center justify-center gap-2 transition"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Kirim via WhatsApp ke {toName}</span>
+                  </a>
+
+                  <Button
+                    onClick={() => {
+                      setIsOpen(false);
+                      window.location.reload();
+                    }}
+                    variant="outline"
+                    className="w-full border-slate-200 text-slate-600 rounded-xl text-xs cursor-pointer"
+                  >
+                    Tutup & Perbarui Status
+                  </Button>
+                </div>
               </div>
             ) : (
-              <form onSubmit={handleTransfer} className="space-y-3 text-xs">
-                <p className="text-slate-500">
-                  Masukkan identitas penerima baru. QR Code tiket Anda akan dinonaktifkan sementara dan penerima akan mendapatkan link konfirmasi.
-                </p>
+              <form onSubmit={handleTransfer} className="space-y-3.5 text-xs">
+                <div className="p-3 bg-teal-50/60 border border-[#08B4B5]/20 rounded-2xl text-[11px] text-teal-900 space-y-1">
+                  <span className="font-bold flex items-center gap-1 text-[#08B4B5]">
+                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                    <span>Perlindungan Keamanan TAQtix:</span>
+                  </span>
+                  <p className="leading-relaxed">
+                    Sistem akan menonaktifkan QR Code lama dan menerbitkan QR Code baru setelah penerima mengonfirmasi klaim. Setiap tiket hanya dapat ditransfer maksimal 1 kali.
+                  </p>
+                </div>
 
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Nama Lengkap Penerima</label>
@@ -290,7 +425,7 @@ function TransferModal({ ticketId, currentEmail }: { ticketId: string; currentEm
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Email Penerima</label>
+                  <label className="font-bold text-slate-700 block mb-1">Email Penerima (Akun TAQtix)</label>
                   <input
                     type="email"
                     required
@@ -299,6 +434,9 @@ function TransferModal({ ticketId, currentEmail }: { ticketId: string; currentEm
                     onChange={(e) => setToEmail(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:border-[#08B4B5] focus:outline-none"
                   />
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    Penerima wajib login ke akun dengan email ini untuk mengklaim.
+                  </span>
                 </div>
 
                 <div>
@@ -327,7 +465,7 @@ function TransferModal({ ticketId, currentEmail }: { ticketId: string; currentEm
                     disabled={submitting}
                     className="w-1/2 bg-[#08B4B5] hover:bg-[#079b9c] rounded-xl font-bold text-white cursor-pointer border-0"
                   >
-                    {submitting ? 'Proses...' : 'Kirim Transfer'}
+                    {submitting ? 'Memproses...' : 'Buat Tautan Transfer'}
                   </Button>
                 </div>
               </form>

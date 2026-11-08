@@ -281,6 +281,8 @@ export class TicketsService {
       isDateTba: ticket.event.isDateTba,
       organizerName: ticket.event.organizer.name,
       signedQrPayload: ticket.qrPayload,
+      transferCount: ticket.transferCount,
+      allowTicketTransfer: ticket.event.allowTicketTransfer,
     };
   }
 
@@ -340,35 +342,41 @@ export class TicketsService {
 
     const tickets = await this.prisma.ticket.findMany({
       where: {
-        orderItem: {
-          order: {
-            status: 'PAID',
+        OR: [
+          { ownerId: trimmed },
+          {
+            orderItem: {
+              order: {
+                status: 'PAID',
+              },
+              OR: [
+                { attendeeEmail: { equals: trimmed, mode: 'insensitive' } },
+                { order: { buyer: { email: { equals: trimmed, mode: 'insensitive' } } } },
+                { orderId: { equals: trimmed } },
+                { order: { buyerId: trimmed } },
+                ...(cleanPhone.length >= 7
+                  ? [
+                      { attendeePhone: { contains: cleanPhone } },
+                      {
+                        attendeePhone: {
+                          contains: cleanPhone.startsWith('0')
+                            ? cleanPhone.slice(1)
+                            : cleanPhone,
+                        },
+                      },
+                      {
+                        attendeePhone: {
+                          contains: cleanPhone.startsWith('62')
+                            ? cleanPhone.slice(2)
+                            : cleanPhone,
+                        },
+                      },
+                    ]
+                  : []),
+              ],
+            },
           },
-          OR: [
-            { attendeeEmail: { equals: trimmed, mode: 'insensitive' } },
-            { order: { buyer: { email: { equals: trimmed, mode: 'insensitive' } } } },
-            { orderId: { equals: trimmed } },
-            ...(cleanPhone.length >= 7
-              ? [
-                  { attendeePhone: { contains: cleanPhone } },
-                  {
-                    attendeePhone: {
-                      contains: cleanPhone.startsWith('0')
-                        ? cleanPhone.slice(1)
-                        : cleanPhone,
-                    },
-                  },
-                  {
-                    attendeePhone: {
-                      contains: cleanPhone.startsWith('62')
-                        ? cleanPhone.slice(2)
-                        : cleanPhone,
-                    },
-                  },
-                ]
-              : []),
-          ],
-        },
+        ],
       },
       include: {
         orderItem: {
@@ -412,6 +420,7 @@ export class TicketsService {
       isDateTba: t.event.isDateTba,
       organizerName: t.event.organizer.name,
       signedQrPayload: t.qrPayload,
+      transferCount: t.transferCount,
     }));
   }
 

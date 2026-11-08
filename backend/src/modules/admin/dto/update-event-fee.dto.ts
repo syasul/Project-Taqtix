@@ -31,3 +31,4 @@ export class UpdateEventFeeDto {
   @Type(() => TicketCategoryFeeItemDto)
   categories?: TicketCategoryFeeItemDto[];
 }
+

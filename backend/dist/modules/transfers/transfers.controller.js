@@ -19,16 +19,20 @@ const transfers_service_1 = require("./transfers.service");
 const request_transfer_dto_1 = require("./dto/request-transfer.dto");
 const public_decorator_1 = require("../../common/decorators/public.decorator");
 const roles_decorator_1 = require("../../common/decorators/roles.decorator");
+const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 let TransfersController = class TransfersController {
     transfersService;
     constructor(transfersService) {
         this.transfersService = transfersService;
     }
-    async requestTransfer(ticketId, dto) {
-        return this.transfersService.requestTransfer(ticketId, dto);
+    async requestTransfer(ticketId, dto, user) {
+        return this.transfersService.requestTransfer(ticketId, dto, user);
     }
-    async confirmTransfer(requestToken) {
-        return this.transfersService.confirmTransfer(requestToken);
+    async getTransferDetails(requestToken) {
+        return this.transfersService.getTransferDetails(requestToken);
+    }
+    async confirmTransfer(requestToken, user) {
+        return this.transfersService.confirmTransfer(requestToken, user);
     }
     async declineTransfer(requestToken) {
         return this.transfersService.declineTransfer(requestToken);
@@ -39,10 +43,10 @@ let TransfersController = class TransfersController {
 };
 exports.TransfersController = TransfersController;
 __decorate([
-    (0, public_decorator_1.Public)(),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)('tickets/:id/transfer'),
     (0, swagger_1.ApiOperation)({
-        summary: 'Pemilik tiket mengajukan permintaan transfer kepemilikan',
+        summary: 'Pemilik tiket mengajukan permintaan transfer kepemilikan (Wajib Login)',
     }),
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.CREATED,
@@ -50,24 +54,41 @@ __decorate([
     }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, request_transfer_dto_1.RequestTransferDto]),
+    __metadata("design:paramtypes", [String, request_transfer_dto_1.RequestTransferDto, Object]),
     __metadata("design:returntype", Promise)
 ], TransfersController.prototype, "requestTransfer", null);
 __decorate([
     (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('tickets/transfer/:requestToken'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Melihat ringkasan informasi transfer tiket sebelum diklaim (Public)',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Detail transfer tiket berhasil diambil.',
+    }),
+    __param(0, (0, common_1.Param)('requestToken')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TransfersController.prototype, "getTransferDetails", null);
+__decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)('tickets/transfer/:requestToken/confirm'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({
-        summary: 'Penerima mengonfirmasi dan menerima transfer tiket',
+        summary: 'Penerima mengonfirmasi dan menerima transfer tiket ke akunnya (Wajib Login)',
     }),
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.OK,
         description: 'Transfer tiket berhasil dikonfirmasi.',
     }),
     __param(0, (0, common_1.Param)('requestToken')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], TransfersController.prototype, "confirmTransfer", null);
 __decorate([

@@ -4,4 +4,5 @@ export declare class UpdateOrganizerDto {
     plan?: string;
     planExpiresAt?: string;
     bankAccount?: string;
+    internetFee?: number;
 }

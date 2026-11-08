@@ -1,5 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { SettlementsService } from '../settlements/settlements.service';
+import { UpdateEventFeeDto } from './dto/update-event-fee.dto';
+import { UpdateOrganizerDto } from './dto/update-organizer.dto';
 export declare class AdminService {
     private readonly prisma;
     private readonly settlementsService;
@@ -14,6 +16,7 @@ export declare class AdminService {
         plan: string;
         segment: string | null;
         bankAccount: string | null;
+        internetFee: number;
         createdAt: string;
         approvedAt: string | null;
         approvedBy: string | null;
@@ -44,13 +47,7 @@ export declare class AdminService {
         id: string;
         message: string;
     }>;
-    updateOrganizerSegmentAndPlan(organizerId: string, dto: {
-        segment?: string;
-        plan?: string;
-        planExpiresAt?: string;
-        name?: string;
-        bankAccount?: string;
-    }): Promise<{
+    updateOrganizerSegmentAndPlan(organizerId: string, dto: UpdateOrganizerDto): Promise<{
         segment: string | null;
         id: string;
         createdAt: Date;
@@ -74,6 +71,7 @@ export declare class AdminService {
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
         integrations: import("@prisma/client/runtime/library").JsonValue | null;
+        internetFee: number | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -264,6 +262,17 @@ export declare class AdminService {
         endDate: string;
         ticketsSold: number;
         quota: number;
+        internetFee: number;
+        organizerInternetFee: number;
+        ticketCategories: {
+            id: string;
+            name: string;
+            price: number;
+            quota: number;
+            sold: number;
+            ticketPerPackage: number;
+            internetFee: number | null;
+        }[];
     }[]>;
     approveEvent(eventId: string): Promise<{
         description: string | null;
@@ -273,6 +282,7 @@ export declare class AdminService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -298,6 +308,7 @@ export declare class AdminService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -348,6 +359,7 @@ export declare class AdminService {
         plan: string;
         segment: string | null;
         bankAccount: string | null;
+        internetFee: number;
         createdAt: string;
         approvedAt: string | null;
         approvedBy: string | null;
@@ -387,6 +399,7 @@ export declare class AdminService {
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
         integrations: import("@prisma/client/runtime/library").JsonValue | null;
+        internetFee: number | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -414,6 +427,7 @@ export declare class AdminService {
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
         integrations: import("@prisma/client/runtime/library").JsonValue | null;
+        internetFee: number | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -441,6 +455,7 @@ export declare class AdminService {
         planStartedAt: Date | null;
         planExpiresAt: Date | null;
         integrations: import("@prisma/client/runtime/library").JsonValue | null;
+        internetFee: number | null;
         approvedAt: Date | null;
         approvedBy: string | null;
     }>;
@@ -452,6 +467,7 @@ export declare class AdminService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -543,6 +559,48 @@ export declare class AdminService {
         targetType: string;
         details: import("@prisma/client/runtime/library").JsonValue | null;
     }[]>;
+    updateEventInternetFee(eventId: string, dto: UpdateEventFeeDto, adminId?: string): Promise<({
+        ticketCategories: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            internetFee: number | null;
+            eventId: string;
+            price: number;
+            quota: number;
+            sold: number;
+            maxPerOrder: number;
+            ticketPerPackage: number;
+            saleStartAt: Date;
+            saleEndAt: Date;
+        }[];
+    } & {
+        description: string | null;
+        title: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        slug: string;
+        status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
+        organizerId: string;
+        location: string;
+        isDateTba: boolean;
+        startDate: Date;
+        endDate: Date;
+        bannerUrl: string;
+        requireLogin: boolean;
+        seoTitle: string | null;
+        seoDescription: string | null;
+        seoKeywords: string | null;
+        adminSeoKeywords: string | null;
+        seoPriority: string | null;
+        geofenceLat: number | null;
+        geofenceLng: number | null;
+        geofenceRadius: number | null;
+        allowTicketTransfer: boolean;
+    }) | null>;
     recordAuditLog(adminId: string, action: string, targetId: string, targetType: string, details?: any): Promise<{
         id: string;
         timestamp: Date;

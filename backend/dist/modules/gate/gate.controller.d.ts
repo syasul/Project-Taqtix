@@ -17,6 +17,7 @@ export declare class GateController {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;

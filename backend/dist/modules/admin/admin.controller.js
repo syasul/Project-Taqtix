@@ -26,6 +26,7 @@ const create_partner_dto_1 = require("./dto/create-partner.dto");
 const update_partner_dto_1 = require("./dto/update-partner.dto");
 const create_lead_dto_1 = require("./dto/create-lead.dto");
 const update_plan_dto_1 = require("./dto/update-plan.dto");
+const update_event_fee_dto_1 = require("./dto/update-event-fee.dto");
 let AdminController = class AdminController {
     adminService;
     constructor(adminService) {
@@ -61,6 +62,10 @@ let AdminController = class AdminController {
     }
     async deleteOrganizer(id) {
         const result = await this.adminService.deleteOrganizer(id);
+        return { success: true, data: result };
+    }
+    async updateOrganizerById(id, dto) {
+        const result = await this.adminService.updateOrganizerSegmentAndPlan(id, dto);
         return { success: true, data: result };
     }
     async updateOrganizer(id, dto) {
@@ -117,6 +122,10 @@ let AdminController = class AdminController {
     }
     async forceUnpublishEvent(id, adminId) {
         const result = await this.adminService.forceUnpublishEvent(id, adminId);
+        return { success: true, data: result };
+    }
+    async updateEventInternetFee(id, dto, adminId) {
+        const result = await this.adminService.updateEventInternetFee(id, dto, adminId);
         return { success: true, data: result };
     }
     async searchOrders(q) {
@@ -231,6 +240,17 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "deleteOrganizer", null);
+__decorate([
+    (0, common_1.Patch)('admin/organizers/:id'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Memperbarui data dan pengaturan organizer (Admin Only)' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_organizer_dto_1.UpdateOrganizerDto]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "updateOrganizerById", null);
 __decorate([
     (0, common_1.Patch)('admin/organizers/:id/segment'),
     (0, roles_decorator_1.Roles)('admin'),
@@ -381,6 +401,20 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "forceUnpublishEvent", null);
+__decorate([
+    (0, common_1.Patch)('admin/events/:id/internet-fee'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengatur Internet Fee per event dan tier kategori tiket (Admin Only)',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_event_fee_dto_1.UpdateEventFeeDto, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "updateEventInternetFee", null);
 __decorate([
     (0, common_1.Get)('admin/orders'),
     (0, roles_decorator_1.Roles)('admin'),

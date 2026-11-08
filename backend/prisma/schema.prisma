@@ -98,6 +98,7 @@ model Organizer {
   planStartedAt  DateTime?
   planExpiresAt  DateTime?
   integrations   Json?             // { metaPixelId, tiktokPixelId, gaTrackingId }
+  internetFee    Float?            @default(0) // Default Internet Fee per tiket untuk organizer (Rp)
   approvedAt     DateTime?         // Waktu persetujuan akun oleh main admin
   approvedBy     String?           // ID admin yang menyetujui akun
   createdAt      DateTime          @default(now())
@@ -129,6 +130,7 @@ model Event {
   allowTicketTransfer Boolean           @default(true)
   requireLogin        Boolean           @default(false)
   isDateTba           Boolean           @default(false)
+  internetFee         Float?            @default(0) // Default Internet Fee per tiket untuk event (Rp)
   
   // SEO & Double Engagement Fields
   seoTitle            String?
@@ -172,6 +174,7 @@ model TicketCategory {
   sold        Int      @default(0)
   maxPerOrder Int      @default(5)
   ticketPerPackage Int @default(1)
+  internetFee Float?   @default(0) // Internet Fee per tiket (Rp). Jika diisi meng-override default event/organizer
   saleStartAt DateTime
   saleEndAt   DateTime
   createdAt   DateTime @default(now())
@@ -188,6 +191,7 @@ model Order {
   buyerId        String
   totalAmount    Float
   discountAmount Float             @default(0.0)
+  internetFee    Float             @default(0.0) // Total internet fee pada order ini
   status         OrderStatus       @default(PENDING)
   promoCodeId    String?
   partnerId      String?
@@ -213,6 +217,7 @@ model OrderItem {
   ticketCategoryId   String
   qty                Int
   unitPrice          Float
+  internetFee        Float          @default(0.0) // Internet fee per unit tiket saat pembelian
   attendeeName       String
   attendeeEmail      String
   attendeePhone      String

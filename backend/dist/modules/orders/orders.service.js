@@ -47,6 +47,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
             where: { id: dto.eventId },
             include: {
                 customFormFields: true,
+                organizer: true,
             },
         });
         if (!event) {
@@ -177,10 +178,11 @@ let OrdersService = OrdersService_1 = class OrdersService {
                 }
             }
             let basePriceTotal = 0;
+            let totalInternetFee = 0;
             const verifiedItems = [];
             for (const item of dto.items) {
                 const ticketCategories = await tx.$queryRaw `
-          SELECT id, quota, sold, name, price, "ticketPerPackage" FROM "TicketCategory"
+          SELECT id, quota, sold, name, price, "ticketPerPackage", "internetFee" FROM "TicketCategory"
           WHERE id = ${item.ticketCategoryId} AND "eventId" = ${dto.eventId}
           FOR UPDATE
         `;
@@ -203,6 +205,20 @@ let OrdersService = OrdersService_1 = class OrdersService {
                 });
                 const itemTotal = ticketCategory.price * item.qty;
                 basePriceTotal += itemTotal;
+                const organizerFee = event.organizer?.internetFee !== null &&
+                    event.organizer?.internetFee !== undefined
+                    ? Number(event.organizer.internetFee)
+                    : 0;
+                const eventFee = event.internetFee !== null && event.internetFee !== undefined
+                    ? Number(event.internetFee)
+                    : organizerFee;
+                const tierFee = ticketCategory.internetFee !== null &&
+                    ticketCategory.internetFee !== undefined
+                    ? Number(ticketCategory.internetFee)
+                    : eventFee;
+                const effectiveFeePerTicket = Math.max(0, tierFee);
+                const itemInternetFee = effectiveFeePerTicket * item.qty;
+                totalInternetFee += itemInternetFee;
                 let itemFacilityCost = 0;
                 const verifiedItemFacilities = [];
                 if (item.facilities && item.facilities.length > 0) {
@@ -253,6 +269,9 @@ let OrdersService = OrdersService_1 = class OrdersService {
                             price: Number(facility.price),
                         });
                     }
+                    if (itemFacilityCost > 0) {
+                        basePriceTotal += itemFacilityCost;
+                    }
                 }
                 const combinedAnswers = {
                     ...(dto.customFieldAnswers || {}),
@@ -267,6 +286,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
                     ticketCategoryId: ticketCategory.id,
                     qty: item.qty,
                     price: ticketCategory.price,
+                    internetFee: effectiveFeePerTicket,
                     attendeeName: item.attendeeName || dto.buyerName,
                     attendeeEmail: item.attendeeEmail || dto.buyerEmail,
                     attendeePhone: item.attendeePhone || dto.buyerPhone || '',
@@ -314,7 +334,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
                     });
                 }
             }
-            const totalAmount = Math.max(0, basePriceTotal - discountAmt);
+            const totalAmount = Math.max(0, basePriceTotal + totalInternetFee - discountAmt);
             const expiredAt = new Date(Date.now() + 10 * 60 * 1000);
             const newOrder = await tx.order.create({
                 data: {
@@ -322,6 +342,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
                     eventId: dto.eventId,
                     totalAmount,
                     discountAmount: discountAmt,
+                    internetFee: totalInternetFee,
                     status: client_1.OrderStatus.PENDING,
                     promoCodeId,
                     partnerId: affiliatePartnerId,
@@ -338,6 +359,7 @@ let OrdersService = OrdersService_1 = class OrdersService {
                         ticketCategoryId: item.ticketCategoryId,
                         qty: item.qty,
                         unitPrice: item.price,
+                        internetFee: item.internetFee,
                         attendeeName: item.attendeeName || dto.buyerName,
                         attendeeEmail: item.attendeeEmail || dto.buyerEmail,
                         attendeePhone: item.attendeePhone || dto.buyerPhone || '',

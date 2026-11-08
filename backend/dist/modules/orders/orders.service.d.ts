@@ -23,6 +23,7 @@ export declare class OrdersService {
             updatedAt: Date;
             slug: string;
             status: import("@prisma/client").$Enums.EventStatus;
+            internetFee: number | null;
             organizerId: string;
             location: string;
             isDateTba: boolean;
@@ -69,6 +70,7 @@ export declare class OrdersService {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                internetFee: number | null;
                 eventId: string;
                 price: number;
                 quota: number;
@@ -81,6 +83,7 @@ export declare class OrdersService {
         } & {
             id: string;
             createdAt: Date;
+            internetFee: number;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
             attendeeName: string;
             orderId: string;
@@ -97,6 +100,7 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
+        internetFee: number;
         eventId: string;
         promoCodeId: string | null;
         buyerId: string;
@@ -137,6 +141,7 @@ export declare class OrdersService {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                internetFee: number | null;
                 eventId: string;
                 price: number;
                 quota: number;
@@ -170,6 +175,7 @@ export declare class OrdersService {
         } & {
             id: string;
             createdAt: Date;
+            internetFee: number;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
             attendeeName: string;
             orderId: string;
@@ -186,6 +192,7 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         status: import("@prisma/client").$Enums.OrderStatus;
+        internetFee: number;
         eventId: string;
         promoCodeId: string | null;
         buyerId: string;

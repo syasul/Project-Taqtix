@@ -29,6 +29,16 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+interface TicketCategoryItem {
+  id: string;
+  name: string;
+  price: number;
+  quota: number;
+  sold: number;
+  ticketPerPackage?: number;
+  internetFee?: number | null;
+}
+
 interface EventItem {
   id: string;
   title: string;
@@ -48,6 +58,9 @@ interface EventItem {
   seoKeywords?: string;
   adminSeoKeywords?: string;
   seoPriority?: 'NORMAL' | 'HIGH' | 'MAX_BOOST';
+  internetFee?: number;
+  organizerInternetFee?: number;
+  ticketCategories?: TicketCategoryItem[];
 }
 
 const formatDate = (isoString: string) => {
@@ -74,11 +87,69 @@ export default function EventsApprovalPage() {
   const [adminKeywordsInput, setAdminKeywordsInput] = useState('');
   const [seoPriorityInput, setSeoPriorityInput] = useState<'NORMAL' | 'HIGH' | 'MAX_BOOST'>('NORMAL');
 
+  // Internet Fee Modal State
+  const [feeModalEvent, setFeeModalEvent] = useState<EventItem | null>(null);
+  const [eventFeeInput, setEventFeeInput] = useState<number>(0);
+  const [categoryFeesInput, setCategoryFeesInput] = useState<Record<string, number>>({});
+
   // Fetch Events
   const { data: events = [], isLoading } = useQuery<EventItem[]>({
     queryKey: ['admin-events'],
     queryFn: () => api.get<EventItem[]>('/admin/events'),
   });
+
+  // Update Internet Fee Mutation
+  const updateFeeMutation = useMutation({
+    mutationFn: (data: {
+      id: string;
+      internetFee: number;
+      applyToAllCategories?: boolean;
+      categories?: { id: string; internetFee: number }[];
+    }) => api.patch(`/admin/events/${data.id}/internet-fee`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      setFeeModalEvent(null);
+      toast.success('Pengaturan Internet Fee berhasil disimpan!');
+    },
+    onError: () => {
+      toast.error('Gagal menyimpan pengaturan Internet Fee');
+    },
+  });
+
+  const handleOpenFeeModal = (evt: EventItem) => {
+    setFeeModalEvent(evt);
+    const defaultEvtFee = evt.internetFee ?? evt.organizerInternetFee ?? 0;
+    setEventFeeInput(defaultEvtFee);
+    const catMap: Record<string, number> = {};
+    evt.ticketCategories?.forEach((tc) => {
+      catMap[tc.id] = tc.internetFee != null ? tc.internetFee : defaultEvtFee;
+    });
+    setCategoryFeesInput(catMap);
+  };
+
+  const handleApplyFeeToAllTiers = () => {
+    if (!feeModalEvent?.ticketCategories) return;
+    const updated: Record<string, number> = {};
+    feeModalEvent.ticketCategories.forEach((tc) => {
+      updated[tc.id] = eventFeeInput;
+    });
+    setCategoryFeesInput(updated);
+    toast.info(`Internet Fee Rp ${eventFeeInput.toLocaleString('id-ID')} diterapkan ke semua tier.`);
+  };
+
+  const handleSaveFee = () => {
+    if (!feeModalEvent) return;
+    const categoriesPayload =
+      feeModalEvent.ticketCategories?.map((tc) => ({
+        id: tc.id,
+        internetFee: categoryFeesInput[tc.id] ?? eventFeeInput,
+      })) || [];
+    updateFeeMutation.mutate({
+      id: feeModalEvent.id,
+      internetFee: eventFeeInput,
+      categories: categoriesPayload,
+    });
+  };
 
   // Update SEO Booster Mutation
   const updateSeoMutation = useMutation({
@@ -275,6 +346,7 @@ export default function EventsApprovalPage() {
                   <th className="py-3.5 px-4">Penjualan / Kuota</th>
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4">Double SEO Engagement</th>
+                  <th className="py-3.5 px-4">Internet Fee</th>
                   <th className="py-3.5 px-4 text-right">Aksi Moderasi</th>
                 </tr>
               </thead>
@@ -355,6 +427,36 @@ export default function EventsApprovalPage() {
                             {evt.seoPriority === 'MAX_BOOST' ? 'MAX' : 'HIGH'}
                           </span>
                         )}
+                      </button>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <button
+                        onClick={() => handleOpenFeeModal(evt)}
+                        title="Atur Internet Fee Event & Tier Kategori"
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-2xs ${
+                          (evt.internetFee && evt.internetFee > 0) ||
+                          evt.ticketCategories?.some((c) => c.internetFee && c.internetFee > 0)
+                            ? 'bg-amber-50 border-amber-200 text-amber-900 hover:bg-amber-100'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        <DollarSign
+                          className={`w-3.5 h-3.5 ${
+                            (evt.internetFee && evt.internetFee > 0) ||
+                            evt.ticketCategories?.some((c) => c.internetFee && c.internetFee > 0)
+                              ? 'text-amber-600'
+                              : 'text-slate-400'
+                          }`}
+                        />
+                        <span>
+                          {evt.internetFee && evt.internetFee > 0
+                            ? `Rp ${evt.internetFee.toLocaleString('id-ID')}`
+                            : evt.ticketCategories?.some((c) => c.internetFee && c.internetFee > 0)
+                            ? 'Tier Khusus'
+                            : evt.organizerInternetFee && evt.organizerInternetFee > 0
+                            ? `EO: Rp ${evt.organizerInternetFee.toLocaleString('id-ID')}`
+                            : 'Set Fee'}
+                        </span>
                       </button>
                     </td>
                     <td className="py-3.5 px-4 text-right">
@@ -810,6 +912,203 @@ export default function EventsApprovalPage() {
                   <>
                     <Save className="w-3.5 h-3.5" />
                     <span>Simpan Pengaturan Booster</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: PENGATURAN INTERNET FEE EVENT & TIER KATEGORI                     */}
+      {/* ========================================================================= */}
+      {feeModalEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto space-y-5">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-900">
+                      Pengaturan Internet Fee & Biaya Layanan
+                    </h3>
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      Platform Fee
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate max-w-md">
+                    {feeModalEvent.title} • {feeModalEvent.organizerName}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setFeeModalEvent(null)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl text-lg leading-none cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* EO Default Fee Info Banner */}
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 text-slate-600">
+                <Building2 className="w-4 h-4 text-slate-400" />
+                <span>Default Internet Fee Penyelenggara (EO):</span>
+              </div>
+              <span className="font-bold text-slate-800 font-mono">
+                Rp {(feeModalEvent.organizerInternetFee || 0).toLocaleString('id-ID')} / tiket
+              </span>
+            </div>
+
+            {/* Event Default Fee Section */}
+            <div className="p-4 bg-amber-50/40 border border-amber-200/80 rounded-2xl space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <label className="text-xs font-bold text-slate-900 block">
+                    Default Internet Fee Event (Rp per tiket)
+                  </label>
+                  <span className="text-[11px] text-slate-500 block leading-tight">
+                    Biaya standar yang dikenakan per tiket untuk seluruh kategori di event ini.
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-36">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                      Rp
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={500}
+                      value={eventFeeInput}
+                      onChange={(e) => setEventFeeInput(Number(e.target.value) || 0)}
+                      className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#08B4B5]"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleApplyFeeToAllTiers}
+                    title="Terapkan nominal default ini ke seluruh kategori tiket"
+                    className="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-2xs whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Sama Rata ke Semua</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Category / Tier Breakdown Table */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+                  Pengaturan Internet Fee Tiap Tier Kategori Tiket
+                </label>
+                <span className="text-[11px] text-slate-400 font-medium">
+                  {feeModalEvent.ticketCategories?.length || 0} Kategori Tiket
+                </span>
+              </div>
+
+              {!feeModalEvent.ticketCategories || feeModalEvent.ticketCategories.length === 0 ? (
+                <div className="p-6 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+                  Belum ada kategori tiket yang dibuat untuk event ini.
+                </div>
+              ) : (
+                <div className="border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100">
+                  <div className="bg-slate-50 px-4 py-2.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider grid grid-cols-12 gap-3 items-center">
+                    <span className="col-span-5">Kategori / Tier</span>
+                    <span className="col-span-3 text-right">Harga Tiket</span>
+                    <span className="col-span-4 text-right">Internet Fee (Rp)</span>
+                  </div>
+
+                  {feeModalEvent.ticketCategories.map((tc) => {
+                    const currentTierFee = categoryFeesInput[tc.id] ?? eventFeeInput;
+                    const totalPrice = Number(tc.price) + Number(currentTierFee);
+                    const isCustom = currentTierFee !== eventFeeInput;
+
+                    return (
+                      <div
+                        key={tc.id}
+                        className="px-4 py-3 grid grid-cols-12 gap-3 items-center hover:bg-slate-50/50 transition-colors"
+                      >
+                        <div className="col-span-5 space-y-0.5">
+                          <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                            <span>{tc.name}</span>
+                            {isCustom ? (
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.2 bg-teal-50 text-[#08B4B5] border border-teal-200 rounded-md">
+                                Kustom
+                              </span>
+                            ) : (
+                              <span className="text-[9px] text-slate-400 font-normal">
+                                (Default)
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-400 block font-mono">
+                            Total Bayar: Rp {totalPrice.toLocaleString('id-ID')}
+                          </span>
+                        </div>
+
+                        <div className="col-span-3 text-right">
+                          <span className="text-xs font-semibold text-slate-700 font-mono">
+                            Rp {Number(tc.price).toLocaleString('id-ID')}
+                          </span>
+                        </div>
+
+                        <div className="col-span-4 flex items-center justify-end">
+                          <div className="relative w-32">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                              Rp
+                            </span>
+                            <input
+                              type="number"
+                              min={0}
+                              step={500}
+                              value={currentTierFee}
+                              onChange={(e) => {
+                                const val = Number(e.target.value) || 0;
+                                setCategoryFeesInput((prev) => ({
+                                  ...prev,
+                                  [tc.id]: val,
+                                }));
+                              }}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-2.5 py-1.5 text-xs font-bold text-slate-900 text-right focus:outline-none focus:border-[#08B4B5] focus:bg-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setFeeModalEvent(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveFee}
+                disabled={updateFeeMutation.isPending}
+                className="px-4 py-2 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-xl text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1.5"
+              >
+                {updateFeeMutation.isPending ? (
+                  <span>Menyimpan...</span>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Simpan Pengaturan Internet Fee</span>
                   </>
                 )}
               </button>

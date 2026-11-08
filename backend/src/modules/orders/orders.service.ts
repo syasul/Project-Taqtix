@@ -50,6 +50,7 @@ export class OrdersService {
       where: { id: dto.eventId },
       include: {
         customFormFields: true,
+        organizer: true,
       },
     });
 
@@ -231,10 +232,12 @@ export class OrdersService {
 
       // 3. Lock dan validasi kuota tiket
       let basePriceTotal = 0;
+      let totalInternetFee = 0;
       const verifiedItems: {
         ticketCategoryId: string;
         qty: number;
         price: number;
+        internetFee: number;
         attendeeName?: string;
         attendeeEmail?: string;
         attendeePhone?: string;
@@ -245,7 +248,7 @@ export class OrdersService {
       for (const item of dto.items) {
         // Pessimistic locking pada baris TicketCategory
         const ticketCategories = await tx.$queryRaw<any[]>`
-          SELECT id, quota, sold, name, price, "ticketPerPackage" FROM "TicketCategory"
+          SELECT id, quota, sold, name, price, "ticketPerPackage", "internetFee" FROM "TicketCategory"
           WHERE id = ${item.ticketCategoryId} AND "eventId" = ${dto.eventId}
           FOR UPDATE
         `;
@@ -278,6 +281,30 @@ export class OrdersService {
 
         const itemTotal = ticketCategory.price * item.qty;
         basePriceTotal += itemTotal;
+
+        // Hierarki kalkulasi Internet Fee:
+        // 1. Tier kategori tiket (jika di-set secara spesifik)
+        // 2. Default event (jika di-set)
+        // 3. Default EO / organizer (jika di-set)
+        // 4. Fallback 0
+        const organizerFee =
+          event.organizer?.internetFee !== null &&
+          event.organizer?.internetFee !== undefined
+            ? Number(event.organizer.internetFee)
+            : 0;
+        const eventFee =
+          event.internetFee !== null && event.internetFee !== undefined
+            ? Number(event.internetFee)
+            : organizerFee;
+        const tierFee =
+          ticketCategory.internetFee !== null &&
+          ticketCategory.internetFee !== undefined
+            ? Number(ticketCategory.internetFee)
+            : eventFee;
+
+        const effectiveFeePerTicket = Math.max(0, tierFee);
+        const itemInternetFee = effectiveFeePerTicket * item.qty;
+        totalInternetFee += itemInternetFee;
 
         // Process item facilities if any
         let itemFacilityCost = 0;
@@ -348,6 +375,9 @@ export class OrdersService {
               price: Number(facility.price),
             });
           }
+          if (itemFacilityCost > 0) {
+            basePriceTotal += itemFacilityCost;
+          }
         }
 
         const combinedAnswers = {
@@ -364,6 +394,7 @@ export class OrdersService {
           ticketCategoryId: ticketCategory.id,
           qty: item.qty,
           price: ticketCategory.price,
+          internetFee: effectiveFeePerTicket,
           attendeeName: item.attendeeName || dto.buyerName,
           attendeeEmail: item.attendeeEmail || dto.buyerEmail,
           attendeePhone: item.attendeePhone || dto.buyerPhone || '',
@@ -417,7 +448,10 @@ export class OrdersService {
         }
       }
 
-      const totalAmount = Math.max(0, basePriceTotal - discountAmt);
+      const totalAmount = Math.max(
+        0,
+        basePriceTotal + totalInternetFee - discountAmt,
+      );
       const expiredAt = new Date(Date.now() + 10 * 60 * 1000); // 10 menit sesuai API_CONTRACT.md
 
       // 5. Buat Order
@@ -427,6 +461,7 @@ export class OrdersService {
           eventId: dto.eventId,
           totalAmount,
           discountAmount: discountAmt,
+          internetFee: totalInternetFee,
           status: OrderStatus.PENDING,
           promoCodeId,
           partnerId: affiliatePartnerId,
@@ -445,6 +480,7 @@ export class OrdersService {
             ticketCategoryId: item.ticketCategoryId,
             qty: item.qty,
             unitPrice: item.price,
+            internetFee: item.internetFee,
             attendeeName: item.attendeeName || dto.buyerName,
             attendeeEmail: item.attendeeEmail || dto.buyerEmail,
             attendeePhone: item.attendeePhone || dto.buyerPhone || '',

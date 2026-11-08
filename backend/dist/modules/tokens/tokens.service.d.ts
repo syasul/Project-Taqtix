@@ -59,6 +59,7 @@ export declare class TokensService {
             planStartedAt: Date | null;
             planExpiresAt: Date | null;
             integrations: import("@prisma/client/runtime/library").JsonValue | null;
+            internetFee: number | null;
             approvedAt: Date | null;
             approvedBy: string | null;
         };

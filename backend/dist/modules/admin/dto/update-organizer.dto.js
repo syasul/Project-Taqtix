@@ -18,6 +18,7 @@ class UpdateOrganizerDto {
     plan;
     planExpiresAt;
     bankAccount;
+    internetFee;
 }
 exports.UpdateOrganizerDto = UpdateOrganizerDto;
 __decorate([
@@ -65,4 +66,14 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateOrganizerDto.prototype, "bankAccount", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 5000,
+        description: 'Default Internet fee per tiket (Rp)',
+    }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], UpdateOrganizerDto.prototype, "internetFee", void 0);
 //# sourceMappingURL=update-organizer.dto.js.map

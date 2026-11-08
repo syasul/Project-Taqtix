@@ -602,7 +602,7 @@ function CheckoutContent() {
     }
   }, [buyer.name, buyer.phone, eventId]);
 
-  // Kalkulasi Harga: dihitung murni dari jumlah paket yang dibeli * harga kategori
+  // Kalkulasi Harga Tiket
   const subtotalTickets = useMemo(() => {
     return checkoutItems.reduce((sum, item) => {
       const cat = categories.find((c: any) => c.id === item.categoryId);
@@ -615,8 +615,24 @@ function CheckoutContent() {
     return sum + (fac ? Number(fac.price) * qty : 0);
   }, 0);
 
+  // Kalkulasi Internet Fee per tiket / per tier
+  const totalInternetFee = useMemo(() => {
+    return checkoutItems.reduce((sum, item) => {
+      const cat = categories.find((c: any) => c.id === item.categoryId);
+      // Hierarki: tier fee -> event fee -> organizer fee -> 0
+      const organizerFee =
+        event?.organizer?.internetFee != null ? Number(event.organizer.internetFee) : 0;
+      const eventFee =
+        event?.internetFee != null ? Number(event.internetFee) : organizerFee;
+      const tierFee =
+        cat?.internetFee != null ? Number(cat.internetFee) : eventFee;
+      const effectiveFee = Math.max(0, tierFee);
+      return sum + effectiveFee * item.qty;
+    }, 0);
+  }, [checkoutItems, categories, event]);
+
   const subtotal = subtotalTickets + subtotalFacilities;
-  const total = Math.max(0, subtotal - promoDiscount);
+  const total = Math.max(0, subtotal + totalInternetFee - promoDiscount);
 
   // Validasi Promo Code
   const handleCheckPromo = async () => {
@@ -2359,11 +2375,32 @@ function CheckoutContent() {
             {/* Divider Tipis */}
             <div className="border-t border-slate-100 pt-3 space-y-2.5 text-xs">
               <div className="flex justify-between items-center text-slate-500">
-                <span>Subtotal</span>
+                <span>Subtotal Tiket</span>
                 <span className="font-semibold text-slate-800">
-                  Rp{subtotal.toLocaleString('id-ID')}
+                  Rp{subtotalTickets.toLocaleString('id-ID')}
                 </span>
               </div>
+
+              {subtotalFacilities > 0 && (
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Fasilitas Tambahan</span>
+                  <span className="font-semibold text-slate-800">
+                    Rp{subtotalFacilities.toLocaleString('id-ID')}
+                  </span>
+                </div>
+              )}
+
+              {totalInternetFee > 0 && (
+                <div className="flex justify-between items-center text-slate-600">
+                  <span className="flex items-center gap-1">
+                    <span>Biaya Layanan & Internet</span>
+                    <span className="text-[10px] text-slate-400 font-normal">(Internet Fee)</span>
+                  </span>
+                  <span className="font-semibold text-slate-800">
+                    Rp{totalInternetFee.toLocaleString('id-ID')}
+                  </span>
+                </div>
+              )}
 
               {promoDiscount > 0 && (
                 <div className="flex justify-between items-center text-emerald-600">

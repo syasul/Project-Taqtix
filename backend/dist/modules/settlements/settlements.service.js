@@ -49,7 +49,7 @@ let SettlementsService = class SettlementsService {
         }
         const createdSettlements = [];
         for (const event of endedEvents) {
-            const grossRevenue = event.orders.reduce((sum, order) => sum + order.totalAmount, 0);
+            const grossRevenue = event.orders.reduce((sum, order) => sum + Math.max(0, order.totalAmount - (order.internetFee || 0)), 0);
             const affiliateCommissionTotal = event.partners.reduce((sum, partner) => sum + partner.commissionEarned, 0);
             let feeRate = 0.05;
             if (event.organizer?.plan === 'pro')

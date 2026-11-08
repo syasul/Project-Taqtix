@@ -69,9 +69,9 @@ export class SettlementsService implements OnModuleInit {
     const createdSettlements: any[] = [];
 
     for (const event of endedEvents) {
-      // 1. Gross revenue dari semua order PAID
+      // 1. Gross revenue tiket dari semua order PAID (dikurangi internet fee platform)
       const grossRevenue = event.orders.reduce(
-        (sum, order) => sum + order.totalAmount,
+        (sum, order) => sum + Math.max(0, order.totalAmount - (order.internetFee || 0)),
         0,
       );
 

@@ -29,6 +29,7 @@ interface Organizer {
   plan: 'starter' | 'pro' | 'enterprise';
   segment: 'event_builder' | 'event_ip_owner' | 'campus_community' | 'enterprise' | null;
   bankAccount?: string;
+  internetFee?: number;
   createdAt: string;
   approvedAt: string | null;
   approvedBy: string | null;
@@ -46,6 +47,7 @@ export default function OrganizerDetailPage() {
   const [segment, setSegment] = useState<string>('event_builder');
   const [plan, setPlan] = useState<string>('starter');
   const [bankAccount, setBankAccount] = useState('');
+  const [internetFee, setInternetFee] = useState<number>(0);
 
   // Fetch organizer details
   const { data: organizers = [], isLoading } = useQuery<Organizer[]>({
@@ -62,6 +64,7 @@ export default function OrganizerDetailPage() {
       setSegment(org.segment || 'event_builder');
       setPlan(org.plan || 'starter');
       setBankAccount(org.bankAccount || '');
+      setInternetFee(org.internetFee || 0);
     }
   }, [org]);
 
@@ -72,6 +75,7 @@ export default function OrganizerDetailPage() {
       segment: string;
       plan: string;
       bankAccount: string;
+      internetFee: number;
     }) => api.patch(`/admin/organizers/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-organizers'] });
@@ -85,7 +89,7 @@ export default function OrganizerDetailPage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    saveMutation.mutate({ name, phone, segment, plan, bankAccount });
+    saveMutation.mutate({ name, phone, segment, plan, bankAccount, internetFee });
   };
 
   const segmentInfo = {
@@ -268,6 +272,37 @@ export default function OrganizerDetailPage() {
               onChange={(e) => setBankAccount(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#08B4B5] focus:bg-white"
             />
+          </div>
+        </div>
+
+        {/* Internet Fee Configuration */}
+        <div className="space-y-4 pt-4 border-t border-slate-100">
+          <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-[#08B4B5]" />
+            Internet Fee & Biaya Layanan Default
+          </h3>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+              Default Internet Fee EO (Rp per tiket)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                Rp
+              </span>
+              <input
+                type="number"
+                min={0}
+                step={500}
+                value={internetFee}
+                onChange={(e) => setInternetFee(Number(e.target.value) || 0)}
+                placeholder="0"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 font-bold focus:outline-none focus:border-[#08B4B5] focus:bg-white"
+              />
+            </div>
+            <p className="text-[11px] text-slate-500 leading-normal">
+              Biaya internet fee / penanganan standar per tiket untuk event milik EO ini. Jika suatu event atau tier tiket menentukan fee-nya sendiri, biaya spesifik tersebut yang akan diprioritaskan.
+            </p>
           </div>
         </div>
 

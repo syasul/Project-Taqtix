@@ -95,11 +95,22 @@ let DokuService = DokuService_1 = class DokuService {
                 callback_url: `${frontendUrl}/checkout/success?orderId=${order.id}`,
                 callback_url_cancel: `${frontendUrl}/checkout/cancelled?orderId=${order.id}`,
                 auto_redirect: true,
-                line_items: order.orderItems?.map((item) => ({
-                    name: (item.ticketCategory?.name || 'Tiket Event').substring(0, 50),
-                    price: Math.round(item.unitPrice),
-                    quantity: item.qty,
-                })) || [],
+                line_items: [
+                    ...(order.orderItems?.map((item) => ({
+                        name: (item.ticketCategory?.name || 'Tiket Event').substring(0, 50),
+                        price: Math.round(item.unitPrice),
+                        quantity: item.qty,
+                    })) || []),
+                    ...(order.internetFee && Number(order.internetFee) > 0
+                        ? [
+                            {
+                                name: 'Biaya Layanan & Internet',
+                                price: Math.round(Number(order.internetFee)),
+                                quantity: 1,
+                            },
+                        ]
+                        : []),
+                ],
             },
             payment: pConfig,
             customer: {

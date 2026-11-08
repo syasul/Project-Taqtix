@@ -57,6 +57,7 @@ interface TicketCategory {
   quota: number;
   sold: number;
   maxPerOrder: number;
+  internetFee?: number | null;
   saleStartAt: string;
   saleEndAt: string;
 }
@@ -489,7 +490,22 @@ export default function EventDetailPage() {
 
   const totalCost = selectedItems.reduce((sum, item) => {
     const category = event.ticketCategories.find((c) => c.id === item.categoryId);
-    return sum + (category ? category.price * item.qty : 0);
+    if (!category) return sum;
+    const organizerFee = (event as any).organizer?.internetFee != null ? Number((event as any).organizer.internetFee) : 0;
+    const eventFee = (event as any).internetFee != null ? Number((event as any).internetFee) : organizerFee;
+    const tierFee = (category as any).internetFee != null ? Number((category as any).internetFee) : eventFee;
+    const itemFee = Math.max(0, tierFee);
+    return sum + (category.price + itemFee) * item.qty;
+  }, 0);
+
+  const totalInternetFee = selectedItems.reduce((sum, item) => {
+    const category = event.ticketCategories.find((c) => c.id === item.categoryId);
+    if (!category) return sum;
+    const organizerFee = (event as any).organizer?.internetFee != null ? Number((event as any).organizer.internetFee) : 0;
+    const eventFee = (event as any).internetFee != null ? Number((event as any).internetFee) : organizerFee;
+    const tierFee = (category as any).internetFee != null ? Number((category as any).internetFee) : eventFee;
+    const itemFee = Math.max(0, tierFee);
+    return sum + itemFee * item.qty;
   }, 0);
 
   const totalSelectedQty = selectedItems.reduce((sum, item) => sum + item.qty, 0);
@@ -1268,6 +1284,24 @@ export default function EventDetailPage() {
                                 minimumFractionDigits: 0,
                               })}
                             </span>
+                            {(() => {
+                              const effFee =
+                                category.internetFee != null
+                                  ? Number(category.internetFee)
+                                  : (event as any).internetFee != null
+                                  ? Number((event as any).internetFee)
+                                  : (event as any).organizer?.internetFee != null
+                                  ? Number((event as any).organizer.internetFee)
+                                  : 0;
+                              if (effFee > 0) {
+                                return (
+                                  <span className="text-[10px] text-slate-400 font-medium block">
+                                    + Layanan: Rp{effFee.toLocaleString('id-ID')}
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                           {isSoldOut ? (
                             <span className="text-[9px] font-bold text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -1341,6 +1375,14 @@ export default function EventDetailPage() {
                           </div>
                         );
                       })}
+                      {totalInternetFee > 0 && (
+                        <div className="flex justify-between text-slate-500 text-[11px] pt-1.5 border-t border-slate-100">
+                          <span>Biaya Layanan & Internet</span>
+                          <span className="font-semibold text-slate-700">
+                            Rp{totalInternetFee.toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex justify-between items-center pt-2 border-t border-slate-100">

@@ -52,6 +52,7 @@ export declare class DoorprizeController {
             orderItem: {
                 id: string;
                 createdAt: Date;
+                internetFee: number;
                 facilities: import("@prisma/client/runtime/library").JsonValue | null;
                 attendeeName: string;
                 orderId: string;

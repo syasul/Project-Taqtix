@@ -1,4 +1,4 @@
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateOrganizerDto {
@@ -41,4 +41,13 @@ export class UpdateOrganizerDto {
   @IsString()
   @IsOptional()
   bankAccount?: string;
+
+  @ApiPropertyOptional({
+    example: 5000,
+    description: 'Default Internet fee per tiket (Rp)',
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  internetFee?: number;
 }

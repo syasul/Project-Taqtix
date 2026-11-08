@@ -25,6 +25,7 @@ import { CreatePartnerDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
+import { UpdateEventFeeDto } from './dto/update-event-fee.dto';
 
 @ApiTags('Admin Panel Console')
 @Controller()
@@ -119,6 +120,21 @@ export class AdminController {
   @ApiOperation({ summary: 'Menghapus akun organizer (Admin Only)' })
   async deleteOrganizer(@Param('id') id: string) {
     const result = await this.adminService.deleteOrganizer(id);
+    return { success: true, data: result };
+  }
+
+  @Patch('admin/organizers/:id')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Memperbarui data dan pengaturan organizer (Admin Only)' })
+  async updateOrganizerById(
+    @Param('id') id: string,
+    @Body() dto: UpdateOrganizerDto,
+  ) {
+    const result = await this.adminService.updateOrganizerSegmentAndPlan(
+      id,
+      dto,
+    );
     return { success: true, data: result };
   }
 
@@ -265,6 +281,21 @@ export class AdminController {
     @CurrentUser('id') adminId: string,
   ) {
     const result = await this.adminService.forceUnpublishEvent(id, adminId);
+    return { success: true, data: result };
+  }
+
+  @Patch('admin/events/:id/internet-fee')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Mengatur Internet Fee per event dan tier kategori tiket (Admin Only)',
+  })
+  async updateEventInternetFee(
+    @Param('id') id: string,
+    @Body() dto: UpdateEventFeeDto,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.updateEventInternetFee(id, dto, adminId);
     return { success: true, data: result };
   }
 

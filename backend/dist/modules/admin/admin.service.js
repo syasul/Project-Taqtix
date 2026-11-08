@@ -80,6 +80,7 @@ let AdminService = class AdminService {
             plan: o.plan,
             segment: o.segment,
             bankAccount: o.bankAccount,
+            internetFee: o.internetFee ?? 0,
             createdAt: o.createdAt.toISOString(),
             approvedAt: o.approvedAt ? o.approvedAt.toISOString() : null,
             approvedBy: o.approvedBy || null,
@@ -176,6 +177,9 @@ let AdminService = class AdminService {
                 segment: dto.segment ?? organizer.segment,
                 plan: dto.plan ?? organizer.plan,
                 bankAccount: dto.bankAccount ?? organizer.bankAccount,
+                internetFee: dto.internetFee !== undefined
+                    ? dto.internetFee
+                    : organizer.internetFee,
                 planStartedAt: dto.plan ? new Date() : organizer.planStartedAt,
                 planExpiresAt: dto.planExpiresAt
                     ? new Date(dto.planExpiresAt)
@@ -368,6 +372,17 @@ let AdminService = class AdminService {
             endDate: e.endDate.toISOString(),
             ticketsSold: e.ticketCategories.reduce((s, tc) => s + tc.sold, 0),
             quota: e.ticketCategories.reduce((s, tc) => s + tc.quota, 0),
+            internetFee: e.internetFee ?? 0,
+            organizerInternetFee: e.organizer.internetFee ?? 0,
+            ticketCategories: e.ticketCategories.map((tc) => ({
+                id: tc.id,
+                name: tc.name,
+                price: tc.price,
+                quota: tc.quota,
+                sold: tc.sold,
+                ticketPerPackage: tc.ticketPerPackage,
+                internetFee: tc.internetFee,
+            })),
         }));
     }
     async approveEvent(eventId) {
@@ -469,6 +484,7 @@ let AdminService = class AdminService {
             plan: o.plan,
             segment: o.segment,
             bankAccount: o.bankAccount,
+            internetFee: o.internetFee ?? 0,
             createdAt: o.createdAt.toISOString(),
             approvedAt: o.approvedAt ? o.approvedAt.toISOString() : null,
             approvedBy: o.approvedBy || null,
@@ -601,6 +617,43 @@ let AdminService = class AdminService {
         return this.prisma.auditLog.findMany({
             orderBy: { timestamp: 'desc' },
             take: 100,
+        });
+    }
+    async updateEventInternetFee(eventId, dto, adminId) {
+        const event = await this.prisma.event.findUnique({
+            where: { id: eventId },
+            include: { ticketCategories: true },
+        });
+        if (!event)
+            throw new common_1.NotFoundException('Event tidak ditemukan');
+        await this.prisma.$transaction(async (tx) => {
+            await tx.event.update({
+                where: { id: eventId },
+                data: { internetFee: dto.internetFee },
+            });
+            if (dto.applyToAllCategories) {
+                await tx.ticketCategory.updateMany({
+                    where: { eventId },
+                    data: { internetFee: dto.internetFee },
+                });
+            }
+            else if (dto.categories && dto.categories.length > 0) {
+                for (const cat of dto.categories) {
+                    await tx.ticketCategory.update({
+                        where: { id: cat.id },
+                        data: { internetFee: cat.internetFee },
+                    });
+                }
+            }
+        });
+        await this.recordAuditLog(adminId || 'admin', 'update_event_internet_fee', eventId, 'event', {
+            internetFee: dto.internetFee,
+            applyToAllCategories: dto.applyToAllCategories,
+            categoriesCount: dto.categories?.length || 0,
+        });
+        return this.prisma.event.findUnique({
+            where: { id: eventId },
+            include: { ticketCategories: true },
         });
     }
     async recordAuditLog(adminId, action, targetId, targetType, details) {

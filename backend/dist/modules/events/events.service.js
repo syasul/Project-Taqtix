@@ -195,6 +195,7 @@ let EventsService = class EventsService {
                         instagram: true,
                         tiktok: true,
                         youtube: true,
+                        internetFee: true,
                     },
                 },
                 ticketCategories: {

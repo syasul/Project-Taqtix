@@ -14,6 +14,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -39,6 +40,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -64,6 +66,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -97,6 +100,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -135,12 +139,14 @@ export declare class EventsService {
             instagram: string | null;
             tiktok: string | null;
             youtube: string | null;
+            internetFee: number | null;
         };
         ticketCategories: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            internetFee: number | null;
             eventId: string;
             price: number;
             quota: number;
@@ -203,6 +209,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;
@@ -228,6 +235,7 @@ export declare class EventsService {
         updatedAt: Date;
         slug: string;
         status: import("@prisma/client").$Enums.EventStatus;
+        internetFee: number | null;
         organizerId: string;
         location: string;
         isDateTba: boolean;

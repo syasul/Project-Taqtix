@@ -39,6 +39,7 @@ export declare class TicketsController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        internetFee: number | null;
         eventId: string;
         price: number;
         quota: number;
@@ -53,6 +54,7 @@ export declare class TicketsController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        internetFee: number | null;
         eventId: string;
         price: number;
         quota: number;
@@ -67,6 +69,7 @@ export declare class TicketsController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        internetFee: number | null;
         eventId: string;
         price: number;
         quota: number;
@@ -122,6 +125,7 @@ export declare class TicketsController {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                internetFee: number | null;
                 eventId: string;
                 price: number;
                 quota: number;
@@ -134,6 +138,7 @@ export declare class TicketsController {
         } & {
             id: string;
             createdAt: Date;
+            internetFee: number;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
             attendeeName: string;
             orderId: string;
@@ -242,6 +247,7 @@ export declare class TicketsController {
                 createdAt: Date;
                 updatedAt: Date;
                 name: string;
+                internetFee: number | null;
                 eventId: string;
                 price: number;
                 quota: number;
@@ -254,6 +260,7 @@ export declare class TicketsController {
         } & {
             id: string;
             createdAt: Date;
+            internetFee: number;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
             attendeeName: string;
             orderId: string;

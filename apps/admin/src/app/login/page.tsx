@@ -101,15 +101,6 @@ export default function LoginPage() {
           <p className="text-xs text-slate-500 font-semibold max-w-xs mx-auto">
             Portal Khusus Administrator Pusat TAQtix (core.taqtix.id)
           </p>
-          <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-[11px] leading-relaxed">
-            Anda Penyelenggara Event (EO)?{' '}
-            <a
-              href="https://partner.taqtix.id/login"
-              className="text-[#08B4B5] font-bold underline hover:text-[#079b9c] inline-block"
-            >
-              Masuk ke Portal EO di partner.taqtix.id &rarr;
-            </a>
-          </div>
         </div>
 
         {error && (

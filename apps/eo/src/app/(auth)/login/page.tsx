@@ -105,15 +105,6 @@ function LoginForm() {
         <p className="text-xs text-slate-500 mt-1 font-medium">
           Workspace Resmi EO TAQtix (partner.taqtix.id)
         </p>
-        <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-[11px] leading-relaxed">
-          Anda Main Admin / Superadmin?{' '}
-          <a
-            href="https://core.taqtix.id/login"
-            className="text-rose-600 font-bold underline hover:text-rose-700 inline-block"
-          >
-            Masuk ke Portal Superadmin di core.taqtix.id &rarr;
-          </a>
-        </div>
       </div>
 
       {/* Form */}

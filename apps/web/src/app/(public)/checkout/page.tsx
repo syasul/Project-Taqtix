@@ -1348,9 +1348,7 @@ function CheckoutContent() {
             {orderDetails?.payment?.snapToken ? (
               <div className="w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative min-h-[520px]">
                 <iframe
-                  src={`${orderDetails.payment.snapToken}${
-                    orderDetails.payment.snapToken.includes('?') ? '&' : '?'
-                  }view=iframe`}
+                  src={orderDetails.payment.snapToken}
                   className="w-full h-[560px] border-0"
                   title="DOKU Payment Portal"
                   allow="payment *"

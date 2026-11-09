@@ -23,16 +23,12 @@ import {
   Ticket as TicketIcon,
   QrCode,
   Building2,
-  CreditCard,
-  Wallet,
-  Store,
   X,
   Sparkles,
   Copy,
   Check,
   Download,
   RefreshCw,
-  ExternalLink,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { apiClient } from '@/lib/api-client';
@@ -203,7 +199,7 @@ function CheckoutContent() {
   const isVaQuery = queryMethod ? queryMethod.startsWith('VIRTUAL_ACCOUNT') : true;
   const [paymentTab, setPaymentTab] = useState<'qris' | 'va'>('va');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(
-    queryMethod || 'VIRTUAL_ACCOUNT_BNI'
+    queryMethod || ''
   );
   const [activeInstructionBank, setActiveInstructionBank] = useState<string>(
     queryMethod && queryMethod.startsWith('VIRTUAL_ACCOUNT_')
@@ -1341,22 +1337,11 @@ function CheckoutContent() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Metode Aktif DOKU</span>
+                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Metode Pembayaran Resmi</span>
                 </div>
-                <h3 className="font-bold text-slate-900 text-base mt-0.5">Virtual Account Bank (Verifikasi Instan)</h3>
-                <p className="text-xs text-slate-500">Pilih bank Anda untuk mendapatkan nomor rekening Virtual Account resmi dari DOKU</p>
+                <h3 className="font-bold text-slate-900 text-base mt-0.5">Portal Pembayaran (Verifikasi Instan)</h3>
+                <p className="text-xs text-slate-500">Pilih metode pembayaran (Virtual Account, QRIS, dll) di bawah untuk menyelesaikan transaksi Anda</p>
               </div>
-              {orderDetails?.payment?.snapToken && (
-                <a
-                  href={orderDetails.payment.snapToken}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#08ADAE] hover:text-[#07999A] hover:underline shrink-0 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 transition"
-                >
-                  <span>Buka Halaman DOKU Penuh</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
             </div>
 
             {/* Seamless Embedded DOKU Container */}
@@ -2127,196 +2112,6 @@ function CheckoutContent() {
               </div>
             </div>
           )}
-
-          {/* Card: Pilihan Metode Pembayaran Kustom TAQtix */}
-          <div className="bg-white p-5 sm:p-7 border border-slate-200/80 rounded-3xl shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-teal-50 border border-[#08B4B5]/20 flex items-center justify-center text-[#08B4B5]">
-                  <CreditCard className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm tracking-tight">Metode Pembayaran</h3>
-                  <p className="text-[11px] text-slate-500 font-medium">
-                    Pilih metode bayar langsung tanpa diarahkan keluar dari TAQtix
-                  </p>
-                </div>
-              </div>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                Instan & Terverifikasi
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              {/* Option 1: BNI Virtual Account */}
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BNI')}
-                className={cn(
-                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BNI'
-                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 px-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0">
-                      <svg className="h-4 w-auto" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 6L2 26H14V6Z" fill="#F15A24"/>
-                        <path d="M17 14L25 26H17V14Z" fill="#005E6A"/>
-                        <text x="32" y="24" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="22" fill="#005E6A" letterSpacing="1">BNI</text>
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-900 text-xs block">BNI Virtual Account</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">BNI Mobile, ATM, Transfer Antar Bank</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                    Aktif
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
-                </div>
-              </button>
-
-              {/* Option 2: BRI Virtual Account (BRIVA) */}
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BRI')}
-                className={cn(
-                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BRI'
-                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 px-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0">
-                      <svg className="h-4 w-auto" viewBox="0 0 95 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="7" fill="#00529C"/>
-                        <text x="4" y="23" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="900" fontSize="16" fill="#FFFFFF" letterSpacing="0.5">BRI</text>
-                        <circle cx="28" cy="8" r="3" fill="#F37021"/>
-                        <text x="39" y="23" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="800" fontSize="18" fill="#00529C">BRIVA</text>
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-900 text-xs block">BRI Virtual Account (BRIVA)</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">BRImo, ATM BRI, Transfer Antar Bank</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                    Aktif
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
-                </div>
-              </button>
-
-              {/* Option 3: Mandiri Virtual Account */}
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BANK_MANDIRI')}
-                className={cn(
-                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BANK_MANDIRI'
-                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 px-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0">
-                      <svg className="h-4 w-auto" viewBox="0 0 110 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <text x="0" y="24" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="800" fontSize="21" fill="#002D62">mandiri</text>
-                        <path d="M82 10C88 6 98 6 104 12C98 10 90 12 86 16C84 14 83 12 82 10Z" fill="#F5A800"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-900 text-xs block">Mandiri Virtual Account</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">Livin&apos; by Mandiri, ATM Mandiri</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                    Aktif
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
-                </div>
-              </button>
-
-              {/* Option 4: Permata / BCA / BSI VA */}
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('VIRTUAL_ACCOUNT_BCA')}
-                className={cn(
-                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer',
-                  selectedPaymentMethod === 'VIRTUAL_ACCOUNT_BCA'
-                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 px-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0">
-                      <svg className="h-4 w-auto" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="28" height="28" rx="6" fill="#00A859"/>
-                        <polygon points="14,4 24,14 14,24 4,14" fill="#FFFFFF"/>
-                        <text x="36" y="22" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="800" fontSize="16" fill="#003882">PERMATA</text>
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-900 text-xs block">Permata / BCA / BSI VA</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">m-BCA, PermataNet, BSI Mobile</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                    Aktif
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Verifikasi instan otomatis DOKU 24 Jam</span>
-                </div>
-              </button>
-
-              {/* Option 5: Minimarket (Indomaret & Alfamart) */}
-              <button
-                type="button"
-                onClick={() => setSelectedPaymentMethod('')}
-                className={cn(
-                  'p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 cursor-pointer sm:col-span-2',
-                  selectedPaymentMethod === ''
-                    ? 'border-[#08ADAE] bg-teal-50/40 ring-2 ring-[#08ADAE]/20 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 px-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0 gap-1.5 text-xs font-black">
-                      <span className="text-blue-600">Indomaret</span>
-                      <span className="text-slate-300 font-normal">|</span>
-                      <span className="text-red-600">Alfamart</span>
-                    </div>
-                    <div>
-                      <span className="font-bold text-slate-900 text-xs block">Gerai Retail &amp; Metode Lainnya</span>
-                      <span className="text-[10px] text-slate-500 font-medium block">Indomaret, Alfamart, Akulaku PayLater</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                    Aktif
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium">
-                  <span>Bayar tunai di kasir gerai terdekat atau PayLater</span>
-                </div>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* ======================================================== */}

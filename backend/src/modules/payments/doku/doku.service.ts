@@ -84,6 +84,11 @@ export class DokuService {
       this.configService.get<string>('TAQTIX_WEB_URL') ||
       'https://taqtix.id';
 
+    const backendUrl =
+      this.configService.get<string>('TAQTIX_BASE_URL') ||
+      this.configService.get<string>('API_URL') ||
+      'https://api.taqtix.id';
+
     const invoiceNumber = `TAQTIX-ORD-${order.id}`;
 
     const paymentConfig: any = {
@@ -125,6 +130,9 @@ export class DokuService {
         email: buyerEmail,
         phone: formattedPhone || undefined,
         country: 'ID',
+      },
+      additional_info: {
+        override_notification_url: `${backendUrl}/payments/webhook/doku`,
       },
     });
 

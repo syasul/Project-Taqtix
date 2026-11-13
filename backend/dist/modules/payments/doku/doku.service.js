@@ -81,6 +81,9 @@ let DokuService = DokuService_1 = class DokuService {
             this.configService.get('TAQTIX_FRONTEND_URL') ||
             this.configService.get('TAQTIX_WEB_URL') ||
             'https://taqtix.id';
+        const backendUrl = this.configService.get('TAQTIX_BASE_URL') ||
+            this.configService.get('API_URL') ||
+            'https://api.taqtix.id';
         const invoiceNumber = `TAQTIX-ORD-${order.id}`;
         const paymentConfig = {
             payment_due_date: 10,
@@ -119,6 +122,9 @@ let DokuService = DokuService_1 = class DokuService {
                 email: buyerEmail,
                 phone: formattedPhone || undefined,
                 country: 'ID',
+            },
+            additional_info: {
+                override_notification_url: `${backendUrl}/payments/webhook/doku`,
             },
         });
         let currentPayload = buildPayload(paymentConfig);

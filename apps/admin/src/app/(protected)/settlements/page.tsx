@@ -130,19 +130,22 @@ export default function SettlementsPage() {
     },
   });
 
+  const safeSettlements = Array.isArray(settlements) ? settlements : [];
+  const safeAffiliatePayouts = Array.isArray(affiliatePayouts) ? affiliatePayouts : [];
+
   // Filtering EO settlements
-  const filteredSettlements = settlements.filter((set) => {
+  const filteredSettlements = safeSettlements.filter((set) => {
     const eventTitle = (getSettlementEventTitle(set) || '').toLowerCase();
     const organizerName = (getSettlementOrganizerName(set) || '').toLowerCase();
     const term = (searchTerm || '').trim().toLowerCase();
     const matchesSearch =
       !term || eventTitle.includes(term) || organizerName.includes(term);
-    const matchesStatus = statusFilter === 'all' || set.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || set?.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   // Filtering Affiliate payouts
-  const filteredPayouts = affiliatePayouts.filter((p) => {
+  const filteredPayouts = safeAffiliatePayouts.filter((p) => {
     const partnerName = (p?.partnerName || '').toLowerCase();
     const uniqueCode = (p?.uniqueCode || '').toLowerCase();
     const bankName = (p?.bankName || '').toLowerCase();
@@ -152,17 +155,17 @@ export default function SettlementsPage() {
       partnerName.includes(term) ||
       uniqueCode.includes(term) ||
       bankName.includes(term);
-    const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || p?.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const totalPendingPayout = settlements
-    .filter((s) => s.status !== 'paid')
-    .reduce((sum, s) => sum + s.netAmount, 0);
+  const totalPendingPayout = safeSettlements
+    .filter((s) => s?.status !== 'paid')
+    .reduce((sum, s) => sum + Number(s?.netAmount || 0), 0);
 
-  const totalPendingAffiliate = affiliatePayouts
-    .filter((p) => p.status === 'pending')
-    .reduce((sum, p) => sum + p.amount, 0);
+  const totalPendingAffiliate = safeAffiliatePayouts
+    .filter((p) => p?.status === 'pending')
+    .reduce((sum, p) => sum + Number(p?.amount || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -237,7 +240,7 @@ export default function SettlementsPage() {
               {activeTab === 'eo' ? 'Total Transaksi EO' : 'Total Permintaan Tarik'}
             </p>
             <p className="text-xl font-extrabold text-slate-900 mt-1">
-              {activeTab === 'eo' ? settlements.length : affiliatePayouts.length}
+              {activeTab === 'eo' ? safeSettlements.length : safeAffiliatePayouts.length}
             </p>
           </div>
           <div className="p-3 bg-[#08B4B5]/10 rounded-xl text-[#08B4B5] border border-[#08B4B5]/20">

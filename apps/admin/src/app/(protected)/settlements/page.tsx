@@ -47,14 +47,38 @@ interface Settlement {
   };
 }
 
-const getSettlementEventTitle = (set?: Settlement | null) =>
-  set?.eventTitle || set?.event?.title || 'Event';
+const safeLowerCase = (val: unknown): string => {
+  if (typeof val === 'string') return val.toLowerCase();
+  if (val === null || val === undefined) return '';
+  return String(val).toLowerCase();
+};
 
-const getSettlementOrganizerName = (set?: Settlement | null) =>
-  set?.organizerName || set?.organizer?.name || 'Organizer';
+const getSettlementEventTitle = (set?: Settlement | null): string => {
+  if (!set) return 'Event';
+  const val = set.eventTitle || set.event?.title;
+  if (typeof val === 'string' && val.trim()) return val;
+  if (typeof val === 'object' && val !== null) {
+    return (val as any).title || (val as any).name || 'Event';
+  }
+  return val ? String(val) : 'Event';
+};
 
-const getSettlementBankAccount = (set?: Settlement | null) =>
-  set?.bankAccount || set?.organizer?.bankAccount || null;
+const getSettlementOrganizerName = (set?: Settlement | null): string => {
+  if (!set) return 'Organizer';
+  const val = set.organizerName || set.organizer?.name;
+  if (typeof val === 'string' && val.trim()) return val;
+  if (typeof val === 'object' && val !== null) {
+    return (val as any).name || 'Organizer';
+  }
+  return val ? String(val) : 'Organizer';
+};
+
+const getSettlementBankAccount = (set?: Settlement | null): string | null => {
+  if (!set) return null;
+  const val = set.bankAccount || set.organizer?.bankAccount;
+  if (typeof val === 'string') return val;
+  return val ? String(val) : null;
+};
 
 const formatRupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -135,9 +159,9 @@ export default function SettlementsPage() {
 
   // Filtering EO settlements
   const filteredSettlements = safeSettlements.filter((set) => {
-    const eventTitle = (getSettlementEventTitle(set) || '').toLowerCase();
-    const organizerName = (getSettlementOrganizerName(set) || '').toLowerCase();
-    const term = (searchTerm || '').trim().toLowerCase();
+    const eventTitle = safeLowerCase(getSettlementEventTitle(set));
+    const organizerName = safeLowerCase(getSettlementOrganizerName(set));
+    const term = safeLowerCase(searchTerm).trim();
     const matchesSearch =
       !term || eventTitle.includes(term) || organizerName.includes(term);
     const matchesStatus = statusFilter === 'all' || set?.status === statusFilter;
@@ -146,10 +170,10 @@ export default function SettlementsPage() {
 
   // Filtering Affiliate payouts
   const filteredPayouts = safeAffiliatePayouts.filter((p) => {
-    const partnerName = (p?.partnerName || '').toLowerCase();
-    const uniqueCode = (p?.uniqueCode || '').toLowerCase();
-    const bankName = (p?.bankName || '').toLowerCase();
-    const term = (searchTerm || '').trim().toLowerCase();
+    const partnerName = safeLowerCase(p?.partnerName);
+    const uniqueCode = safeLowerCase(p?.uniqueCode);
+    const bankName = safeLowerCase(p?.bankName);
+    const term = safeLowerCase(searchTerm).trim();
     const matchesSearch =
       !term ||
       partnerName.includes(term) ||
@@ -210,9 +234,9 @@ export default function SettlementsPage() {
         >
           <HeartHandshake className="w-4 h-4" />
           <span>Pencairan Komisi Affiliate</span>
-          {affiliatePayouts.filter((p) => p.status === 'pending').length > 0 && (
+          {safeAffiliatePayouts.filter((p) => p?.status === 'pending').length > 0 && (
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-              {affiliatePayouts.filter((p) => p.status === 'pending').length}
+              {safeAffiliatePayouts.filter((p) => p?.status === 'pending').length}
             </span>
           )}
         </button>

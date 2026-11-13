@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SettlementsService } from '../settlements/settlements.service';
+import { PaymentsService } from '../payments/payments.service';
 import { UpdateEventFeeDto } from './dto/update-event-fee.dto';
 import { UpdateOrganizerDto } from './dto/update-organizer.dto';
 import * as bcrypt from 'bcrypt';
@@ -14,6 +15,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly settlementsService: SettlementsService,
+    private readonly paymentsService: PaymentsService,
   ) {}
 
   /**
@@ -925,5 +927,69 @@ export class AdminService {
     } catch (err) {
       console.error('Gagal mencatat audit log:', err);
     }
+  }
+
+  /**
+   * Sinkronisasi status order langsung ke payment gateway (DOKU)
+   */
+  async syncOrderPayment(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { payment: true },
+    });
+    if (!order) {
+      throw new NotFoundException('Pesanan tidak ditemukan');
+    }
+
+    const invoiceNumber = `TAQTIX-ORD-${order.id}`;
+    const result = await this.paymentsService.checkDokuOrderStatus(invoiceNumber);
+
+    const refreshed = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { payment: true },
+    });
+
+    return {
+      orderId,
+      status: refreshed?.status.toLowerCase(),
+      paymentStatus: refreshed?.payment?.status.toLowerCase(),
+      gatewayResult: result,
+    };
+  }
+
+  /**
+   * Menandai order sebagai LUNAS secara manual oleh Superadmin
+   */
+  async markOrderPaid(orderId: string, adminId?: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { payment: true },
+    });
+    if (!order) {
+      throw new NotFoundException('Pesanan tidak ditemukan');
+    }
+
+    if (order.status === 'PAID') {
+      return { success: true, message: 'Pesanan sudah berstatus LUNAS' };
+    }
+
+    await this.paymentsService.processPaymentSuccess(
+      order.id,
+      `MANUAL_ADMIN_${adminId || 'SUPERADMIN'}_${Date.now()}`,
+      new Date(),
+    );
+
+    await this.recordAuditLog(
+      adminId || 'admin',
+      'manual_mark_order_paid',
+      orderId,
+      'order',
+      { orderId, previousStatus: order.status },
+    );
+
+    return {
+      success: true,
+      message: 'Pesanan berhasil diverifikasi dan ditandai LUNAS secara manual',
+    };
   }
 }

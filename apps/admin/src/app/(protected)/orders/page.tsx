@@ -1,9 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
-import { Search, Calendar, User, Phone, Mail, Hash, FileSearch } from 'lucide-react';
+import {
+  Search,
+  Calendar,
+  User,
+  Phone,
+  Mail,
+  Hash,
+  FileSearch,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle,
+  X,
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 interface OrderItem {
   id: string;
@@ -54,12 +67,66 @@ const formatDate = (isoString: string) => {
 
 export default function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [markingOrder, setMarkingOrder] = useState<Order | null>(null);
+  const [isMarking, setIsMarking] = useState(false);
+  const queryClient = useQueryClient();
 
   // Fetch Orders
   const { data: orders = [], isLoading } = useQuery<Order[]>({
     queryKey: ['admin-orders'],
     queryFn: () => api.get<Order[]>('/admin/orders'),
   });
+
+  const handleSyncPayment = async (orderId: string) => {
+    setSyncingId(orderId);
+    try {
+      const res: any = await api.post(`/admin/orders/${orderId}/sync-payment`);
+      const status = res?.status || res?.data?.status;
+      const gwStatus =
+        res?.gatewayResult?.transactionStatus ||
+        res?.data?.gatewayResult?.transactionStatus ||
+        '';
+
+      if (status === 'paid') {
+        toast.success(`Pembayaran terverifikasi di DOKU! Order #${orderId.slice(0, 8)} kini LUNAS.`);
+      } else {
+        toast.info(
+          `Status di gateway DOKU: ${gwStatus || status || 'Belum dibayar'}.`
+        );
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          'Gagal sinkronisasi status ke gateway DOKU'
+      );
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
+  const handleConfirmMarkPaid = async () => {
+    if (!markingOrder) return;
+    setIsMarking(true);
+    try {
+      await api.post(`/admin/orders/${markingOrder.id}/mark-paid`);
+      toast.success(
+        `Order #${markingOrder.id.slice(0, 8)} berhasil ditandai LUNAS dan tiket telah diterbitkan!`
+      );
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      setMarkingOrder(null);
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          'Gagal menandai order sebagai lunas'
+      );
+    } finally {
+      setIsMarking(false);
+    }
+  };
 
   // Filter orders by ID, buyerName, buyerEmail, or phone
   const filteredOrders = orders.filter((order) => {
@@ -134,26 +201,57 @@ export default function OrdersPage() {
                     Dipesan pada: {formatDate(order.createdAt)}
                   </div>
                 </div>
-                <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                    order.status === 'paid'
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : order.status === 'pending'
-                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                      : 'bg-rose-50 text-rose-700 border border-rose-200'
-                  }`}
-                >
+                <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className={`w-1.5 h-1.5 rounded-full ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                       order.status === 'paid'
-                        ? 'bg-emerald-500'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : order.status === 'pending'
-                        ? 'bg-amber-500'
-                        : 'bg-rose-500'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        : 'bg-rose-50 text-rose-700 border border-rose-200'
                     }`}
-                  />
-                  {order.status === 'paid' ? 'LUNAS' : order.status === 'pending' ? 'PENDING' : order.status}
-                </span>
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        order.status === 'paid'
+                          ? 'bg-emerald-500'
+                          : order.status === 'pending'
+                          ? 'bg-amber-500'
+                          : 'bg-rose-500'
+                      }`}
+                    />
+                    {order.status === 'paid' ? 'LUNAS' : order.status === 'pending' ? 'PENDING' : order.status}
+                  </span>
+
+                  {order.status !== 'paid' && (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleSyncPayment(order.id)}
+                        disabled={syncingId === order.id}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer transition disabled:opacity-50"
+                        title="Cek status transaksi langsung ke gateway DOKU"
+                      >
+                        <RefreshCw
+                          className={`w-3.5 h-3.5 text-[#08B4B5] ${
+                            syncingId === order.id ? 'animate-spin' : ''
+                          }`}
+                        />
+                        <span>{syncingId === order.id ? 'Mengecek...' : 'Cek Status DOKU'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setMarkingOrder(order)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 cursor-pointer transition"
+                        title="Tandai pesanan lunas secara manual dan terbitkan e-tiket"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Tandai Lunas</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Card Content Grid */}
@@ -244,6 +342,87 @@ export default function OrdersPage() {
           ))
         )}
       </div>
+
+      {/* Modal Konfirmasi Tandai Lunas Manual */}
+      {markingOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+            <button
+              onClick={() => setMarkingOrder(null)}
+              className="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Konfirmasi Tandai Lunas
+                </h3>
+                <p className="text-xs text-slate-500 font-mono">
+                  Order ID: {markingOrder.id}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl mb-4 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Event:</span>
+                <span className="font-bold text-slate-900 text-right">{markingOrder.eventTitle}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Pembeli:</span>
+                <span className="font-semibold text-slate-800">
+                  {markingOrder.buyerName || markingOrder.items?.[0]?.attendeeName || 'Pembeli'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Total Nominal:</span>
+                <span className="font-bold text-emerald-600">{formatRupiah(markingOrder.totalAmount)}</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-6 text-xs text-amber-800 flex items-start gap-2 leading-relaxed">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+              <span>
+                Tindakan ini akan langsung mengubah status order menjadi <strong>LUNAS</strong> dan <strong>menerbitkan e-tiket resmi</strong> kepada pembeli. Pastikan dana telah Anda verifikasi di mutasi bank/DOKU.
+              </span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setMarkingOrder(null)}
+                disabled={isMarking}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmMarkPaid}
+                disabled={isMarking}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {isMarking ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Memproses...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Ya, Verifikasi & Tandai Lunas</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

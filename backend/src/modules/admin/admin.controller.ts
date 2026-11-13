@@ -335,6 +335,32 @@ export class AdminController {
     return { success: true, data: result };
   }
 
+  @Post('admin/orders/:id/sync-payment')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Sinkronisasi status pembayaran pesanan langsung ke gateway DOKU (Admin Only)',
+  })
+  async syncOrderPayment(@Param('id') id: string) {
+    const result = await this.adminService.syncOrderPayment(id);
+    return { success: true, data: result };
+  }
+
+  @Post('admin/orders/:id/mark-paid')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Menandai pesanan sebagai LUNAS secara manual (Admin Only)',
+  })
+  async markOrderPaid(
+    @Param('id') id: string,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.adminService.markOrderPaid(id, adminId);
+    return { success: true, data: result };
+  }
+
   @Get('admin/settlements')
   @Roles('admin')
   @ApiBearerAuth()

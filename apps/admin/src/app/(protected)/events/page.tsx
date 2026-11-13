@@ -231,9 +231,10 @@ export default function EventsApprovalPage() {
 
   // Filter logic
   const filteredEvents = events.filter((evt) => {
-    const matchesSearch =
-      evt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      evt.organizerName.toLowerCase().includes(searchTerm.toLowerCase());
+    const title = (evt?.title || '').toLowerCase();
+    const organizerName = (evt?.organizerName || (evt as any)?.organizer?.name || '').toLowerCase();
+    const term = (searchTerm || '').trim().toLowerCase();
+    const matchesSearch = !term || title.includes(term) || organizerName.includes(term);
     const matchesStatus = statusFilter === 'all' || evt.status === statusFilter;
     return matchesSearch && matchesStatus;
   });

@@ -59,12 +59,18 @@ export default function OrdersPage() {
   const filteredOrders = orders.filter((order) => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
+    const id = (order?.id || '').toLowerCase();
+    const buyerName = (order?.buyerName || '').toLowerCase();
+    const buyerEmail = (order?.buyerEmail || '').toLowerCase();
+    const buyerPhone = order?.buyerPhone || '';
+    const eventTitle = (order?.eventTitle || (order as any)?.event?.title || '').toLowerCase();
+
     return (
-      order.id.toLowerCase().includes(term) ||
-      order.buyerName.toLowerCase().includes(term) ||
-      order.buyerEmail.toLowerCase().includes(term) ||
-      order.buyerPhone.includes(term) ||
-      order.eventTitle.toLowerCase().includes(term)
+      id.includes(term) ||
+      buyerName.includes(term) ||
+      buyerEmail.includes(term) ||
+      buyerPhone.includes(term) ||
+      eventTitle.includes(term)
     );
   });
 

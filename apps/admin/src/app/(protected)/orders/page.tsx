@@ -7,31 +7,37 @@ import { Search, Calendar, User, Phone, Mail, Hash, FileSearch } from 'lucide-re
 
 interface OrderItem {
   id: string;
-  name: string;
+  name?: string;
+  categoryName?: string;
   qty: number;
-  price: number;
+  price?: number;
+  unitPrice?: number;
+  attendeeName?: string;
+  attendeeEmail?: string;
+  attendeePhone?: string;
 }
 
 interface Order {
   id: string;
   eventTitle: string;
-  buyerName: string;
-  buyerEmail: string;
-  buyerPhone: string;
-  status: 'pending' | 'paid' | 'expired' | 'cancelled' | 'refunded';
+  buyerName?: string;
+  buyerEmail?: string;
+  buyerPhone?: string;
+  status: 'pending' | 'paid' | 'expired' | 'cancelled' | 'refunded' | string;
   totalAmount: number;
-  discountAmount: number;
+  discountAmount?: number;
   createdAt: string;
-  expiredAt: string;
-  items: OrderItem[];
+  expiredAt?: string;
+  items?: OrderItem[];
 }
 
-const formatRupiah = (value: number) => {
+const formatRupiah = (value: number | undefined | null) => {
+  const num = typeof value === 'number' && !isNaN(value) ? value : Number(value) || 0;
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
-  }).format(value);
+  }).format(num);
 };
 
 const formatDate = (isoString: string) => {
@@ -60,9 +66,9 @@ export default function OrdersPage() {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     const id = (order?.id || '').toLowerCase();
-    const buyerName = (order?.buyerName || '').toLowerCase();
+    const buyerName = (order?.buyerName || order?.items?.[0]?.attendeeName || '').toLowerCase();
     const buyerEmail = (order?.buyerEmail || '').toLowerCase();
-    const buyerPhone = order?.buyerPhone || '';
+    const buyerPhone = order?.buyerPhone || order?.items?.[0]?.attendeePhone || '';
     const eventTitle = (order?.eventTitle || (order as any)?.event?.title || '').toLowerCase();
 
     return (
@@ -160,15 +166,19 @@ export default function OrdersPage() {
                   <div className="space-y-1.5 text-slate-700">
                     <div className="flex items-center gap-2">
                       <User className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="font-bold text-slate-900">{order.buyerName}</span>
+                      <span className="font-bold text-slate-900">
+                        {order.buyerName || order.items?.[0]?.attendeeName || 'Pembeli'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{order.buyerEmail}</span>
+                      <span>{order.buyerEmail || order.items?.[0]?.attendeeEmail || '-'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="font-mono text-[11px]">{order.buyerPhone}</span>
+                      <span className="font-mono text-[11px]">
+                        {order.buyerPhone || order.items?.[0]?.attendeePhone || '-'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -191,7 +201,7 @@ export default function OrdersPage() {
                   <div className="text-xl font-extrabold text-slate-900">
                     {formatRupiah(order.totalAmount)}
                   </div>
-                  {order.discountAmount > 0 && (
+                  {(Number(order.discountAmount) || 0) > 0 && (
                     <div className="text-xs text-emerald-600 font-semibold">
                       Diskon: -{formatRupiah(order.discountAmount)}
                     </div>
@@ -205,14 +215,29 @@ export default function OrdersPage() {
                   Rincian Item Tiket
                 </span>
                 <div className="space-y-1.5">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center text-xs text-slate-700 font-mono">
-                      <span>
-                        {item.name} <strong className="text-slate-500 font-bold">x{item.qty}</strong>
-                      </span>
-                      <span className="font-bold">{formatRupiah(item.price * item.qty)}</span>
-                    </div>
-                  ))}
+                  {(order.items || []).map((item, idx) => {
+                    const itemName = item.name || item.categoryName || 'Item Tiket';
+                    const itemQty = Number(item.qty) || 1;
+                    const unitPrice =
+                      typeof item.price === 'number' && !isNaN(item.price)
+                        ? item.price
+                        : typeof item.unitPrice === 'number' && !isNaN(item.unitPrice)
+                        ? item.unitPrice
+                        : 0;
+                    const subtotal = unitPrice * itemQty;
+
+                    return (
+                      <div
+                        key={item.id || idx}
+                        className="flex justify-between items-center text-xs text-slate-700 font-mono"
+                      >
+                        <span>
+                          {itemName} <strong className="text-slate-500 font-bold">x{itemQty}</strong>
+                        </span>
+                        <span className="font-bold">{formatRupiah(subtotal)}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

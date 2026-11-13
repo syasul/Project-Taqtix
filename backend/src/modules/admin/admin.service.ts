@@ -756,23 +756,34 @@ export class AdminService {
       take: 50,
     });
 
-    return orders.map((o) => ({
-      id: o.id,
-      eventId: o.eventId,
-      eventTitle: o.event.title,
-      organizerName: o.event.organizer.name,
-      buyerEmail: o.buyer.email,
-      status: o.status.toLowerCase(),
-      totalAmount: o.totalAmount,
-      promoCode: o.promoCodeId,
-      createdAt: o.createdAt.toISOString(),
-      items: o.orderItems.map((it) => ({
-        categoryName: it.ticketCategory.name,
-        qty: it.qty,
-        attendeeName: it.attendeeName,
-        attendeePhone: it.attendeePhone,
-      })),
-    }));
+    return orders.map((o) => {
+      const firstItem = o.orderItems[0];
+      return {
+        id: o.id,
+        eventId: o.eventId,
+        eventTitle: o.event?.title || 'Event',
+        organizerName: o.event?.organizer?.name || 'Organizer',
+        buyerName: firstItem?.attendeeName || 'Pembeli',
+        buyerEmail: o.buyer?.email || firstItem?.attendeeEmail || '-',
+        buyerPhone: firstItem?.attendeePhone || '-',
+        status: o.status.toLowerCase(),
+        totalAmount: Number(o.totalAmount) || 0,
+        discountAmount: Number(o.discountAmount) || 0,
+        promoCode: o.promoCodeId,
+        createdAt: o.createdAt.toISOString(),
+        expiredAt: o.expiredAt ? o.expiredAt.toISOString() : null,
+        items: o.orderItems.map((it) => ({
+          id: it.id,
+          name: it.ticketCategory?.name || 'Tiket',
+          categoryName: it.ticketCategory?.name || 'Tiket',
+          qty: Number(it.qty) || 1,
+          price: Number(it.unitPrice ?? it.ticketCategory?.price ?? 0),
+          unitPrice: Number(it.unitPrice ?? it.ticketCategory?.price ?? 0),
+          attendeeName: it.attendeeName,
+          attendeePhone: it.attendeePhone,
+        })),
+      };
+    });
   }
 
   /**

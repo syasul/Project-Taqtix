@@ -741,27 +741,33 @@ export class PaymentsService {
         const attendeeName = ticket.attendeeName || ticket.orderItem.attendeeName;
         const attendeeEmail = ticket.orderItem.attendeeEmail;
 
-        // Job WhatsApp
-        if (attendeePhone) {
-          await this.notificationsQueue.add('send-ticket-whatsapp', {
+        try {
+          // Job WhatsApp
+          if (attendeePhone) {
+            await this.notificationsQueue.add('send-ticket-whatsapp', {
+              ticketId: ticket.id,
+              phone: attendeePhone,
+              buyerName: attendeeName,
+              eventTitle: order.event.title,
+              ticketCategory: ticket.orderItem.ticketCategory.name,
+              qrUrl,
+            });
+          }
+
+          // Job Email
+          await this.notificationsQueue.add('send-ticket-email', {
             ticketId: ticket.id,
-            phone: attendeePhone,
+            email: attendeeEmail,
             buyerName: attendeeName,
             eventTitle: order.event.title,
             ticketCategory: ticket.orderItem.ticketCategory.name,
             qrUrl,
           });
+        } catch (queueErr: any) {
+          this.logger.warn(
+            `[BullMQ] Gagal menambahkan job notifikasi tiket ke antrean Redis (${queueErr.message}). Tiket tetap aman diterbitkan.`,
+          );
         }
-
-        // Job Email
-        await this.notificationsQueue.add('send-ticket-email', {
-          ticketId: ticket.id,
-          email: attendeeEmail,
-          buyerName: attendeeName,
-          eventTitle: order.event.title,
-          ticketCategory: ticket.orderItem.ticketCategory.name,
-          qrUrl,
-        });
       }
     });
   }

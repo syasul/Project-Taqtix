@@ -24,26 +24,33 @@ import { CRMModule } from './modules/crm/crm.module';
           'redis://localhost:6379';
         const explicitPassword =
           config.get<string>('REDIS_PASSWORD') ||
-          process.env.REDIS_PASSWORD ||
-          undefined;
+          process.env.REDIS_PASSWORD;
 
         try {
           const parsed = new URL(redisUrl);
-          const password = parsed.password || explicitPassword || undefined;
+          const password =
+            (parsed.password && parsed.password.trim()) ||
+            (explicitPassword && explicitPassword.trim()) ||
+            undefined;
           return {
             redis: {
               host: parsed.hostname || 'localhost',
               port: parseInt(parsed.port || '6379', 10),
-              username: parsed.username || undefined,
+              username: (parsed.username && parsed.username.trim()) || undefined,
               password,
+              maxRetriesPerRequest: null,
+              enableReadyCheck: false,
             },
           };
         } catch {
+          const password = (explicitPassword && explicitPassword.trim()) || undefined;
           return {
             redis: {
               host: 'localhost',
               port: 6379,
-              password: explicitPassword,
+              password,
+              maxRetriesPerRequest: null,
+              enableReadyCheck: false,
             },
           };
         }

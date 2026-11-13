@@ -1175,12 +1175,23 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     }
 
     if (!response.ok || (payload && payload.success === false)) {
-      const errorDetails = payload?.error || {
-        code: 'UNKNOWN_ERROR',
-        message: payload?.message || 'An unexpected error occurred.',
-      };
-      const msg = typeof errorDetails === 'string' ? errorDetails : (errorDetails.message || 'An unexpected error occurred.');
-      throw new ApiError(msg, errorDetails.code || 'API_ERROR', response.status);
+      let msg = 'An unexpected error occurred.';
+      if (Array.isArray(payload?.message)) {
+        msg = payload.message.join(', ');
+      } else if (typeof payload?.message === 'string') {
+        msg = payload.message;
+      } else if (typeof payload?.error === 'string') {
+        msg = payload.error;
+      } else if (payload?.error?.message) {
+        msg = Array.isArray(payload.error.message)
+          ? payload.error.message.join(', ')
+          : payload.error.message;
+      }
+      throw new ApiError(
+        msg,
+        (typeof payload?.error === 'object' && payload?.error?.code) || 'API_ERROR',
+        response.status
+      );
     }
 
     return (payload?.data !== undefined ? payload.data : payload) as T;

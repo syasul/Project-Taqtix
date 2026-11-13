@@ -11,7 +11,23 @@ export class UpdateOrganizerDto {
   name?: string;
 
   @ApiPropertyOptional({
-    example: 'ENTERPRISE',
+    example: '08123456789',
+    description: 'Nomor telepon/WhatsApp organizer',
+  })
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiPropertyOptional({
+    example: 'active',
+    description: 'Status akun organizer (active, pending, suspended)',
+  })
+  @IsString()
+  @IsOptional()
+  status?: string;
+
+  @ApiPropertyOptional({
+    example: 'EVENT_BUILDER',
     description: 'Segmentasi bisnis organizer',
   })
   @IsString()

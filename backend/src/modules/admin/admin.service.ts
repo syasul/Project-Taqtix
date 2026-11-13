@@ -176,15 +176,20 @@ export class AdminService {
     return this.prisma.organizer.update({
       where: { id: organizerId },
       data: {
-        name: dto.name ?? organizer.name,
-        segment: dto.segment ?? organizer.segment,
-        plan: dto.plan ?? organizer.plan,
-        bankAccount: dto.bankAccount ?? organizer.bankAccount,
+        name: dto.name !== undefined ? dto.name : organizer.name,
+        phone: dto.phone !== undefined ? dto.phone : organizer.phone,
+        status: dto.status !== undefined ? dto.status : organizer.status,
+        segment: dto.segment !== undefined ? dto.segment : organizer.segment,
+        plan: dto.plan !== undefined ? dto.plan : organizer.plan,
+        bankAccount: dto.bankAccount !== undefined ? dto.bankAccount : organizer.bankAccount,
         internetFee:
           dto.internetFee !== undefined
             ? dto.internetFee
             : organizer.internetFee,
-        planStartedAt: dto.plan ? new Date() : organizer.planStartedAt,
+        planStartedAt:
+          dto.plan && dto.plan !== organizer.plan
+            ? new Date()
+            : organizer.planStartedAt,
         planExpiresAt: dto.planExpiresAt
           ? new Date(dto.planExpiresAt)
           : organizer.planExpiresAt,

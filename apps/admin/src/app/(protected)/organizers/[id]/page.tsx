@@ -82,8 +82,8 @@ export default function OrganizerDetailPage() {
       toast.success('Pengaturan organizer berhasil disimpan');
       router.push('/organizers');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui pengaturan organizer');
+    onError: (err: any) => {
+      toast.error(err.message || 'Gagal memperbarui pengaturan organizer');
     },
   });
 

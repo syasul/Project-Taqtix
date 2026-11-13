@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShieldCheck, LogOut, Menu, X } from 'lucide-react';
 import SidebarNav from './sidebar-nav';
@@ -39,24 +40,30 @@ export default function AdminLayoutWrapper({
     <>
       <div>
         {/* Logo / Branding */}
-        <div className="p-5 border-b border-slate-200 flex items-center justify-between relative bg-slate-900 text-white">
+        <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between relative bg-white">
           <div className="w-full flex flex-col items-center justify-center text-center gap-1.5">
-            <Image
-              src="/logo.png"
-              alt="TAQtix Logo"
-              width={120}
-              height={34}
-              className="h-7 w-auto object-contain mx-auto brightness-0 invert"
-              priority
-            />
-            <span className="text-[10px] text-rose-300 font-mono tracking-wider font-extrabold uppercase bg-rose-950/80 border border-rose-800/80 px-2.5 py-0.5 rounded-full shadow-xs">
+            <Link
+              href="/"
+              onClick={isMobile ? () => setIsSidebarOpen(false) : undefined}
+              className="inline-flex justify-center items-center"
+            >
+              <Image
+                src="/logo.png"
+                alt="TAQtix Logo"
+                width={120}
+                height={34}
+                className="h-7 w-auto object-contain mx-auto"
+                priority
+              />
+            </Link>
+            <span className="text-[10px] text-rose-700 font-mono tracking-wider font-extrabold uppercase bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full shadow-2xs">
               🔴 MAIN ADMIN (SUPERADMIN)
             </span>
           </div>
           {isMobile && (
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-650 hover:bg-slate-100 cursor-pointer md:hidden absolute right-4 top-6"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer md:hidden absolute right-4 top-6"
             >
               <X className="w-5 h-5" />
             </button>
@@ -128,7 +135,7 @@ export default function AdminLayoutWrapper({
             </button>
 
             {/* Mobile Branding */}
-            <div className="flex items-center gap-2 md:hidden">
+            <Link href="/" className="flex items-center gap-2 md:hidden">
               <Image
                 src="/logo.png"
                 alt="TAQtix Logo"
@@ -140,7 +147,7 @@ export default function AdminLayoutWrapper({
               <span className="text-[9px] text-rose-700 font-mono tracking-wider font-extrabold uppercase bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
                 🔴 Superadmin
               </span>
-            </div>
+            </Link>
 
             <div className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] font-mono font-bold bg-rose-50 border border-rose-200 text-rose-700 uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />

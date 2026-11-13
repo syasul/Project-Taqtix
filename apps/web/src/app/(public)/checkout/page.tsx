@@ -208,6 +208,23 @@ function CheckoutContent() {
   );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeAccordion, setActiveAccordion] = useState<'mbanking' | 'atm' | 'ibanking'>('mbanking');
+  const [iframeHeight, setIframeHeight] = useState<number>(950);
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      try {
+        if (typeof e.origin === 'string' && !e.origin.includes('doku.com')) return;
+        if (e.data && (e.data.type === 'doku_resize' || e.data.height)) {
+          const h = Number(e.data.height);
+          if (h && h > 400) {
+            setIframeHeight(Math.max(920, h + 60));
+          }
+        }
+      } catch {}
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const handleCopy = (text: string, key: string) => {
     try {
@@ -1344,14 +1361,19 @@ function CheckoutContent() {
               </div>
             </div>
 
-            {/* Seamless Embedded DOKU Container */}
+            {/* Seamless Embedded DOKU Container (Full Height Tanpa Scroll di Dalam Scroll) */}
             {orderDetails?.payment?.snapToken ? (
-              <div className="w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative min-h-[520px]">
+              <div
+                className="w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative transition-all duration-300"
+                style={{ minHeight: `${iframeHeight}px` }}
+              >
                 <iframe
                   src={orderDetails.payment.snapToken}
-                  className="w-full h-[560px] border-0"
+                  style={{ height: `${iframeHeight}px`, minHeight: '920px' }}
+                  className="w-full border-0 transition-all duration-300"
                   title="DOKU Payment Portal"
                   allow="payment *"
+                  scrolling="no"
                 />
               </div>
             ) : (

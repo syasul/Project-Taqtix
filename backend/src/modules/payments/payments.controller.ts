@@ -42,7 +42,12 @@ export class PaymentsController {
 
   @Public()
   @SkipThrottle()
-  @Post(['payments/webhook/:provider', 'v1/payments/webhook/:provider'])
+  @Post([
+    'payments/webhook/:provider',
+    'v1/payments/webhook/:provider',
+    'api/payments/webhook/:provider',
+    'v1/api/payments/webhook/:provider',
+  ])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:

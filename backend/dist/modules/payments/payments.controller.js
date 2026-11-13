@@ -62,7 +62,12 @@ __decorate([
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, throttler_1.SkipThrottle)(),
-    (0, common_1.Post)(['payments/webhook/:provider', 'v1/payments/webhook/:provider']),
+    (0, common_1.Post)([
+        'payments/webhook/:provider',
+        'v1/payments/webhook/:provider',
+        'api/payments/webhook/:provider',
+        'v1/api/payments/webhook/:provider',
+    ]),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({
         summary: 'Menerima notifikasi callback webhook dari payment gateway (DOKU / Midtrans)',

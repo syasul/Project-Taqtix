@@ -93,6 +93,8 @@ async function bootstrap() {
         exclude: [
             'payments/webhook/(.*)',
             'payments/webhook',
+            'api/payments/webhook/(.*)',
+            'api/payments/webhook',
             'uploads/(.*)',
             'uploads',
         ],

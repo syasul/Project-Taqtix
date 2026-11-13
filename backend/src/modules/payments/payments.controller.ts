@@ -86,7 +86,13 @@ export class PaymentsController {
     description: 'Pesanan tidak ditemukan.',
   })
   async getPaymentStatus(@Param('orderId') orderId: string) {
-    return this.paymentsService.getPaymentStatus(orderId);
+    const result = await this.paymentsService.getPaymentStatus(orderId);
+    return {
+      success: true,
+      data: result,
+      status: result.status,
+      expiredAt: result.expiredAt,
+    };
   }
 
   @Public()

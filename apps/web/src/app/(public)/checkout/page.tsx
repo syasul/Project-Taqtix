@@ -157,7 +157,7 @@ function CheckoutContent() {
     const checkStatus = async () => {
       try {
         const res = await apiClient.get(`/payments/${pollingOrderId}/status`);
-        const status = res.data?.data?.status;
+        const status = res.data?.data?.status || res.data?.status;
 
         if (status) {
           setPollingStatus(status);
@@ -271,7 +271,7 @@ function CheckoutContent() {
     setIsManualChecking(true);
     try {
       const res = await apiClient.get(`/payments/${pollingOrderId}/status`);
-      const status = res.data?.data?.status;
+      const status = res.data?.data?.status || res.data?.status;
       if (status) {
         setPollingStatus(status);
         if (status === 'success') {

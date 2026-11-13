@@ -107,7 +107,7 @@ function CheckoutSuccessContent() {
     if (!orderId) return null;
     try {
       const res = await apiClient.get(`/payments/${orderId}/status`);
-      const status = String(res.data?.data?.status || '').toLowerCase();
+      const status = String(res.data?.data?.status || res.data?.status || '').toLowerCase();
       if (status === 'success' || status === 'paid') return 'success';
       if (status === 'failed') return 'failed';
       if (status === 'expired') return 'expired';

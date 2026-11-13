@@ -39,8 +39,9 @@ export default function Header() {
       <div
         className={cn(
           'mx-auto max-w-6xl flex h-16 items-center justify-between px-5 sm:px-6 rounded-full transition-all duration-300',
-          'liquid-glass-pill',
-          scrolled ? 'shadow-[0_16px_36px_-10px_rgba(0,0,0,0.1)] bg-white/90 border-white/90' : ''
+          scrolled
+            ? 'shadow-lg bg-white/95 backdrop-blur-2xl border border-slate-200/90'
+            : 'liquid-glass-pill'
         )}
       >
         {/* Logo */}

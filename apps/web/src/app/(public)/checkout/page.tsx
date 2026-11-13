@@ -208,7 +208,7 @@ function CheckoutContent() {
   );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeAccordion, setActiveAccordion] = useState<'mbanking' | 'atm' | 'ibanking'>('mbanking');
-  const [iframeHeight, setIframeHeight] = useState<number>(950);
+  const [iframeHeight, setIframeHeight] = useState<number>(1150);
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
@@ -217,7 +217,7 @@ function CheckoutContent() {
         if (e.data && (e.data.type === 'doku_resize' || e.data.height)) {
           const h = Number(e.data.height);
           if (h && h > 400) {
-            setIframeHeight(Math.max(920, h + 60));
+            setIframeHeight(Math.max(1150, h + 80));
           }
         }
       } catch {}
@@ -1364,12 +1364,12 @@ function CheckoutContent() {
             {/* Seamless Embedded DOKU Container (Full Height Tanpa Scroll di Dalam Scroll) */}
             {orderDetails?.payment?.snapToken ? (
               <div
-                className="w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 relative transition-all duration-300"
+                className="w-full rounded-2xl overflow-hidden border border-slate-200 bg-white relative transition-all duration-300"
                 style={{ minHeight: `${iframeHeight}px` }}
               >
                 <iframe
                   src={orderDetails.payment.snapToken}
-                  style={{ height: `${iframeHeight}px`, minHeight: '920px' }}
+                  style={{ height: `${iframeHeight}px`, minHeight: '1150px' }}
                   className="w-full border-0 transition-all duration-300"
                   title="DOKU Payment Portal"
                   allow="payment *"

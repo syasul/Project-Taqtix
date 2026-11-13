@@ -730,12 +730,12 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
             throw new common_1.NotFoundException('Pesanan tidak ditemukan');
         }
         if (order.status === client_1.OrderStatus.PENDING &&
-            order.payment?.provider === 'doku' &&
-            order.payment?.externalId) {
+            order.payment?.provider === 'doku') {
             const { clientId, secretKey } = this.getDokuConfig();
             if (clientId && secretKey) {
                 try {
-                    await this.checkDokuOrderStatus(order.payment.externalId);
+                    const invoiceNumber = `TAQTIX-ORD-${order.id}`;
+                    await this.checkDokuOrderStatus(invoiceNumber);
                     const refreshed = await this.prisma.order.findUnique({
                         where: { id: orderId },
                         include: { payment: true },
@@ -751,7 +751,8 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
                         return { status, expiredAt: refreshed.expiredAt };
                     }
                 }
-                catch {
+                catch (err) {
+                    this.logger.warn(`Fallback checkDokuOrderStatus gagal untuk order ${order.id}:`, err);
                 }
             }
         }

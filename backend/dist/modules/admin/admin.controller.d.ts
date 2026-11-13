@@ -641,7 +641,10 @@ export declare class AdminController {
     }>;
     getSettlements(): Promise<{
         success: boolean;
-        data: ({
+        data: {
+            eventTitle: string;
+            organizerName: string;
+            bankAccount: string | null;
             organizer: {
                 user: {
                     email: string;
@@ -657,7 +660,6 @@ export declare class AdminController {
                 location: string;
                 endDate: Date;
             };
-        } & {
             id: string;
             createdAt: Date;
             updatedAt: Date;
@@ -670,7 +672,7 @@ export declare class AdminController {
             affiliateCommissionTotal: number;
             netAmount: number;
             paidBy: string | null;
-        })[];
+        }[];
     }>;
     calculateSettlements(): Promise<{
         success: boolean;

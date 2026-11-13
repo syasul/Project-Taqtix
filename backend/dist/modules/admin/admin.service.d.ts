@@ -507,7 +507,10 @@ export declare class AdminService {
         processed: number;
         settlements: any[];
     }>;
-    getSettlements(): Promise<({
+    getSettlements(): Promise<{
+        eventTitle: string;
+        organizerName: string;
+        bankAccount: string | null;
         organizer: {
             user: {
                 email: string;
@@ -523,7 +526,6 @@ export declare class AdminService {
             location: string;
             endDate: Date;
         };
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -536,7 +538,7 @@ export declare class AdminService {
         affiliateCommissionTotal: number;
         netAmount: number;
         paidBy: string | null;
-    })[]>;
+    }[]>;
     markSettlementPaid(id: string, adminId?: string): Promise<{
         id: string;
         createdAt: Date;

@@ -243,7 +243,8 @@ let TransfersService = class TransfersService {
         if (transfer.fromUserId && transfer.fromUserId === receiverUser.id) {
             throw new common_1.BadRequestException('Anda tidak dapat mentransfer tiket ke akun Anda sendiri.');
         }
-        if (transfer.fromEmail.toLowerCase() === receiverUser.email.toLowerCase()) {
+        if (transfer.fromEmail &&
+            transfer.fromEmail.toLowerCase() === receiverUser.email.toLowerCase()) {
             throw new common_1.BadRequestException('Akun penerima tidak boleh sama dengan akun pemilik tiket.');
         }
         if (transfer.ticket.checkedInAt) {

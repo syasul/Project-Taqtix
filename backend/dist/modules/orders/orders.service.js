@@ -401,10 +401,11 @@ let OrdersService = OrdersService_1 = class OrdersService {
             try {
                 const result = await this.dokuService.createPayment(fullOrder, payment, undefined, dto.paymentMethod);
                 paymentUrl = result.paymentUrl;
+                const dokuInvoiceNumber = result.invoiceNumber || `TAQTIX-ORD-${order.id}`;
                 await this.prisma.payment.update({
                     where: { id: payment.id },
                     data: {
-                        externalId: result.tokenId || result.invoiceNumber,
+                        externalId: dokuInvoiceNumber,
                         snapToken: result.paymentUrl,
                         provider: 'doku',
                     },

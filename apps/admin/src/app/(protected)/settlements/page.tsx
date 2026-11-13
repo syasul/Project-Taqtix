@@ -20,8 +20,8 @@ import { toast } from 'sonner';
 
 interface Settlement {
   id: string;
-  eventTitle: string;
-  organizerName: string;
+  eventTitle?: string;
+  organizerName?: string;
   grossRevenue: number;
   platformFee: number;
   affiliateCommissionTotal: number;
@@ -29,7 +29,32 @@ interface Settlement {
   status: 'pending' | 'processing' | 'paid';
   paidAt: string | null;
   paidBy: string | null;
+  bankAccount?: string | null;
+  organizer?: {
+    id?: string;
+    name?: string;
+    bankAccount?: string | null;
+    phone?: string | null;
+    user?: {
+      email?: string;
+    };
+  };
+  event?: {
+    id?: string;
+    title?: string;
+    endDate?: string | null;
+    location?: string | null;
+  };
 }
+
+const getSettlementEventTitle = (set?: Settlement | null) =>
+  set?.eventTitle || set?.event?.title || 'Event';
+
+const getSettlementOrganizerName = (set?: Settlement | null) =>
+  set?.organizerName || set?.organizer?.name || 'Organizer';
+
+const getSettlementBankAccount = (set?: Settlement | null) =>
+  set?.bankAccount || set?.organizer?.bankAccount || null;
 
 const formatRupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -56,6 +81,8 @@ export default function SettlementsPage() {
   const [confirmPaidModal, setConfirmPaidModal] = useState<{
     id: string;
     eventTitle: string;
+    organizerName: string;
+    bankAccount: string | null;
     netAmount: number;
   } | null>(null);
 
@@ -105,19 +132,26 @@ export default function SettlementsPage() {
 
   // Filtering EO settlements
   const filteredSettlements = settlements.filter((set) => {
+    const eventTitle = (getSettlementEventTitle(set) || '').toLowerCase();
+    const organizerName = (getSettlementOrganizerName(set) || '').toLowerCase();
+    const term = (searchTerm || '').trim().toLowerCase();
     const matchesSearch =
-      set.eventTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      set.organizerName.toLowerCase().includes(searchTerm.toLowerCase());
+      !term || eventTitle.includes(term) || organizerName.includes(term);
     const matchesStatus = statusFilter === 'all' || set.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   // Filtering Affiliate payouts
   const filteredPayouts = affiliatePayouts.filter((p) => {
+    const partnerName = (p?.partnerName || '').toLowerCase();
+    const uniqueCode = (p?.uniqueCode || '').toLowerCase();
+    const bankName = (p?.bankName || '').toLowerCase();
+    const term = (searchTerm || '').trim().toLowerCase();
     const matchesSearch =
-      p.partnerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.uniqueCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.bankName.toLowerCase().includes(searchTerm.toLowerCase());
+      !term ||
+      partnerName.includes(term) ||
+      uniqueCode.includes(term) ||
+      bankName.includes(term);
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -277,47 +311,61 @@ export default function SettlementsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredSettlements.map((set) => (
-                    <tr key={set.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-4">
-                        <div className="font-bold text-slate-900">{set.eventTitle}</div>
-                        <div className="text-[11px] text-slate-400">{set.organizerName}</div>
-                      </td>
-                      <td className="p-4 font-mono">{formatRupiah(set.grossRevenue)}</td>
-                      <td className="p-4 font-mono text-rose-600">-{formatRupiah(set.platformFee)}</td>
-                      <td className="p-4 font-mono text-amber-600">
-                        -{formatRupiah(set.affiliateCommissionTotal)}
-                      </td>
-                      <td className="p-4 font-mono font-bold text-slate-900">{formatRupiah(set.netAmount)}</td>
-                      <td className="p-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                            set.status === 'paid'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
-                          }`}
-                        >
-                          {set.status === 'paid' ? `Lunas (${formatDate(set.paidAt)})` : 'Pending'}
-                        </span>
-                      </td>
-                      <td className="p-4 text-right">
-                        {set.status !== 'paid' && (
-                          <button
-                            onClick={() =>
-                              setConfirmPaidModal({
-                                id: set.id,
-                                eventTitle: set.eventTitle,
-                                netAmount: set.netAmount,
-                              })
-                            }
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-xs"
+                  {filteredSettlements.map((set) => {
+                    const eventTitle = getSettlementEventTitle(set);
+                    const organizerName = getSettlementOrganizerName(set);
+                    const bankAccount = getSettlementBankAccount(set);
+                    return (
+                      <tr key={set.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="p-4">
+                          <div className="font-bold text-slate-900">{eventTitle}</div>
+                          <div className="text-[11px] text-slate-400">
+                            {organizerName}
+                            {bankAccount && (
+                              <span className="ml-1 text-slate-500 font-medium">
+                                • Rekening: {bankAccount}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4 font-mono">{formatRupiah(set.grossRevenue || 0)}</td>
+                        <td className="p-4 font-mono text-rose-600">-{formatRupiah(set.platformFee || 0)}</td>
+                        <td className="p-4 font-mono text-amber-600">
+                          -{formatRupiah(set.affiliateCommissionTotal || 0)}
+                        </td>
+                        <td className="p-4 font-mono font-bold text-slate-900">{formatRupiah(set.netAmount || 0)}</td>
+                        <td className="p-4">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                              set.status === 'paid'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-amber-50 text-amber-700 border border-amber-200'
+                            }`}
                           >
-                            Mark as Paid
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                            {set.status === 'paid' ? `Lunas (${formatDate(set.paidAt)})` : 'Pending'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right">
+                          {set.status !== 'paid' && (
+                            <button
+                              onClick={() =>
+                                setConfirmPaidModal({
+                                  id: set.id,
+                                  eventTitle,
+                                  organizerName,
+                                  bankAccount,
+                                  netAmount: set.netAmount,
+                                })
+                              }
+                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-xs"
+                            >
+                              Mark as Paid
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -482,13 +530,22 @@ export default function SettlementsPage() {
               <div className="p-3 bg-amber-50 border border-amber-200 text-amber-600 rounded-xl shrink-0">
                 <AlertTriangle className="w-6 h-6" />
               </div>
-              <div>
+              <div className="space-y-2">
                 <h3 className="font-bold text-lg text-slate-900">Konfirmasi Pencairan Dana EO</h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   Apakah Anda sudah selesai mentransfer dana secara manual sebesar{' '}
                   <strong className="text-slate-800">{formatRupiah(confirmPaidModal.netAmount)}</strong> kepada penyelenggara{' '}
+                  <strong className="text-slate-800">{confirmPaidModal.organizerName}</strong> untuk event{' '}
                   <strong className="text-slate-800">{confirmPaidModal.eventTitle}</strong>?
                 </p>
+                {confirmPaidModal.bankAccount && (
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
+                    <span className="text-slate-500 block font-medium">Rekening Tujuan Organizer:</span>
+                    <span className="font-bold text-slate-900 font-mono block">
+                      {confirmPaidModal.bankAccount}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3 text-xs font-bold">

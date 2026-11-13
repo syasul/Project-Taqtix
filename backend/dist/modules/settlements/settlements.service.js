@@ -84,7 +84,7 @@ let SettlementsService = class SettlementsService {
         };
     }
     async getSettlements() {
-        return this.prisma.settlement.findMany({
+        const list = await this.prisma.settlement.findMany({
             include: {
                 organizer: {
                     select: {
@@ -110,6 +110,12 @@ let SettlementsService = class SettlementsService {
             },
             orderBy: { createdAt: 'desc' },
         });
+        return list.map((s) => ({
+            ...s,
+            eventTitle: s.event?.title || 'Event',
+            organizerName: s.organizer?.name || 'Organizer',
+            bankAccount: s.organizer?.bankAccount || null,
+        }));
     }
     async markSettlementPaid(settlementId, adminId) {
         const settlement = await this.prisma.settlement.findUnique({

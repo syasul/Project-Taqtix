@@ -9,7 +9,10 @@ export declare class SettlementsService implements OnModuleInit {
         processed: number;
         settlements: any[];
     }>;
-    getSettlements(): Promise<({
+    getSettlements(): Promise<{
+        eventTitle: string;
+        organizerName: string;
+        bankAccount: string | null;
         organizer: {
             user: {
                 email: string;
@@ -25,7 +28,6 @@ export declare class SettlementsService implements OnModuleInit {
             location: string;
             endDate: Date;
         };
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -38,7 +40,7 @@ export declare class SettlementsService implements OnModuleInit {
         affiliateCommissionTotal: number;
         netAmount: number;
         paidBy: string | null;
-    })[]>;
+    }[]>;
     markSettlementPaid(settlementId: string, adminId: string): Promise<{
         id: string;
         createdAt: Date;

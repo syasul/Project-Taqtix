@@ -1039,16 +1039,16 @@ export class PaymentsService {
       throw new NotFoundException('Pesanan tidak ditemukan');
     }
 
-    // Fallback cek status ke DOKU jika order masih PENDING dan memiliki externalId/invoice
+    // Fallback cek status ke DOKU jika order masih PENDING
     if (
       order.status === OrderStatus.PENDING &&
-      order.payment?.provider === 'doku' &&
-      order.payment?.externalId
+      order.payment?.provider === 'doku'
     ) {
       const { clientId, secretKey } = this.getDokuConfig();
       if (clientId && secretKey) {
         try {
-          await this.checkDokuOrderStatus(order.payment.externalId);
+          const invoiceNumber = `TAQTIX-ORD-${order.id}`;
+          await this.checkDokuOrderStatus(invoiceNumber);
           // Ambil state terkini setelah sinkronisasi
           const refreshed = await this.prisma.order.findUnique({
             where: { id: orderId },
@@ -1063,8 +1063,11 @@ export class PaymentsService {
               status = 'failed';
             return { status, expiredAt: refreshed.expiredAt };
           }
-        } catch {
-          // Tetap lanjutkan dengan status yang ada jika request fallback gagal
+        } catch (err) {
+          this.logger.warn(
+            `Fallback checkDokuOrderStatus gagal untuk order ${order.id}:`,
+            err,
+          );
         }
       }
     }

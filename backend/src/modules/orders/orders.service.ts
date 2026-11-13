@@ -534,11 +534,12 @@ export class OrdersService {
         );
         paymentUrl = result.paymentUrl;
 
-        // Simpan response.payment.token_id ke Payment.externalId (dan snapToken = paymentUrl)
+        // Simpan invoice_number ke Payment.externalId (dan snapToken = paymentUrl)
+        const dokuInvoiceNumber = result.invoiceNumber || `TAQTIX-ORD-${order.id}`;
         await this.prisma.payment.update({
           where: { id: payment.id },
           data: {
-            externalId: result.tokenId || result.invoiceNumber,
+            externalId: dokuInvoiceNumber,
             snapToken: result.paymentUrl,
             provider: 'doku',
           },

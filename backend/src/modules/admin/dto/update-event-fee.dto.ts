@@ -14,6 +14,11 @@ export class TicketCategoryFeeItemDto {
 }
 
 export class UpdateEventFeeDto {
+  @ApiPropertyOptional({ description: 'ID Event' })
+  @IsString()
+  @IsOptional()
+  id?: string;
+
   @ApiProperty({ description: 'Default Internet Fee per tiket untuk event ini (Rp)' })
   @IsNumber()
   @Min(0)

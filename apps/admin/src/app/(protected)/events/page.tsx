@@ -101,19 +101,22 @@ export default function EventsApprovalPage() {
 
   // Update Internet Fee Mutation
   const updateFeeMutation = useMutation({
-    mutationFn: (data: {
+    mutationFn: ({
+      id,
+      ...body
+    }: {
       id: string;
       internetFee: number;
       applyToAllCategories?: boolean;
       categories?: { id: string; internetFee: number }[];
-    }) => api.patch(`/admin/events/${data.id}/internet-fee`, data),
+    }) => api.patch(`/admin/events/${id}/internet-fee`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] });
       setFeeModalEvent(null);
       toast.success('Pengaturan Internet Fee berhasil disimpan!');
     },
-    onError: () => {
-      toast.error('Gagal menyimpan pengaturan Internet Fee');
+    onError: (err: any) => {
+      toast.error(err.message || 'Gagal menyimpan pengaturan Internet Fee');
     },
   });
 
@@ -675,6 +678,36 @@ export default function EventsApprovalPage() {
                   }`}
                 >
                   {detailEvent.allowTicketTransfer !== false ? 'Aktif (On)' : 'Nonaktif (Off)'}
+                </button>
+              </div>
+
+              {/* Internet Fee & Biaya Layanan Card in Detail Modal */}
+              <div className="p-3.5 bg-amber-50/50 border border-amber-200/80 rounded-xl flex items-center justify-between text-xs gap-3">
+                <div className="space-y-0.5">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+                    <DollarSign className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Internet Fee &amp; Biaya Layanan</span>
+                  </span>
+                  <p className="text-[11px] text-slate-500 leading-tight">
+                    {detailEvent.internetFee && detailEvent.internetFee > 0
+                      ? `Rp ${detailEvent.internetFee.toLocaleString('id-ID')} per tiket`
+                      : detailEvent.ticketCategories?.some((c) => c.internetFee && c.internetFee > 0)
+                      ? 'Dikonfigurasi kustom per-tier tiket'
+                      : detailEvent.organizerInternetFee && detailEvent.organizerInternetFee > 0
+                      ? `Default EO: Rp ${detailEvent.organizerInternetFee.toLocaleString('id-ID')} / tiket`
+                      : 'Belum diatur (Rp 0)'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleOpenFeeModal(detailEvent);
+                    setDetailEvent(null);
+                  }}
+                  className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition cursor-pointer shrink-0 shadow-2xs flex items-center gap-1.5"
+                >
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>Atur Fee</span>
                 </button>
               </div>
             </div>

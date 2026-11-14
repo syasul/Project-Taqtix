@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
@@ -303,6 +304,18 @@ export default function OrganizerDetailPage() {
             <p className="text-[11px] text-slate-500 leading-normal">
               Biaya internet fee / penanganan standar per tiket untuk event milik EO ini. Jika suatu event atau tier tiket menentukan fee-nya sendiri, biaya spesifik tersebut yang akan diprioritaskan.
             </p>
+
+            <div className="p-3 bg-teal-50/70 border border-teal-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs mt-2">
+              <span className="text-teal-900 font-medium text-[11px]">
+                Ingin mengatur nominal Internet Fee khusus per-event atau per-tier kategori tiket?
+              </span>
+              <Link
+                href="/events"
+                className="inline-flex items-center justify-center px-3 py-1.5 bg-[#08B4B5] hover:bg-[#079b9c] text-white rounded-lg font-bold text-[11px] shrink-0 transition shadow-2xs"
+              >
+                Buka Menu Approval &amp; Event &rarr;
+              </Link>
+            </div>
           </div>
         </div>
 

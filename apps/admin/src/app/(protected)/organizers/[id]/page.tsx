@@ -292,11 +292,14 @@ export default function OrganizerDetailPage() {
                 Rp
               </span>
               <input
-                type="number"
-                min={0}
-                step={500}
-                value={internetFee}
-                onChange={(e) => setInternetFee(Number(e.target.value) || 0)}
+                type="text"
+                inputMode="numeric"
+                value={internetFee ? internetFee.toLocaleString('id-ID') : '0'}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, '');
+                  setInternetFee(raw ? parseInt(raw, 10) : 0);
+                }}
                 placeholder="0"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-800 font-bold focus:outline-none focus:border-[#08B4B5] focus:bg-white"
               />

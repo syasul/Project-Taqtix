@@ -1101,16 +1101,19 @@ export default function EventsApprovalPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="relative w-36">
+                  <div className="relative w-40">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
                       Rp
                     </span>
                     <input
-                      type="number"
-                      min={0}
-                      step={500}
-                      value={eventFeeInput}
-                      onChange={(e) => setEventFeeInput(Number(e.target.value) || 0)}
+                      type="text"
+                      inputMode="numeric"
+                      value={eventFeeInput ? eventFeeInput.toLocaleString('id-ID') : '0'}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, '');
+                        setEventFeeInput(raw ? parseInt(raw, 10) : 0);
+                      }}
                       className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#08B4B5]"
                     />
                   </div>
@@ -1185,17 +1188,18 @@ export default function EventsApprovalPage() {
                         </div>
 
                         <div className="col-span-4 flex items-center justify-end">
-                          <div className="relative w-32">
+                          <div className="relative w-36">
                             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
                               Rp
                             </span>
                             <input
-                              type="number"
-                              min={0}
-                              step={500}
-                              value={currentTierFee}
+                              type="text"
+                              inputMode="numeric"
+                              value={currentTierFee ? currentTierFee.toLocaleString('id-ID') : '0'}
+                              onFocus={(e) => e.target.select()}
                               onChange={(e) => {
-                                const val = Number(e.target.value) || 0;
+                                const raw = e.target.value.replace(/\D/g, '');
+                                const val = raw ? parseInt(raw, 10) : 0;
                                 setCategoryFeesInput((prev) => ({
                                   ...prev,
                                   [tc.id]: val,

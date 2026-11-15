@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
   if (token) {
     const payload = parseJwt(token);
     if (payload) {
-      const isExpired = payload.exp * 1000 < Date.now();
+      const isExpired = payload.exp ? payload.exp * 1000 < Date.now() : false;
       if (!isExpired) {
         isAuthenticated = true;
         isAdmin = payload.role === 'admin';
@@ -59,6 +59,7 @@ export function middleware(request: NextRequest) {
   if (!isAuthenticated || !isAdmin) {
     if (!isPublicRoute) {
       const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
   } else {

@@ -233,16 +233,21 @@ export default function EventsApprovalPage() {
   });
 
   // Filter logic
-  const filteredEvents = events.filter((evt) => {
+  const safeEvents: EventItem[] = Array.isArray(events)
+    ? events
+    : Array.isArray((events as any)?.data)
+    ? (events as any).data
+    : [];
+  const filteredEvents = safeEvents.filter((evt) => {
     const title = (evt?.title || '').toLowerCase();
     const organizerName = (evt?.organizerName || (evt as any)?.organizer?.name || '').toLowerCase();
     const term = (searchTerm || '').trim().toLowerCase();
     const matchesSearch = !term || title.includes(term) || organizerName.includes(term);
-    const matchesStatus = statusFilter === 'all' || evt.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || evt?.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const pendingCount = events.filter((e) => e.status === 'pending_approval').length;
+  const pendingCount = safeEvents.filter((e) => e?.status === 'pending_approval').length;
   const publishedCount = events.filter((e) => e.status === 'published').length;
   const draftCount = events.filter((e) => e.status === 'draft').length;
 

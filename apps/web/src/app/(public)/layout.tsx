@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import FloatingWhatsApp from '@/components/layout/floating-whatsapp';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       </main>
 
       <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 }

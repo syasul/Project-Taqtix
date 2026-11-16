@@ -298,22 +298,6 @@ export default function TicketCategoriesPage() {
                               minimumFractionDigits: 0,
                             })}
                           </p>
-                          {(() => {
-                            const effFee =
-                              category.internetFee != null
-                                ? Number(category.internetFee)
-                                : eventResponse?.internetFee != null
-                                ? Number(eventResponse.internetFee)
-                                : 0;
-                            if (effFee > 0) {
-                              return (
-                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                                  Internet Fee: Rp{effFee.toLocaleString('id-ID')}
-                                </span>
-                              );
-                            }
-                            return null;
-                          })()}
                         </div>
                       </div>
 

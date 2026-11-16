@@ -39,6 +39,7 @@ import {
   Mic2,
   Globe,
   Music,
+  ChevronDown,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -338,6 +339,7 @@ export default function EventDetailPage() {
   const slug = params?.slug as string;
   const { user } = useAuth();
   const [copiedLink, setCopiedLink] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
 
   // Tangkap affiliate partner code (?ref=... atau ?aff=...) jika di-share
   const affCode = searchParams?.get('ref') || searchParams?.get('aff') || '';
@@ -1160,19 +1162,40 @@ export default function EventDetailPage() {
             </div>
           </div>
 
-          {/* SYARAT, KETENTUAN & PANDUAN MASUK */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
-                Tata Tertib Acara
-              </span>
-              <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                <Info className="w-4 h-4 text-[#08ADAE]" />
-                <span>Syarat dan Ketentuan</span>
-              </h3>
-            </div>
+          {/* SYARAT, KETENTUAN & PANDUAN MASUK (ACCORDION) */}
+          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs transition-all">
+            <button
+              type="button"
+              onClick={() => setIsTermsOpen((prev) => !prev)}
+              className="w-full p-6 sm:p-7 flex items-center justify-between text-left cursor-pointer hover:bg-slate-50/70 transition-colors"
+            >
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider block">
+                  Tata Tertib Acara
+                </span>
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                  <Info className="w-4 h-4 text-[#08ADAE]" />
+                  <span>Syarat dan Ketentuan</span>
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  {isTermsOpen ? 'Klik untuk menutup rincian tata tertib' : 'Klik untuk melihat 17 poin ketentuan acara'}
+                </p>
+              </div>
+              <div
+                className={cn(
+                  'p-2 rounded-xl transition-all duration-200 shrink-0 border ml-3',
+                  isTermsOpen
+                    ? 'bg-[#08ADAE]/10 border-[#08ADAE]/20 text-[#08ADAE] rotate-180'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
+                )}
+              >
+                <ChevronDown className="w-4 h-4" />
+              </div>
+            </button>
 
-            <div className="space-y-3 text-xs text-slate-600 leading-relaxed pt-1">
+            {isTermsOpen && (
+              <div className="px-6 pb-7 sm:px-8 sm:pb-8 pt-1 border-t border-slate-100 animate-in fade-in-50 duration-200">
+                <div className="space-y-3 text-xs text-slate-600 leading-relaxed pt-3">
               <div className="flex items-start gap-2.5">
                 <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
                   1
@@ -1331,6 +1354,8 @@ export default function EventDetailPage() {
               </div>
             </div>
           </div>
+        )}
+      </div>
         </div>
 
         {/* ========================================================================= */}

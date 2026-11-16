@@ -115,7 +115,7 @@ export class DokuService {
           ...(order.internetFee && Number(order.internetFee) > 0
             ? [
                 {
-                  name: 'Biaya Layanan & Internet',
+                  name: 'Service Fee',
                   price: Math.round(Number(order.internetFee)),
                   quantity: 1,
                 },

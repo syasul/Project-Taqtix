@@ -1590,7 +1590,7 @@ function CheckoutContent() {
 
                 {Number(orderDetails.internetFee || 0) > 0 && (
                   <div className="flex justify-between items-center text-slate-500">
-                    <span>Biaya Layanan</span>
+                    <span>Service Fee</span>
                     <span className="font-semibold text-slate-800">
                       Rp {Number(orderDetails.internetFee).toLocaleString('id-ID')}
                     </span>
@@ -2358,10 +2358,7 @@ function CheckoutContent() {
 
               {totalInternetFee > 0 && (
                 <div className="flex justify-between items-center text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <span>Biaya Layanan & Internet</span>
-                    <span className="text-[10px] text-slate-400 font-normal">(Internet Fee)</span>
-                  </span>
+                  <span>Service Fee</span>
                   <span className="font-semibold text-slate-800">
                     Rp{totalInternetFee.toLocaleString('id-ID')}
                   </span>

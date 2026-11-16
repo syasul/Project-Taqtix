@@ -1296,7 +1296,7 @@ export default function EventDetailPage() {
                               if (effFee > 0) {
                                 return (
                                   <span className="text-[10px] text-slate-400 font-medium block">
-                                    + Layanan: Rp{effFee.toLocaleString('id-ID')}
+                                    + Service Fee: Rp{effFee.toLocaleString('id-ID')}
                                   </span>
                                 );
                               }
@@ -1377,7 +1377,7 @@ export default function EventDetailPage() {
                       })}
                       {totalInternetFee > 0 && (
                         <div className="flex justify-between text-slate-500 text-[11px] pt-1.5 border-t border-slate-100">
-                          <span>Biaya Layanan & Internet</span>
+                          <span>Service Fee</span>
                           <span className="font-semibold text-slate-700">
                             Rp{totalInternetFee.toLocaleString('id-ID')}
                           </span>

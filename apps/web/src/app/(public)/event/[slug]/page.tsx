@@ -1092,21 +1092,21 @@ export default function EventDetailPage() {
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
-                Tata Tertib Venue
+                Tata Tertib Acara
               </span>
               <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
                 <Info className="w-4 h-4 text-[#08ADAE]" />
-                <span>Syarat & Ketentuan Menghadiri Acara</span>
+                <span>Syarat dan Ketentuan</span>
               </h3>
             </div>
 
-            <div className="space-y-2.5 text-xs text-slate-600 leading-relaxed pt-1">
+            <div className="space-y-3 text-xs text-slate-600 leading-relaxed pt-1">
               <div className="flex items-start gap-2.5">
                 <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
                   1
                 </span>
                 <p>
-                  Pengunjung wajib menunjukkan <strong>QR Code E-Ticket</strong> resmi TAQtix dari pesan WhatsApp atau menu Tiket Saya di pintu masuk gerbang.
+                  Pembeli wajib menunjukkan e-ticket beserta identitas sebelum memasuki venue. E-ticket didapatkan melalui email pembelian tiket atau fitur download e-ticket melalui website TAQtix.
                 </p>
               </div>
 
@@ -1115,7 +1115,7 @@ export default function EventDetailPage() {
                   2
                 </span>
                 <p>
-                  Pengunjung disarankan membawa kartu identitas fisik resmi (KTP, SIM, atau Kartu Pelajar) yang sesuai dengan nama pada e-ticket untuk verifikasi jika diperlukan.
+                  E-ticket dapat ditukarkan dengan tiket akses pada tanggal yang ditentukan dan akan diumumkan pada akun Instagram penyelenggara.
                 </p>
               </div>
 
@@ -1124,7 +1124,7 @@ export default function EventDetailPage() {
                   3
                 </span>
                 <p>
-                  Tiket yang sudah dibeli tidak dapat dibatalkan atau direfund, kecuali Jika terjadi pembatalan acara oleh penyelenggara, maka refund sepenuhnya ditanggung oleh pihak penyelenggara.
+                  1 (satu) e-ticket hanya dapat ditukarkan dengan 1 (satu) tiket atau jika tiket bundling misalnya couple akan mendapatkan 2 (dua) tiket atau sesuai dengan jenis bundlingnya.
                 </p>
               </div>
 
@@ -1133,7 +1133,128 @@ export default function EventDetailPage() {
                   4
                 </span>
                 <p>
-                  Dilarang membawa senjata tajam, obat-obatan terlarang, flare, botol kaca, atau benda yang membahayakan kenyamanan dan keselamatan pengunjung lain.
+                  Tiket wajib dibawa pada hari pelaksanaan. Jika penonton tidak menunjukkan tiket saat hari pelaksanaan tidak diizinkan untuk memasuki venue acara.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  5
+                </span>
+                <p>
+                  Tiket wajib digunakan selama acara berlangsung.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  6
+                </span>
+                <p>
+                  Harap tidak membagikan kode pemesanan, kode QR, dan barcode. Selalu jaga keamanan dan kerahasiaannya. Tidak ada pengembalian uang atau pergantian tiket akibat hal ini.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  7
+                </span>
+                <p>
+                  Panitia tidak bertanggung jawab atas pembelian tiket acara melalui calo/tempat/kanal/platform yang bukan mitra resmi penjualan tiket.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  8
+                </span>
+                <p>
+                  Panitia tidak bertanggung jawab untuk mengganti rugi tiket yang hilang/rusak/dicuri/hasil penipuan akibat kelalaian pemilik tiket.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  9
+                </span>
+                <p>
+                  Dalam keadaan Force Majeure, seperti bencana alam, kerusuhan, perang, wabah, dan semua keadaan darurat yang diumumkan secara resmi oleh pemerintah, panitia berhak untuk membatalkan dan/atau mengubah waktu acara dan tata letak tempat tanpa pemberitahuan sebelumnya.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  10
+                </span>
+                <p>
+                  Panitia tidak bertanggung jawab atas hilangnya barang-barang pribadi para penonton atau kejadian-kejadian yang mungkin terjadi di luar kendali.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  11
+                </span>
+                <div className="space-y-1.5">
+                  <p className="font-semibold text-slate-800">Penyelenggara berhak untuk:</p>
+                  <ul className="list-disc pl-4 space-y-1 text-slate-600">
+                    <li>Melarang penonton masuk jika tiket telah digunakan oleh orang lain/rusak.</li>
+                    <li>Memproses atau mengajukan hukuman, baik perdata maupun pidana, terhadap pengunjung yang mendapatkan akses masuk (e-ticket, tiket, free pass, tenant bazaar pass, guest star pass, talent pass, security pass, dan akses masuk lainnya) secara tidak sah, termasuk memalsukan dan menggandakan akses masuk yang sah atau memperoleh akses masuk dengan cara yang tidak sesuai dengan prosedur.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  12
+                </span>
+                <p>
+                  Penonton dilarang membawa makanan dan minuman dari luar ke dalam venue acara.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  13
+                </span>
+                <p>
+                  Penyelenggara acara berhak mengambil tindakan tegas dan mengeluarkan pengunjung dari venue jika tidak mematuhi ketentuan yang telah ditetapkan oleh penyelenggara acara.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  14
+                </span>
+                <p>
+                  Pengunjung yang merusak, membuat onar, dan menimbulkan kerusuhan, wajib menggantikan seluruh biaya yang ditanggung oleh penyelenggara acara.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  15
+                </span>
+                <p>
+                  Penonton wajib menaati peraturan yang telah dibuat oleh penyelenggara acara sebagaimana akan dijelaskan pada Instagram penyelenggara.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  16
+                </span>
+                <p>
+                  Tiket yang sudah dibeli tidak dapat direfund (kecuali ada kebijakan dari penyelenggara).
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="h-5 w-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  17
+                </span>
+                <p>
+                  Jika event dibatalkan dikarenakan kondisi yang mendesak serta atas pertimbangan yang matang, maka penyelenggara bertanggungjawab penuh untuk melakukan dan memproses refund sesuai harga tiket kepada seluruh pembeli.
                 </p>
               </div>
             </div>

@@ -40,6 +40,7 @@ import {
   Globe,
   Music,
   ChevronDown,
+  X,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -93,6 +94,24 @@ const TikTokIcon = ({ className = 'w-3.5 h-3.5 shrink-0' }: { className?: string
 const TwitterIcon = () => (
   <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="currentColor">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const WhatsAppIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.25-1.5-1.4-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42h-.47c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.17-.48-.29z" />
+  </svg>
+);
+
+const FacebookIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+  </svg>
+);
+
+const ThreadsIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.001 2c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm4.847 13.918c-.378.857-.936 1.572-1.666 2.087-.73.515-1.58.777-2.529.777-1.448 0-2.617-.468-3.477-1.393-.86-.925-1.28-2.186-1.28-3.753 0-1.637.447-2.923 1.328-3.824.88-.901 2.052-1.365 3.486-1.365 1.455 0 2.61.464 3.435 1.378.825.914 1.237 2.18 1.237 3.766v.566h-7.618c.036.938.319 1.675.843 2.193.523.518 1.218.78 2.067.78.694 0 1.281-.176 1.745-.525.464-.349.791-.849.974-1.485l1.455.595zm-1.87-3.321c-.027-.79-.272-1.408-.73-1.841-.458-.433-1.076-.653-1.841-.653-.746 0-1.353.218-1.808.649-.455.431-.722 1.041-.795 1.845h5.174z" />
   </svg>
 );
 
@@ -340,6 +359,7 @@ export default function EventDetailPage() {
   const { user } = useAuth();
   const [copiedLink, setCopiedLink] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Tangkap affiliate partner code (?ref=... atau ?aff=...) jika di-share
   const affCode = searchParams?.get('ref') || searchParams?.get('aff') || '';
@@ -406,6 +426,27 @@ export default function EventDetailPage() {
       toast.success('Tautan event berhasil disalin ke papan klip!');
       setTimeout(() => setCopiedLink(false), 2000);
     }
+  };
+
+  const handleShare = async () => {
+    if (typeof window === 'undefined' || !event) return;
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: event.title,
+      text: `Yuk hadiri "${event.title}"! Dapatkan tiket resminya di TAQtix:`,
+      url: shareUrl,
+    };
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return;
+      }
+    }
+
+    setIsShareModalOpen(true);
   };
 
   const handleShareWhatsApp = () => {
@@ -532,31 +573,13 @@ export default function EventDetailPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            onClick={handleShareWhatsApp}
+            onClick={handleShare}
             variant="outline"
             size="sm"
-            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 cursor-pointer active:scale-95"
+            className="rounded-xl text-xs font-semibold gap-2 border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95 shadow-2xs"
           >
-            <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="hidden sm:inline">Bagikan</span> WhatsApp
-          </Button>
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Ayo hadiri ${event.title}! Dapatkan tiket resminya di TAQtix:`)}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition active:scale-95"
-          >
-            <TwitterIcon />
-            <span>Bagikan X</span>
-          </a>
-          <Button
-            onClick={handleCopyLink}
-            variant="outline"
-            size="sm"
-            className="rounded-xl text-xs font-semibold gap-1.5 border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95"
-          >
-            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-            <span>{copiedLink ? 'Tersalin' : 'Salin Tautan'}</span>
+            <Share2 className="w-3.5 h-3.5 text-[#08ADAE]" />
+            <span>Bagikan</span>
           </Button>
         </div>
       </div>
@@ -569,7 +592,7 @@ export default function EventDetailPage() {
           {/* Banner with Rich Fallback Texture */}
           <div className="relative rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900">
             {event.bannerUrl ? (
-              <div className="relative h-72 sm:h-96 w-full overflow-hidden bg-slate-900">
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={event.bannerUrl || '/default-banner.svg'}
@@ -585,7 +608,7 @@ export default function EventDetailPage() {
               </div>
             ) : (
               /* Rich Aesthetic Event Passport Fallback (Never Empty) */
-              <div className="relative min-h-[260px] sm:min-h-[340px] w-full p-6 sm:p-10 flex flex-col justify-between overflow-hidden bg-slate-900 text-white">
+              <div className="relative aspect-[16/9] min-h-[220px] sm:min-h-[320px] w-full p-6 sm:p-10 flex flex-col justify-between overflow-hidden bg-slate-900 text-white">
                 {/* Subtle Geometric Background */}
                 <div className="absolute inset-0 bg-[radial-gradient(#08ADAE_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
                 <div className="absolute -right-20 -top-20 w-72 h-72 bg-[#08ADAE]/25 rounded-full blur-3xl pointer-events-none" />
@@ -1582,6 +1605,137 @@ export default function EventDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* MODAL BAGIKAN (SHARE POPUP MODAL)                                         */}
+      {/* ========================================================================= */}
+      {isShareModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setIsShareModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-5 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider block">
+                  Bagikan Event
+                </span>
+                <h3 className="font-bold text-slate-900 text-base">Bagikan ke Teman</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(false)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Social Share Grid */}
+            <div className="grid grid-cols-4 gap-3 text-center">
+              {/* WhatsApp */}
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Yuk hadiri "${event.title}"!\nPesan tiket resminya di TAQtix:\n${typeof window !== 'undefined' ? window.location.href : ''}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition shadow-2xs border border-emerald-100">
+                  <WhatsAppIcon className="w-6 h-6" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-700">WhatsApp</span>
+              </a>
+
+              {/* Instagram */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success('Tautan disalin! Buka Instagram untuk bagikan ke Story / DM.');
+                    window.open('https://instagram.com', '_blank');
+                  }
+                }}
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center group-hover:scale-105 transition shadow-2xs">
+                  <InstagramIcon className="w-6 h-6" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-700">Instagram</span>
+              </button>
+
+              {/* Threads */}
+              <a
+                href={`https://www.threads.net/intent/post?text=${encodeURIComponent(
+                  `Yuk hadiri "${event.title}"! Beli tiket resminya di TAQtix: ${typeof window !== 'undefined' ? window.location.href : ''}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-105 transition shadow-2xs">
+                  <ThreadsIcon className="w-6 h-6" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-700">Threads</span>
+              </a>
+
+              {/* X / Twitter */}
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                  `Yuk hadiri "${event.title}"! Dapatkan tiket resminya di TAQtix:`
+                )}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-105 transition shadow-2xs">
+                  <TwitterIcon />
+                </div>
+                <span className="text-[11px] font-medium text-slate-700">Twitter</span>
+              </a>
+
+              {/* Facebook */}
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  typeof window !== 'undefined' ? window.location.href : ''
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-1.5 p-2 rounded-2xl hover:bg-slate-50 transition group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center group-hover:scale-105 transition shadow-2xs">
+                  <FacebookIcon className="w-6 h-6" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-700">Facebook</span>
+              </a>
+            </div>
+
+            {/* Salin Tautan Langsung */}
+            <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={typeof window !== 'undefined' ? window.location.href : ''}
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600 font-mono select-all focus:outline-none"
+              />
+              <Button
+                type="button"
+                onClick={handleCopyLink}
+                size="sm"
+                className="bg-[#08ADAE] hover:bg-[#07999A] text-white rounded-xl text-xs font-semibold px-3 py-2 cursor-pointer shrink-0"
+              >
+                {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedLink ? 'Tersalin' : 'Salin'}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

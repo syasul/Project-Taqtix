@@ -1563,51 +1563,6 @@ export default function EventDetailPage() {
                   </div>
                 )}
               </div>
-
-              {/* JAMINAN TRANSAKSI AMAN */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2.5 text-xs">
-                <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider block">
-                  Jaminan Transaksi TAQtix
-                </span>
-                <div className="space-y-2 text-[11px] text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>100% Tiket Resmi & Terverifikasi</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>E-Ticket Langsung Masuk WhatsApp</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Kuota Terkunci saat Checkout</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* METODE PEMBAYARAN RESMI */}
-              <div className="space-y-2 text-xs">
-                <span className="font-bold text-slate-700 text-[11px] uppercase tracking-wider block">
-                  Metode Pembayaran
-                </span>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Mendukung Virtual Account resmi (BNI, BRI BRIVA, Mandiri, Permata) serta Gerai Retail (Indomaret, Alfamart) dengan verifikasi otomatis 24 jam.
-                </p>
-              </div>
-
-              {/* BANTUAN PELANGGAN */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Butuh bantuan pemesanan?</span>
-                <a
-                  href="https://wa.me/628158006658"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold text-[#08ADAE] hover:underline flex items-center gap-1"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>CS WhatsApp</span>
-                </a>
-              </div>
             </CardContent>
           </Card>
         </div>

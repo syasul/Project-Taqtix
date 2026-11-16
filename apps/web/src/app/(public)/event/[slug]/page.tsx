@@ -437,7 +437,13 @@ export default function EventDetailPage() {
       url: shareUrl,
     };
 
-    if (typeof navigator !== 'undefined' && navigator.share) {
+    // Cek apakah benar-benar perangkat HP / Tablet fisik
+    const isMobileDevice =
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints > 1 && 'ontouchstart' in window && window.innerWidth < 768);
+
+    // Di HP / smartphone: panggil native OS share sheet (membuka aplikasi WA, IG, Threads, FB yang terpasang)
+    if (isMobileDevice && typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share(shareData);
         return;
@@ -446,6 +452,7 @@ export default function EventDetailPage() {
       }
     }
 
+    // Di Laptop / Desktop / PC: selalu tampilkan modal popup bagikan TAQtix
     setIsShareModalOpen(true);
   };
 
@@ -1615,7 +1622,7 @@ export default function EventDetailPage() {
           onClick={() => setIsShareModalOpen(false)}
         >
           <div
-            className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-5 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-150"
+            className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -1623,7 +1630,7 @@ export default function EventDetailPage() {
                 <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider block">
                   Bagikan Event
                 </span>
-                <h3 className="font-bold text-slate-900 text-base">Bagikan ke Teman</h3>
+                <h3 className="font-bold text-slate-900 text-base">Bagikan ke Teman & Media Sosial</h3>
               </div>
               <button
                 type="button"
@@ -1634,8 +1641,8 @@ export default function EventDetailPage() {
               </button>
             </div>
 
-            {/* Social Share Grid */}
-            <div className="grid grid-cols-4 gap-3 text-center">
+            {/* Social Share Grid (5 Platform) */}
+            <div className="grid grid-cols-5 gap-2 text-center">
               {/* WhatsApp */}
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(

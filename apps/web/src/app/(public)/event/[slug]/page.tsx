@@ -1088,6 +1088,78 @@ export default function EventDetailPage() {
             </div>
           )}
 
+          {/* LOKASI VENUE & PETUNJUK MAPS */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
+                  Peta Lokasi
+                </span>
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                  <Navigation className="w-4 h-4 text-[#08ADAE]" />
+                  <span>Lokasi Venue Acara</span>
+                </h3>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 space-y-0">
+              {/* INTERACTIVE EMBEDDED GOOGLE MAP */}
+              <div className="w-full h-64 sm:h-80 bg-slate-100 relative overflow-hidden">
+                <iframe
+                  title="Peta Lokasi Acara"
+                  width="100%"
+                  height="100%"
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    event.location
+                  )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                />
+              </div>
+
+              {/* Venue details and actions below map */}
+              <div className="p-4 sm:p-5 space-y-3 bg-white">
+                <div className="flex items-start gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0 mt-0.5">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <div className="space-y-0.5 flex-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">{event.location}</h4>
+                    <p className="text-[11px] text-slate-500">
+                      Pastikan tiba di lokasi minimal 30-60 menit sebelum sesi acara dimulai.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#08ADAE] text-white text-xs font-bold hover:bg-[#07999A] transition shadow-xs cursor-pointer active:scale-95"
+                  >
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>Buka Rute di Google Maps</span>
+                  </a>
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(event.location);
+                      toast.success('Alamat lokasi berhasil disalin ke papan klip!');
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl text-xs font-semibold border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Salin Alamat</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* SYARAT, KETENTUAN & PANDUAN MASUK */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
             <div className="space-y-1">
@@ -1256,78 +1328,6 @@ export default function EventDetailPage() {
                 <p>
                   Jika event dibatalkan dikarenakan kondisi yang mendesak serta atas pertimbangan yang matang, maka penyelenggara bertanggungjawab penuh untuk melakukan dan memproses refund sesuai harga tiket kepada seluruh pembeli.
                 </p>
-              </div>
-            </div>
-          </div>
-
-          {/* LOKASI VENUE & PETUNJUK MAPS */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-[#08ADAE] uppercase tracking-wider">
-                  Peta Lokasi
-                </span>
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
-                  <Navigation className="w-4 h-4 text-[#08ADAE]" />
-                  <span>Lokasi Venue Acara</span>
-                </h3>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 space-y-0">
-              {/* INTERACTIVE EMBEDDED GOOGLE MAP */}
-              <div className="w-full h-64 sm:h-80 bg-slate-100 relative overflow-hidden">
-                <iframe
-                  title="Peta Lokasi Acara"
-                  width="100%"
-                  height="100%"
-                  className="w-full h-full border-0"
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    event.location
-                  )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                />
-              </div>
-
-              {/* Venue details and actions below map */}
-              <div className="p-4 sm:p-5 space-y-3 bg-white">
-                <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-[#08ADAE]/10 border border-[#08ADAE]/20 flex items-center justify-center text-[#08ADAE] shrink-0 mt-0.5">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <div className="space-y-0.5 flex-1">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">{event.location}</h4>
-                    <p className="text-[11px] text-slate-500">
-                      Pastikan tiba di lokasi minimal 30-60 menit sebelum sesi acara dimulai.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#08ADAE] text-white text-xs font-bold hover:bg-[#07999A] transition shadow-xs cursor-pointer active:scale-95"
-                  >
-                    <Navigation className="w-3.5 h-3.5" />
-                    <span>Buka Rute di Google Maps</span>
-                  </a>
-                  <Button
-                    onClick={() => {
-                      navigator.clipboard.writeText(event.location);
-                      toast.success('Alamat lokasi berhasil disalin ke papan klip!');
-                    }}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-xl text-xs font-semibold border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Salin Alamat</span>
-                  </Button>
-                </div>
               </div>
             </div>
           </div>

@@ -9,8 +9,8 @@ import { ArrowUpRight } from 'lucide-react';
 export default function Footer() {
   const pathname = usePathname();
 
-  // Sembunyikan footer di halaman detail event (/event/[slug])
-  if (pathname?.startsWith('/event/')) {
+  // Sembunyikan footer di halaman detail event (/event/[slug]) dan halaman checkout/pembayaran (/checkout)
+  if (pathname?.startsWith('/event/') || pathname?.startsWith('/checkout')) {
     return null;
   }
 

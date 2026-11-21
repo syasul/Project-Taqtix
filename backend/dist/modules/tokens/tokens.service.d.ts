@@ -45,6 +45,8 @@ export declare class TokensService {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;

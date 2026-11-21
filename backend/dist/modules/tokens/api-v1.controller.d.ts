@@ -32,6 +32,7 @@ export declare class ApiV1Controller {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -40,7 +41,6 @@ export declare class ApiV1Controller {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;

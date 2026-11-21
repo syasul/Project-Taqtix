@@ -68,6 +68,7 @@ model User {
   
   organizer            Organizer?
   organizerMembers     OrganizerMember[]
+  organizerFollows     OrganizerFollower[]
   orders               Order[]
   checkedTickets       Ticket[]           @relation("CheckedByRelation")
   checkedOutTickets    Ticket[]           @relation("CheckedOutByRelation")
@@ -83,6 +84,8 @@ model Organizer {
   slug           String            @unique
   phone          String?           // Nomor telepon kontak organizer
   logoUrl        String?           // URL logo organisasi
+  bannerUrl      String?           // URL banner / cover profil organizer
+  bio            String?           @db.Text // Deskripsi / profil lengkap organizer
   contactEmail   String?           // Email kontak resmi organisasi
   website        String?           // Website resmi organizer
   instagram      String?           // Akun / URL Instagram resmi
@@ -110,6 +113,8 @@ model Organizer {
   vouchers       Voucher[]
   apiTokens      ApiToken[]
   settlements    Settlement[]
+  followers      OrganizerFollower[]
+  posts          OrganizerPost[]
 }
 
 /// Representasi dari suatu Event / Acara.
@@ -165,6 +170,7 @@ model Event {
   posTransactions     PosTransaction[]
   settlements         Settlement[]
   seatSections        SeatSection[]
+  organizerPosts      OrganizerPost[]
 }
 
 /// Kategori/Tipe Tiket yang tersedia pada suatu event.
@@ -774,4 +780,34 @@ model Seat {
   ticket           Ticket?         @relation(fields: [ticketId], references: [id], onDelete: SetNull)
 
   @@unique([sectionId, seatNumber])
+}
+
+/// Relasi pengikut (followers) dari suatu Organizer.
+model OrganizerFollower {
+  id          String   @id @default(uuid())
+  organizerId String
+  userId      String?
+  email       String
+  name        String?
+  createdAt   DateTime @default(now())
+
+  organizer   Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizerId, email])
+}
+
+/// Kabar / Perkembangan / Post publik dari Organizer untuk para pengikut & audiens.
+model OrganizerPost {
+  id          String   @id @default(uuid())
+  organizerId String
+  eventId     String?
+  title       String
+  content     String   @db.Text
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organizer   Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  event       Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
 }

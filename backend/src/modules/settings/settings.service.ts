@@ -51,6 +51,8 @@ export class SettingsService {
         name: true,
         slug: true,
         logoUrl: true,
+        bannerUrl: true,
+        bio: true,
         contactEmail: true,
         phone: true,
         website: true,
@@ -68,6 +70,8 @@ export class SettingsService {
     data: {
       name?: string;
       logoUrl?: string;
+      bannerUrl?: string;
+      bio?: string;
       contactEmail?: string;
       phone?: string;
       website?: string;
@@ -82,6 +86,8 @@ export class SettingsService {
       data: {
         ...(data.name ? { name: data.name } : {}),
         ...(data.logoUrl !== undefined ? { logoUrl: data.logoUrl } : {}),
+        ...(data.bannerUrl !== undefined ? { bannerUrl: data.bannerUrl } : {}),
+        ...(data.bio !== undefined ? { bio: data.bio } : {}),
         ...(data.contactEmail !== undefined
           ? { contactEmail: data.contactEmail }
           : {}),
@@ -96,6 +102,8 @@ export class SettingsService {
         name: true,
         slug: true,
         logoUrl: true,
+        bannerUrl: true,
+        bio: true,
         contactEmail: true,
         phone: true,
         website: true,

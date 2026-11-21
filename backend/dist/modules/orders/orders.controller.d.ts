@@ -58,11 +58,11 @@ export declare class OrdersController {
             title: string;
             id: string;
             slug: string;
+            bannerUrl: string;
             location: string;
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
         };
         payment: {
             id: string;
@@ -158,6 +158,7 @@ export declare class OrdersController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -166,7 +167,6 @@ export declare class OrdersController {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;

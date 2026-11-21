@@ -45,6 +45,7 @@ const settings_module_1 = require("./modules/settings/settings.module");
 const system_settings_module_1 = require("./modules/system-settings/system-settings.module");
 const banners_module_1 = require("./modules/banners/banners.module");
 const seats_module_1 = require("./modules/seats/seats.module");
+const organizers_module_1 = require("./modules/organizers/organizers.module");
 const throttler_1 = require("@nestjs/throttler");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const roles_guard_1 = require("./common/guards/roles.guard");
@@ -149,6 +150,7 @@ exports.AppModule = AppModule = __decorate([
             system_settings_module_1.SystemSettingsModule,
             banners_module_1.BannersModule,
             seats_module_1.SeatsModule,
+            organizers_module_1.OrganizersModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

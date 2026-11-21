@@ -16,7 +16,8 @@ import {
   Instagram,
   Youtube,
   Globe,
-  Share2
+  Share2,
+  ExternalLink,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -39,15 +40,19 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 export default function OrganizationSettingsPage() {
   const { isOwner, isLoading: isRoleLoading } = useOrganizerRole();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
     slug: '',
     logoUrl: '',
+    bannerUrl: '',
+    bio: '',
     contactEmail: '',
     phone: '',
     website: '',
@@ -70,6 +75,8 @@ export default function OrganizationSettingsPage() {
           name: data.name || '',
           slug: data.slug || '',
           logoUrl: data.logoUrl || '',
+          bannerUrl: data.bannerUrl || '',
+          bio: data.bio || '',
           contactEmail: data.contactEmail || '',
           phone: data.phone || '',
           website: data.website || '',
@@ -129,6 +136,45 @@ export default function OrganizationSettingsPage() {
     }
   };
 
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file banner maksimal 10MB');
+      return;
+    }
+
+    try {
+      setUploadingBanner(true);
+      let processedFile = file;
+      try {
+        processedFile = await compressImage(file, {
+          maxWidth: 1600,
+          maxHeight: 800,
+          quality: 0.85,
+          mimeType: 'image/webp',
+        });
+      } catch {
+        processedFile = file;
+      }
+
+      const formData = new FormData();
+      formData.append('file', processedFile);
+
+      const res = await apiClient.post('/upload', formData, { timeout: 30000 });
+      const uploadedUrl = res.data?.data?.url || res.data?.url;
+      if (uploadedUrl) {
+        setForm((prev) => ({ ...prev, bannerUrl: uploadedUrl }));
+        toast.success('Banner berhasil diunggah!');
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Gagal mengunggah banner');
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isOwner) return;
@@ -138,6 +184,8 @@ export default function OrganizationSettingsPage() {
       const res = await apiClient.patch('/organizer/settings/organization', {
         name: form.name.trim(),
         logoUrl: form.logoUrl.trim(),
+        bannerUrl: form.bannerUrl.trim(),
+        bio: form.bio.trim(),
         contactEmail: form.contactEmail.trim(),
         phone: form.phone.trim(),
         website: form.website.trim(),
@@ -189,6 +237,33 @@ export default function OrganizationSettingsPage() {
         </div>
       )}
 
+      {/* Laman Publik Banner Card */}
+      {form.slug && (
+        <div className="p-5 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-teal-950 flex items-center gap-2">
+              <Globe className="h-4 w-4 text-[#08B4B5]" />
+              Laman Media Sosial & Afiliasi Publik Organizer
+            </h3>
+            <p className="text-xs text-teal-700">
+              Audiens dapat melihat seluruh daftar acara, mengikuti Anda, dan bergabung ke program afiliasi di:{' '}
+              <span className="font-mono font-semibold text-teal-900">
+                taqtix.id/eo/{form.slug}
+              </span>
+            </p>
+          </div>
+          <a
+            href={`/eo/${form.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-teal-300 text-teal-800 text-xs font-bold shadow-xs hover:bg-teal-50 transition-colors"
+          >
+            <span>Buka Laman Publik</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      )}
+
       <Card className="bg-white border-slate-200/80 shadow-xs rounded-2xl">
         <CardHeader>
           <CardTitle className="text-base font-bold text-slate-900">Identitas Organizer</CardTitle>
@@ -198,6 +273,58 @@ export default function OrganizationSettingsPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Banner Section */}
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-700">Banner / Sampul Profil</Label>
+              <div className="relative w-full h-36 sm:h-44 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center">
+                {form.bannerUrl ? (
+                  <img
+                    src={form.bannerUrl}
+                    alt="Banner Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center p-4">
+                    <ImageIcon className="h-8 w-8 text-slate-300 mx-auto mb-1" />
+                    <p className="text-xs text-slate-400 font-medium">Belum ada banner sampul</p>
+                  </div>
+                )}
+                {isOwner && (
+                  <div className="absolute bottom-3 right-3">
+                    <input
+                      type="file"
+                      ref={bannerInputRef}
+                      onChange={handleBannerUpload}
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={uploadingBanner}
+                      onClick={() => bannerInputRef.current?.click()}
+                      className="rounded-xl bg-slate-900/80 hover:bg-slate-900 text-white text-xs font-bold shadow-md flex items-center gap-2"
+                    >
+                      {uploadingBanner ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <span>Mengunggah...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-3.5 w-3.5" />
+                          <span>Ganti Banner</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <p className="text-[10px] text-slate-400">
+                Disarankan gambar beresolusi 1600x600 px (rasio landscape). Maks. 10MB.
+              </p>
+            </div>
+
             {/* Logo Section */}
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-700">Logo Organizer</Label>
@@ -265,6 +392,25 @@ export default function OrganizationSettingsPage() {
                 className="rounded-xl border-slate-200 text-xs font-medium"
                 required
               />
+            </div>
+
+            {/* Bio / Profil Singkat */}
+            <div className="space-y-2">
+              <Label htmlFor="org-bio" className="text-xs font-bold text-slate-700">
+                Bio / Deskripsi Organizer
+              </Label>
+              <textarea
+                id="org-bio"
+                rows={3}
+                value={form.bio}
+                disabled={!isOwner || saving}
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                placeholder="Ceritakan tentang promotor Anda, genre event yang sering diadakan, atau visi komunitas Anda..."
+                className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-xs font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#08B4B5]/20 focus:border-[#08B4B5] disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <p className="text-[10px] text-slate-400">
+                Deskripsi ini akan muncul di bagian atas laman sosial & profil publik EO Anda.
+              </p>
             </div>
 
             {/* Slug */}

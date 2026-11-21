@@ -55,6 +55,8 @@ let SettingsService = class SettingsService {
                 name: true,
                 slug: true,
                 logoUrl: true,
+                bannerUrl: true,
+                bio: true,
                 contactEmail: true,
                 phone: true,
                 website: true,
@@ -74,6 +76,8 @@ let SettingsService = class SettingsService {
             data: {
                 ...(data.name ? { name: data.name } : {}),
                 ...(data.logoUrl !== undefined ? { logoUrl: data.logoUrl } : {}),
+                ...(data.bannerUrl !== undefined ? { bannerUrl: data.bannerUrl } : {}),
+                ...(data.bio !== undefined ? { bio: data.bio } : {}),
                 ...(data.contactEmail !== undefined
                     ? { contactEmail: data.contactEmail }
                     : {}),
@@ -88,6 +92,8 @@ let SettingsService = class SettingsService {
                 name: true,
                 slug: true,
                 logoUrl: true,
+                bannerUrl: true,
+                bio: true,
                 contactEmail: true,
                 phone: true,
                 website: true,

@@ -28,6 +28,8 @@ export class SettingsController {
     body: {
       name?: string;
       logoUrl?: string;
+      bannerUrl?: string;
+      bio?: string;
       contactEmail?: string;
       phone?: string;
       website?: string;

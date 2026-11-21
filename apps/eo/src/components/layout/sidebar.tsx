@@ -86,6 +86,8 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
   const organizationLinks = [
     { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, resource: 'view_sales_revenue' },
     { href: '/dashboard/events', label: 'Daftar Event', icon: Calendar, resource: 'view_sales_revenue' },
+    { href: '/dashboard/feed', label: 'Kabar & Post', icon: Megaphone, resource: 'view_sales_revenue' },
+    { href: '/dashboard/followers', label: 'Pengikut (Followers)', icon: UserCheck, resource: 'view_sales_revenue' },
     { href: '/dashboard/settings/team', label: 'Staff (Team Access)', icon: Users, resource: 'manage_team_access' },
     { href: '/dashboard/vouchers', label: 'Voucher', icon: TicketPercent, resource: 'manage_promo_code' },
     { href: '/dashboard/cash', label: 'Cash (Kas Organisasi)', icon: Banknote, resource: 'view_sales_revenue' },

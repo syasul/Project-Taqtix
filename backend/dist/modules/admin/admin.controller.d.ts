@@ -95,6 +95,8 @@ export declare class AdminController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;
@@ -126,6 +128,8 @@ export declare class AdminController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;
@@ -157,6 +161,8 @@ export declare class AdminController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;
@@ -211,6 +217,8 @@ export declare class AdminController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;
@@ -242,6 +250,8 @@ export declare class AdminController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;
@@ -467,6 +477,7 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -475,7 +486,6 @@ export declare class AdminController {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;
@@ -498,6 +508,7 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -506,7 +517,6 @@ export declare class AdminController {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;
@@ -529,6 +539,7 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -537,7 +548,6 @@ export declare class AdminController {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;
@@ -576,6 +586,7 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -584,7 +595,6 @@ export declare class AdminController {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;
@@ -607,6 +617,7 @@ export declare class AdminController {
             createdAt: Date;
             updatedAt: Date;
             slug: string;
+            bannerUrl: string;
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
@@ -615,7 +626,6 @@ export declare class AdminController {
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
             requireLogin: boolean;
             hasSeatingLayout: boolean;
             seoTitle: string | null;

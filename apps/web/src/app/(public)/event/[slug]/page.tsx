@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import {
@@ -762,9 +763,12 @@ export default function EventDetailPage() {
                 {/* Penyelenggara */}
                 <div className="space-y-1.5">
                   <span className="text-xs font-medium text-slate-500 block">Penyelenggara</span>
-                  <div className="flex items-center gap-2.5">
+                  <Link
+                    href={`/eo/${event.organizer.slug || ''}`}
+                    className="inline-flex items-center gap-2.5 group hover:opacity-90 transition-opacity"
+                  >
                     {event.organizer.logoUrl ? (
-                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0 shadow-2xs">
+                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0 shadow-2xs group-hover:border-teal-400 transition-colors">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={event.organizer.logoUrl}
@@ -773,14 +777,19 @@ export default function EventDetailPage() {
                         />
                       </div>
                     ) : (
-                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs group-hover:bg-[#08ADAE] transition-colors">
                         {event.organizer.name.substring(0, 2).toUpperCase()}
                       </div>
                     )}
-                    <span className="font-bold text-slate-900 text-sm sm:text-base">
-                      {event.organizer.name}
-                    </span>
-                  </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900 text-sm sm:text-base group-hover:text-[#08ADAE] transition-colors">
+                        {event.organizer.name}
+                      </span>
+                      <span className="text-xs text-[#08ADAE] font-semibold bg-teal-50 px-2 py-0.5 rounded-full border border-teal-100 group-hover:bg-teal-100 transition-colors">
+                        Lihat Profil ↗
+                      </span>
+                    </div>
+                  </Link>
                 </div>
 
                 {/* Media Sosial */}

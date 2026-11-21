@@ -191,6 +191,7 @@ export declare class GateService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -199,7 +200,6 @@ export declare class GateService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         requireLogin: boolean;
         hasSeatingLayout: boolean;
         seoTitle: string | null;

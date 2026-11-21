@@ -15,6 +15,7 @@ export declare class EventsService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -23,7 +24,6 @@ export declare class EventsService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         requireLogin: boolean;
         hasSeatingLayout: boolean;
         seoTitle: string | null;
@@ -43,6 +43,7 @@ export declare class EventsService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -51,7 +52,6 @@ export declare class EventsService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         requireLogin: boolean;
         hasSeatingLayout: boolean;
         seoTitle: string | null;
@@ -71,6 +71,7 @@ export declare class EventsService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -79,7 +80,6 @@ export declare class EventsService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         requireLogin: boolean;
         hasSeatingLayout: boolean;
         seoTitle: string | null;
@@ -107,6 +107,7 @@ export declare class EventsService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -115,7 +116,6 @@ export declare class EventsService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         requireLogin: boolean;
         hasSeatingLayout: boolean;
         seoTitle: string | null;
@@ -219,6 +219,7 @@ export declare class EventsService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -227,7 +228,6 @@ export declare class EventsService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         hasSeatingLayout: boolean;
         seoTitle: string | null;
         seoDescription: string | null;
@@ -246,6 +246,7 @@ export declare class EventsService {
         createdAt: Date;
         updatedAt: Date;
         slug: string;
+        bannerUrl: string;
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
@@ -254,7 +255,6 @@ export declare class EventsService {
         isDateTba: boolean;
         startDate: Date;
         endDate: Date;
-        bannerUrl: string;
         requireLogin: boolean;
         hasSeatingLayout: boolean;
         seoTitle: string | null;

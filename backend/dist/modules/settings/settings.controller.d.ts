@@ -10,6 +10,8 @@ export declare class SettingsController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;
@@ -20,6 +22,8 @@ export declare class SettingsController {
     updateOrganization(userId: string, body: {
         name?: string;
         logoUrl?: string;
+        bannerUrl?: string;
+        bio?: string;
         contactEmail?: string;
         phone?: string;
         website?: string;
@@ -34,6 +38,8 @@ export declare class SettingsController {
             slug: string;
             phone: string | null;
             logoUrl: string | null;
+            bannerUrl: string | null;
+            bio: string | null;
             contactEmail: string | null;
             website: string | null;
             instagram: string | null;

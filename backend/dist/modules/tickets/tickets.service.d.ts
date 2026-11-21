@@ -264,11 +264,11 @@ export declare class TicketsService {
             title: string;
             id: string;
             slug: string;
+            bannerUrl: string;
             location: string;
             isDateTba: boolean;
             startDate: Date;
             endDate: Date;
-            bannerUrl: string;
         };
         orderItem: {
             ticketCategory: {

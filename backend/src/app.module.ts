@@ -35,6 +35,7 @@ import { SettlementsModule } from './modules/settlements/settlements.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { SystemSettingsModule } from './modules/system-settings/system-settings.module';
 import { BannersModule } from './modules/banners/banners.module';
+import { SeatsModule } from './modules/seats/seats.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -142,6 +143,7 @@ import { IdempotencyInterceptor } from './common/interceptors/idempotency.interc
     SettingsModule,
     SystemSettingsModule,
     BannersModule,
+    SeatsModule,
   ],
   controllers: [AppController],
   providers: [

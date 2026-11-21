@@ -97,6 +97,15 @@ export class CreateEventDto {
   requireLogin?: boolean;
 
   @ApiProperty({
+    example: false,
+    required: false,
+    description: 'Apakah event menggunakan denah dan pemilihan nomor kursi (Seating Layout)',
+  })
+  @IsBoolean()
+  @IsOptional()
+  hasSeatingLayout?: boolean;
+
+  @ApiProperty({
     example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi',
     required: false,
     description: 'Custom SEO Meta Title',

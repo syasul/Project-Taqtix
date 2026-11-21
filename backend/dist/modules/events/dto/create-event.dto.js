@@ -23,6 +23,7 @@ class CreateEventDto {
     endDate;
     bannerUrl;
     requireLogin;
+    hasSeatingLayout;
     seoTitle;
     seoDescription;
     seoKeywords;
@@ -124,6 +125,16 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateEventDto.prototype, "requireLogin", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: false,
+        required: false,
+        description: 'Apakah event menggunakan denah dan pemilihan nomor kursi (Seating Layout)',
+    }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateEventDto.prototype, "hasSeatingLayout", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'Konser Akbar Taqwa Movement 2026 - Tiket Resmi',

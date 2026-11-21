@@ -41,6 +41,7 @@ import {
   Music,
   ChevronDown,
   X,
+  Armchair,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
@@ -49,6 +50,13 @@ import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -331,6 +339,7 @@ interface EventDetail {
   endDate: string;
   isDateTba?: boolean;
   requireLogin?: boolean;
+  hasSeatingLayout?: boolean;
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
@@ -360,6 +369,16 @@ export default function EventDetailPage() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isSeatModalOpen, setIsSeatModalOpen] = useState(false);
+  const [selectedSeats, setSelectedSeats] = useState<
+    Array<{
+      id: string;
+      seatNumber: string;
+      categoryId: string;
+      categoryName: string;
+      price: number;
+    }>
+  >([]);
 
   // Tangkap affiliate partner code (?ref=... atau ?aff=...) jika di-share
   const affCode = searchParams?.get('ref') || searchParams?.get('aff') || '';
@@ -403,8 +422,48 @@ export default function EventDetailPage() {
     }
   }, [event?.id]);
 
+  // Fetch denah kursi publik jika event hasSeatingLayout
+  const { data: seatingResponse } = useQuery({
+    queryKey: ['public-seating', slug],
+    queryFn: async () => {
+      const res = await apiClient.get(`/events/${slug}/seating`);
+      return res.data?.data;
+    },
+    enabled: Boolean(event?.hasSeatingLayout),
+  });
+
+  const seatingData = seatingResponse || null;
+
   // State untuk menyimpan kuantitas tiket terpilih per kategori: { [categoryId]: qty }
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+
+  const handleToggleSeat = (seat: any, section: any) => {
+    const isSelected = selectedSeats.some((s) => s.id === seat.id);
+    let nextSeats;
+    if (isSelected) {
+      nextSeats = selectedSeats.filter((s) => s.id !== seat.id);
+    } else {
+      const cat = event?.ticketCategories.find((c) => c.id === seat.ticketCategoryId);
+      nextSeats = [
+        ...selectedSeats,
+        {
+          id: seat.id,
+          seatNumber: seat.seatNumber,
+          categoryId: seat.ticketCategoryId,
+          categoryName: cat?.name || section.name,
+          price: cat?.price || 0,
+        },
+      ];
+    }
+    setSelectedSeats(nextSeats);
+
+    // Sinkronkan quantities tiket otomatis dengan kursi yang dipilih
+    const newQty: Record<string, number> = {};
+    nextSeats.forEach((s) => {
+      newQty[s.categoryId] = (newQty[s.categoryId] || 0) + 1;
+    });
+    setQuantities(newQty);
+  };
 
   const handleQtyChange = (categoryId: string, delta: number, max: number) => {
     const current = quantities[categoryId] || 0;
@@ -484,7 +543,10 @@ export default function EventDetailPage() {
     }
 
     const serializedItems = selectedItems.map((item) => `${item.categoryId}:${item.qty}`).join(',');
-    const checkoutUrl = `/checkout?eventId=${event.id}&items=${serializedItems}`;
+    let checkoutUrl = `/checkout?eventId=${event.id}&items=${serializedItems}`;
+    if (selectedSeats.length > 0) {
+      checkoutUrl += `&seats=${encodeURIComponent(selectedSeats.map((s) => s.seatNumber).join(','))}`;
+    }
 
     if (event.requireLogin && !user) {
       toast.info('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.');
@@ -1418,6 +1480,62 @@ export default function EventDetailPage() {
                 </div>
               )}
 
+              {/* Feature: Seating Layout Indicator & Button */}
+              {event.hasSeatingLayout && (
+                <div className="p-3.5 rounded-2xl bg-teal-50/80 border border-[#08ADAE]/30 flex items-center justify-between gap-3 shadow-2xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-[#08ADAE] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <Armchair className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Pilih Nomor Kursi</p>
+                      <p className="text-[11px] text-teal-800">Tersedia denah panggung</p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => setIsSeatModalOpen(true)}
+                    className="bg-[#08ADAE] hover:bg-[#07999A] text-white text-xs font-bold rounded-xl h-8 px-3 shrink-0 cursor-pointer shadow-xs gap-1.5"
+                  >
+                    <span>Pilih Kursi</span>
+                    <Armchair className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Badges Kursi Terpilih */}
+              {selectedSeats.length > 0 && (
+                <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1">
+                      <Armchair className="w-3 h-3 text-[#08ADAE]" />
+                      <span>Nomor Kursi Dipilih ({selectedSeats.length})</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSeats([]);
+                        setQuantities({});
+                      }}
+                      className="text-[10px] text-rose-500 hover:underline cursor-pointer font-bold"
+                    >
+                      Batal Pilih Kursi
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedSeats.map((s) => (
+                      <span
+                        key={s.id}
+                        className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-[#08ADAE] text-white shadow-2xs"
+                      >
+                        {s.seatNumber}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {event.ticketCategories.length === 0 ? (
                 <p className="text-xs text-slate-400 text-center py-6">Kategori tiket belum tersedia.</p>
               ) : (
@@ -1697,6 +1815,167 @@ export default function EventDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Dialog Modal Denah & Pemilihan Kursi Interaktif Pembeli */}
+      {event?.hasSeatingLayout && (
+        <Dialog open={isSeatModalOpen} onOpenChange={setIsSeatModalOpen}>
+          <DialogContent className="max-w-2xl bg-slate-950 text-white rounded-3xl p-5 sm:p-7 shadow-2xl border border-slate-800 max-h-[92vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-base sm:text-lg font-bold text-white flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Armchair className="w-5 h-5 text-[#08ADAE]" />
+                  <span>Denah & Pemilihan Nomor Kursi</span>
+                </span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-400">
+                Pilih nomor kursi favorit Anda. Klik kursi untuk memilih atau membatalkan pilihan.
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Visual Panggung / Stage */}
+            <div className="py-2.5 px-6 rounded-2xl bg-gradient-to-r from-teal-500/20 via-[#08ADAE]/35 to-teal-500/20 border border-teal-500/40 text-center my-3 shadow-inner">
+              <span className="text-xs font-black uppercase tracking-[0.25em] text-teal-200">
+                🎭 PANGGUNG / STAGE ACARA
+              </span>
+            </div>
+
+            {/* Sections & Seats Grid */}
+            {!seatingData || !seatingData.sections || seatingData.sections.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 text-xs">
+                Denah kursi sedang dipersiapkan oleh pihak penyelenggara.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {seatingData.sections.map((section: any) => {
+                  // Group seats by row
+                  const rowMap: Record<string, any[]> = {};
+                  (section.seats || []).forEach((seat: any) => {
+                    if (!rowMap[seat.row]) rowMap[seat.row] = [];
+                    rowMap[seat.row].push(seat);
+                  });
+
+                  return (
+                    <div
+                      key={section.id}
+                      className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#08ADAE]" />
+                          <h4 className="text-xs sm:text-sm font-bold text-white">{section.name}</h4>
+                          {section.ticketCategory && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/30">
+                              {section.ticketCategory.name} •{' '}
+                              {section.ticketCategory.price.toLocaleString('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                              })}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Rows Grid */}
+                      <div className="overflow-x-auto py-2">
+                        <div className="flex flex-col items-center gap-2 min-w-max">
+                          {Object.keys(rowMap)
+                            .sort()
+                            .map((rowLabel) => {
+                              const seatsInRow = rowMap[rowLabel].sort((a, b) => a.col - b.col);
+
+                              return (
+                                <div key={rowLabel} className="flex items-center gap-2">
+                                  <span className="w-6 text-center text-[11px] font-bold font-mono text-slate-500">
+                                    {rowLabel}
+                                  </span>
+
+                                  <div className="flex items-center gap-1.5">
+                                    {seatsInRow.map((seat: any) => {
+                                      const isChosen = selectedSeats.some((s) => s.id === seat.id);
+                                      const isAvailable = seat.status === 'AVAILABLE';
+                                      const isBooked = seat.status === 'BOOKED';
+                                      const isLocked = seat.status === 'LOCKED';
+                                      const isDisabled = seat.status === 'DISABLED';
+
+                                      return (
+                                        <button
+                                          key={seat.id}
+                                          type="button"
+                                          disabled={!isAvailable && !isChosen}
+                                          onClick={() => handleToggleSeat(seat, section)}
+                                          title={`Kursi ${seat.seatNumber} (${isChosen ? 'Dipilih' : seat.status})`}
+                                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-[10px] font-mono font-bold flex items-center justify-center transition-all cursor-pointer select-none ${
+                                            isChosen
+                                              ? 'bg-[#08ADAE] text-white scale-110 shadow-md ring-2 ring-white/40'
+                                              : isBooked
+                                                ? 'bg-rose-950/40 text-rose-500/60 cursor-not-allowed border border-rose-900/30'
+                                                : isLocked
+                                                  ? 'bg-amber-950/40 text-amber-500/60 cursor-not-allowed border border-amber-900/30'
+                                                  : isDisabled
+                                                    ? 'invisible'
+                                                    : 'bg-white/10 hover:bg-[#08ADAE]/30 text-slate-200 border border-white/20 hover:scale-105 active:scale-95'
+                                          }`}
+                                        >
+                                          {isDisabled ? '' : seat.col}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+
+                                  <span className="w-6 text-center text-[11px] font-bold font-mono text-slate-500">
+                                    {rowLabel}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Legenda & Action Bar */}
+            <div className="pt-4 border-t border-slate-800 space-y-3">
+              <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-md bg-white/10 border border-white/20" />
+                  <span>Tersedia</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-md bg-[#08ADAE]" />
+                  <span>Kursi Dipilih</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-md bg-rose-950/40 border border-rose-900/30" />
+                  <span>Sudah Terjual</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Total Kursi Dipilih:</span>
+                  <span className="text-sm font-bold text-white font-mono">
+                    {selectedSeats.length > 0
+                      ? selectedSeats.map((s) => s.seatNumber).join(', ')
+                      : 'Belum ada kursi dipilih'}
+                  </span>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={() => setIsSeatModalOpen(false)}
+                  className="bg-[#08ADAE] hover:bg-[#07999A] text-white text-xs font-bold px-4 py-2 rounded-xl cursor-pointer"
+                >
+                  Selesai Memilih
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

@@ -477,6 +477,7 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            hasSeatingLayout: boolean;
             seoTitle: string | null;
             seoDescription: string | null;
             seoKeywords: string | null;
@@ -507,6 +508,7 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            hasSeatingLayout: boolean;
             seoTitle: string | null;
             seoDescription: string | null;
             seoKeywords: string | null;
@@ -537,6 +539,7 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            hasSeatingLayout: boolean;
             seoTitle: string | null;
             seoDescription: string | null;
             seoKeywords: string | null;
@@ -583,6 +586,7 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            hasSeatingLayout: boolean;
             seoTitle: string | null;
             seoDescription: string | null;
             seoKeywords: string | null;
@@ -613,6 +617,7 @@ export declare class AdminController {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            hasSeatingLayout: boolean;
             seoTitle: string | null;
             seoDescription: string | null;
             seoKeywords: string | null;

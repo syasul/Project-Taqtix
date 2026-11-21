@@ -73,6 +73,7 @@ let EventsService = class EventsService {
             startDate,
             endDate,
             requireLogin: dto.requireLogin ?? false,
+            hasSeatingLayout: dto.hasSeatingLayout ?? false,
             seoTitle: dto.seoTitle,
             seoDescription: dto.seoDescription,
             seoKeywords: dto.seoKeywords,
@@ -126,6 +127,8 @@ let EventsService = class EventsService {
             updateData.endDate = new Date(dto.endDate);
         if (dto.requireLogin !== undefined)
             updateData.requireLogin = dto.requireLogin;
+        if (dto.hasSeatingLayout !== undefined)
+            updateData.hasSeatingLayout = dto.hasSeatingLayout;
         if (dto.seoTitle !== undefined)
             updateData.seoTitle = dto.seoTitle;
         if (dto.seoDescription !== undefined)

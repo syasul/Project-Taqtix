@@ -42,6 +42,7 @@ export declare class ApiV1Controller {
             endDate: Date;
             bannerUrl: string;
             requireLogin: boolean;
+            hasSeatingLayout: boolean;
             seoTitle: string | null;
             seoDescription: string | null;
             seoKeywords: string | null;
@@ -91,6 +92,7 @@ export declare class ApiV1Controller {
                 internetFee: number;
                 facilities: import("@prisma/client/runtime/library").JsonValue | null;
                 attendeeName: string;
+                seatNumber: string | null;
                 orderId: string;
                 ticketCategoryId: string;
                 qty: number;

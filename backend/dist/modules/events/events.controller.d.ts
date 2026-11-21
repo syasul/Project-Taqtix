@@ -27,6 +27,7 @@ export declare class EventsController {
         endDate: Date;
         bannerUrl: string;
         requireLogin: boolean;
+        hasSeatingLayout: boolean;
         seoTitle: string | null;
         seoDescription: string | null;
         seoKeywords: string | null;
@@ -137,6 +138,7 @@ export declare class EventsController {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
+        hasSeatingLayout: boolean;
         seoTitle: string | null;
         seoDescription: string | null;
         seoKeywords: string | null;

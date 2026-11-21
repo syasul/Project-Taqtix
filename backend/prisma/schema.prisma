@@ -130,6 +130,7 @@ model Event {
   geofenceRadius      Float?
   allowTicketTransfer Boolean           @default(true)
   requireLogin        Boolean           @default(false)
+  hasSeatingLayout    Boolean           @default(false) // Toggle layout denah dan pemilihan nomor kursi
   isDateTba           Boolean           @default(false)
   internetFee         Float?            @default(0) // Default Internet Fee per tiket untuk event (Rp)
   
@@ -163,6 +164,7 @@ model Event {
   cashTransactions    CashTransaction[]
   posTransactions     PosTransaction[]
   settlements         Settlement[]
+  seatSections        SeatSection[]
 }
 
 /// Kategori/Tipe Tiket yang tersedia pada suatu event.
@@ -183,6 +185,8 @@ model TicketCategory {
 
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
+  seatSections SeatSection[]
+  seats       Seat[]
 }
 
 /// Model Order transaksi pembelian tiket.
@@ -225,11 +229,13 @@ model OrderItem {
   city               String?
   customFieldAnswers Json?          // Record<string, string>
   facilities         Json?          // { facilityId: string; qty: number; price: number }[]
+  seatNumber         String?        // Nomor kursi terpilih (misal: "VIP-A12")
   createdAt          DateTime       @default(now())
 
   order              Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
   ticketCategory     TicketCategory @relation(fields: [ticketCategoryId], references: [id])
   tickets            Ticket[]
+  seats              Seat[]
 }
 
 /// Lembaran tiket fisik digital (e-ticket) yang sah untuk check-in.
@@ -251,6 +257,8 @@ model Ticket {
   blockedReason      String?
   blockedBy          String?
   blockedAt          DateTime?
+  seatNumber         String?         // Nomor kursi tercetak di e-ticket
+  seat               Seat?
   transferCount      Int             @default(0) // Jumlah kali tiket ditransfer/resell (maks 1x)
   ownerId            String?         // User ID pemilik akun saat ini
   transferredAt      DateTime?       // Waktu terakhir kali tiket ditransfer
@@ -719,4 +727,51 @@ model SystemSetting {
   value       String   @db.Text
   description String?
   updatedAt   DateTime @updatedAt
+}
+
+enum SeatStatus {
+  AVAILABLE
+  LOCKED
+  BOOKED
+  DISABLED
+}
+
+/// Seksi / Blok denah tempat duduk acara (misal: VIP Depan, CAT 1 Sayap Kiri, Tribun).
+model SeatSection {
+  id               String          @id @default(uuid())
+  eventId          String
+  ticketCategoryId String?
+  name             String
+  stagePosition    String          @default("CENTER") // "TOP", "BOTTOM", "LEFT", "RIGHT", "CENTER"
+  order            Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  event            Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketCategory   TicketCategory? @relation(fields: [ticketCategoryId], references: [id], onDelete: SetNull)
+  seats            Seat[]
+}
+
+/// Kursi individual dalam suatu seksi denah acara.
+model Seat {
+  id               String          @id @default(uuid())
+  sectionId        String
+  ticketCategoryId String
+  row              String          // Label baris: "A", "B", "1", "2"
+  col              Int             // Nomor kolom urut: 1, 2, 3...
+  seatNumber       String          // Nomor kursi tampilan: "A-1", "B-12"
+  status           SeatStatus      @default(AVAILABLE)
+  lockedUntil      DateTime?       // Waktu expiry lock (concurrency lock 10 menit saat checkout)
+  lockedByOrderId  String?
+  orderItemId      String?
+  ticketId         String?         @unique
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  section          SeatSection     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  ticketCategory   TicketCategory  @relation(fields: [ticketCategoryId], references: [id], onDelete: Cascade)
+  orderItem        OrderItem?      @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  ticket           Ticket?         @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  @@unique([sectionId, seatNumber])
 }

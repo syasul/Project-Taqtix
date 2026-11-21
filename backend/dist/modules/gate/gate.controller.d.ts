@@ -26,6 +26,7 @@ export declare class GateController {
         endDate: Date;
         bannerUrl: string;
         requireLogin: boolean;
+        hasSeatingLayout: boolean;
         seoTitle: string | null;
         seoDescription: string | null;
         seoKeywords: string | null;

@@ -8,6 +8,7 @@ export declare class CreateEventDto {
     endDate?: string;
     bannerUrl?: string;
     requireLogin?: boolean;
+    hasSeatingLayout?: boolean;
     seoTitle?: string;
     seoDescription?: string;
     seoKeywords?: string;

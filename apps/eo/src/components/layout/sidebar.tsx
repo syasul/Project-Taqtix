@@ -37,6 +37,7 @@ import {
   Building2,
   CreditCard,
   SlidersHorizontal,
+  Armchair,
   LogOut,
   X,
 } from 'lucide-react';
@@ -135,6 +136,13 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
               label: 'Kategori Tiket',
               icon: Ticket,
               resource: 'manage_ticket_category',
+            },
+            {
+              href: `/dashboard/events/${eventId}/seating`,
+              label: 'Denah & Nomor Kursi',
+              icon: Armchair,
+              resource: 'manage_ticket_category',
+              badge: 'Layout',
             },
             {
               href: `/dashboard/events/${eventId}/facilities`,

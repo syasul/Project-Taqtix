@@ -52,6 +52,7 @@ const eventSchema = z
       )
       .or(z.literal('')),
     requireLogin: z.boolean().default(false),
+    hasSeatingLayout: z.boolean().default(false),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
     seoKeywords: z.string().optional(),
@@ -204,6 +205,7 @@ export default function CreateEventPage() {
       endDate: '',
       bannerUrl: DEFAULT_BANNER_URL,
       requireLogin: false,
+      hasSeatingLayout: false,
       seoTitle: '',
       seoDescription: '',
       seoKeywords: '',
@@ -237,6 +239,7 @@ export default function CreateEventPage() {
       ...values,
       capacity: typeof values.capacity === 'number' && values.capacity >= 0 ? values.capacity : undefined,
       requireLogin: allowGuestCheckoutFeature ? values.requireLogin : true,
+      hasSeatingLayout: Boolean(values.hasSeatingLayout),
       startDate: values.isDateTba || !values.startDate?.trim() ? undefined : values.startDate,
       endDate: values.isDateTba || !values.endDate?.trim() ? undefined : values.endDate,
       seoTitle: values.seoTitle?.trim() || undefined,
@@ -729,6 +732,49 @@ export default function CreateEventPage() {
                   )}
                 />
               )}
+
+              {/* Requirement: Toggle Denah & Pemilihan Nomor Kursi (Numbered Seating Layout) */}
+              <FormField
+                control={form.control}
+                name="hasSeatingLayout"
+                render={({ field }) => (
+                  <FormItem className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <FormLabel className="text-xs font-bold text-slate-900 flex items-center gap-2 cursor-pointer">
+                          <span>Aktifkan Denah & Nomor Kursi (Seating Layout)</span>
+                          {field.value && (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#08B4B5] border border-[#08B4B5]/30">
+                              Aktif
+                            </span>
+                          )}
+                        </FormLabel>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Aktifkan untuk event indoor, teater, bioskop, atau konser internasional di mana pembeli dapat memilih nomor kursi pada denah interaktif.
+                        </p>
+                      </div>
+                      <FormControl>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={field.value}
+                          onClick={() => field.onChange(!field.value)}
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            field.value ? 'bg-[#08B4B5]' : 'bg-slate-300'
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                              field.value ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </FormControl>
+                    </div>
+                  </FormItem>
+                )}
+              />
 
               {/* SEO & Double Engagement Section */}
               <SeoFormSection

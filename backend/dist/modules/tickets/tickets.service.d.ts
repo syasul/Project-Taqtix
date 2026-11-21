@@ -162,6 +162,7 @@ export declare class TicketsService {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        seatNumber: string | null;
         transferCount: number;
         ownerId: string | null;
         transferredAt: Date | null;
@@ -186,6 +187,7 @@ export declare class TicketsService {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        seatNumber: string | null;
         transferCount: number;
         ownerId: string | null;
         transferredAt: Date | null;
@@ -213,6 +215,7 @@ export declare class TicketsService {
             internetFee: number;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
             attendeeName: string;
+            seatNumber: string | null;
             orderId: string;
             ticketCategoryId: string;
             qty: number;
@@ -242,6 +245,7 @@ export declare class TicketsService {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        seatNumber: string | null;
         transferCount: number;
         ownerId: string | null;
         transferredAt: Date | null;
@@ -288,6 +292,7 @@ export declare class TicketsService {
             internetFee: number;
             facilities: import("@prisma/client/runtime/library").JsonValue | null;
             attendeeName: string;
+            seatNumber: string | null;
             orderId: string;
             ticketCategoryId: string;
             qty: number;
@@ -317,6 +322,7 @@ export declare class TicketsService {
         blockedReason: string | null;
         blockedBy: string | null;
         blockedAt: Date | null;
+        seatNumber: string | null;
         transferCount: number;
         ownerId: string | null;
         transferredAt: Date | null;

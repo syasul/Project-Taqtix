@@ -24,24 +24,24 @@ export declare class OrganizersService {
             youtube: string | null;
         };
         upcomingEvents: {
-            id: string;
-            title: string;
-            slug: string;
-            bannerUrl: string;
-            location: string;
-            startDate: Date;
-            endDate: Date;
-            lowestPrice: number;
+            id: any;
+            title: any;
+            slug: any;
+            bannerUrl: any;
+            location: any;
+            startDate: any;
+            endDate: any;
+            lowestPrice: any;
         }[];
         pastEvents: {
-            id: string;
-            title: string;
-            slug: string;
-            bannerUrl: string;
-            location: string;
-            startDate: Date;
-            endDate: Date;
-            lowestPrice: number;
+            id: any;
+            title: any;
+            slug: any;
+            bannerUrl: any;
+            location: any;
+            startDate: any;
+            endDate: any;
+            lowestPrice: any;
         }[];
         posts: ({
             event: {

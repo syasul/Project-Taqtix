@@ -328,14 +328,14 @@ export class SeatsService {
 
     // Pastikan semua kursi berstatus AVAILABLE atau terkunci oleh order yang sama
     const unavailableSeats = seats.filter(
-      (s) =>
+      (s: any) =>
         s.status === SeatStatus.BOOKED ||
         s.status === SeatStatus.DISABLED ||
         (s.status === SeatStatus.LOCKED && s.lockedByOrderId && s.lockedByOrderId !== orderId),
     );
 
     if (unavailableSeats.length > 0) {
-      const numbers = unavailableSeats.map((s) => s.seatNumber).join(', ');
+      const numbers = unavailableSeats.map((s: any) => s.seatNumber).join(', ');
       throw new BadRequestException(`Kursi ${numbers} sedang dipesan atau tidak tersedia.`);
     }
 

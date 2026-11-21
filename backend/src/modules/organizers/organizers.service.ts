@@ -101,8 +101,8 @@ export class OrganizersService {
     ]);
 
     const upcomingEvents = allEvents
-      .filter((e) => new Date(e.endDate) >= now)
-      .map((e) => ({
+      .filter((e: any) => new Date(e.endDate) >= now)
+      .map((e: any) => ({
         id: e.id,
         title: e.title,
         slug: e.slug,
@@ -114,9 +114,9 @@ export class OrganizersService {
       }));
 
     const pastEvents = allEvents
-      .filter((e) => new Date(e.endDate) < now)
+      .filter((e: any) => new Date(e.endDate) < now)
       .reverse()
-      .map((e) => ({
+      .map((e: any) => ({
         id: e.id,
         title: e.title,
         slug: e.slug,

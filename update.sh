@@ -13,8 +13,7 @@ rm -rf apps/web/.next
 rm -rf backend/dist
 
 echo "🗄️ [TAQtix] Sinkronisasi skema database Prisma..."
-pnpm --filter backend prisma:generate
-npx prisma db push --schema=backend/prisma/schema.prisma --skip-generate || true
+(cd backend && npx prisma generate && npx prisma db push --schema=prisma/schema.prisma)
 
 echo "📦 [TAQtix] Mem-build backend API..."
 pnpm --filter backend build

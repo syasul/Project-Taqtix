@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import {
@@ -26,6 +27,7 @@ import {
   TrendingUp,
   Save,
   Flame,
+  Settings,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -265,12 +267,22 @@ export default function EventsApprovalPage() {
           </p>
         </div>
 
-        {pendingCount > 0 && (
-          <div className="flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 border border-amber-200 rounded-full text-amber-800 text-xs font-bold animate-pulse self-start md:self-auto">
-            <Clock className="w-4 h-4 text-amber-600" />
-            <span>{pendingCount} Event Menunggu Approval</span>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+          <Link
+            href="/settings"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-white border border-slate-200 hover:border-[#08B4B5] hover:text-[#08B4B5] rounded-full text-slate-700 text-xs font-semibold shadow-xs transition"
+          >
+            <Settings className="w-3.5 h-3.5 text-slate-500" />
+            <span>Pengaturan Fitur EO</span>
+          </Link>
+
+          {pendingCount > 0 && (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 border border-amber-200 rounded-full text-amber-800 text-xs font-bold animate-pulse">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span>{pendingCount} Event Menunggu Approval</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Quick Summary Cards */}

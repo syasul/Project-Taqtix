@@ -14,6 +14,8 @@ const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 class UpdateOrganizerDto {
     name;
+    phone;
+    status;
     segment;
     plan;
     planExpiresAt;
@@ -32,7 +34,25 @@ __decorate([
 ], UpdateOrganizerDto.prototype, "name", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
-        example: 'ENTERPRISE',
+        example: '08123456789',
+        description: 'Nomor telepon/WhatsApp organizer',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizerDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'active',
+        description: 'Status akun organizer (active, pending, suspended)',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateOrganizerDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'EVENT_BUILDER',
         description: 'Segmentasi bisnis organizer',
     }),
     (0, class_validator_1.IsString)(),

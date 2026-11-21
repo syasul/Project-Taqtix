@@ -46,13 +46,16 @@ exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const settlements_service_1 = require("../settlements/settlements.service");
+const payments_service_1 = require("../payments/payments.service");
 const bcrypt = __importStar(require("bcrypt"));
 let AdminService = class AdminService {
     prisma;
     settlementsService;
-    constructor(prisma, settlementsService) {
+    paymentsService;
+    constructor(prisma, settlementsService, paymentsService) {
         this.prisma = prisma;
         this.settlementsService = settlementsService;
+        this.paymentsService = paymentsService;
     }
     async getOrganizers() {
         const orgs = await this.prisma.organizer.findMany({
@@ -173,14 +176,18 @@ let AdminService = class AdminService {
         return this.prisma.organizer.update({
             where: { id: organizerId },
             data: {
-                name: dto.name ?? organizer.name,
-                segment: dto.segment ?? organizer.segment,
-                plan: dto.plan ?? organizer.plan,
-                bankAccount: dto.bankAccount ?? organizer.bankAccount,
+                name: dto.name !== undefined ? dto.name : organizer.name,
+                phone: dto.phone !== undefined ? dto.phone : organizer.phone,
+                status: dto.status !== undefined ? dto.status : organizer.status,
+                segment: dto.segment !== undefined ? dto.segment : organizer.segment,
+                plan: dto.plan !== undefined ? dto.plan : organizer.plan,
+                bankAccount: dto.bankAccount !== undefined ? dto.bankAccount : organizer.bankAccount,
                 internetFee: dto.internetFee !== undefined
                     ? dto.internetFee
                     : organizer.internetFee,
-                planStartedAt: dto.plan ? new Date() : organizer.planStartedAt,
+                planStartedAt: dto.plan && dto.plan !== organizer.plan
+                    ? new Date()
+                    : organizer.planStartedAt,
                 planExpiresAt: dto.planExpiresAt
                     ? new Date(dto.planExpiresAt)
                     : organizer.planExpiresAt,
@@ -587,23 +594,34 @@ let AdminService = class AdminService {
             orderBy: { createdAt: 'desc' },
             take: 50,
         });
-        return orders.map((o) => ({
-            id: o.id,
-            eventId: o.eventId,
-            eventTitle: o.event.title,
-            organizerName: o.event.organizer.name,
-            buyerEmail: o.buyer.email,
-            status: o.status.toLowerCase(),
-            totalAmount: o.totalAmount,
-            promoCode: o.promoCodeId,
-            createdAt: o.createdAt.toISOString(),
-            items: o.orderItems.map((it) => ({
-                categoryName: it.ticketCategory.name,
-                qty: it.qty,
-                attendeeName: it.attendeeName,
-                attendeePhone: it.attendeePhone,
-            })),
-        }));
+        return orders.map((o) => {
+            const firstItem = o.orderItems[0];
+            return {
+                id: o.id,
+                eventId: o.eventId,
+                eventTitle: o.event?.title || 'Event',
+                organizerName: o.event?.organizer?.name || 'Organizer',
+                buyerName: firstItem?.attendeeName || 'Pembeli',
+                buyerEmail: o.buyer?.email || firstItem?.attendeeEmail || '-',
+                buyerPhone: firstItem?.attendeePhone || '-',
+                status: o.status.toLowerCase(),
+                totalAmount: Number(o.totalAmount) || 0,
+                discountAmount: Number(o.discountAmount) || 0,
+                promoCode: o.promoCodeId,
+                createdAt: o.createdAt.toISOString(),
+                expiredAt: o.expiredAt ? o.expiredAt.toISOString() : null,
+                items: o.orderItems.map((it) => ({
+                    id: it.id,
+                    name: it.ticketCategory?.name || 'Tiket',
+                    categoryName: it.ticketCategory?.name || 'Tiket',
+                    qty: Number(it.qty) || 1,
+                    price: Number(it.unitPrice ?? it.ticketCategory?.price ?? 0),
+                    unitPrice: Number(it.unitPrice ?? it.ticketCategory?.price ?? 0),
+                    attendeeName: it.attendeeName,
+                    attendeePhone: it.attendeePhone,
+                })),
+            };
+        });
     }
     async calculateSettlements() {
         return this.settlementsService.calculatePendingSettlements();
@@ -686,11 +704,51 @@ let AdminService = class AdminService {
             console.error('Gagal mencatat audit log:', err);
         }
     }
+    async syncOrderPayment(orderId) {
+        const order = await this.prisma.order.findUnique({
+            where: { id: orderId },
+            include: { payment: true },
+        });
+        if (!order) {
+            throw new common_1.NotFoundException('Pesanan tidak ditemukan');
+        }
+        const invoiceNumber = `TAQTIX-ORD-${order.id}`;
+        const result = await this.paymentsService.checkDokuOrderStatus(invoiceNumber);
+        const refreshed = await this.prisma.order.findUnique({
+            where: { id: orderId },
+            include: { payment: true },
+        });
+        return {
+            orderId,
+            status: refreshed?.status.toLowerCase(),
+            paymentStatus: refreshed?.payment?.status.toLowerCase(),
+            gatewayResult: result,
+        };
+    }
+    async markOrderPaid(orderId, adminId) {
+        const order = await this.prisma.order.findUnique({
+            where: { id: orderId },
+            include: { payment: true },
+        });
+        if (!order) {
+            throw new common_1.NotFoundException('Pesanan tidak ditemukan');
+        }
+        if (order.status === 'PAID') {
+            return { success: true, message: 'Pesanan sudah berstatus LUNAS' };
+        }
+        await this.paymentsService.processPaymentSuccess(order.id, `MANUAL_ADMIN_${adminId || 'SUPERADMIN'}_${Date.now()}`, new Date());
+        await this.recordAuditLog(adminId || 'admin', 'manual_mark_order_paid', orderId, 'order', { orderId, previousStatus: order.status });
+        return {
+            success: true,
+            message: 'Pesanan berhasil diverifikasi dan ditandai LUNAS secara manual',
+        };
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        settlements_service_1.SettlementsService])
+        settlements_service_1.SettlementsService,
+        payments_service_1.PaymentsService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

@@ -21,20 +21,23 @@ const bull_1 = require("@nestjs/bull");
 const bullmq_1 = require("bullmq");
 const doku_service_1 = require("../payments/doku/doku.service");
 const config_1 = require("@nestjs/config");
+const system_settings_service_1 = require("../system-settings/system-settings.service");
 let OrdersService = OrdersService_1 = class OrdersService {
     prisma;
     orderExpirationQueue;
     checkoutQueue;
     dokuService;
     configService;
+    systemSettingsService;
     logger = new common_1.Logger(OrdersService_1.name);
     idempotencyStore = new Map();
-    constructor(prisma, orderExpirationQueue, checkoutQueue, dokuService, configService) {
+    constructor(prisma, orderExpirationQueue, checkoutQueue, dokuService, configService, systemSettingsService) {
         this.prisma = prisma;
         this.orderExpirationQueue = orderExpirationQueue;
         this.checkoutQueue = checkoutQueue;
         this.dokuService = dokuService;
         this.configService = configService;
+        this.systemSettingsService = systemSettingsService;
     }
     async create(dto, authenticatedUserId, idempotencyKey) {
         if (idempotencyKey) {
@@ -53,7 +56,11 @@ let OrdersService = OrdersService_1 = class OrdersService {
         if (!event) {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
-        if (event.requireLogin && !authenticatedUserId) {
+        const isGuestCheckoutFeatureEnabled = this.systemSettingsService
+            ? await this.systemSettingsService.isGuestCheckoutFeatureEnabled()
+            : true;
+        const isLoginRequired = !isGuestCheckoutFeatureEnabled || Boolean(event.requireLogin);
+        if (isLoginRequired && !authenticatedUserId) {
             throw new common_1.UnauthorizedException('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu sebelum memesan tiket.');
         }
         if (event.customFormFields && event.customFormFields.length > 0) {
@@ -592,7 +599,11 @@ let OrdersService = OrdersService_1 = class OrdersService {
         if (!event) {
             throw new common_1.NotFoundException('Event tidak ditemukan');
         }
-        if (event.requireLogin && !authenticatedUserId) {
+        const isGuestCheckoutFeatureEnabled = this.systemSettingsService
+            ? await this.systemSettingsService.isGuestCheckoutFeatureEnabled()
+            : true;
+        const isLoginRequired = !isGuestCheckoutFeatureEnabled || Boolean(event.requireLogin);
+        if (isLoginRequired && !authenticatedUserId) {
             throw new common_1.UnauthorizedException('Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.');
         }
         const queueId = `q_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -682,10 +693,12 @@ exports.OrdersService = OrdersService = OrdersService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, bull_1.InjectQueue)('order-expiration')),
     __param(2, (0, bull_1.InjectQueue)('order-checkout-queue')),
+    __param(5, (0, common_1.Optional)()),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         bullmq_1.Queue,
         bullmq_1.Queue,
         doku_service_1.DokuService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        system_settings_service_1.SystemSettingsService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

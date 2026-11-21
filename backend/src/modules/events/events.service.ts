@@ -2,15 +2,20 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventStatus, Prisma } from '@prisma/client';
+import { SystemSettingsService } from '../system-settings/system-settings.service';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Optional() private readonly systemSettingsService?: SystemSettingsService,
+  ) {}
 
   /**
    * Helper untuk mencari profil Organizer berdasarkan User ID.
@@ -264,8 +269,16 @@ export class EventsService {
       );
     }
 
+    const isGuestCheckoutFeatureEnabled = this.systemSettingsService
+      ? await this.systemSettingsService.isGuestCheckoutFeatureEnabled()
+      : true;
+    const effectiveRequireLogin = isGuestCheckoutFeatureEnabled
+      ? Boolean(event.requireLogin)
+      : true;
+
     return {
       ...event,
+      requireLogin: effectiveRequireLogin,
       customFields: event.customFormFields,
     };
   }

@@ -8,15 +8,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
+const system_settings_service_1 = require("../system-settings/system-settings.service");
 let EventsService = class EventsService {
     prisma;
-    constructor(prisma) {
+    systemSettingsService;
+    constructor(prisma, systemSettingsService) {
         this.prisma = prisma;
+        this.systemSettingsService = systemSettingsService;
     }
     async getOrganizerOrThrow(userId) {
         const member = await this.prisma.organizerMember.findFirst({
@@ -228,8 +234,15 @@ let EventsService = class EventsService {
         if (!event || event.status !== client_1.EventStatus.PUBLISHED) {
             throw new common_1.NotFoundException('Event tidak ditemukan atau belum dipublikasikan');
         }
+        const isGuestCheckoutFeatureEnabled = this.systemSettingsService
+            ? await this.systemSettingsService.isGuestCheckoutFeatureEnabled()
+            : true;
+        const effectiveRequireLogin = isGuestCheckoutFeatureEnabled
+            ? Boolean(event.requireLogin)
+            : true;
         return {
             ...event,
+            requireLogin: effectiveRequireLogin,
             customFields: event.customFormFields,
         };
     }
@@ -248,6 +261,8 @@ let EventsService = class EventsService {
 exports.EventsService = EventsService;
 exports.EventsService = EventsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(1, (0, common_1.Optional)()),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        system_settings_service_1.SystemSettingsService])
 ], EventsService);
 //# sourceMappingURL=events.service.js.map

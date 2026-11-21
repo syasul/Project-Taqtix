@@ -626,18 +626,46 @@ export declare class AdminController {
             eventId: string;
             eventTitle: string;
             organizerName: string;
+            buyerName: string;
             buyerEmail: string;
+            buyerPhone: string;
             status: string;
             totalAmount: number;
+            discountAmount: number;
             promoCode: string | null;
             createdAt: string;
+            expiredAt: string | null;
             items: {
+                id: string;
+                name: string;
                 categoryName: string;
                 qty: number;
+                price: number;
+                unitPrice: number;
                 attendeeName: string;
                 attendeePhone: string;
             }[];
         }[];
+    }>;
+    syncOrderPayment(id: string): Promise<{
+        success: boolean;
+        data: {
+            orderId: string;
+            status: string | undefined;
+            paymentStatus: string | undefined;
+            gatewayResult: import("../payments/doku/doku.service").DokuCheckStatusResult | {
+                success: boolean;
+                transactionStatus: string;
+                data: any;
+            };
+        };
+    }>;
+    markOrderPaid(id: string, adminId: string): Promise<{
+        success: boolean;
+        data: {
+            success: boolean;
+            message: string;
+        };
     }>;
     getSettlements(): Promise<{
         success: boolean;
@@ -702,12 +730,12 @@ export declare class AdminController {
         success: boolean;
         data: {
             id: string;
-            timestamp: Date;
-            action: string;
             adminId: string;
+            action: string;
             targetId: string;
             targetType: string;
             details: import("@prisma/client/runtime/library").JsonValue | null;
+            timestamp: Date;
         }[];
     }>;
 }

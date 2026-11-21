@@ -32,7 +32,13 @@ let PaymentsController = class PaymentsController {
         return this.paymentsService.handleWebhook(body, provider, headers, rawBody, requestPath);
     }
     async getPaymentStatus(orderId) {
-        return this.paymentsService.getPaymentStatus(orderId);
+        const result = await this.paymentsService.getPaymentStatus(orderId);
+        return {
+            success: true,
+            data: result,
+            status: result.status,
+            expiredAt: result.expiredAt,
+        };
     }
     async checkGatewayStatus(invoiceNumber) {
         return this.paymentsService.checkDokuOrderStatus(invoiceNumber);

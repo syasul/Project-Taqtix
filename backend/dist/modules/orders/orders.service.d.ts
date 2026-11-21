@@ -3,15 +3,17 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { Queue } from 'bullmq';
 import { DokuService } from '../payments/doku/doku.service';
 import { ConfigService } from '@nestjs/config';
+import { SystemSettingsService } from '../system-settings/system-settings.service';
 export declare class OrdersService {
     private prisma;
     private orderExpirationQueue;
     private checkoutQueue;
     private readonly dokuService;
     private readonly configService;
+    private readonly systemSettingsService?;
     private readonly logger;
     private idempotencyStore;
-    constructor(prisma: PrismaService, orderExpirationQueue: Queue, checkoutQueue: Queue, dokuService: DokuService, configService: ConfigService);
+    constructor(prisma: PrismaService, orderExpirationQueue: Queue, checkoutQueue: Queue, dokuService: DokuService, configService: ConfigService, systemSettingsService?: SystemSettingsService | undefined);
     create(dto: CreateOrderDto, authenticatedUserId?: string, idempotencyKey?: string): Promise<any>;
     private rollbackOrder;
     findOne(id: string): Promise<{

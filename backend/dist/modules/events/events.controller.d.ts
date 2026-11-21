@@ -37,6 +37,7 @@ export declare class EventsController {
         allowTicketTransfer: boolean;
     })[]>;
     getPublicEventBySlug(slug: string): Promise<{
+        requireLogin: boolean;
         customFields: {
             order: number;
             required: boolean;
@@ -134,7 +135,6 @@ export declare class EventsController {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
-        requireLogin: boolean;
         seoTitle: string | null;
         seoDescription: string | null;
         seoKeywords: string | null;

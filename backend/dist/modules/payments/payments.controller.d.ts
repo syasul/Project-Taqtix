@@ -19,6 +19,11 @@ export declare class PaymentsController {
         received: boolean;
     }>;
     getPaymentStatus(orderId: string): Promise<{
+        success: boolean;
+        data: {
+            status: string;
+            expiredAt: Date;
+        };
         status: string;
         expiredAt: Date;
     }>;

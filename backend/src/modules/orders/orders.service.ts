@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -14,6 +15,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bullmq';
 import { DokuService } from '../payments/doku/doku.service';
 import { ConfigService } from '@nestjs/config';
+import { SystemSettingsService } from '../system-settings/system-settings.service';
 
 @Injectable()
 export class OrdersService {
@@ -29,6 +31,7 @@ export class OrdersService {
     @InjectQueue('order-checkout-queue') private checkoutQueue: Queue,
     private readonly dokuService: DokuService,
     private readonly configService: ConfigService,
+    @Optional() private readonly systemSettingsService?: SystemSettingsService,
   ) {}
 
   /**
@@ -58,8 +61,14 @@ export class OrdersService {
       throw new NotFoundException('Event tidak ditemukan');
     }
 
-    // Jika event mewajibkan login, pastikan pemesan sudah terotentikasi
-    if (event.requireLogin && !authenticatedUserId) {
+    // Jika fitur guest checkout dinonaktifkan di Core Admin, atau event mewajibkan login, pastikan pemesan sudah terotentikasi
+    const isGuestCheckoutFeatureEnabled = this.systemSettingsService
+      ? await this.systemSettingsService.isGuestCheckoutFeatureEnabled()
+      : true;
+    const isLoginRequired =
+      !isGuestCheckoutFeatureEnabled || Boolean(event.requireLogin);
+
+    if (isLoginRequired && !authenticatedUserId) {
       throw new UnauthorizedException(
         'Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu sebelum memesan tiket.',
       );
@@ -796,7 +805,13 @@ export class OrdersService {
       throw new NotFoundException('Event tidak ditemukan');
     }
 
-    if (event.requireLogin && !authenticatedUserId) {
+    const isGuestCheckoutFeatureEnabled = this.systemSettingsService
+      ? await this.systemSettingsService.isGuestCheckoutFeatureEnabled()
+      : true;
+    const isLoginRequired =
+      !isGuestCheckoutFeatureEnabled || Boolean(event.requireLogin);
+
+    if (isLoginRequired && !authenticatedUserId) {
       throw new UnauthorizedException(
         'Event ini mewajibkan Anda untuk masuk (login) akun TAQtix terlebih dahulu.',
       );

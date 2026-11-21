@@ -42,6 +42,7 @@ const exports_module_1 = require("./modules/exports/exports.module");
 const upload_module_1 = require("./modules/upload/upload.module");
 const settlements_module_1 = require("./modules/settlements/settlements.module");
 const settings_module_1 = require("./modules/settings/settings.module");
+const system_settings_module_1 = require("./modules/system-settings/system-settings.module");
 const banners_module_1 = require("./modules/banners/banners.module");
 const throttler_1 = require("@nestjs/throttler");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
@@ -85,26 +86,32 @@ exports.AppModule = AppModule = __decorate([
                         process.env.REDIS_URL ||
                         'redis://localhost:6379';
                     const explicitPassword = config.get('REDIS_PASSWORD') ||
-                        process.env.REDIS_PASSWORD ||
-                        undefined;
+                        process.env.REDIS_PASSWORD;
                     try {
                         const parsed = new URL(redisUrl);
-                        const password = parsed.password || explicitPassword || undefined;
+                        const password = (parsed.password && parsed.password.trim()) ||
+                            (explicitPassword && explicitPassword.trim()) ||
+                            undefined;
                         return {
                             redis: {
                                 host: parsed.hostname || 'localhost',
                                 port: parseInt(parsed.port || '6379', 10),
-                                username: parsed.username || undefined,
+                                username: (parsed.username && parsed.username.trim()) || undefined,
                                 password,
+                                maxRetriesPerRequest: null,
+                                enableReadyCheck: false,
                             },
                         };
                     }
                     catch {
+                        const password = (explicitPassword && explicitPassword.trim()) || undefined;
                         return {
                             redis: {
                                 host: 'localhost',
                                 port: 6379,
-                                password: explicitPassword,
+                                password,
+                                maxRetriesPerRequest: null,
+                                enableReadyCheck: false,
                             },
                         };
                     }
@@ -138,6 +145,7 @@ exports.AppModule = AppModule = __decorate([
             upload_module_1.UploadModule,
             settlements_module_1.SettlementsModule,
             settings_module_1.SettingsModule,
+            system_settings_module_1.SystemSettingsModule,
             banners_module_1.BannersModule,
         ],
         controllers: [app_controller_1.AppController],

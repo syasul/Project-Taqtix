@@ -711,3 +711,11 @@ model Banner {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// Pengaturan sistem dan fitur global platform TAQtix
+model SystemSetting {
+  key         String   @id
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+}

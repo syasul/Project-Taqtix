@@ -12,6 +12,7 @@ import {
   HeartHandshake,
   TicketPercent,
   Image as ImageIcon,
+  Settings,
 } from 'lucide-react';
 
 export default function SidebarNav({ onItemClick }: { onItemClick?: () => void }) {
@@ -29,6 +30,7 @@ export default function SidebarNav({ onItemClick }: { onItemClick?: () => void }
     { label: 'Billing Control', href: '/billing', icon: DollarSign },
     { label: 'Leads Pipeline', href: '/leads', icon: Users },
     { label: 'Audit Log', href: '/audit-log', icon: History },
+    { label: 'Pengaturan Sistem', href: '/settings', icon: Settings },
   ];
 
   return (

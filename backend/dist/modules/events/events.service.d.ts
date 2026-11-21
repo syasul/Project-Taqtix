@@ -2,9 +2,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Prisma } from '@prisma/client';
+import { SystemSettingsService } from '../system-settings/system-settings.service';
 export declare class EventsService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private readonly systemSettingsService?;
+    constructor(prisma: PrismaService, systemSettingsService?: SystemSettingsService | undefined);
     private getOrganizerOrThrow;
     create(dto: CreateEventDto, userId: string): Promise<{
         description: string | null;
@@ -119,6 +121,7 @@ export declare class EventsService {
         allowTicketTransfer: boolean;
     })[]>;
     findOnePublicBySlug(slugOrId: string): Promise<{
+        requireLogin: boolean;
         customFields: {
             order: number;
             required: boolean;
@@ -216,7 +219,6 @@ export declare class EventsService {
         startDate: Date;
         endDate: Date;
         bannerUrl: string;
-        requireLogin: boolean;
         seoTitle: string | null;
         seoDescription: string | null;
         seoKeywords: string | null;

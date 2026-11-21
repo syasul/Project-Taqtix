@@ -3,6 +3,7 @@ export declare class TicketCategoryFeeItemDto {
     internetFee: number;
 }
 export declare class UpdateEventFeeDto {
+    id?: string;
     internetFee: number;
     applyToAllCategories?: boolean;
     categories?: TicketCategoryFeeItemDto[];

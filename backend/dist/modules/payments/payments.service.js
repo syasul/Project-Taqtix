@@ -498,24 +498,29 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
                 const attendeePhone = ticket.orderItem.attendeePhone;
                 const attendeeName = ticket.attendeeName || ticket.orderItem.attendeeName;
                 const attendeeEmail = ticket.orderItem.attendeeEmail;
-                if (attendeePhone) {
-                    await this.notificationsQueue.add('send-ticket-whatsapp', {
+                try {
+                    if (attendeePhone) {
+                        await this.notificationsQueue.add('send-ticket-whatsapp', {
+                            ticketId: ticket.id,
+                            phone: attendeePhone,
+                            buyerName: attendeeName,
+                            eventTitle: order.event.title,
+                            ticketCategory: ticket.orderItem.ticketCategory.name,
+                            qrUrl,
+                        });
+                    }
+                    await this.notificationsQueue.add('send-ticket-email', {
                         ticketId: ticket.id,
-                        phone: attendeePhone,
+                        email: attendeeEmail,
                         buyerName: attendeeName,
                         eventTitle: order.event.title,
                         ticketCategory: ticket.orderItem.ticketCategory.name,
                         qrUrl,
                     });
                 }
-                await this.notificationsQueue.add('send-ticket-email', {
-                    ticketId: ticket.id,
-                    email: attendeeEmail,
-                    buyerName: attendeeName,
-                    eventTitle: order.event.title,
-                    ticketCategory: ticket.orderItem.ticketCategory.name,
-                    qrUrl,
-                });
+                catch (queueErr) {
+                    this.logger.warn(`[BullMQ] Gagal menambahkan job notifikasi tiket ke antrean Redis (${queueErr.message}). Tiket tetap aman diterbitkan.`);
+                }
             }
         });
     }
@@ -612,7 +617,16 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
         });
     }
     async checkDokuOrderStatus(invoiceNumber) {
-        const checkResult = await this.dokuService.checkStatus(invoiceNumber);
+        const dokuInvoice = invoiceNumber.startsWith('TAQTIX-ORD-')
+            ? invoiceNumber
+            : `TAQTIX-ORD-${invoiceNumber}`;
+        let checkResult = await this.dokuService.checkStatus(dokuInvoice);
+        if (!checkResult.success && invoiceNumber !== dokuInvoice) {
+            const rawResult = await this.dokuService.checkStatus(invoiceNumber);
+            if (rawResult.success) {
+                checkResult = rawResult;
+            }
+        }
         if (!checkResult.success) {
             return checkResult;
         }
@@ -627,15 +641,20 @@ let PaymentsService = PaymentsService_1 = class PaymentsService {
                 OR: [
                     { id: cleanOrderId },
                     { id: invoiceNumber },
+                    { id: dokuInvoice },
                     { payment: { externalId: invoiceNumber } },
+                    { payment: { externalId: dokuInvoice } },
                 ],
             },
         });
-        if (order && order.status === client_1.OrderStatus.PENDING) {
+        if (order &&
+            (order.status === client_1.OrderStatus.PENDING ||
+                order.status === client_1.OrderStatus.EXPIRED)) {
             if (transactionStatus === 'SUCCESS') {
                 await this.processPaymentSuccess(order.id, transactionId, transactionDateStr ? new Date(transactionDateStr) : new Date());
             }
-            else if (transactionStatus === 'EXPIRED') {
+            else if (transactionStatus === 'EXPIRED' &&
+                order.status === client_1.OrderStatus.PENDING) {
                 await this.processPaymentExpired(order.id);
             }
         }

@@ -558,6 +558,8 @@ let mockAuditLogs = [
   },
 ];
 
+let mockGuestCheckoutEnabled = true;
+
 function handleMockRequest(method: string, path: string, body?: any): ApiResponse {
   const url = path.split('?')[0]; // strip query parameters
 
@@ -1126,6 +1128,40 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
   // AUDIT LOGS
   if (url === '/admin/audit-log') {
     return { success: true, data: mockAuditLogs };
+  }
+
+  // SYSTEM SETTINGS & GUEST CHECKOUT
+  if (url === '/admin/settings/guest-checkout' || url === '/admin/settings' || url === '/system/features') {
+    if (method === 'GET') {
+      return {
+        success: true,
+        data: {
+          enabled: mockGuestCheckoutEnabled,
+          allowGuestCheckoutFeature: mockGuestCheckoutEnabled,
+        },
+      };
+    }
+    if (method === 'PATCH' || method === 'POST') {
+      if (body?.enabled !== undefined) {
+        mockGuestCheckoutEnabled = Boolean(body.enabled);
+      } else if (body?.allowGuestCheckoutFeature !== undefined) {
+        mockGuestCheckoutEnabled = Boolean(body.allowGuestCheckoutFeature);
+      }
+      mockAuditLogs.unshift({
+        id: `log-${Date.now()}`,
+        adminEmail: 'admin@taqtix.id',
+        action: 'UPDATE_GUEST_CHECKOUT_FEATURE',
+        target: `Feature Guest Checkout: ${mockGuestCheckoutEnabled ? 'AKTIF' : 'NONAKTIF'}`,
+        timestamp: new Date().toISOString(),
+      });
+      return {
+        success: true,
+        data: {
+          enabled: mockGuestCheckoutEnabled,
+          allowGuestCheckoutFeature: mockGuestCheckoutEnabled,
+        },
+      };
+    }
   }
 
   throw new ApiError('Not found', 'NOT_FOUND', 404);

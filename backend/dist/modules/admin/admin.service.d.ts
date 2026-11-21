@@ -1,11 +1,13 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { SettlementsService } from '../settlements/settlements.service';
+import { PaymentsService } from '../payments/payments.service';
 import { UpdateEventFeeDto } from './dto/update-event-fee.dto';
 import { UpdateOrganizerDto } from './dto/update-organizer.dto';
 export declare class AdminService {
     private readonly prisma;
     private readonly settlementsService;
-    constructor(prisma: PrismaService, settlementsService: SettlementsService);
+    private readonly paymentsService;
+    constructor(prisma: PrismaService, settlementsService: SettlementsService, paymentsService: PaymentsService);
     getOrganizers(): Promise<{
         id: string;
         name: string;
@@ -491,14 +493,22 @@ export declare class AdminService {
         eventId: string;
         eventTitle: string;
         organizerName: string;
+        buyerName: string;
         buyerEmail: string;
+        buyerPhone: string;
         status: string;
         totalAmount: number;
+        discountAmount: number;
         promoCode: string | null;
         createdAt: string;
+        expiredAt: string | null;
         items: {
+            id: string;
+            name: string;
             categoryName: string;
             qty: number;
+            price: number;
+            unitPrice: number;
             attendeeName: string;
             attendeePhone: string;
         }[];
@@ -555,12 +565,12 @@ export declare class AdminService {
     }>;
     getAuditLogs(): Promise<{
         id: string;
-        timestamp: Date;
-        action: string;
         adminId: string;
+        action: string;
         targetId: string;
         targetType: string;
         details: import("@prisma/client/runtime/library").JsonValue | null;
+        timestamp: Date;
     }[]>;
     updateEventInternetFee(eventId: string, dto: UpdateEventFeeDto, adminId?: string): Promise<({
         ticketCategories: {
@@ -632,11 +642,25 @@ export declare class AdminService {
     }>;
     recordAuditLog(adminId: string, action: string, targetId: string, targetType: string, details?: any): Promise<{
         id: string;
-        timestamp: Date;
-        action: string;
         adminId: string;
+        action: string;
         targetId: string;
         targetType: string;
         details: import("@prisma/client/runtime/library").JsonValue | null;
+        timestamp: Date;
     } | undefined>;
+    syncOrderPayment(orderId: string): Promise<{
+        orderId: string;
+        status: string | undefined;
+        paymentStatus: string | undefined;
+        gatewayResult: import("../payments/doku/doku.service").DokuCheckStatusResult | {
+            success: boolean;
+            transactionStatus: string;
+            data: any;
+        };
+    }>;
+    markOrderPaid(orderId: string, adminId?: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

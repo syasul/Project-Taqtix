@@ -30,11 +30,18 @@ __decorate([
     __metadata("design:type", Number)
 ], TicketCategoryFeeItemDto.prototype, "internetFee", void 0);
 class UpdateEventFeeDto {
+    id;
     internetFee;
     applyToAllCategories;
     categories;
 }
 exports.UpdateEventFeeDto = UpdateEventFeeDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'ID Event' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateEventFeeDto.prototype, "id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Default Internet Fee per tiket untuk event ini (Rp)' }),
     (0, class_validator_1.IsNumber)(),

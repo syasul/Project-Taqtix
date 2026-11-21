@@ -136,6 +136,14 @@ let AdminController = class AdminController {
         const result = await this.adminService.searchOrders(q);
         return { success: true, data: result };
     }
+    async syncOrderPayment(id) {
+        const result = await this.adminService.syncOrderPayment(id);
+        return { success: true, data: result };
+    }
+    async markOrderPaid(id, adminId) {
+        const result = await this.adminService.markOrderPaid(id, adminId);
+        return { success: true, data: result };
+    }
     async getSettlements() {
         const result = await this.adminService.getSettlements();
         return { success: true, data: result };
@@ -450,6 +458,31 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "searchOrders", null);
+__decorate([
+    (0, common_1.Post)('admin/orders/:id/sync-payment'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Sinkronisasi status pembayaran pesanan langsung ke gateway DOKU (Admin Only)',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "syncOrderPayment", null);
+__decorate([
+    (0, common_1.Post)('admin/orders/:id/mark-paid'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Menandai pesanan sebagai LUNAS secara manual (Admin Only)',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "markOrderPaid", null);
 __decorate([
     (0, common_1.Get)('admin/settlements'),
     (0, roles_decorator_1.Roles)('admin'),

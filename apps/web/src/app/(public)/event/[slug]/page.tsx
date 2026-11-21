@@ -1461,7 +1461,7 @@ export default function EventDetailPage() {
                         {!isSoldOut && (
                           <div className="flex justify-between items-center pt-1 border-t border-slate-100">
                             <span className="text-[10px] text-slate-400 font-medium">
-                              Maks. {category.maxPerOrder} tiket
+                              Maks. {category.maxPerOrder} tiket per transaksi
                             </span>
                             <div className="flex items-center space-x-2.5">
                               <button

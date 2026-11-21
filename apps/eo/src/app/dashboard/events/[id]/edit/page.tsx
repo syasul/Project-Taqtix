@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Calendar, Send, ShieldAlert, Edit3, Upload, ClipboardList, ArrowRight, Ticket, CheckCircle2, Image as ImageIcon, Trash2, RefreshCw, AlertTriangle, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Calendar, Send, ShieldAlert, Edit3, Upload, ClipboardList, ArrowRight, Ticket, CheckCircle2, Image as ImageIcon, Trash2, RefreshCw, AlertTriangle, Sparkles, X, Users } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +41,7 @@ const eventSchema = z
     title: z.string().min(5, { message: 'Judul event minimal 5 karakter' }),
     description: z.string().min(10, { message: 'Deskripsi minimal 10 karakter' }),
     location: z.string().min(5, { message: 'Lokasi minimal 5 karakter' }),
+    capacity: z.number().min(0, { message: 'Kapasitas tidak boleh kurang dari 0' }).optional().nullable(),
     isDateTba: z.boolean().default(false),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
@@ -93,6 +94,7 @@ interface Event {
   description: string;
   bannerUrl: string;
   location: string;
+  capacity?: number;
   isDateTba?: boolean;
   startDate: string;
   endDate: string;
@@ -231,6 +233,7 @@ export default function EditEventPage() {
       title: '',
       description: '',
       location: '',
+      capacity: undefined,
       isDateTba: false,
       startDate: '',
       endDate: '',
@@ -280,6 +283,7 @@ export default function EditEventPage() {
           title: found.title,
           description: found.description || '',
           location: found.location,
+          capacity: typeof found.capacity === 'number' ? found.capacity : undefined,
           isDateTba: Boolean(found.isDateTba),
           startDate: toLocalString(found.startDate),
           endDate: toLocalString(found.endDate),
@@ -335,6 +339,7 @@ export default function EditEventPage() {
   const onSubmit = (values: EventFormValues) => {
     const payload = {
       ...values,
+      capacity: typeof values.capacity === 'number' && values.capacity >= 0 ? values.capacity : undefined,
       requireLogin: allowGuestCheckoutFeature ? values.requireLogin : true,
       startDate: values.isDateTba || !values.startDate?.trim() ? undefined : values.startDate,
       endDate: values.isDateTba || !values.endDate?.trim() ? undefined : values.endDate,
@@ -532,6 +537,37 @@ export default function EditEventPage() {
                         }}
                       />
                     </FormControl>
+                    <FormMessage className="text-rose-500 text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Requirement: Setting Kapasitas Penonton / Kuota Event */}
+              <FormField
+                control={form.control}
+                name="capacity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#08B4B5]" />
+                      <span>Kapasitas / Estimasi Jumlah Penonton Acara (Opsional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="Contoh: 1500 (Orang / Penonton)"
+                        className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono"
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value === '' ? undefined : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(val as number) ? undefined : val);
+                        }}
+                      />
+                    </FormControl>
+                    <p className="text-[11px] text-slate-500">
+                      Batas maksimal atau estimasi total jumlah penonton untuk keseluruhan event ini. Memudahkan Anda mengukur dan membagi kuota tiket pada tiap tier kategori. (Catatan: Angka ini hanya untuk manajemen EO dan tidak ditampilkan ke pembeli).
+                    </p>
                     <FormMessage className="text-rose-500 text-xs" />
                   </FormItem>
                 )}

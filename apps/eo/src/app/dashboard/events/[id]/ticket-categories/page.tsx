@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Plus, Edit2, Loader2, Calendar, Ticket, Percent } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Loader2, Calendar, Ticket, Percent, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { apiClient } from '@/lib/api-client';
@@ -77,6 +77,10 @@ export default function TicketCategoriesPage() {
   });
 
   const categories: TicketCategory[] = categoriesResponse || [];
+  const totalAllocatedQuota = categories.reduce((sum, c) => sum + (c.quota || 0), 0);
+  const totalSold = categories.reduce((sum, c) => sum + (c.sold || 0), 0);
+  const totalRemaining = Math.max(0, totalAllocatedQuota - totalSold);
+  const eventCapacity = eventResponse?.capacity;
 
   // Form hooks untuk category baru
   const newForm = useForm<CategoryFormValues>({
@@ -257,6 +261,61 @@ export default function TicketCategoriesPage() {
         </Button>
       </div>
 
+      {/* Summary Stats Overview */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Users className="w-3.5 h-3.5 text-[#08B4B5]" />
+            <span className="text-[10px] uppercase font-bold tracking-wider">Kapasitas Acara</span>
+          </div>
+          <p className="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
+            {typeof eventCapacity === 'number' && eventCapacity > 0
+              ? `${eventCapacity.toLocaleString('id-ID')} Orang`
+              : 'Belum Diatur'}
+          </p>
+          <p className="text-[10px] text-slate-400">
+            {typeof eventCapacity === 'number' && eventCapacity > 0
+              ? `${totalAllocatedQuota} tiket dialokasikan`
+              : 'Atur di menu Detail Event'}
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Ticket className="w-3.5 h-3.5 text-teal-500" />
+            <span className="text-[10px] uppercase font-bold tracking-wider">Total Kuota Tiket</span>
+          </div>
+          <p className="text-sm sm:text-base font-extrabold text-[#08B4B5] font-mono">
+            {totalAllocatedQuota.toLocaleString('id-ID')} Tiket
+          </p>
+          <p className="text-[10px] text-slate-400">Akumulasi semua tier</p>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Ticket className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-[10px] uppercase font-bold tracking-wider">Tiket Terjual</span>
+          </div>
+          <p className="text-sm sm:text-base font-extrabold text-emerald-600 font-mono">
+            {totalSold.toLocaleString('id-ID')} Tiket
+          </p>
+          <p className="text-[10px] text-slate-400">
+            {totalAllocatedQuota > 0 ? `${((totalSold / totalAllocatedQuota) * 100).toFixed(0)}% terjual` : '0% terjual'}
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Ticket className="w-3.5 h-3.5 text-amber-500" />
+            <span className="text-[10px] uppercase font-bold tracking-wider">Sisa Tiket Tersedia</span>
+          </div>
+          <p className="text-sm sm:text-base font-extrabold text-slate-700 font-mono">
+            {totalRemaining.toLocaleString('id-ID')} Tiket
+          </p>
+          <p className="text-[10px] text-slate-400">Tersedia untuk dijual</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* List of categories */}
         <div className="lg:col-span-8 space-y-4">
@@ -400,15 +459,25 @@ export default function TicketCategoriesPage() {
                     name="quota"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kuota Kapasitas</FormLabel>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Jumlah Tiket (Kuota Tier) *
+                          </FormLabel>
+                          <span className="text-[10px] text-slate-400 font-normal">Internal EO</span>
+                        </div>
                         <FormControl>
                           <Input
                             type="number"
+                            min={1}
+                            placeholder="Contoh: 500"
                             className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
+                        <p className="text-[10px] text-slate-400">
+                          Jumlah kuota tiket untuk tier ini. Jumlah tidak ditampilkan ke pembeli (pembeli hanya melihat status Tersedia/Habis).
+                        </p>
                         <FormMessage className="text-rose-500 text-[10px]" />
                       </FormItem>
                     )}
@@ -550,15 +619,24 @@ export default function TicketCategoriesPage() {
                   name="quota"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">Kuota</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          Jumlah Tiket (Kuota Tier) *
+                        </FormLabel>
+                        <span className="text-[10px] text-slate-400 font-normal">Internal EO</span>
+                      </div>
                       <FormControl>
                         <Input
                           type="number"
+                          min={1}
                           className="bg-slate-50 border-slate-200 text-slate-900 focus:border-[#08B4B5] focus:bg-white rounded-xl text-xs font-mono py-2"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
+                      <p className="text-[10px] text-slate-400">
+                        Jumlah kuota tiket untuk tier ini (tidak terlihat oleh pembeli).
+                      </p>
                       <FormMessage className="text-rose-500 text-[10px]" />
                     </FormItem>
                   )}

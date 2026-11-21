@@ -1,5 +1,6 @@
 export declare class UpdateEventDto {
     title?: string;
+    capacity?: number;
     description?: string;
     location?: string;
     isDateTba?: boolean;

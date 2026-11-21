@@ -14,6 +14,7 @@ export declare class OrganizerEventsController {
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
+        capacity: number | null;
         location: string;
         isDateTba: boolean;
         startDate: Date;
@@ -40,6 +41,7 @@ export declare class OrganizerEventsController {
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
+        capacity: number | null;
         location: string;
         isDateTba: boolean;
         startDate: Date;
@@ -66,6 +68,7 @@ export declare class OrganizerEventsController {
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
+        capacity: number | null;
         location: string;
         isDateTba: boolean;
         startDate: Date;
@@ -92,6 +95,7 @@ export declare class OrganizerEventsController {
         status: import("@prisma/client").$Enums.EventStatus;
         internetFee: number | null;
         organizerId: string;
+        capacity: number | null;
         location: string;
         isDateTba: boolean;
         startDate: Date;

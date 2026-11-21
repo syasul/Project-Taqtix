@@ -151,6 +151,12 @@ export default function EventOverviewWorkspacePage() {
                         {event.location}
                       </span>
                     )}
+                    {typeof event?.capacity === 'number' && event.capacity > 0 && (
+                      <span className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-teal-400" />
+                        <span>Kapasitas: {event.capacity.toLocaleString('id-ID')} Penonton</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

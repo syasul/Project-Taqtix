@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsDateString, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDateString,
+  IsBoolean,
+  IsNumber,
+  Min,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -8,6 +15,17 @@ export class UpdateEventDto {
   @IsString()
   @IsOptional()
   title?: string;
+
+  @ApiProperty({
+    example: 1000,
+    required: false,
+    description: 'Estimasi kapasitas / jumlah penonton keseluruhan acara',
+  })
+  @Transform(({ value }) => (value === '' || value === null || isNaN(Number(value)) ? undefined : Number(value)))
+  @IsNumber({}, { message: 'Kapasitas penonton harus berupa angka' })
+  @Min(0, { message: 'Kapasitas penonton minimal 0' })
+  @IsOptional()
+  capacity?: number;
 
   @ApiProperty({ example: 'Event dakwah islam modern', required: false })
   @Transform(({ value }) => (value === '' || value === null ? undefined : value))

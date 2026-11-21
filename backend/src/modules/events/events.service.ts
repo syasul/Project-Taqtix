@@ -75,6 +75,7 @@ export class EventsService {
       description: dto.description,
       bannerUrl: dto.bannerUrl?.trim() || '/default-banner.svg',
       location: dto.location,
+      capacity: dto.capacity ?? null,
       isDateTba,
       startDate,
       endDate,
@@ -130,6 +131,7 @@ export class EventsService {
     if (dto.bannerUrl !== undefined)
       updateData.bannerUrl = dto.bannerUrl?.trim() || '/default-banner.svg';
     if (dto.location !== undefined) updateData.location = dto.location;
+    if (dto.capacity !== undefined) updateData.capacity = dto.capacity;
     if (dto.isDateTba !== undefined) updateData.isDateTba = dto.isDateTba;
     if (dto.startDate !== undefined && dto.startDate)
       updateData.startDate = new Date(dto.startDate);

@@ -15,6 +15,7 @@ const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
 class UpdateEventDto {
     title;
+    capacity;
     description;
     location;
     isDateTba;
@@ -36,6 +37,18 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateEventDto.prototype, "title", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 1000,
+        required: false,
+        description: 'Estimasi kapasitas / jumlah penonton keseluruhan acara',
+    }),
+    (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null || isNaN(Number(value)) ? undefined : Number(value))),
+    (0, class_validator_1.IsNumber)({}, { message: 'Kapasitas penonton harus berupa angka' }),
+    (0, class_validator_1.Min)(0, { message: 'Kapasitas penonton minimal 0' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], UpdateEventDto.prototype, "capacity", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Event dakwah islam modern', required: false }),
     (0, class_transformer_1.Transform)(({ value }) => (value === '' || value === null ? undefined : value)),

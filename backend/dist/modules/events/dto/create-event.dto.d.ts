@@ -1,5 +1,6 @@
 export declare class CreateEventDto {
     title: string;
+    capacity?: number;
     description?: string;
     location: string;
     isDateTba?: boolean;

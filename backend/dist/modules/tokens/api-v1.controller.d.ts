@@ -35,6 +35,7 @@ export declare class ApiV1Controller {
             status: import("@prisma/client").$Enums.EventStatus;
             internetFee: number | null;
             organizerId: string;
+            capacity: number | null;
             location: string;
             isDateTba: boolean;
             startDate: Date;

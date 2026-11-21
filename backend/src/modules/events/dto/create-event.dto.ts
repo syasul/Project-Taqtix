@@ -4,6 +4,8 @@ import {
   IsOptional,
   IsDateString,
   IsBoolean,
+  IsNumber,
+  Min,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -16,6 +18,17 @@ export class CreateEventDto {
   @IsString()
   @IsNotEmpty({ message: 'Judul event tidak boleh kosong' })
   title!: string;
+
+  @ApiProperty({
+    example: 1000,
+    required: false,
+    description: 'Estimasi kapasitas / jumlah penonton keseluruhan acara',
+  })
+  @Transform(({ value }) => (value === '' || value === null || isNaN(Number(value)) ? undefined : Number(value)))
+  @IsNumber({}, { message: 'Kapasitas penonton harus berupa angka' })
+  @Min(0, { message: 'Kapasitas penonton minimal 0' })
+  @IsOptional()
+  capacity?: number;
 
   @ApiProperty({
     example: 'Stress test pertama untuk ticketing.',

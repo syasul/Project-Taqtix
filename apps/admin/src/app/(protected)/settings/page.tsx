@@ -25,6 +25,7 @@ import {
   Gift,
   Check,
   Zap,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -270,6 +271,7 @@ const FEATURE_LIST: FeatureConfig[] = [
 export default function AdminSettingsPage() {
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [activeInfoFeature, setActiveInfoFeature] = useState<FeatureConfig | null>(null);
 
   const { data: settingsData, isLoading } = useQuery<PlatformFeaturesResponse>({
     queryKey: ['admin-platform-settings'],
@@ -424,33 +426,67 @@ export default function AdminSettingsPage() {
             return (
               <div
                 key={feature.key}
-                className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs space-y-5 hover:border-slate-300 transition-all"
+                className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs hover:border-slate-300 transition-all"
               >
-                {/* Header Row: Icon, Title, Description, and Toggle */}
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-slate-100">
-                  <div className="space-y-1.5 flex-1">
-                    <div className="flex items-center gap-2.5">
-                      <span className="p-2.5 rounded-xl bg-teal-50 text-[#08B4B5] border border-teal-100 shrink-0">
-                        <Icon className="w-5 h-5" />
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            {feature.categoryLabel}
-                          </span>
-                        </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  {/* Left: Icon, Category, Title, Info Button, Description */}
+                  <div className="flex items-start gap-3.5 flex-1">
+                    <span className="p-2.5 rounded-xl bg-teal-50 text-[#08B4B5] border border-teal-100 shrink-0 mt-0.5">
+                      <Icon className="w-5 h-5" />
+                    </span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          {feature.categoryLabel}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${
+                            isEnabled
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-slate-100 text-slate-500 border border-slate-200'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isEnabled ? 'bg-emerald-500' : 'bg-slate-400'
+                            }`}
+                          />
+                          {isEnabled ? 'Aktif' : 'Nonaktif'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
                         <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
                           {feature.name}
                         </h2>
+                        <button
+                          type="button"
+                          onClick={() => setActiveInfoFeature(feature)}
+                          className="inline-flex items-center justify-center p-1 rounded-full text-slate-400 hover:text-[#08B4B5] hover:bg-teal-50 transition-colors"
+                          title="Klik untuk melihat penjelasan informasi fitur"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
                       </div>
+
+                      <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-2xl">
+                        {feature.description}
+                      </p>
                     </div>
-                    <p className="text-xs sm:text-sm text-slate-500 max-w-3xl leading-relaxed pt-1 pl-0 sm:pl-12">
-                      {feature.description}
-                    </p>
                   </div>
 
-                  {/* Toggle Switch */}
-                  <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
+                  {/* Right Actions: Info Button + Toggle Switch */}
+                  <div className="flex items-center gap-3 shrink-0 self-end sm:self-center pt-2 sm:pt-0">
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoFeature(feature)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-teal-50 hover:text-[#08B4B5] border border-slate-200 transition-colors shadow-2xs"
+                      title="Lihat informasi & aturan fitur"
+                    >
+                      <Info className="w-3.5 h-3.5 text-[#08B4B5]" />
+                      <span>Info</span>
+                    </button>
+
                     <button
                       type="button"
                       role="switch"
@@ -470,10 +506,53 @@ export default function AdminSettingsPage() {
                     </button>
                   </div>
                 </div>
+              </div>
+            );
+          })
+        )}
+      </div>
 
-                {/* Status Indicator Banner */}
+      {/* Interactive Feature Info Modal */}
+      {activeInfoFeature && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setActiveInfoFeature(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <span className="p-2.5 rounded-xl bg-teal-50 text-[#08B4B5] border border-teal-100 shrink-0">
+                  <activeInfoFeature.icon className="w-6 h-6" />
+                </span>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {activeInfoFeature.categoryLabel}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 leading-snug">
+                    {activeInfoFeature.name}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveInfoFeature(null)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                title="Tutup dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Current Feature Status Box */}
+            {(() => {
+              const isEnabled = getFeatureValue(activeInfoFeature);
+              return (
                 <div
-                  className={`p-4 rounded-xl border transition-all duration-200 flex items-start gap-3.5 ${
+                  className={`p-4 rounded-xl border flex items-start gap-3.5 ${
                     isEnabled
                       ? 'bg-emerald-50/70 border-emerald-200/90 text-emerald-950'
                       : 'bg-amber-50/80 border-amber-200/90 text-amber-950'
@@ -487,70 +566,66 @@ export default function AdminSettingsPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-xs sm:text-sm">
-                        Status Fitur:{' '}
-                        {isEnabled ? feature.activeLabel : feature.inactiveLabel}
+                        Status Fitur: {isEnabled ? activeInfoFeature.activeLabel : activeInfoFeature.inactiveLabel}
                       </span>
                       <span
                         className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                          isEnabled
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-amber-600 text-white'
+                          isEnabled ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'
                         }`}
                       >
                         {isEnabled ? 'ENABLED' : 'DISABLED'}
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">
-                      {isEnabled ? feature.activeDesc : feature.inactiveDesc}
+                      {isEnabled ? activeInfoFeature.activeDesc : activeInfoFeature.inactiveDesc}
                     </p>
                   </div>
                 </div>
+              );
+            })()}
 
-                {/* Side-by-side Comparison Info Boxes */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                  {/* Di-ON-kan Box */}
-                  <div
-                    className={`p-4 rounded-xl border text-xs space-y-2 ${
-                      isEnabled
-                        ? 'border-emerald-200 bg-emerald-50/30'
-                        : 'border-slate-200 bg-slate-50/50 opacity-75'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Ketika Fitur Di-ON-kan (Default / Fleksibel):</span>
-                    </div>
-                    <ul className="space-y-1.5 text-slate-600 pl-5 list-disc marker:text-emerald-500">
-                      {feature.onBenefits.map((benefit, i) => (
-                        <li key={i}>{benefit}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Di-OFF-kan Box */}
-                  <div
-                    className={`p-4 rounded-xl border text-xs space-y-2 ${
-                      !isEnabled
-                        ? 'border-amber-200 bg-amber-50/40'
-                        : 'border-slate-200 bg-slate-50/50 opacity-75'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
-                      <span>Ketika Fitur Di-OFF-kan (Strict Mode):</span>
-                    </div>
-                    <ul className="space-y-1.5 text-slate-600 pl-5 list-disc marker:text-amber-500">
-                      {feature.offBenefits.map((benefit, i) => (
-                        <li key={i}>{benefit}</li>
-                      ))}
-                    </ul>
-                  </div>
+            {/* Side-by-side Comparison Info Boxes */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Di-ON-kan Box */}
+              <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 text-xs space-y-2">
+                <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Ketika Fitur Di-ON-kan (Default / Fleksibel):</span>
                 </div>
+                <ul className="space-y-1.5 text-slate-600 pl-5 list-disc marker:text-emerald-500">
+                  {activeInfoFeature.onBenefits.map((benefit, i) => (
+                    <li key={i}>{benefit}</li>
+                  ))}
+                </ul>
               </div>
-            );
-          })
-        )}
-      </div>
+
+              {/* Di-OFF-kan Box */}
+              <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/40 text-xs space-y-2">
+                <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+                  <span>Ketika Fitur Di-OFF-kan (Strict Mode):</span>
+                </div>
+                <ul className="space-y-1.5 text-slate-600 pl-5 list-disc marker:text-amber-500">
+                  {activeInfoFeature.offBenefits.map((benefit, i) => (
+                    <li key={i}>{benefit}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setActiveInfoFeature(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Security & Audit Notice Box */}
       <div className="p-5 bg-white border border-slate-200 rounded-2xl flex items-start gap-3.5 shadow-xs">

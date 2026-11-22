@@ -559,6 +559,24 @@ let mockAuditLogs = [
 ];
 
 let mockGuestCheckoutEnabled = true;
+let mockPlatformFeatures: Record<string, boolean> = {
+  ALLOW_GUEST_CHECKOUT: true,
+  ALLOW_SEATING_LAYOUT: true,
+  ALLOW_AFFILIATES_PROGRAM: true,
+  ALLOW_TICKET_TRANSFER: true,
+  ALLOW_EO_FEED: true,
+  ALLOW_POS_CASH: true,
+  ALLOW_CUSTOM_FIELDS: true,
+  ALLOW_DOORPRIZE: true,
+  allowGuestCheckoutFeature: true,
+  allowSeatingLayoutFeature: true,
+  allowAffiliatesProgramFeature: true,
+  allowTicketTransferFeature: true,
+  allowEoFeedFeature: true,
+  allowPosCashFeature: true,
+  allowCustomFieldsFeature: true,
+  allowDoorprizeFeature: true,
+};
 
 function handleMockRequest(method: string, path: string, body?: any): ApiResponse {
   const url = path.split('?')[0]; // strip query parameters
@@ -1130,22 +1148,69 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
     return { success: true, data: mockAuditLogs };
   }
 
-  // SYSTEM SETTINGS & GUEST CHECKOUT
-  if (url === '/admin/settings/guest-checkout' || url === '/admin/settings' || url === '/system/features') {
+  // SYSTEM SETTINGS & FEATURE FLAGS
+  if (
+    url === '/admin/settings/guest-checkout' ||
+    url === '/admin/settings' ||
+    url === '/system/features' ||
+    url === '/admin/settings/toggle'
+  ) {
     if (method === 'GET') {
       return {
         success: true,
         data: {
           enabled: mockGuestCheckoutEnabled,
-          allowGuestCheckoutFeature: mockGuestCheckoutEnabled,
+          ...mockPlatformFeatures,
         },
       };
     }
     if (method === 'PATCH' || method === 'POST') {
+      if (body?.key) {
+        const key = body.key;
+        const val = Boolean(body.enabled);
+        mockPlatformFeatures[key] = val;
+        // Also map camelCase
+        const camelMap: Record<string, string> = {
+          ALLOW_GUEST_CHECKOUT: 'allowGuestCheckoutFeature',
+          ALLOW_SEATING_LAYOUT: 'allowSeatingLayoutFeature',
+          ALLOW_AFFILIATES_PROGRAM: 'allowAffiliatesProgramFeature',
+          ALLOW_TICKET_TRANSFER: 'allowTicketTransferFeature',
+          ALLOW_EO_FEED: 'allowEoFeedFeature',
+          ALLOW_POS_CASH: 'allowPosCashFeature',
+          ALLOW_CUSTOM_FIELDS: 'allowCustomFieldsFeature',
+          ALLOW_DOORPRIZE: 'allowDoorprizeFeature',
+        };
+        if (camelMap[key]) {
+          mockPlatformFeatures[camelMap[key]] = val;
+        }
+        if (key === 'ALLOW_GUEST_CHECKOUT') {
+          mockGuestCheckoutEnabled = val;
+        }
+        mockAuditLogs.unshift({
+          id: `log-${Date.now()}`,
+          adminEmail: 'admin@taqtix.id',
+          action: 'UPDATE_PLATFORM_FEATURE',
+          target: `Feature Flag ${key}: ${val ? 'AKTIF' : 'NONAKTIF'}`,
+          timestamp: new Date().toISOString(),
+        });
+        return {
+          success: true,
+          data: {
+            key,
+            enabled: val,
+            ...mockPlatformFeatures,
+          },
+        };
+      }
+
       if (body?.enabled !== undefined) {
         mockGuestCheckoutEnabled = Boolean(body.enabled);
+        mockPlatformFeatures.ALLOW_GUEST_CHECKOUT = mockGuestCheckoutEnabled;
+        mockPlatformFeatures.allowGuestCheckoutFeature = mockGuestCheckoutEnabled;
       } else if (body?.allowGuestCheckoutFeature !== undefined) {
         mockGuestCheckoutEnabled = Boolean(body.allowGuestCheckoutFeature);
+        mockPlatformFeatures.ALLOW_GUEST_CHECKOUT = mockGuestCheckoutEnabled;
+        mockPlatformFeatures.allowGuestCheckoutFeature = mockGuestCheckoutEnabled;
       }
       mockAuditLogs.unshift({
         id: `log-${Date.now()}`,
@@ -1158,7 +1223,7 @@ function handleMockRequest(method: string, path: string, body?: any): ApiRespons
         success: true,
         data: {
           enabled: mockGuestCheckoutEnabled,
-          allowGuestCheckoutFeature: mockGuestCheckoutEnabled,
+          ...mockPlatformFeatures,
         },
       };
     }

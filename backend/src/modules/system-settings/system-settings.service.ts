@@ -64,26 +64,80 @@ export class SystemSettingsService {
   }
 
   /**
+   * Mengambil status seluruh feature flags platform secara terpusat
+   */
+  async getAllPlatformFeatures() {
+    const [
+      allowGuestCheckoutFeature,
+      allowSeatingLayoutFeature,
+      allowAffiliatesProgramFeature,
+      allowTicketTransferFeature,
+      allowEoFeedFeature,
+      allowPosCashFeature,
+      allowCustomFieldsFeature,
+      allowDoorprizeFeature,
+    ] = await Promise.all([
+      this.isFeatureEnabled('ALLOW_GUEST_CHECKOUT', true),
+      this.isFeatureEnabled('ALLOW_SEATING_LAYOUT', true),
+      this.isFeatureEnabled('ALLOW_AFFILIATES_PROGRAM', true),
+      this.isFeatureEnabled('ALLOW_TICKET_TRANSFER', true),
+      this.isFeatureEnabled('ALLOW_EO_FEED', true),
+      this.isFeatureEnabled('ALLOW_POS_CASH', true),
+      this.isFeatureEnabled('ALLOW_CUSTOM_FIELDS', true),
+      this.isFeatureEnabled('ALLOW_DOORPRIZE', true),
+    ]);
+
+    return {
+      allowGuestCheckoutFeature,
+      allowSeatingLayoutFeature,
+      allowAffiliatesProgramFeature,
+      allowTicketTransferFeature,
+      allowEoFeedFeature,
+      allowPosCashFeature,
+      allowCustomFieldsFeature,
+      allowDoorprizeFeature,
+    };
+  }
+
+  async isFeatureEnabled(key: string, defaultValue = true): Promise<boolean> {
+    const val = await this.getSetting(key, defaultValue ? 'true' : 'false');
+    return val === 'true';
+  }
+
+  async setFeatureEnabled(
+    key: string,
+    enabled: boolean,
+    description?: string,
+    adminId?: string,
+  ): Promise<boolean> {
+    await this.setSetting(
+      key,
+      enabled ? 'true' : 'false',
+      description || `Kontrol global fitur platform: ${key}`,
+      adminId,
+    );
+    return enabled;
+  }
+
+  /**
    * Status fitur Guest Checkout (Pembelian tiket tanpa login) untuk EO.
    * Default: true (ON).
    * - Jika ON: EO dapat mengatur per event apakah butuh login atau tidak.
    * - Jika OFF: Fitur ini tidak ada di dashboard EO dan semua pembelian tiket wajib login.
    */
   async isGuestCheckoutFeatureEnabled(): Promise<boolean> {
-    const val = await this.getSetting('ALLOW_GUEST_CHECKOUT', 'true');
-    return val === 'true';
+    return this.isFeatureEnabled('ALLOW_GUEST_CHECKOUT', true);
   }
 
   async setGuestCheckoutFeatureEnabled(
     enabled: boolean,
     adminId?: string,
   ): Promise<boolean> {
-    await this.setSetting(
+    return this.setFeatureEnabled(
       'ALLOW_GUEST_CHECKOUT',
-      enabled ? 'true' : 'false',
+      enabled,
       'Kontrol global fitur pembelian tiket tanpa login (Guest Checkout) untuk EO',
       adminId,
     );
-    return enabled;
   }
 }

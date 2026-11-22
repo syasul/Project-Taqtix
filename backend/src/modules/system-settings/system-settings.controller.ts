@@ -18,18 +18,15 @@ export class SystemSettingsController {
   @Get('system/features')
   @ApiOperation({ summary: 'Mendapatkan status feature flags sistem platform' })
   async getSystemFeatures() {
-    const allowGuestCheckoutFeature =
-      await this.systemSettingsService.isGuestCheckoutFeatureEnabled();
+    const data = await this.systemSettingsService.getAllPlatformFeatures();
     return {
       success: true,
-      data: {
-        allowGuestCheckoutFeature,
-      },
+      data,
     };
   }
 
   /**
-   * Endpoint Admin untuk mendapatkan status pengaturan sistem
+   * Endpoint Admin untuk mendapatkan status seluruh pengaturan sistem
    */
   @Get('admin/settings')
   @Roles('admin')
@@ -38,12 +35,38 @@ export class SystemSettingsController {
     summary: 'Mendapatkan seluruh pengaturan sistem platform (Admin Only)',
   })
   async getAdminSettings() {
-    const allowGuestCheckoutFeature =
-      await this.systemSettingsService.isGuestCheckoutFeatureEnabled();
+    const data = await this.systemSettingsService.getAllPlatformFeatures();
+    return {
+      success: true,
+      data,
+    };
+  }
+
+  /**
+   * Endpoint Admin untuk mengubah status toggle fitur apapun
+   */
+  @Patch('admin/settings/toggle')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Mengubah status toggle fitur platform (Admin Only)',
+  })
+  async toggleFeature(
+    @Body('key') key: string,
+    @Body('enabled') enabled: boolean,
+    @CurrentUser('id') adminId: string,
+  ) {
+    const result = await this.systemSettingsService.setFeatureEnabled(
+      key,
+      Boolean(enabled),
+      undefined,
+      adminId,
+    );
     return {
       success: true,
       data: {
-        allowGuestCheckoutFeature,
+        key,
+        enabled: result,
       },
     };
   }

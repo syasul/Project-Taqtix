@@ -25,20 +25,26 @@ let SystemSettingsController = class SystemSettingsController {
         this.systemSettingsService = systemSettingsService;
     }
     async getSystemFeatures() {
-        const allowGuestCheckoutFeature = await this.systemSettingsService.isGuestCheckoutFeatureEnabled();
+        const data = await this.systemSettingsService.getAllPlatformFeatures();
         return {
             success: true,
-            data: {
-                allowGuestCheckoutFeature,
-            },
+            data,
         };
     }
     async getAdminSettings() {
-        const allowGuestCheckoutFeature = await this.systemSettingsService.isGuestCheckoutFeatureEnabled();
+        const data = await this.systemSettingsService.getAllPlatformFeatures();
+        return {
+            success: true,
+            data,
+        };
+    }
+    async toggleFeature(key, enabled, adminId) {
+        const result = await this.systemSettingsService.setFeatureEnabled(key, Boolean(enabled), undefined, adminId);
         return {
             success: true,
             data: {
-                allowGuestCheckoutFeature,
+                key,
+                enabled: result,
             },
         };
     }
@@ -81,6 +87,20 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], SystemSettingsController.prototype, "getAdminSettings", null);
+__decorate([
+    (0, common_1.Patch)('admin/settings/toggle'),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mengubah status toggle fitur platform (Admin Only)',
+    }),
+    __param(0, (0, common_1.Body)('key')),
+    __param(1, (0, common_1.Body)('enabled')),
+    __param(2, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Boolean, String]),
+    __metadata("design:returntype", Promise)
+], SystemSettingsController.prototype, "toggleFeature", null);
 __decorate([
     (0, common_1.Get)('admin/settings/guest-checkout'),
     (0, roles_decorator_1.Roles)('admin'),

@@ -67,13 +67,41 @@ let SystemSettingsService = SystemSettingsService_1 = class SystemSettingsServic
             return value;
         }
     }
-    async isGuestCheckoutFeatureEnabled() {
-        const val = await this.getSetting('ALLOW_GUEST_CHECKOUT', 'true');
+    async getAllPlatformFeatures() {
+        const [allowGuestCheckoutFeature, allowSeatingLayoutFeature, allowAffiliatesProgramFeature, allowTicketTransferFeature, allowEoFeedFeature, allowPosCashFeature, allowCustomFieldsFeature, allowDoorprizeFeature,] = await Promise.all([
+            this.isFeatureEnabled('ALLOW_GUEST_CHECKOUT', true),
+            this.isFeatureEnabled('ALLOW_SEATING_LAYOUT', true),
+            this.isFeatureEnabled('ALLOW_AFFILIATES_PROGRAM', true),
+            this.isFeatureEnabled('ALLOW_TICKET_TRANSFER', true),
+            this.isFeatureEnabled('ALLOW_EO_FEED', true),
+            this.isFeatureEnabled('ALLOW_POS_CASH', true),
+            this.isFeatureEnabled('ALLOW_CUSTOM_FIELDS', true),
+            this.isFeatureEnabled('ALLOW_DOORPRIZE', true),
+        ]);
+        return {
+            allowGuestCheckoutFeature,
+            allowSeatingLayoutFeature,
+            allowAffiliatesProgramFeature,
+            allowTicketTransferFeature,
+            allowEoFeedFeature,
+            allowPosCashFeature,
+            allowCustomFieldsFeature,
+            allowDoorprizeFeature,
+        };
+    }
+    async isFeatureEnabled(key, defaultValue = true) {
+        const val = await this.getSetting(key, defaultValue ? 'true' : 'false');
         return val === 'true';
     }
-    async setGuestCheckoutFeatureEnabled(enabled, adminId) {
-        await this.setSetting('ALLOW_GUEST_CHECKOUT', enabled ? 'true' : 'false', 'Kontrol global fitur pembelian tiket tanpa login (Guest Checkout) untuk EO', adminId);
+    async setFeatureEnabled(key, enabled, description, adminId) {
+        await this.setSetting(key, enabled ? 'true' : 'false', description || `Kontrol global fitur platform: ${key}`, adminId);
         return enabled;
+    }
+    async isGuestCheckoutFeatureEnabled() {
+        return this.isFeatureEnabled('ALLOW_GUEST_CHECKOUT', true);
+    }
+    async setGuestCheckoutFeatureEnabled(enabled, adminId) {
+        return this.setFeatureEnabled('ALLOW_GUEST_CHECKOUT', enabled, 'Kontrol global fitur pembelian tiket tanpa login (Guest Checkout) untuk EO', adminId);
     }
 };
 exports.SystemSettingsService = SystemSettingsService;

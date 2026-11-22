@@ -111,6 +111,25 @@ export default function OrganizerPublicPage() {
     enabled: !!slug && !!followerEmail,
   });
 
+  // Check Platform Feature Flags
+  const { data: featureSettings } = useQuery({
+    queryKey: ['system-features'],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get('/system/features');
+        return res.data?.data;
+      } catch {
+        return {
+          allowEoFeedFeature: true,
+          allowAffiliatesProgramFeature: true,
+        };
+      }
+    },
+  });
+
+  const allowEoFeedFeature = featureSettings?.allowEoFeedFeature ?? true;
+  const allowAffiliatesProgramFeature = featureSettings?.allowAffiliatesProgramFeature ?? true;
+
   // Toggle Follow Mutation
   const followMutation = useMutation({
     mutationFn: async (payload: { email: string; name?: string }) => {
@@ -409,25 +428,37 @@ export default function OrganizerPublicPage() {
       {/* MAIN TABS: ACARA, KABAR & POST, AFILIASI */}
       {/* ============================================================ */}
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="w-full max-w-md grid grid-cols-3 p-1 bg-slate-100 rounded-2xl h-12">
+        <TabsList
+          className={`w-full max-w-md grid p-1 bg-slate-100 rounded-2xl h-12 ${
+            allowEoFeedFeature && allowAffiliatesProgramFeature
+              ? 'grid-cols-3'
+              : allowEoFeedFeature || allowAffiliatesProgramFeature
+              ? 'grid-cols-2'
+              : 'grid-cols-1'
+          }`}
+        >
           <TabsTrigger
             value="events"
             className="rounded-xl font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
           >
             Acara ({upcomingEvents.length + pastEvents.length})
           </TabsTrigger>
-          <TabsTrigger
-            value="feed"
-            className="rounded-xl font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
-          >
-            Kabar & Feed ({posts.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="affiliate"
-            className="rounded-xl font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
-          >
-            Afiliasi & Promoter
-          </TabsTrigger>
+          {allowEoFeedFeature && (
+            <TabsTrigger
+              value="feed"
+              className="rounded-xl font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
+            >
+              Kabar & Feed ({posts.length})
+            </TabsTrigger>
+          )}
+          {allowAffiliatesProgramFeature && (
+            <TabsTrigger
+              value="affiliate"
+              className="rounded-xl font-semibold data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
+            >
+              Afiliasi & Promoter
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* ------------------------------------------------------------ */}
@@ -561,7 +592,8 @@ export default function OrganizerPublicPage() {
         {/* ------------------------------------------------------------ */}
         {/* TAB 2: KABAR & FEED (UPDATES) */}
         {/* ------------------------------------------------------------ */}
-        <TabsContent value="feed" className="mt-8 space-y-6">
+        {allowEoFeedFeature && (
+          <TabsContent value="feed" className="mt-8 space-y-6">
           {posts.length === 0 ? (
             <Card className="border border-dashed border-slate-200 bg-slate-50/50 p-12 text-center rounded-2xl">
               <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
@@ -628,11 +660,13 @@ export default function OrganizerPublicPage() {
             </div>
           )}
         </TabsContent>
+        )}
 
         {/* ------------------------------------------------------------ */}
         {/* TAB 3: AFILIASI & PROMOTER HUB */}
         {/* ------------------------------------------------------------ */}
-        <TabsContent value="affiliate" className="mt-8 space-y-6">
+        {allowAffiliatesProgramFeature && (
+          <TabsContent value="affiliate" className="mt-8 space-y-6">
           <Card className="rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white">
             <div className="p-8 sm:p-12 space-y-6 max-w-3xl">
               <Badge className="bg-[#08ADAE] text-white hover:bg-[#08ADAE] px-3 py-1 font-semibold">
@@ -683,6 +717,7 @@ export default function OrganizerPublicPage() {
             </div>
           </Card>
         </TabsContent>
+        )}
       </Tabs>
 
       {/* ============================================================ */}

@@ -86,11 +86,7 @@ export default function RegisterPage() {
             priority
           />
         </div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#08B4B5]/30 bg-[#08B4B5]/10 text-[10px] font-mono tracking-wider text-[#08B4B5] font-bold uppercase mb-2 shadow-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#08B4B5]" />
-          Registrasi Partner & Organizer
-        </div>
-        <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="text-xl font-extrabold tracking-tight text-slate-900 mt-2">
           Daftar Akun Baru
         </h1>
         <p className="text-xs text-slate-500 mt-1 font-medium">

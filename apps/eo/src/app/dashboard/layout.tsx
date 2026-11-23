@@ -145,23 +145,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="h-6 w-auto object-contain"
                 priority
               />
-              <span className="text-[9px] text-[#08B4B5] font-mono tracking-wider font-bold uppercase bg-[#08B4B5]/10 px-1.5 py-0.5 rounded border border-[#08B4B5]/20">
-                Organizer
+              <span className="text-xs font-semibold text-slate-500">
+                Partner
               </span>
             </div>
 
-            {/* Desktop Context Badge */}
-            <div className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] font-mono font-bold bg-teal-50 border border-teal-200 text-teal-800 tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>ORGANIZER WORKSPACE (partner.taqtix.id)</span>
+            {/* Desktop Environment Context */}
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="font-mono text-slate-700 font-semibold">partner.taqtix.id</span>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-500 font-normal">Organizer Workspace</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 uppercase">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Online</span>
-            </div>
 
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
               <span className="hidden lg:inline text-slate-400 font-mono text-[11px]">

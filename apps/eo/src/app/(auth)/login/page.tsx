@@ -95,15 +95,11 @@ function LoginForm() {
             priority
           />
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-teal-300 bg-teal-50 text-[11px] font-mono tracking-wider text-teal-800 font-extrabold uppercase mb-2 shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          PORTAL EVENT ORGANIZER (EO)
-        </div>
-        <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="text-xl font-extrabold tracking-tight text-slate-900 mt-2">
           Masuk Akun Penyelenggara Event
         </h1>
         <p className="text-xs text-slate-500 mt-1 font-medium">
-          Workspace Resmi EO TAQtix (partner.taqtix.id)
+          Portal Partner & Organizer TAQtix (partner.taqtix.id)
         </p>
       </div>
 

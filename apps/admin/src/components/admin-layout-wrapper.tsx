@@ -40,30 +40,28 @@ export default function AdminLayoutWrapper({
     <>
       <div>
         {/* Logo / Branding */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between relative bg-white">
-          <div className="w-full flex flex-col items-center justify-center text-center gap-1.5">
-            <Link
-              href="/"
-              onClick={isMobile ? () => setIsSidebarOpen(false) : undefined}
-              className="inline-flex justify-center items-center"
-            >
-              <Image
-                src="/logo.png"
-                alt="TAQtix Logo"
-                width={120}
-                height={34}
-                className="h-7 w-auto object-contain mx-auto"
-                priority
-              />
-            </Link>
-            <span className="text-[10px] text-rose-700 font-mono tracking-wider font-extrabold uppercase bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full shadow-2xs">
-              🔴 MAIN ADMIN (SUPERADMIN)
+        <div className="p-5 border-b border-slate-100 flex items-center justify-between relative bg-white">
+          <Link
+            href="/"
+            onClick={isMobile ? () => setIsSidebarOpen(false) : undefined}
+            className="inline-flex items-center gap-2.5 px-2"
+          >
+            <Image
+              src="/logo.png"
+              alt="TAQtix Logo"
+              width={110}
+              height={30}
+              className="h-6 w-auto object-contain"
+              priority
+            />
+            <span className="text-[11px] font-semibold text-slate-400 border-l border-slate-200 pl-2.5">
+              Admin
             </span>
-          </div>
+          </Link>
           {isMobile && (
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer md:hidden absolute right-4 top-6"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer md:hidden"
             >
               <X className="w-5 h-5" />
             </button>
@@ -144,20 +142,24 @@ export default function AdminLayoutWrapper({
                 className="h-6 w-auto object-contain"
                 priority
               />
-              <span className="text-[9px] text-rose-700 font-mono tracking-wider font-extrabold uppercase bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
-                🔴 Superadmin
+              <span className="text-xs font-semibold text-slate-500">
+                Admin
               </span>
             </Link>
 
-            <div className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] font-mono font-bold bg-rose-50 border border-rose-200 text-rose-700 uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <span>MAIN ADMIN CONSOLE (core.taqtix.id)</span>
+            {/* Desktop Environment Context */}
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="font-mono text-slate-700 font-semibold">core.taqtix.id</span>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-500 font-normal">Superadmin Console</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-slate-900 text-white uppercase tracking-wider border border-slate-700">
-              Superadmin Mode
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200/70">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#08B4B5]" />
+              <span>Superadmin</span>
             </div>
           </div>
         </header>

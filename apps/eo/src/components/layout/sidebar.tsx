@@ -301,30 +301,28 @@ export default function Sidebar({ className, onItemClick }: SidebarProps) {
     >
       <div className="flex flex-col flex-1 min-h-0">
         {/* 1. Logo & Portal Title (Centered, consistent with Admin & Affiliates) */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between relative shrink-0">
-          <div className="w-full flex flex-col items-center justify-center text-center gap-1">
-            <Link
-              href="/dashboard"
-              onClick={onItemClick}
-              className="inline-flex justify-center items-center"
-            >
-              <Image
-                src="/logo.png"
-                alt="TAQtix Logo"
-                width={120}
-                height={34}
-                className="h-7 w-auto object-contain mx-auto"
-                priority
-              />
-            </Link>
-            <span className="text-[10px] text-teal-800 font-mono tracking-wider font-extrabold uppercase bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
-              🟢 EVENT ORGANIZER (EO)
+        <div className="p-5 border-b border-slate-100 flex items-center justify-between relative shrink-0 bg-white">
+          <Link
+            href="/dashboard"
+            onClick={onItemClick}
+            className="inline-flex items-center gap-2.5 px-2"
+          >
+            <Image
+              src="/logo.png"
+              alt="TAQtix Logo"
+              width={110}
+              height={30}
+              className="h-6 w-auto object-contain"
+              priority
+            />
+            <span className="text-[11px] font-semibold text-slate-400 border-l border-slate-200 pl-2.5">
+              Partner
             </span>
-          </div>
+          </Link>
           {onItemClick && (
             <button
               onClick={onItemClick}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer md:hidden absolute right-4 top-6"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer md:hidden"
               aria-label="Tutup Menu"
             >
               <X className="w-5 h-5" />

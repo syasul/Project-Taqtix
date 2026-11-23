@@ -96,13 +96,14 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-rose-300 bg-rose-50 text-[11px] font-mono tracking-wider text-rose-700 font-extrabold uppercase mb-2 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            MAIN ADMIN CONSOLE (SUPERADMIN)
+          <div className="space-y-1 mb-2">
+            <h2 className="text-sm font-bold text-slate-800 tracking-tight">
+              Main Administration Console
+            </h2>
+            <p className="text-xs text-slate-500 font-medium max-w-xs mx-auto">
+              Portal Administrator Pusat TAQtix (core.taqtix.id)
+            </p>
           </div>
-          <p className="text-xs text-slate-500 font-semibold max-w-xs mx-auto">
-            Portal Khusus Administrator Pusat TAQtix (core.taqtix.id)
-          </p>
         </div>
 
         {error && (
